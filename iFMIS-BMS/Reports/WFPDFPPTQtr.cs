@@ -65,16 +65,19 @@ namespace iFMIS_BMS.Reports
                 string _sqlQuery2 = "exec ifmis.dbo.sp_BMS_WFPDFPPT_Preparer_v2 " + OfficeID + ","+ yearof + ",''";
                 _dt2 = OleDbHelper.ExecuteDataset(ConfigurationManager.ConnectionStrings["pmisqldb"].ToString(), CommandType.Text, _sqlQuery2).Tables[0];
 
-            //textBox67.Value = _dt2.Rows[0][7].ToString();
-                if (OfficeID == 1)
+                //textBox67.Value = _dt2.Rows[0][7].ToString();
+                if (_dt2.Rows.Count != 0)
                 {
-                    textBox66.Value = "";
+                    if (OfficeID == 1)
+                    {
+                        textBox66.Value = "";
+                    }
+                    else
+                    {
+                        textBox66.Value = _dt2.Rows[0][5].ToString();
+                    }
+                    textBox71.Value = _dt2.Rows[0][9].ToString();
                 }
-                else
-                {
-                    textBox66.Value = _dt2.Rows[0][5].ToString();
-                }
-                textBox71.Value = _dt2.Rows[0][9].ToString(); 
                 //textBox64.Value = empname;
 
                 DataTable _dt3 = new DataTable();

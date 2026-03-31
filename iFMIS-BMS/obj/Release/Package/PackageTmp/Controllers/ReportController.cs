@@ -4425,8 +4425,8 @@ namespace iFMIS_BMS.Controllers
                             //string networkPath2 = @"\\192.168.2.210\pgas_attachment\bms\WFP\" + fileName + "";
 
                             //temporary save to local computer
-                            string nas = @"r:\Web Application\iFMIS-BMS_publish";
-                            string networkPath2 = @"r:\Web Application\iFMIS-BMS_publish\" + fileName + "";
+                            string nas = @"d:\Web Application\iFMIS-BMS_publish";
+                            string networkPath2 = @"d:\Web Application\iFMIS-BMS_publish\" + fileName + "";
                             //temporary save to local computer
                             try
                             {
@@ -4472,7 +4472,7 @@ namespace iFMIS_BMS.Controllers
                                 }
 
                                 //PDF to binary file - START
-                                filePathbin = @"r:\Web Application\iFMIS-BMS_publish\" + fileName + "";
+                                filePathbin = @"d:\Web Application\iFMIS-BMS_publish\" + fileName + "";
                                 fileData = System.IO.File.ReadAllBytes(filePathbin); // Convert PDF to binary
 
                                 //using (SqlConnection conn = new SqlConnection(Common.MyConn()))
@@ -5384,7 +5384,7 @@ namespace iFMIS_BMS.Controllers
                     //{
 
                     //string networkPath2 = @"\\192.168.2.210\pgas_attachment\bms\Report\" + fileName + "";
-                    string networkPath2 = @"r:\Web Application\iFMIS-BMS_publish\" + fileName + "";
+                    string networkPath2 = @"d:\Web Application\iFMIS-BMS_publish\" + fileName + "";
                     if (System.IO.File.Exists(networkPath2))
                     {
                         System.IO.File.Delete(networkPath2);
@@ -5405,7 +5405,7 @@ namespace iFMIS_BMS.Controllers
                         }
                     }
                     //PDF to binary file - START
-                    filePathbin = @"r:\Web Application\iFMIS-BMS_publish\" + fileName + "";
+                    filePathbin = @"d:\Web Application\iFMIS-BMS_publish\" + fileName + "";
                     fileData = System.IO.File.ReadAllBytes(filePathbin); // Convert PDF to binary
                                                                          //using (SqlConnection conn = new SqlConnection(Common.MyConn()))
                                                                          //using (SqlCommand cmd = new SqlCommand("insert into [ifmis].[dbo].[tbl_T_BMSWFP_PDFtoBinary] ([filename],[filedata],[actioncode],[tyear]) VALUES (@FileName, @FileData,@actioncode,@tyear)", conn))
@@ -6213,9 +6213,9 @@ namespace iFMIS_BMS.Controllers
         //    private HttpClient httpClient = new HttpClient();
 
         //public string networkPath = @"\\192.168.2.210\pgas_attachment\bms\WFP";
-        public string networkPath = @"r:\Web Application\iFMIS-BMS_publish";
+        public string networkPath = @"d:\Web Application\iFMIS-BMS_publish";
         //public string networkPath_report = @"\\192.168.2.210\pgas_attachment\bms\Report";
-        public string networkPath_report = @"r:\Web Application\iFMIS-BMS_publish";
+        public string networkPath_report = @"d:\Web Application\iFMIS-BMS_publish";
         private Task<string> SmsHelper;
 
         //private static readonly System.Threading.Tasks.Task client;
@@ -7519,9 +7519,9 @@ namespace iFMIS_BMS.Controllers
                         //{
                         //string networkPath2 = @"\\192.168.2.210\pgas_attachment\digital_signature\Form" + FormID + "";
                         //string nas = @"\\192.168.2.210\pgas_attachment\bms\WFP";
-                        string nas = @"r:\Web Application\iFMIS-BMS_publish";
+                        string nas = @"d:\Web Application\iFMIS-BMS_publish";
                         //string networkPath2 = @"\\192.168.2.210\pgas_attachment\bms\WFP\" + fileName + "";
-                        string networkPath2 = @"r:\Web Application\iFMIS-BMS_publish\" + fileName + "";
+                        string networkPath2 = @"d:\Web Application\iFMIS-BMS_publish\" + fileName + "";
                         try
                         {
                             //if (Directory.Exists(nas))
@@ -7553,7 +7553,7 @@ namespace iFMIS_BMS.Controllers
                                 regenerate = 0;
                             }
                             //PDF to binary file - START
-                            filePathbin = @"r:\Web Application\iFMIS-BMS_publish\" + fileName + "";
+                            filePathbin = @"d:\Web Application\iFMIS-BMS_publish\" + fileName + "";
                             fileData = System.IO.File.ReadAllBytes(filePathbin); // Convert PDF to binary
                                                                                  //using (SqlConnection conn = new SqlConnection(Common.MyConn()))
                                                                                  //using (SqlCommand cmd = new SqlCommand("insert into [ifmis].[dbo].[tbl_T_BMSWFP_PDFtoBinary] ([filename],[filedata],[actioncode],[tyear]) VALUES (@FileName, @FileData,@actioncode,@tyear)", conn))

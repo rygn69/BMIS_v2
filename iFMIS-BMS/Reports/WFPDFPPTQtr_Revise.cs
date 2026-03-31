@@ -62,7 +62,7 @@ namespace iFMIS_BMS.Reports
                 ////txt_account.Value = _dt.Rows[0]["AccountName"].ToString();
 
                 DataTable _dt2 = new DataTable();
-                string _sqlQuery2 = "exec ifmis.dbo.sp_BMS_WFPDFPPT_Preparer " + OfficeID + ","+ yearof + "";
+                string _sqlQuery2 = "exec ifmis.dbo.sp_BMS_WFPDFPPT_Preparer_v2 " + OfficeID + ","+ yearof + ",''";
                 _dt2 = OleDbHelper.ExecuteDataset(ConfigurationManager.ConnectionStrings["pmisqldb"].ToString(), CommandType.Text, _sqlQuery2).Tables[0];
 
             //textBox67.Value = _dt2.Rows[0][7].ToString();
