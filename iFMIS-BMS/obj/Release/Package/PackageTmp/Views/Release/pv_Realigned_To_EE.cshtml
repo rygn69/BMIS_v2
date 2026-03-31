@@ -1,0 +1,1835 @@
+﻿
+<script>
+
+    function fn_History_to_EE() {
+        var url = "@Url.Action("Realignment_History", "Release")";
+
+
+        $.get(url, {}, function (d) {
+            $('#realign_historyToEE').html(d);
+        })
+
+        $('#realign_historyToEE').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Realigned From").center().open();
+        
+    }
+    function refresh_expNrel_EE() {
+
+        var office_id = $('#office_realigned_to_EE_To').val()
+        var program_id = $('#Program_realigned_to_EE_To').val()
+        var account_id = $('#account_list_realigned_to_EE_To').val()
+        var year_ = $("#ddlYear").val();
+
+        var url = "@Url.Action("get_Expense", "Release")";
+
+
+
+
+        if (program_id == null || program_id == 0 || program_id == "") {
+
+            program_id = 0;
+            account_id = 0;
+
+            $.post(url, { program_id: program_id, account_id: account_id, year_: year_ }, function (e) {
+                document.getElementById("expense_EE").value = e;
+
+            })
+        }
+        else {
+
+            $.post(url, { program_id: program_id, account_id: account_id, year_: year_ }, function (e) {
+                document.getElementById("expense_EE").value = e;
+
+            })
+
+        }
+
+
+
+
+        var lure = "@Url.Action("get_TotalRelease", "Release")";
+
+
+        $.post(lure, { office_id: office_id, program_id: program_id, account_id: account_id, year_: year_ }, function (d) {
+            document.getElementById("totalRelease_EE").value = d;
+
+        })
+
+    }
+
+    setTimeout(function () {
+
+
+        var office_id = $('#office_realigned_to_EE_To').val()
+        var program_id = $('#Program_realigned_to_EE_To').val()
+        var account_id = $('#account_list_realigned_to_EE_To').val()
+        var year_ = $("#ddlYear").val();
+
+        var url = "@Url.Action("get_Expense", "Release")";
+
+
+
+
+        if (program_id == null || program_id == 0 || program_id == "") {
+
+            program_id = 0;
+            account_id = 0;
+
+            $.post(url, { program_id: program_id, account_id: account_id, year_: year_ }, function (e) {
+                document.getElementById("expense_EE").value = e;
+
+            })
+        }
+        else {
+
+            $.post(url, { program_id: program_id, account_id: account_id, year_: year_ }, function (e) {
+                document.getElementById("expense_EE").value = e;
+
+            })
+
+        }
+
+
+
+
+        var lure = "@Url.Action("get_TotalRelease", "Release")";
+
+
+        $.post(lure, { office_id: office_id, program_id: program_id, account_id: account_id, year_: year_ }, function (d) {
+            document.getElementById("totalRelease_EE").value = d;
+
+        })
+
+
+
+    }, 500);
+
+
+
+
+
+    function fn_closeRealigned_To_EE() {
+
+        $("#history_to_EE").data("kendoWindow").close();
+    }
+
+
+
+    function fn_save_edit_realign_TO_EE() {
+
+        var url = "@Url.Action("Save_Realign_Edit_TO", "Release")";
+
+
+        var year_ = $("#ddlYear").val();
+        var amount = $('#amount_torealign_TO_EE').val()
+        var realignment_id = $('#for_ID_TO_EE').val()
+        var amount_dum = $('#amount_torealign_TO_EE_dum').val()
+        var tobealign = $('#total_toberealign_TO_EE').val()
+        var availables = $('#available_amount_TO_EE').val()
+
+
+
+
+
+
+
+        var Expense = $("#expense_EE").val();
+        var Total_Release = $("#totalRelease_EE").val();
+
+        var TO_E = Number(Total_Release) - Number(Expense);
+
+
+        if (Total_Release < Expense) {
+
+            swal({
+                title: "Sorry!",
+                text: "You can't Edit this Transaction has already been used in obligation.",
+                timer: 2000,
+                type: "error",
+                showConfirmButton: false
+            })
+
+        } else {
+
+
+
+            if (Number(amount) < Number(amount_dum)) {
+
+                var amount_Cya = Number(amount_dum) - Number(amount);
+
+                if (Total_Release <= Expense) {
+                    swal({
+                        title: "Sorry!",
+                        text: "You can't Edit this Transaction has already been used in obligation.",
+                        timer: 2000,
+                        type: "error",
+                        showConfirmButton: false
+                    })
+
+                } else {
+                    if (TO_E < amount_Cya) {
+                        swal({
+                            title: "Sorry!",
+                            text: "You can't Edit this Transaction has already been used in obligation.",
+                            timer: 2000,
+                            type: "error",
+                            showConfirmButton: false
+                        })
+
+                    } else {
+
+
+
+
+
+                        if (Number(amount) < Number(amount_dum)) {
+
+                            var amount_Cya = Number(amount_dum) - Number(amount);
+                            if (Number(amount_Cya) > Number(availables)) {
+                                swal({
+                                    title: "Oopps!",
+                                    text: "You are not allowed to exceed amount",
+                                    timer: 3000,
+                                    type: "error",
+                                    showConfirmButton: false
+                                })
+
+
+
+                            } else {
+
+
+                                if (Number(availables) == 0) {
+
+                                    if (Number(amount) < Number(amount_dum)) {
+
+                                        swal({
+                                            title: "Oopps!",
+                                            text: "You are not allowd to exceed amount",
+                                            timer: 3000,
+                                            type: "error",
+                                            showConfirmButton: false
+                                        })
+
+
+                                    } else {
+
+                                        if (Number(tobealign) == 0) {
+
+                                            if (Number(amount) > Number(amount_dum)) {
+
+                                                swal({
+                                                    title: "Oopps!",
+                                                    text: "You are not allowd to exceed amount",
+                                                    timer: 3000,
+                                                    type: "error",
+                                                    showConfirmButton: false
+                                                })
+
+
+                                            } else {
+
+                                                if (Number(realignment_id) == 0) {
+                                                    swal({
+                                                        title: "Oopps!",
+                                                        text: "Please Select an Item.",
+                                                        timer: 2000,
+                                                        type: "error",
+                                                        showConfirmButton: false
+                                                    })
+
+                                                } else {
+                                                    swal({
+                                                        title: "Are you sure?",
+                                                        text: "This item will be EDITED and SAVED!",
+                                                        type: "info",
+                                                        showCancelButton: true,
+                                                        closeOnConfirm: false,
+                                                        confirmButtonColor: "#1fa67a",
+                                                        confirmButtonText: "Yes, Save It!",
+                                                        showLoaderOnConfirm: true,
+                                                    }, function () {
+                                                        $.post(url, { year_: year_, amount: ConvertCommasToEmpty(amount), realignment_id: realignment_id, amount_dum: amount_dum }, function (e) {
+                                                            if (e == "1") {
+                                                                swal({
+                                                                    title: "Success!",
+                                                                    text: "Amount successfully saved.",
+                                                                    timer: 2000,
+                                                                    type: "success",
+                                                                    showConfirmButton: false
+                                                                })
+
+                                                                document.getElementById("for_ID_TO_EE").value = 0;
+                                                                document.getElementById("amount_torealign_TO_EE_dum").value = 0;
+                                                                document.getElementById("amount_torealign_TO_EE").value = 0;
+
+                                                                document.getElementById("amount_torealign_TO_EE").disabled = true;
+                                                                refresher_TOEEto();
+                                                                acc_availble_mount();
+                                                                refresh_expNrel_EE();
+                                                                $('#Realigned_To_Grid_EE').data('kendoGrid').dataSource.read();
+                                                            } else {
+                                                                swal({
+                                                                    title: "Error!",
+                                                                    text: "System Error! Please try again.",
+                                                                    timer: 2000,
+                                                                    type: "error",
+                                                                    showConfirmButton: false
+                                                                })
+                                                            }
+
+                                                        })
+
+                                                    });
+
+                                                }
+
+                                            }
+
+
+
+                                        }
+                                        else {
+
+                                            if (Number(realignment_id) == 0) {
+                                                swal({
+                                                    title: "Oopps!",
+                                                    text: "Please Select an Item.",
+                                                    timer: 2000,
+                                                    type: "error",
+                                                    showConfirmButton: false
+                                                })
+
+                                            } else {
+                                                swal({
+                                                    title: "Are you sure?",
+                                                    text: "This item will be EDITED and SAVED!",
+                                                    type: "info",
+                                                    showCancelButton: true,
+                                                    closeOnConfirm: false,
+                                                    confirmButtonColor: "#1fa67a",
+                                                    confirmButtonText: "Yes, Save It!",
+                                                    showLoaderOnConfirm: true,
+                                                }, function () {
+                                                    $.post(url, { year_: year_, amount: ConvertCommasToEmpty(amount), realignment_id: realignment_id, amount_dum: amount_dum }, function (e) {
+                                                        if (e == "1") {
+                                                            swal({
+                                                                title: "Success!",
+                                                                text: "Amount successfully saved.",
+                                                                timer: 2000,
+                                                                type: "success",
+                                                                showConfirmButton: false
+                                                            })
+
+                                                            document.getElementById("for_ID_TO_EE").value = 0;
+                                                            document.getElementById("amount_torealign_TO_EE_dum").value = 0;
+                                                            document.getElementById("amount_torealign_TO_EE").value = 0;
+
+                                                            document.getElementById("amount_torealign_TO_EE").disabled = true;
+                                                            refresher_TOEEto();
+                                                            acc_availble_mount();
+                                                            refresh_expNrel_EE();
+                                                            $('#Realigned_To_Grid_EE').data('kendoGrid').dataSource.read();
+                                                        } else {
+                                                            swal({
+                                                                title: "Error!",
+                                                                text: "System Error! Please try again.",
+                                                                timer: 2000,
+                                                                type: "error",
+                                                                showConfirmButton: false
+                                                            })
+                                                        }
+
+                                                    })
+
+                                                });
+
+                                            }
+
+                                        }
+                                    }
+                                }
+                                else {
+
+                                    if (Number(tobealign) == 0) {
+
+                                        if (Number(amount) > Number(amount_dum)) {
+
+                                            swal({
+                                                title: "Oopps!",
+                                                text: "You are not allowd to exceed amount",
+                                                timer: 3000,
+                                                type: "error",
+                                                showConfirmButton: false
+                                            })
+
+
+                                        } else {
+
+                                            if (Number(realignment_id) == 0) {
+                                                swal({
+                                                    title: "Oopps!",
+                                                    text: "Please Select an Item.",
+                                                    timer: 2000,
+                                                    type: "error",
+                                                    showConfirmButton: false
+                                                })
+
+                                            } else {
+                                                swal({
+                                                    title: "Are you sure?",
+                                                    text: "This item will be EDITED and SAVED!",
+                                                    type: "info",
+                                                    showCancelButton: true,
+                                                    closeOnConfirm: false,
+                                                    confirmButtonColor: "#1fa67a",
+                                                    confirmButtonText: "Yes, Save It!",
+                                                    showLoaderOnConfirm: true,
+                                                }, function () {
+                                                    $.post(url, { year_: year_, amount: ConvertCommasToEmpty(amount), realignment_id: realignment_id, amount_dum: amount_dum }, function (e) {
+                                                        if (e == "1") {
+                                                            swal({
+                                                                title: "Success!",
+                                                                text: "Amount successfully saved.",
+                                                                timer: 2000,
+                                                                type: "success",
+                                                                showConfirmButton: false
+                                                            })
+
+                                                            document.getElementById("for_ID_TO_EE").value = 0;
+                                                            document.getElementById("amount_torealign_TO_EE_dum").value = 0;
+                                                            document.getElementById("amount_torealign_TO_EE").value = 0;
+
+                                                            document.getElementById("amount_torealign_TO_EE").disabled = true;
+                                                            refresher_TOEEto();
+                                                            acc_availble_mount();
+                                                            refresh_expNrel_EE();
+                                                            $('#Realigned_To_Grid_EE').data('kendoGrid').dataSource.read();
+                                                        } else {
+                                                            swal({
+                                                                title: "Error!",
+                                                                text: "System Error! Please try again.",
+                                                                timer: 2000,
+                                                                type: "error",
+                                                                showConfirmButton: false
+                                                            })
+                                                        }
+
+                                                    })
+
+                                                });
+
+                                            }
+
+                                        }
+
+
+
+                                    }
+                                    else {
+
+                                        if (Number(realignment_id) == 0) {
+                                            swal({
+                                                title: "Oopps!",
+                                                text: "Please Select an Item.",
+                                                timer: 2000,
+                                                type: "error",
+                                                showConfirmButton: false
+                                            })
+
+                                        } else {
+                                            swal({
+                                                title: "Are you sure?",
+                                                text: "This item will be EDITED and SAVED!",
+                                                type: "info",
+                                                showCancelButton: true,
+                                                closeOnConfirm: false,
+                                                confirmButtonColor: "#1fa67a",
+                                                confirmButtonText: "Yes, Save It!",
+                                                showLoaderOnConfirm: true,
+                                            }, function () {
+                                                $.post(url, { year_: year_, amount: ConvertCommasToEmpty(amount), realignment_id: realignment_id, amount_dum: amount_dum }, function (e) {
+                                                    if (e == "1") {
+                                                        swal({
+                                                            title: "Success!",
+                                                            text: "Amount successfully saved.",
+                                                            timer: 2000,
+                                                            type: "success",
+                                                            showConfirmButton: false
+                                                        })
+
+                                                        document.getElementById("for_ID_TO_EE").value = 0;
+                                                        document.getElementById("amount_torealign_TO_EE_dum").value = 0;
+                                                        document.getElementById("amount_torealign_TO_EE").value = 0;
+
+                                                        document.getElementById("amount_torealign_TO_EE").disabled = true;
+                                                        refresher_TOEEto();
+                                                        acc_availble_mount();
+                                                        refresh_expNrel_EE();
+                                                        $('#Realigned_To_Grid_EE').data('kendoGrid').dataSource.read();
+                                                    } else {
+                                                        swal({
+                                                            title: "Error!",
+                                                            text: "System Error! Please try again.",
+                                                            timer: 2000,
+                                                            type: "error",
+                                                            showConfirmButton: false
+                                                        })
+                                                    }
+
+                                                })
+
+                                            });
+
+                                        }
+                                    }
+                                }
+
+                            }
+                            //oie end
+                        } else {
+
+                            var amount_Cya = Number(amount) - Number(amount_dum);
+                            if (Number(amount_Cya) > Number(tobealign)) {
+
+                                swal({
+                                    title: "Oopps!",
+                                    text: "You are not allowed to exceed amount",
+                                    timer: 3000,
+                                    type: "error",
+                                    showConfirmButton: false
+                                })
+
+
+
+                            } else {
+
+
+                                if (Number(availables) == 0) {
+
+                                    if (Number(amount) < Number(amount_dum)) {
+
+                                        swal({
+                                            title: "Oopps!",
+                                            text: "You are not allowd to exceed amount",
+                                            timer: 3000,
+                                            type: "error",
+                                            showConfirmButton: false
+                                        })
+
+
+                                    } else {
+
+                                        if (Number(tobealign) == 0) {
+
+                                            if (Number(amount) > Number(amount_dum)) {
+
+                                                swal({
+                                                    title: "Oopps!",
+                                                    text: "You are not allowd to exceed amount",
+                                                    timer: 3000,
+                                                    type: "error",
+                                                    showConfirmButton: false
+                                                })
+
+
+                                            } else {
+
+                                                if (Number(realignment_id) == 0) {
+                                                    swal({
+                                                        title: "Oopps!",
+                                                        text: "Please Select an Item.",
+                                                        timer: 2000,
+                                                        type: "error",
+                                                        showConfirmButton: false
+                                                    })
+
+                                                } else {
+                                                    swal({
+                                                        title: "Are you sure?",
+                                                        text: "This item will be EDITED and SAVED!",
+                                                        type: "info",
+                                                        showCancelButton: true,
+                                                        closeOnConfirm: false,
+                                                        confirmButtonColor: "#1fa67a",
+                                                        confirmButtonText: "Yes, Save It!",
+                                                        showLoaderOnConfirm: true,
+                                                    }, function () {
+                                                        $.post(url, { year_: year_, amount: ConvertCommasToEmpty(amount), realignment_id: realignment_id, amount_dum: amount_dum }, function (e) {
+                                                            if (e == "1") {
+                                                                swal({
+                                                                    title: "Success!",
+                                                                    text: "Amount successfully saved.",
+                                                                    timer: 2000,
+                                                                    type: "success",
+                                                                    showConfirmButton: false
+                                                                })
+
+                                                                document.getElementById("for_ID_TO_EE").value = 0;
+                                                                document.getElementById("amount_torealign_TO_EE_dum").value = 0;
+                                                                document.getElementById("amount_torealign_TO_EE").value = 0;
+
+                                                                document.getElementById("amount_torealign_TO_EE").disabled = true;
+                                                                refresher_TOEEto();
+                                                                acc_availble_mount();
+                                                                refresh_expNrel_EE();
+                                                                $('#Realigned_To_Grid_EE').data('kendoGrid').dataSource.read();
+                                                            } else {
+                                                                swal({
+                                                                    title: "Error!",
+                                                                    text: "System Error! Please try again.",
+                                                                    timer: 2000,
+                                                                    type: "error",
+                                                                    showConfirmButton: false
+                                                                })
+                                                            }
+
+                                                        })
+
+                                                    });
+
+                                                }
+
+                                            }
+
+
+
+                                        }
+                                        else {
+
+                                            if (Number(realignment_id) == 0) {
+                                                swal({
+                                                    title: "Oopps!",
+                                                    text: "Please Select an Item.",
+                                                    timer: 2000,
+                                                    type: "error",
+                                                    showConfirmButton: false
+                                                })
+
+                                            } else {
+                                                swal({
+                                                    title: "Are you sure?",
+                                                    text: "This item will be EDITED and SAVED!",
+                                                    type: "info",
+                                                    showCancelButton: true,
+                                                    closeOnConfirm: false,
+                                                    confirmButtonColor: "#1fa67a",
+                                                    confirmButtonText: "Yes, Save It!",
+                                                    showLoaderOnConfirm: true,
+                                                }, function () {
+                                                    $.post(url, { year_: year_, amount: ConvertCommasToEmpty(amount), realignment_id: realignment_id, amount_dum: amount_dum }, function (e) {
+                                                        if (e == "1") {
+                                                            swal({
+                                                                title: "Success!",
+                                                                text: "Amount successfully saved.",
+                                                                timer: 2000,
+                                                                type: "success",
+                                                                showConfirmButton: false
+                                                            })
+
+                                                            document.getElementById("for_ID_TO_EE").value = 0;
+                                                            document.getElementById("amount_torealign_TO_EE_dum").value = 0;
+                                                            document.getElementById("amount_torealign_TO_EE").value = 0;
+
+                                                            document.getElementById("amount_torealign_TO_EE").disabled = true;
+                                                            refresher_TOEEto();
+                                                            acc_availble_mount();
+                                                            refresh_expNrel_EE();
+                                                            $('#Realigned_To_Grid_EE').data('kendoGrid').dataSource.read();
+                                                        } else {
+                                                            swal({
+                                                                title: "Error!",
+                                                                text: "System Error! Please try again.",
+                                                                timer: 2000,
+                                                                type: "error",
+                                                                showConfirmButton: false
+                                                            })
+                                                        }
+
+                                                    })
+
+                                                });
+
+                                            }
+
+                                        }
+                                    }
+                                }
+                                else {
+
+                                    if (Number(tobealign) == 0) {
+
+                                        if (Number(amount) > Number(amount_dum)) {
+
+                                            swal({
+                                                title: "Oopps!",
+                                                text: "You are not allowd to exceed amount",
+                                                timer: 3000,
+                                                type: "error",
+                                                showConfirmButton: false
+                                            })
+
+
+                                        } else {
+
+                                            if (Number(realignment_id) == 0) {
+                                                swal({
+                                                    title: "Oopps!",
+                                                    text: "Please Select an Item.",
+                                                    timer: 2000,
+                                                    type: "error",
+                                                    showConfirmButton: false
+                                                })
+
+                                            } else {
+                                                swal({
+                                                    title: "Are you sure?",
+                                                    text: "This item will be EDITED and SAVED!",
+                                                    type: "info",
+                                                    showCancelButton: true,
+                                                    closeOnConfirm: false,
+                                                    confirmButtonColor: "#1fa67a",
+                                                    confirmButtonText: "Yes, Save It!",
+                                                    showLoaderOnConfirm: true,
+                                                }, function () {
+                                                    $.post(url, { year_: year_, amount: ConvertCommasToEmpty(amount), realignment_id: realignment_id, amount_dum: amount_dum }, function (e) {
+                                                        if (e == "1") {
+                                                            swal({
+                                                                title: "Success!",
+                                                                text: "Amount successfully saved.",
+                                                                timer: 2000,
+                                                                type: "success",
+                                                                showConfirmButton: false
+                                                            })
+
+                                                            document.getElementById("for_ID_TO_EE").value = 0;
+                                                            document.getElementById("amount_torealign_TO_EE_dum").value = 0;
+                                                            document.getElementById("amount_torealign_TO_EE").value = 0;
+
+                                                            document.getElementById("amount_torealign_TO_EE").disabled = true;
+                                                            refresher_TOEEto();
+                                                            acc_availble_mount();
+                                                            refresh_expNrel_EE();
+                                                            $('#Realigned_To_Grid_EE').data('kendoGrid').dataSource.read();
+                                                        } else {
+                                                            swal({
+                                                                title: "Error!",
+                                                                text: "System Error! Please try again.",
+                                                                timer: 2000,
+                                                                type: "error",
+                                                                showConfirmButton: false
+                                                            })
+                                                        }
+
+                                                    })
+
+                                                });
+
+                                            }
+
+                                        }
+
+
+
+                                    }
+                                    else {
+
+                                        if (Number(realignment_id) == 0) {
+                                            swal({
+                                                title: "Oopps!",
+                                                text: "Please Select an Item.",
+                                                timer: 2000,
+                                                type: "error",
+                                                showConfirmButton: false
+                                            })
+
+                                        } else {
+                                            swal({
+                                                title: "Are you sure?",
+                                                text: "This item will be EDITED and SAVED!",
+                                                type: "info",
+                                                showCancelButton: true,
+                                                closeOnConfirm: false,
+                                                confirmButtonColor: "#1fa67a",
+                                                confirmButtonText: "Yes, Save It!",
+                                                showLoaderOnConfirm: true,
+                                            }, function () {
+                                                $.post(url, { year_: year_, amount: ConvertCommasToEmpty(amount), realignment_id: realignment_id, amount_dum: amount_dum }, function (e) {
+                                                    if (e == "1") {
+                                                        swal({
+                                                            title: "Success!",
+                                                            text: "Amount successfully saved.",
+                                                            timer: 2000,
+                                                            type: "success",
+                                                            showConfirmButton: false
+                                                        })
+
+                                                        document.getElementById("for_ID_TO_EE").value = 0;
+                                                        document.getElementById("amount_torealign_TO_EE_dum").value = 0;
+                                                        document.getElementById("amount_torealign_TO_EE").value = 0;
+
+                                                        document.getElementById("amount_torealign_TO_EE").disabled = true;
+                                                        refresher_TOEEto();
+                                                        acc_availble_mount();
+                                                        refresh_expNrel_EE();
+                                                        $('#Realigned_To_Grid_EE').data('kendoGrid').dataSource.read();
+                                                    } else {
+                                                        swal({
+                                                            title: "Error!",
+                                                            text: "System Error! Please try again.",
+                                                            timer: 2000,
+                                                            type: "error",
+                                                            showConfirmButton: false
+                                                        })
+                                                    }
+
+                                                })
+
+                                            });
+
+                                        }
+                                    }
+                                }
+
+                            }
+                        }
+
+
+
+
+                    }
+                }
+            }
+
+            else {
+
+
+
+
+
+                if (Number(amount) < Number(amount_dum)) {
+
+                    var amount_Cya = Number(amount_dum) - Number(amount);
+                    if (Number(amount_Cya) > Number(availables)) {
+                        swal({
+                            title: "Oopps!",
+                            text: "You are not allowed to exceed amount",
+                            timer: 3000,
+                            type: "error",
+                            showConfirmButton: false
+                        })
+
+
+
+                    } else {
+
+
+                        if (Number(availables) == 0) {
+
+                            if (Number(amount) < Number(amount_dum)) {
+
+                                swal({
+                                    title: "Oopps!",
+                                    text: "You are not allowd to exceed amount",
+                                    timer: 3000,
+                                    type: "error",
+                                    showConfirmButton: false
+                                })
+
+
+                            } else {
+
+                                if (Number(tobealign) == 0) {
+
+                                    if (Number(amount) > Number(amount_dum)) {
+
+                                        swal({
+                                            title: "Oopps!",
+                                            text: "You are not allowd to exceed amount",
+                                            timer: 3000,
+                                            type: "error",
+                                            showConfirmButton: false
+                                        })
+
+
+                                    } else {
+
+                                        if (Number(realignment_id) == 0) {
+                                            swal({
+                                                title: "Oopps!",
+                                                text: "Please Select an Item.",
+                                                timer: 2000,
+                                                type: "error",
+                                                showConfirmButton: false
+                                            })
+
+                                        } else {
+                                            swal({
+                                                title: "Are you sure?",
+                                                text: "This item will be EDITED and SAVED!",
+                                                type: "info",
+                                                showCancelButton: true,
+                                                closeOnConfirm: false,
+                                                confirmButtonColor: "#1fa67a",
+                                                confirmButtonText: "Yes, Save It!",
+                                                showLoaderOnConfirm: true,
+                                            }, function () {
+                                                $.post(url, { year_: year_, amount: ConvertCommasToEmpty(amount), realignment_id: realignment_id, amount_dum: amount_dum }, function (e) {
+                                                    if (e == "1") {
+                                                        swal({
+                                                            title: "Success!",
+                                                            text: "Amount successfully saved.",
+                                                            timer: 2000,
+                                                            type: "success",
+                                                            showConfirmButton: false
+                                                        })
+
+                                                        document.getElementById("for_ID_TO_EE").value = 0;
+                                                        document.getElementById("amount_torealign_TO_EE_dum").value = 0;
+                                                        document.getElementById("amount_torealign_TO_EE").value = 0;
+
+                                                        document.getElementById("amount_torealign_TO_EE").disabled = true;
+                                                        refresher_TOEEto();
+                                                        acc_availble_mount();
+                                                        refresh_expNrel_EE();
+                                                        $('#Realigned_To_Grid_EE').data('kendoGrid').dataSource.read();
+                                                    } else {
+                                                        swal({
+                                                            title: "Error!",
+                                                            text: "System Error! Please try again.",
+                                                            timer: 2000,
+                                                            type: "error",
+                                                            showConfirmButton: false
+                                                        })
+                                                    }
+
+                                                })
+
+                                            });
+
+                                        }
+
+                                    }
+
+
+
+                                }
+                                else {
+
+                                    if (Number(realignment_id) == 0) {
+                                        swal({
+                                            title: "Oopps!",
+                                            text: "Please Select an Item.",
+                                            timer: 2000,
+                                            type: "error",
+                                            showConfirmButton: false
+                                        })
+
+                                    } else {
+                                        swal({
+                                            title: "Are you sure?",
+                                            text: "This item will be EDITED and SAVED!",
+                                            type: "info",
+                                            showCancelButton: true,
+                                            closeOnConfirm: false,
+                                            confirmButtonColor: "#1fa67a",
+                                            confirmButtonText: "Yes, Save It!",
+                                            showLoaderOnConfirm: true,
+                                        }, function () {
+                                            $.post(url, { year_: year_, amount: ConvertCommasToEmpty(amount), realignment_id: realignment_id, amount_dum: amount_dum }, function (e) {
+                                                if (e == "1") {
+                                                    swal({
+                                                        title: "Success!",
+                                                        text: "Amount successfully saved.",
+                                                        timer: 2000,
+                                                        type: "success",
+                                                        showConfirmButton: false
+                                                    })
+
+                                                    document.getElementById("for_ID_TO_EE").value = 0;
+                                                    document.getElementById("amount_torealign_TO_EE_dum").value = 0;
+                                                    document.getElementById("amount_torealign_TO_EE").value = 0;
+
+                                                    document.getElementById("amount_torealign_TO_EE").disabled = true;
+                                                    refresher_TOEEto();
+                                                    acc_availble_mount();
+                                                    refresh_expNrel_EE();
+                                                    $('#Realigned_To_Grid_EE').data('kendoGrid').dataSource.read();
+                                                } else {
+                                                    swal({
+                                                        title: "Error!",
+                                                        text: "System Error! Please try again.",
+                                                        timer: 2000,
+                                                        type: "error",
+                                                        showConfirmButton: false
+                                                    })
+                                                }
+
+                                            })
+
+                                        });
+
+                                    }
+
+                                }
+                            }
+                        }
+                        else {
+
+                            if (Number(tobealign) == 0) {
+
+                                if (Number(amount) > Number(amount_dum)) {
+
+                                    swal({
+                                        title: "Oopps!",
+                                        text: "You are not allowd to exceed amount",
+                                        timer: 3000,
+                                        type: "error",
+                                        showConfirmButton: false
+                                    })
+
+
+                                } else {
+
+                                    if (Number(realignment_id) == 0) {
+                                        swal({
+                                            title: "Oopps!",
+                                            text: "Please Select an Item.",
+                                            timer: 2000,
+                                            type: "error",
+                                            showConfirmButton: false
+                                        })
+
+                                    } else {
+                                        swal({
+                                            title: "Are you sure?",
+                                            text: "This item will be EDITED and SAVED!",
+                                            type: "info",
+                                            showCancelButton: true,
+                                            closeOnConfirm: false,
+                                            confirmButtonColor: "#1fa67a",
+                                            confirmButtonText: "Yes, Save It!",
+                                            showLoaderOnConfirm: true,
+                                        }, function () {
+                                            $.post(url, { year_: year_, amount: ConvertCommasToEmpty(amount), realignment_id: realignment_id, amount_dum: amount_dum }, function (e) {
+                                                if (e == "1") {
+                                                    swal({
+                                                        title: "Success!",
+                                                        text: "Amount successfully saved.",
+                                                        timer: 2000,
+                                                        type: "success",
+                                                        showConfirmButton: false
+                                                    })
+
+                                                    document.getElementById("for_ID_TO_EE").value = 0;
+                                                    document.getElementById("amount_torealign_TO_EE_dum").value = 0;
+                                                    document.getElementById("amount_torealign_TO_EE").value = 0;
+
+                                                    document.getElementById("amount_torealign_TO_EE").disabled = true;
+                                                    refresher_TOEEto();
+                                                    acc_availble_mount();
+                                                    refresh_expNrel_EE();
+                                                    $('#Realigned_To_Grid_EE').data('kendoGrid').dataSource.read();
+                                                } else {
+                                                    swal({
+                                                        title: "Error!",
+                                                        text: "System Error! Please try again.",
+                                                        timer: 2000,
+                                                        type: "error",
+                                                        showConfirmButton: false
+                                                    })
+                                                }
+
+                                            })
+
+                                        });
+
+                                    }
+
+                                }
+
+
+
+                            }
+                            else {
+
+                                if (Number(realignment_id) == 0) {
+                                    swal({
+                                        title: "Oopps!",
+                                        text: "Please Select an Item.",
+                                        timer: 2000,
+                                        type: "error",
+                                        showConfirmButton: false
+                                    })
+
+                                } else {
+                                    swal({
+                                        title: "Are you sure?",
+                                        text: "This item will be EDITED and SAVED!",
+                                        type: "info",
+                                        showCancelButton: true,
+                                        closeOnConfirm: false,
+                                        confirmButtonColor: "#1fa67a",
+                                        confirmButtonText: "Yes, Save It!",
+                                        showLoaderOnConfirm: true,
+                                    }, function () {
+                                        $.post(url, { year_: year_, amount: ConvertCommasToEmpty(amount), realignment_id: realignment_id, amount_dum: amount_dum }, function (e) {
+                                            if (e == "1") {
+                                                swal({
+                                                    title: "Success!",
+                                                    text: "Amount successfully saved.",
+                                                    timer: 2000,
+                                                    type: "success",
+                                                    showConfirmButton: false
+                                                })
+
+                                                document.getElementById("for_ID_TO_EE").value = 0;
+                                                document.getElementById("amount_torealign_TO_EE_dum").value = 0;
+                                                document.getElementById("amount_torealign_TO_EE").value = 0;
+
+                                                document.getElementById("amount_torealign_TO_EE").disabled = true;
+                                                refresher_TOEEto();
+                                                acc_availble_mount();
+                                                refresh_expNrel_EE();
+                                                $('#Realigned_To_Grid_EE').data('kendoGrid').dataSource.read();
+                                            } else {
+                                                swal({
+                                                    title: "Error!",
+                                                    text: "System Error! Please try again.",
+                                                    timer: 2000,
+                                                    type: "error",
+                                                    showConfirmButton: false
+                                                })
+                                            }
+
+                                        })
+
+                                    });
+
+                                }
+                            }
+                        }
+
+                    }
+                    //oie end
+                } else {
+
+                    var amount_Cya = Number(amount) - Number(amount_dum);
+                    if (Number(amount_Cya) > Number(tobealign)) {
+
+                        swal({
+                            title: "Oopps!",
+                            text: "You are not allowed to exceed amount",
+                            timer: 3000,
+                            type: "error",
+                            showConfirmButton: false
+                        })
+
+
+
+                    } else {
+
+
+                        if (Number(availables) == 0) {
+
+                            if (Number(amount) < Number(amount_dum)) {
+
+                                swal({
+                                    title: "Oopps!",
+                                    text: "You are not allowd to exceed amount",
+                                    timer: 3000,
+                                    type: "error",
+                                    showConfirmButton: false
+                                })
+
+
+                            } else {
+
+                                if (Number(tobealign) == 0) {
+
+                                    if (Number(amount) > Number(amount_dum)) {
+
+                                        swal({
+                                            title: "Oopps!",
+                                            text: "You are not allowd to exceed amount",
+                                            timer: 3000,
+                                            type: "error",
+                                            showConfirmButton: false
+                                        })
+
+
+                                    } else {
+
+                                        if (Number(realignment_id) == 0) {
+                                            swal({
+                                                title: "Oopps!",
+                                                text: "Please Select an Item.",
+                                                timer: 2000,
+                                                type: "error",
+                                                showConfirmButton: false
+                                            })
+
+                                        } else {
+                                            swal({
+                                                title: "Are you sure?",
+                                                text: "This item will be EDITED and SAVED!",
+                                                type: "info",
+                                                showCancelButton: true,
+                                                closeOnConfirm: false,
+                                                confirmButtonColor: "#1fa67a",
+                                                confirmButtonText: "Yes, Save It!",
+                                                showLoaderOnConfirm: true,
+                                            }, function () {
+                                                $.post(url, { year_: year_, amount: ConvertCommasToEmpty(amount), realignment_id: realignment_id, amount_dum: amount_dum }, function (e) {
+                                                    if (e == "1") {
+                                                        swal({
+                                                            title: "Success!",
+                                                            text: "Amount successfully saved.",
+                                                            timer: 2000,
+                                                            type: "success",
+                                                            showConfirmButton: false
+                                                        })
+
+                                                        document.getElementById("for_ID_TO_EE").value = 0;
+                                                        document.getElementById("amount_torealign_TO_EE_dum").value = 0;
+                                                        document.getElementById("amount_torealign_TO_EE").value = 0;
+
+                                                        document.getElementById("amount_torealign_TO_EE").disabled = true;
+                                                        refresher_TOEEto();
+                                                        acc_availble_mount();
+                                                        refresh_expNrel_EE();
+                                                        $('#Realigned_To_Grid_EE').data('kendoGrid').dataSource.read();
+                                                    } else {
+                                                        swal({
+                                                            title: "Error!",
+                                                            text: "System Error! Please try again.",
+                                                            timer: 2000,
+                                                            type: "error",
+                                                            showConfirmButton: false
+                                                        })
+                                                    }
+
+                                                })
+
+                                            });
+
+                                        }
+
+                                    }
+
+
+
+                                }
+                                else {
+
+                                    if (Number(realignment_id) == 0) {
+                                        swal({
+                                            title: "Oopps!",
+                                            text: "Please Select an Item.",
+                                            timer: 2000,
+                                            type: "error",
+                                            showConfirmButton: false
+                                        })
+
+                                    } else {
+                                        swal({
+                                            title: "Are you sure?",
+                                            text: "This item will be EDITED and SAVED!",
+                                            type: "info",
+                                            showCancelButton: true,
+                                            closeOnConfirm: false,
+                                            confirmButtonColor: "#1fa67a",
+                                            confirmButtonText: "Yes, Save It!",
+                                            showLoaderOnConfirm: true,
+                                        }, function () {
+                                            $.post(url, { year_: year_, amount: ConvertCommasToEmpty(amount), realignment_id: realignment_id, amount_dum: amount_dum }, function (e) {
+                                                if (e == "1") {
+                                                    swal({
+                                                        title: "Success!",
+                                                        text: "Amount successfully saved.",
+                                                        timer: 2000,
+                                                        type: "success",
+                                                        showConfirmButton: false
+                                                    })
+
+                                                    document.getElementById("for_ID_TO_EE").value = 0;
+                                                    document.getElementById("amount_torealign_TO_EE_dum").value = 0;
+                                                    document.getElementById("amount_torealign_TO_EE").value = 0;
+
+                                                    document.getElementById("amount_torealign_TO_EE").disabled = true;
+                                                    refresher_TOEEto();
+                                                    acc_availble_mount();
+                                                    refresh_expNrel_EE();
+                                                    $('#Realigned_To_Grid_EE').data('kendoGrid').dataSource.read();
+                                                } else {
+                                                    swal({
+                                                        title: "Error!",
+                                                        text: "System Error! Please try again.",
+                                                        timer: 2000,
+                                                        type: "error",
+                                                        showConfirmButton: false
+                                                    })
+                                                }
+
+                                            })
+
+                                        });
+
+                                    }
+
+                                }
+                            }
+                        }
+                        else {
+
+                            if (Number(tobealign) == 0) {
+
+                                if (Number(amount) > Number(amount_dum)) {
+
+                                    swal({
+                                        title: "Oopps!",
+                                        text: "You are not allowd to exceed amount",
+                                        timer: 3000,
+                                        type: "error",
+                                        showConfirmButton: false
+                                    })
+
+
+                                } else {
+
+                                    if (Number(realignment_id) == 0) {
+                                        swal({
+                                            title: "Oopps!",
+                                            text: "Please Select an Item.",
+                                            timer: 2000,
+                                            type: "error",
+                                            showConfirmButton: false
+                                        })
+
+                                    } else {
+                                        swal({
+                                            title: "Are you sure?",
+                                            text: "This item will be EDITED and SAVED!",
+                                            type: "info",
+                                            showCancelButton: true,
+                                            closeOnConfirm: false,
+                                            confirmButtonColor: "#1fa67a",
+                                            confirmButtonText: "Yes, Save It!",
+                                            showLoaderOnConfirm: true,
+                                        }, function () {
+                                            $.post(url, { year_: year_, amount: ConvertCommasToEmpty(amount), realignment_id: realignment_id, amount_dum: amount_dum }, function (e) {
+                                                if (e == "1") {
+                                                    swal({
+                                                        title: "Success!",
+                                                        text: "Amount successfully saved.",
+                                                        timer: 2000,
+                                                        type: "success",
+                                                        showConfirmButton: false
+                                                    })
+
+                                                    document.getElementById("for_ID_TO_EE").value = 0;
+                                                    document.getElementById("amount_torealign_TO_EE_dum").value = 0;
+                                                    document.getElementById("amount_torealign_TO_EE").value = 0;
+
+                                                    document.getElementById("amount_torealign_TO_EE").disabled = true;
+                                                    refresher_TOEEto();
+                                                    acc_availble_mount();
+                                                    refresh_expNrel_EE();
+                                                    $('#Realigned_To_Grid_EE').data('kendoGrid').dataSource.read();
+                                                } else {
+                                                    swal({
+                                                        title: "Error!",
+                                                        text: "System Error! Please try again.",
+                                                        timer: 2000,
+                                                        type: "error",
+                                                        showConfirmButton: false
+                                                    })
+                                                }
+
+                                            })
+
+                                        });
+
+                                    }
+
+                                }
+
+
+
+                            }
+                            else {
+
+                                if (Number(realignment_id) == 0) {
+                                    swal({
+                                        title: "Oopps!",
+                                        text: "Please Select an Item.",
+                                        timer: 2000,
+                                        type: "error",
+                                        showConfirmButton: false
+                                    })
+
+                                } else {
+                                    swal({
+                                        title: "Are you sure?",
+                                        text: "This item will be EDITED and SAVED!",
+                                        type: "info",
+                                        showCancelButton: true,
+                                        closeOnConfirm: false,
+                                        confirmButtonColor: "#1fa67a",
+                                        confirmButtonText: "Yes, Save It!",
+                                        showLoaderOnConfirm: true,
+                                    }, function () {
+                                        $.post(url, { year_: year_, amount: ConvertCommasToEmpty(amount), realignment_id: realignment_id, amount_dum: amount_dum }, function (e) {
+                                            if (e == "1") {
+                                                swal({
+                                                    title: "Success!",
+                                                    text: "Amount successfully saved.",
+                                                    timer: 2000,
+                                                    type: "success",
+                                                    showConfirmButton: false
+                                                })
+
+                                                document.getElementById("for_ID_TO_EE").value = 0;
+                                                document.getElementById("amount_torealign_TO_EE_dum").value = 0;
+                                                document.getElementById("amount_torealign_TO_EE").value = 0;
+
+                                                document.getElementById("amount_torealign_TO_EE").disabled = true;
+                                                refresher_TOEEto();
+                                                acc_availble_mount();
+                                                refresh_expNrel_EE();
+                                                $('#Realigned_To_Grid_EE').data('kendoGrid').dataSource.read();
+                                            } else {
+                                                swal({
+                                                    title: "Error!",
+                                                    text: "System Error! Please try again.",
+                                                    timer: 2000,
+                                                    type: "error",
+                                                    showConfirmButton: false
+                                                })
+                                            }
+
+                                        })
+
+                                    });
+
+                                }
+                            }
+                        }
+
+                    }
+                }
+
+
+
+            }
+
+
+        }
+    }
+
+
+    function refresher_TOEEto() {
+        setTimeout(function () {
+
+            var lru = "@Url.Action("thatass","Release")";
+            var year_ = $("#ddlYear").val();
+            $.post(lru, { year_: year_ }, function (e) {
+                document.getElementById("total_toberealign_TO_EE").value = commaSeparateNumberRealignmentEE(e);
+
+            })
+        }, 1000);
+
+        setTimeout(function () {
+            var url = "@Url.Action("datass", "Release")";
+
+
+            var office_id = $("#office_realigned_to_EE_To").val();
+            var program_id = $("#Program_realigned_to_EE_To").val();
+            //   var ooe_id_to = $('#ooe_id_realigned_to_EE').val()
+            var account_id = $("#account_list_realigned_to_EE_To").val();
+            var year_ = $("#ddlYear").val();
+
+            $.post(url, { office_id: office_id, program_id: program_id, account_id: account_id, year_: year_ }, function (e) {
+                document.getElementById("available_amount_TO_EE").value = commaSeparateNumberRealignmentEE(e);
+                document.getElementById("amount_torealign_TO_EE").disabled = true;
+            })
+
+        }, 1000);
+    }
+
+    setTimeout(function () {
+
+        var lru = "@Url.Action("thatass","Release")";
+        var year_ = $("#ddlYear").val();
+        $.post(lru, { year_: year_ }, function (e) {
+            document.getElementById("total_toberealign_TO_EE").value = commaSeparateNumberRealignmentEE(e);
+
+        })
+    }, 1000);
+
+    setTimeout(function () {
+        var url = "@Url.Action("datass", "Release")";
+
+
+        var office_id = $("#office_realigned_to_EE_To").val();
+        var program_id = $("#Program_realigned_to_EE_To").val();
+        //   var ooe_id_to = $('#ooe_id_realigned_to_EE').val()
+        var account_id = $("#account_list_realigned_to_EE_To").val();
+        var year_ = $("#ddlYear").val();
+
+        $.post(url, { office_id: office_id, program_id: program_id, account_id: account_id, year_: year_ }, function (e) {
+            document.getElementById("available_amount_TO_EE").value = commaSeparateNumberRealignmentEE(e);
+            document.getElementById("for_ID_TO_EE").value = 0;
+            document.getElementById("amount_torealign_TO_EE_dum").value = 0;
+            document.getElementById("amount_torealign_TO_EE").value = 0;
+        })
+
+    }, 1000);
+
+
+
+
+
+
+    function delete_realignment_TO_EE(realignment_id) {
+        edit_realignment_TO_EEV2(realignment_id);
+        document.getElementById("amount_torealign_TO_EE").disabled = true;
+
+        setTimeout(function () {
+            var dummy = $('#amount_torealign_TO_EE_dum').val()
+
+            var url = "@Url.Action("delete_Realaign_TO", "Release")";
+            var year_ = $("#ddlYear").val();
+            var avail_mount = $('#available_amount_TO_EE').val()
+
+            var Expense = $("#expense_EE").val();
+            var Total_Release = $("#totalRelease_EE").val();
+
+            var TO_E = Number(Total_Release) - Number(Expense);
+
+
+            if (Total_Release < Expense) {
+                swal({
+                    title: "Sorry!",
+                    text: "You can't Delete this Transaction that has already been used in obligation.",
+                    timer: 2000,
+                    type: "error",
+                    showConfirmButton: false
+                })
+
+            } else {
+                //if (TO_E < dummy) {
+                //    swal({
+                //        title: "Sorry!",
+                //        text: "You can't Delete this Transaction that has already been used in obligation.",
+                //        timer: 2000,
+                //        type: "error",
+                //        showConfirmButton: false
+                //    })
+
+                //} else {
+
+
+                if (Number(dummy) > Number(avail_mount)) {
+
+                    swal({
+                        title: "Oopps!",
+                        text: "You Can't Delete this Item",
+                        timer: 2000,
+                        type: "error",
+                        showConfirmButton: false
+                    })
+                }else{
+                    swal({
+                        title: "Are you sure?",
+                        text: "This item will be removed!",
+                        type: "info",
+                        showCancelButton: true,
+                        closeOnConfirm: false,
+                        confirmButtonColor: "#DD6B55",
+                        confirmButtonText: "Yes, Remove It!",
+                        showLoaderOnConfirm: true,
+                    }, function () {
+
+                        $.get(url, { realignment_id: realignment_id, year_: year_ }, function (e) {
+                            if (e == "1") {
+                                swal({
+                                    title: "Success!",
+                                    text: "Amount has beed deleted.",
+                                    timer: 2000,
+                                    type: "success",
+                                    showConfirmButton: false
+                                })
+
+                                document.getElementById("for_ID_TO_EE").value = 0;
+                                document.getElementById("amount_torealign_TO_EE_dum").value = 0;
+                                document.getElementById("amount_torealign_TO_EE").value = 0;
+
+                                document.getElementById("amount_torealign_TO_EE").disabled = true;
+                                refresher_TOEEto();
+                                acc_availble_mount();
+                                refresh_expNrel_EE();
+                                $('#Realigned_To_Grid_EE').data('kendoGrid').dataSource.read();
+                            } else {
+                                swal({
+                                    title: "Error!",
+                                    text: "System Error! Please try again.",
+                                    timer: 2000,
+                                    type: "error",
+                                    showConfirmButton: false
+                                })
+                            }
+
+
+                        })
+                    });
+                }
+
+
+                // }
+            }
+
+        }, 500);
+
+
+    }
+
+    function edit_realignment_TO_EEV2 (realignment_id) {
+        var url = "@Url.Action("Edit_RealignV2", "Release")";
+
+        $.get(url, { realignment_id: realignment_id }, function (d) {
+            document.getElementById("amount_torealign_TO_EE").disabled = false;
+            document.getElementById("amount_torealign_TO_EE_dum").value = d.Amount_EDIT;
+            document.getElementById("amount_torealign_TO_EE").value = d.Amount_EDIT;
+            document.getElementById("for_ID_TO_EE").value = d.realignment_id_EDIT;
+        })
+
+    }
+
+    function edit_realignment_TO_EE (realignment_id) {
+        var url = "@Url.Action("Edit_RealignV2", "Release")";
+
+        $.get(url, { realignment_id: realignment_id }, function (d) {
+            document.getElementById("amount_torealign_TO_EE").disabled = false;
+            document.getElementById("amount_torealign_TO_EE_dum").value = d.Amount_EDIT;
+            document.getElementById("amount_torealign_TO_EE").value = d.Amount_EDIT;
+            document.getElementById("for_ID_TO_EE").value = d.realignment_id_EDIT;
+        })
+
+    }
+
+    function readTo_EE() {
+
+        var office_id_to = $("#office_realigned_to_EE_To").val();
+        var program_id_to = $("#Program_realigned_to_EE_To").val();
+        var ooe_id_to = $('#ooe_id_realigned_to_EE').val()
+        var account_id_to = $("#account_list_realigned_to_EE_To").val();
+        var year_ = $("#ddlYear").val();
+
+
+
+        return {
+
+
+            office_id_to : office_id_to,
+            program_id_to : program_id_to,
+            ooe_id_to : ooe_id_to,
+            account_id_to: account_id_to,
+            year_: year_
+
+        }
+
+
+    }
+
+    function refresh_grid(e) {
+        if (e.errors) {
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "\n";
+                    });
+                }
+            });
+            alert(message);
+        }
+        $("#Realigned_To_Grid_EE").data("kendoGrid").dataSource.read();
+    }
+    setTimeout(function () {
+
+        $("#Realigned_To_Grid_EE").data("kendoGrid").dataSource.read();
+
+    }, 1000);
+
+    function To_Grid_Refresh() {
+
+        setTimeout(function () {
+
+            $("#Realigned_To_Grid_EE").data("kendoGrid").dataSource.read();
+
+        }, 500);
+    }
+
+    setTimeout(function () {
+        var url = "@Url.Action("get_AccountName_realignment", "Release")";
+
+        var program_id = $('#Program_realigned_to_EE_To').val()
+        var account_id = $('#account_list_realigned_to_EE_To').val()
+        var year_ = $("#ddlYear").val();
+
+        $.post(url, { program_id: program_id,  account_id: account_id, year_: year_ }, function (e) {
+            document.getElementById("account_name").textContent = e;
+
+        })
+
+    }, 500);
+</script>
+
+<div style="border: outset;clear:both;border-width:1px;border-color:#1fa67a; width: 749px; padding-left:0px;padding-right:0px;padding-top:0px;padding-bottom:7px;margin-top: 0px;">
+    <div style=" width: 0;height: 0; border-right: 5px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;margin-top: -1px; ">
+        <div style="float: left; width: 683px; margin-top:1px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 36px solid #1fa67a; ">
+            <div style="float: left; height:28px; margin-left:-59px; margin-top: 5px;">
+                <i class="fa fa-tasks fa-2x fg-white"></i>
+
+            </div>
+            <div style='color:white;font-size: 20px;font-weight: bold;margin-top: 1px;' id="account_name"></div>
+
+
+        </div>
+    </div>
+
+
+
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Monthly_Realignment_Model>()
+    .Name("Realigned_To_Grid_EE")
+    .Scrollable()
+    .Columns(col =>
+    {
+        col.Bound(m => m.realignment_id).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                                .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Transaction ID</div></text>)
+                        .Width(50)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Bound(m => m.Description).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Account Name</div></text>)
+                        .Width(160)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientFooterTemplate("<div style='text-align:center;color:darkgreen'><label> </label><label> Total Amount </label></div>");
+        col.Bound(m => m.Amount)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Amount</div></text>)
+                        .Width(70)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div>#=kendo.toString(Amount,'c2')# </div>")
+                        .ClientFooterTemplate("<div style='text-align:center;color:darkgreen'><label> </label><label> #=kendo.toString(sum, 'c2')#</label></div>");
+        col.Bound(m => m.YearOf)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Year</div></text>)
+                        .Width(30)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+
+        col.Template(t => { }).ClientTemplate(
+                                     "<div class='k-button k-button-icontext' style='border-radius:50px;color:\\#ffffff;background-color:\\#1FA67A;'    onclick='edit_realignment_TO_EE(#=realignment_id#)'   ><span class='fa fa-pencil-square-o' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'> </span>edit</div> " +
+                                     "<div class='k-button k-button-icontext' style='border-radius:50px;color:\\#ffffff;background-color:\\#DE5555;'   onclick='delete_realignment_TO_EE(#=realignment_id#)'   ><span class='fa fa-trash-o' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'> </span>del</div> "
+                                    ).HtmlAttributes(new { style = "vertical-align: top;" }).Width(110);
+    })
+
+                                                        .Sortable()
+                                                        .Scrollable()
+                                                        .HtmlAttributes(new { style = "height:290px;" })
+                                                                        .DataSource(d => d
+                                                                        .Ajax()
+                                                                        .Aggregates(a =>
+                                                                            {
+                                                                                a.Add(c => c.Amount).Sum();
+                                                                            })
+                                                                        .PageSize(1000)
+                                                                        .Model(m => m.Id(i => i.realignment_id))
+                                                                        .Read(read => read.Action("Realign_To", "Release").Data("readTo_EE")))
+    )
+
+    <div style="float: left;margin-right:0px;margin-top:60px;">
+
+        <div style=" float:left;margin-left:-40px;margin-top:-36px;">
+            <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                Available <br /> &nbsp; Amount
+            </label>
+
+        </div>
+
+        <div style="float: left;margin-left:0px;margin-top:-30px;">
+            : <input type="text" style="width:130px" name="available_amount_TO_EE" id="available_amount_TO_EE" onkeyup="commaSeparateNumberversion2('available_amount_TO_EE')" disabled>
+        </div>
+        <div style="float: left;margin-left:0px;margin-top:-30px;">
+            <input type="text" style="width:130px" name="totalRelease_EE" id="totalRelease_EE" disabled hidden>
+        </div>
+
+        <div style="float: left;margin-left:155px;margin-top:-38px;">
+            <label style="margin-left: 0px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                Amount to <br /> &nbsp; Realign
+            </label>
+        </div>
+        <div></div>
+        <div style="float: left;margin-left:0px;margin-top:-30px;">
+            : <input type="text" style="width:130px" name="amount_torealign_TO_EE" id="amount_torealign_TO_EE" onkeyup="commaSeparateNumberversion2('amount_torealign_TO_EE')" onfocus="this.select();" disabled>
+        </div>
+
+        @*dummy---------------------*@
+
+        <div style="float: left;margin-left:50px;margin-top:-50px;">
+            <input type="text" style="width:130px" name="amount_torealign_TO_EE_dum" id="amount_torealign_TO_EE_dum" disabled hidden>
+        </div>
+        <div style="float: left;margin-left:0px;margin-top:-50px;">
+            <input type="text" style="width:130px" name="expense_EE" id="expense_EE" disabled hidden>
+        </div>
+
+
+
+
+        <div style="float: left;margin-left:350px;margin-top:-42px;">
+            <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                Total Amount <br />to be Realign
+            </label>
+        </div>
+        <div style="float: left;margin-left:590px;margin-top:-37px;">
+            :  <input type="text" style="width:130px" name="total_toberealign_TO_EE" id="total_toberealign_TO_EE" onkeyup="commaSeparateNumberversion2('total_toberealign_TO_EE')" disabled>
+        </div>
+        <div style="float: left;margin-left:630px;margin-top:-37px;">
+            <input type="text" style="width:100px" name="for_ID_TO_EE" id="for_ID_TO_EE" disabled hidden>
+        </div>
+
+    </div>
+    <div style="float:left;margin-top:26px;margin-left:370px">
+        <div class="k-button k-button-icontext" style=" border-radius: 50px; color: #ffffff; background-color: #808080;" onclick="fn_History_to_EE()"><span class='fa fa-history' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'></span> Realign History</div>
+    </div>
+    <div style="float:left;margin-top:-29px;margin-left:530px">
+        <div class="k-button k-button-icontext" style=" bottom: 15px; right: 220px;width: 80px; border-radius:50px;color:#ffffff;background-color:#1FA67A;" onclick="fn_save_edit_realign_TO_EE()"><span class='fa fa-plus-circle' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'></span> Save</div>
+    </div>
+    <div style="float:left;margin-top:-29px;margin-left:617px">
+        <div class="k-button k-button-icontext" style=" bottom: 15px; right: 220px;width: 80px; border-radius:50px;color:#ffffff;background-color:#DE5555;" onclick="fn_closeRealigned_To_EE()"><span class='fa fa-times' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'></span> Close</div>
+    </div>
+    @*<div class="k-button k-button-icontext" style="position: absolute; bottom: 15px; right: 20px;width: 80px;" onclick="fn_save_edit_realign_TO_EE()">save</div>*@
+
+</div>
+
+@(Html.Kendo().Window()
+        .Name("realign_historyToEE")
+        .Title("New Entry")
+        .Width(1030)
+        .Height(600)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+
+        })
+                .Actions(a => { a.Close(); })
+)

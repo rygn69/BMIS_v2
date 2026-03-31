@@ -1,0 +1,153 @@
+﻿<script>
+    function onData() {
+        return {
+            obrno: $("#obrno").val()
+        }
+    }
+    function SearchTrans() {
+        $("#TransDate").data("kendoGrid").dataSource.read();
+    }
+
+    $("#obrno").change(function () {
+        //sync();
+    }).keypress(function (e) {
+        if (e.keyCode == 13) {
+            SearchTrans();
+        }
+    });
+    function selectedrow() {
+        var entityGrid = $("#TransDate").data("kendoGrid");
+        var selItem = entityGrid.dataItem(entityGrid.select());
+
+        $("#supdatetime").data("kendoDateTimePicker").value(selItem.DateTimeEntered);
+        
+    }
+</script>
+<h2 style="font-size:18px;font-weight:bold"><span class="fa fa-tasks"></span> Change Transaction Date </h2>
+
+<div id="" style="display:inline-block;margin-left:262px">
+    <label style="margin-left:70px;font-size:13px;width:100px;margin-top:20px;">ObR No. :</label>
+
+    <div style="float:left;margin-top:-31px;margin-left:160px">
+        <input id="obrno" name="obrno" type="text" value="" placeholder="000-0000-00-00-0000" style="width:300px;height:100%;" onkeyup="SearchTrans()" class="form-control">
+    </div>
+</div>
+
+<div class="transition animated fadeInUp" style="margin-top:-2px;">
+    @(Html.Kendo().Grid<iFMIS_BMS.Models.NonOfficeSubAccount>()
+        .Name("TransDate")
+        .Columns(columns =>
+        {
+            columns.Template(@<text></text>).Hidden().ClientTemplate("<div>#=trnno# </div>");
+            columns.Template(@<text></text>).Hidden().ClientTemplate("<div>#=officeid# </div>");
+            columns.Template(@<text></text>).Hidden().ClientTemplate("<div>#=accountid# </div>");
+  
+            columns.Template(@<text></text>)
+                     .HeaderTemplate(@<text>Account</text>)
+                     .HtmlAttributes(new { style = "text-align:left" })
+                     .HeaderHtmlAttributes(new { style = "text-align:center", @class = "metro-header" })
+                     .Width(200)
+                     .ClientTemplate("<div>#=AccountName# </div>");
+            columns.Template(@<text></text>)
+                     .HeaderTemplate(@<text>ObR No.</text>)
+                     .HtmlAttributes(new { style = "text-align:center" })
+                     .HeaderHtmlAttributes(new { style = "text-align:center", @class = "metro-header" })
+                     .Width(150)
+                     .ClientTemplate("<div>#=obrno# </div>");
+            columns.Template(@<text></text>)
+                     .HeaderTemplate(@<text>Amount</text>)
+                     .HtmlAttributes(new { style = "text-align:right" })
+                     .HeaderHtmlAttributes(new { style = "text-align:center", @class = "metro-header" })
+                     .Width(90)
+                     .ClientTemplate("<div>#=kendo.toString(Amount, 'n2')# </div>");
+            columns.Template(@<text></text>)
+                     .HeaderTemplate(@<text>Data and Time</text>)
+                     .HtmlAttributes(new { style = "text-align:right" })
+                     .HeaderHtmlAttributes(new { style = "text-align:center", @class = "metro-header" })
+                     .Hidden()
+                     .ClientTemplate("<div>#=DateTimeEntered# </div>");
+            columns.Template(@<text></text>)
+                     .HeaderTemplate(@<text>Data and Time</text>)
+                     .HtmlAttributes(new { style = "text-align:right" })
+                     .HeaderHtmlAttributes(new { style = "text-align:center", @class = "metro-header" })
+                     .Width(130)
+                     .ClientTemplate("<div>#=DateTimeEntered2# </div>");
+
+        })
+        .Sortable()
+        .Pageable(pageable => pageable.Refresh(true))
+        .Scrollable()
+        .HtmlAttributes(new { @class = "table-responsive", style = "height:150px; overflow-x:hidden;" })
+        .Selectable(selectable => selectable
+        .Mode(GridSelectionMode.Single)
+        .Type(GridSelectionType.Row))
+        .Events(events => events.Change("selectedrow"))
+        .DataSource(dataSource => dataSource
+            .Ajax()
+            .Model(model => model.Id(u => u.nonofficeid))
+            .PageSize(10)
+            .ServerOperation(false)
+            .Read(read => read.Action("EditTransDate", "Maintenance").Data("onData"))
+        )
+)
+</div>
+<div>
+    <label style="margin-top:20px;display:inline-block">
+        Change Date To: 
+    </label>
+    <div style="display:inline-block;margin-left:10px">
+        @*<input id="datepicker" style="width:190px"/>*@
+        @(Html.Kendo().DateTimePicker()
+              .Name("supdatetime")
+              //.Start(CalendarView.Year)
+              //.Depth(CalendarView.Year)
+              .Format("MM/dd/yyyy hh:mm:ss tt")
+              //.Events(e => e.Change("numeric_desu"))
+              .HtmlAttributes(new { style = "width: 220px" })
+        )
+    </div>
+    <div style="display:inline-block;margin-left:10px">
+        <div id="btnSave" class="k-button k-button-icontext" style="width: 100px;border-radius:50px;background-color:cornflowerblue;color:white;" onclick="reqSave()"><span class="fa fa-save"></span> Save</div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        //$("#txtfields").hide();
+        //$("#datepicker").kendoDatePicker();
+        //$("#datepicker").val(new Date().toLocaleDateString());
+        $("#supdatetime").data("kendoDateTimePicker").value('@Session["datetime"]');
+
+    });
+
+    function reqSave() {
+        var obrno = $("#obrno").val()
+        var tdate = $("#supdatetime").val()
+        if (obrno == "") {
+            swal("","There's nothing to save folks!","warning")
+        }
+        else {
+            swal({
+                title: "Do you want to update the transaction date?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: status,
+                closeOnConfirm: false,
+                showLoaderOnConfirm: true
+            },
+                function (isConfirm) {
+                    if (isConfirm) {
+                        var url = "@Url.Action("savetransdate", "Maintenance")";
+                        $.get(url, { obrno: obrno, tdate: tdate }, function (e) {
+                            if (e == "success") {
+                                swal("Success", "Transaction date successfully changed!", "success");
+                                $("#TransDate").data("kendoGrid").dataSource.read()
+                            } else {
+                                swal("Error", e, "error");
+                            }
+                        });
+                    }
+                });
+        }
+    }
+</script>

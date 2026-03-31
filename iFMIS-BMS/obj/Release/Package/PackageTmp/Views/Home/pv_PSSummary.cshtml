@@ -1,0 +1,12 @@
+﻿@(Html.Kendo().TabStrip()
+              .Name("PSSummaryTabStrip")
+              .Navigatable(false)
+              .Animation(animation =>
+                  animation.Open(effect =>
+                  effect.Fade(FadeDirection.In)))
+              .Items(tabstrip =>
+              {
+                  tabstrip.Add().Text("Plantilla Summary").Selected(true).LoadContentFrom("PlantillaSummaryTab", "Home");
+                  tabstrip.Add().Text("Proposed Positions Summary").LoadContentFrom("ProposedPositionsTab", "Home");
+              })
+)

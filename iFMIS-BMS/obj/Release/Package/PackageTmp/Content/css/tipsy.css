@@ -1,0 +1,44 @@
+.tipsy { 
+    padding: 5px; 
+    font-size: 11px; 
+    /*opacity: 0.8; 
+    filter: alpha(opacity=80);*/ 
+    background:url("tipsy.png") no-repeat;
+    z-index:20;
+   
+}
+  .tipsy-inner { 
+      padding: 5px 8px 10px 15px; 
+      background-color: black; 
+      color: white; 
+      max-width: 250px; 
+      min-height:-5px;
+      text-align: left; 
+      /*opacity: 0.8;*/ 
+    /*filter: alpha(opacity=80);*/ 
+    z-index:100;
+  }
+  /*.tipsy-inner { 
+      -moz-border-radius:3px; 
+      -webkit-border-radius:3px; 
+  }*/
+  .tipsy-north { 
+      background-position: top center; 
+      
+      
+  }
+  .tipsy-south { 
+      background-position: bottom center; 
+      
+  }
+  .tipsy-east { 
+      background-position: right center; 
+      
+  }
+  .tipsy-west { 
+      background-position: left center; 
+      
+      /*padding-top:22px;*/
+      
+  }
+

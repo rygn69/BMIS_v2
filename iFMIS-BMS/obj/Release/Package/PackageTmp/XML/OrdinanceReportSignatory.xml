@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Table>
+  <Signatory>
+    <SignatoryID>1</SignatoryID>
+    <SignatoryName></SignatoryName>
+  </Signatory>
+  <Signatory>
+    <SignatoryID>2</SignatoryID>
+    <SignatoryName></SignatoryName>
+  </Signatory>
+  <Signatory>
+    <SignatoryID>3</SignatoryID>
+    <SignatoryName>LINA O. MONTILLA, PHD</SignatoryName>
+  </Signatory>
+  <Signatory>
+    <SignatoryID>4</SignatoryID>
+    <SignatoryName>City Vice Mayor</SignatoryName>
+  </Signatory>
+  <Signatory>
+    <SignatoryID>5</SignatoryID>
+    <SignatoryName>Presiding Officer</SignatoryName>
+  </Signatory>
+  <Signatory>
+    <SignatoryID>6</SignatoryID>
+    <SignatoryName>JOSEPH GEORGE L. LECHONSITO, MD, DPA</SignatoryName>
+  </Signatory>
+  <Signatory>
+    <SignatoryID>7</SignatoryID>
+    <SignatoryName>City Mayor</SignatoryName>
+  </Signatory>
+</Table>

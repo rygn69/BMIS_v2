@@ -1,0 +1,15 @@
+﻿@(Html.Kendo().TabStrip()
+          .Name("tobstrip_me")
+          .Navigatable(false)
+          .Animation(animation =>
+              animation.Open(effect =>
+              effect.Fade(FadeDirection.In)))
+          .Items(tabstrip =>
+          {
+              tabstrip.Add().Text("Float").Selected(true).LoadContentFrom("Float_EE", "Release");
+              tabstrip.Add().Text("Subs/Inco").LoadContentFrom("Float_EE_Subsidy", "Release");
+            
+          })
+        //.Events(e => e.Activate("fn_refresher"))
+           
+)

@@ -1,0 +1,757 @@
+﻿
+<style>
+    .btn-delete a {
+        color: #000000;
+        background-color: #ffffff;
+        border-style: solid;
+        border-color: #333333;
+        border-width: 1px;
+        /*height: auto;*/
+        /*width: auto;*/
+        padding: 3px;
+        padding-left: 5px;
+        padding-right: 5px;
+        cursor: pointer;
+        margin: auto;
+    }
+
+        .btn-delete a:hover {
+            color: #ffffff;
+            background-color: #000000;
+            border-style: solid;
+            border-color: #333333;
+            /*height: auto;
+            width: auto;*/
+        }
+</style>
+
+<script>
+
+    function GridParameters() {
+        var OffID = "";
+        var isMainOffice = "";
+        if (document.getElementById("cbChildOfficeSelected").checked == true && document.getElementById("MotherOfficeDiv").style.display != "none") {
+            isMainOffice = "NO";
+        }
+        else {
+            isMainOffice = "YES";
+        }
+        if ('@Account.UserInfo.UserTypeDesc.ToString()' == 'Budget In-Charge') {
+            OffID = @Account.UserInfo.Department.ToString();
+
+        }
+        else {
+            OffID = $("#ddlOffices").val()
+        }
+        return {
+            OfficeID: OffID,
+            isMainOffice: isMainOffice,
+            PlanYear:$("#PlanYear").val() - 1
+        }
+
+    }
+    function GridParametersCasual() {
+        OffID = $("#ddlOffices").val()
+        
+        return {
+            OfficeID: OffID,
+            PlanYear:$("#PlanYear").val() - 1
+        }
+
+    }
+
+    function ProposeStepIncrement(SeriesID, ForStepIncrement,StepNew) {
+        if (ForStepIncrement == 0) {
+            swal({
+                title: "Notice!",
+                text: "Step Increment is not Available for this Employee Yet",
+                type: "info",
+                timer: 2000,
+                showConfirmButton: false
+            });
+        }
+        else if(ForStepIncrement == 2){
+            swal({
+                title: "Notice!",
+                text: "Step Increment Already Proposed",
+                type: "info",
+                timer: 2000,
+                showConfirmButton: false
+            });
+        }
+        else {
+            var url = "@Url.Action("UpdatePlantilla", "Maintenance")";
+            $.post(url, { SeriesID: SeriesID }, function (d) {
+                $(window).scrollTop(0);
+                $('#ProposeNewItem').html(d);
+                $('#ProposeNewItem').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Update Item").center().open();
+            })
+        }
+    }
+    function AddNew() {
+        var url = "@Url.Action("reqAddNewPlantillaItem", "Maintenance")";
+        //$('#ComputationDetails').html('<div style="width: 100%;height:100%;"><img src="@Url.Content("~/Content/images/loading.gif")" alt="Loading..." style="position: absolute;top: 20%;left: 30%;margin-top: 0px;margin-left: 0px;" /></div>');
+        $.post(url,{PlanYear:$("#PlanYear").val()  -1 }, function (pvData) {
+            $(window).scrollTop(0);
+            $('#ProposeNewItem').html(pvData);
+            $('#ProposeNewItem').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Propose new Position").center().open();
+        })
+    }
+    function AddNewCasual() {
+        var url = "@Url.Action("AddCasual", "Home")";
+        //$('#ComputationDetails').html('<div style="width: 100%;height:100%;"><img src="@Url.Content("~/Content/images/loading.gif")" alt="Loading..." style="position: absolute;top: 20%;left: 30%;margin-top: 0px;margin-left: 0px;" /></div>');
+        $.post(url,{PlanYear:$("#PlanYear").val() - 1}, function (pvData) {
+            $(window).scrollTop(0);
+            $('#ProposeNewCasual').html(pvData);
+            $('#ProposeNewCasual').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Propose new Casual").center().open();
+        })
+    }
+    function LoadPlantillaItems() {
+        var url2 = "@Url.Action("CheckMotherOffice", "Maintenance")";
+        var plantillayear=$("#PlanYear").val()  -1
+        //alert(plantillayear)
+        $.post(url2,{OfficeID:$("#ddlOffices").val(),PlanYear:plantillayear}, function (d) {
+            if (d == '') {
+                document.getElementById("MotherOfficeDiv").style.display = "none";
+                document.getElementById("cbChildOfficeSelected").checked = false;
+            }
+            else {
+                document.getElementById("MotherOfficeDiv").style.display = "inline";
+                document.getElementById("cbChildOfficeSelected").checked = true;
+                document.getElementById('lblMotherOffice').innerHTML = d;
+            }
+            var SelectedTabIndex = $("#tabstrip").data("kendoTabStrip").select().index();
+            if (SelectedTabIndex == 0) {
+                $("#grdPlantillaList").data("kendoGrid").dataSource.read();
+            }
+            else {
+                $("#grdCasualList").data("kendoGrid").dataSource.read();
+            }
+        })
+        var url = "@Url.Action("CheckWithHazardPay", "Maintenance")";
+        $.post(url,{OfficeID:$("#ddlOffices").val(),PlanYear:plantillayear}, function (d) {
+            if (d != '0') {
+                document.getElementById("HazardFormulaLabel").style.display = "inline-block";
+                $("#ddlHazardComputation").data("kendoComboBox").value(d);
+            }
+            else {
+                document.getElementById("HazardFormulaLabel").style.display = "none";
+            }
+        })
+    }
+    function reqRemove(ForStepIncrement,SeriesID) {
+        if (ForStepIncrement == 2 || ForStepIncrement == 3) {
+            swal({
+                title: "Are you sure?",
+                text: "This item will be removed!",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes, Remove It!",
+                closeOnConfirm: false
+            }, function () {
+                var url = "@Url.Action("RemoveProposedPlantillaItem", "Maintenance")";
+                $.get(url, { PlantillaItemID: SeriesID }, function (d) {
+                    if (d == "1") {
+                        swal({
+                            title: "Success!",
+                            text: "Item Succesffuly Removed.",
+                            type: "success",
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+
+                        $("#grdPlantillaList").data("kendoGrid").dataSource.read();
+                    } else {
+                        swal("Error!", d, "error");
+                    }
+                });
+            });
+        }
+        else if (ForStepIncrement == 4){
+            swal({
+                title: "Notice!",
+                text: "This Item Has been Submitted!",
+                type: "info",
+                timer: 2000,
+                showConfirmButton: false
+            });
+        }
+        else {
+            swal({
+                title: "Notice!",
+                text: "You Can Only Remove Currently proposed item",
+                type: "info",
+                timer: 2000,
+                showConfirmButton: false
+            });
+        }
+    }
+    function reqEdit(ForStepIncrement,SeriesID) {
+        var PlanYear=$("#PlanYear").val()  -1
+        if (ForStepIncrement == 2 ) {
+            var url1 = "@Url.Action("ReqEditPlantillaItem", "Maintenance")";
+            $.post(url1,{ ProposedItemID:SeriesID,PlanYear:PlanYear}, function (pvData) {
+                $(window).scrollTop(0);
+                $('#ProposeNewItem').html(pvData);
+                $('#ProposeNewItem').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Update Proposed Position").center().open();
+            })
+        }
+        else if(ForStepIncrement == 3) {
+            var url2 = "@Url.Action("ReqEditProposedCasual", "Maintenance")";
+            $.post(url2,{ ProposedItemID:SeriesID}, function (pvData) {
+                $(window).scrollTop(0);
+                $('#ProposeNewCasual').html(pvData);
+                $('#ProposeNewCasual').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Update Proposed Casual").center().open();
+            })
+        }
+        else if (ForStepIncrement == 4){
+            swal({
+                title: "Notice!",
+                text: "This Item Has been Submitted!",
+                type: "info",
+                timer: 2000,
+                showConfirmButton: false
+            });
+        }
+        else {
+            swal({
+                title: "Notice!",
+                text: "You Can Only Edit Currently proposed item",
+                type: "info",
+                timer: 2000,
+                showConfirmButton: false
+            });
+        }
+    }
+    function btnTransfer(SeriesID,ForStepIncrement) {
+        if (ForStepIncrement == 2 || ForStepIncrement == 3 || ForStepIncrement == 4) {
+            alert('Cannot Complete Request This item is already assigned in your office');
+        }
+        else {
+            if (document.getElementById("cbChildOfficeSelected").checked == false) {
+                var url2 = "@Url.Action("CheckMotherOffice", "Maintenance")";
+                $.post(url2,{OfficeID:$("#ddlOffices").val()}, function (d) {
+                    if (d == '') {
+                        alert('Cannot Complete Request only the Offices that has Mother Office Can use This Function');
+                    }
+                    else {
+                        var url2 = "@Url.Action("reqTransferToChildOffice", "Maintenance")";
+                        $.post(url2,{ SeriesID:SeriesID, OfficeID:$("#ddlOffices").val()}, function (result) {
+                            if (result == 1) {
+                                alert('Successfuly Transfered');
+                                $("#grdPlantillaList").data("kendoGrid").dataSource.read();
+                            }
+                            else {
+                                alert(result);
+                            }
+                        })
+                    }
+                })
+            }
+            else {
+                var url2 = "@Url.Action("reqTransferToMotherOffice", "Maintenance")";
+                $.post(url2,{ SeriesID:SeriesID, OfficeID:$("#ddlOffices").val()}, function (d) {
+                    if (d == 1) {
+                        alert('Successfuly Transfered');
+                        $("#grdPlantillaList").data("kendoGrid").dataSource.read();
+                    }
+                    else {
+                        alert(d);
+                    }
+                })
+                //alert('This Item has been transfered to your office already please uncheck the box and click the display button to view items from main office');
+            }
+        }
+    }
+    function ChangeSelectedOffice(){
+        $("#grdPlantillaList").data("kendoGrid").dataSource.read();
+        //$("#grdPlantillaList tr.k-grouping-row:even").remove();
+    }
+    var thisculture = kendo.culture();
+    thisculture.numberFormat.currency.symbol = '₱';
+
+    function Sample(SeriesID) {
+        if (document.getElementById("cbChildOfficeSelected").checked == false) {
+            $("#Transferbtn"+SeriesID).attr('title', 'Transfer to Sub Office');
+        }
+        else {
+            $("#Transferbtn"+SeriesID).attr('title', 'Transfer to main Office');
+        }
+
+    }
+    function OnGridDataBound(e) {
+        $("#grdPlantillaList tr.k-grouping-row:even").remove();
+
+        var rows = e.sender.tbody.children();
+
+        for (var j = 0; j < rows.length; j++) {
+
+            var row = $(rows[j]);
+            var dataItem = e.sender.dataItem(row);
+            document.getElementById(dataItem.get("SeriesID")).click();
+
+            if (dataItem.get("EmployeeName") == 'VACANT' || dataItem.get("EmployeeName") == '(For Funding)') {
+                row.addClass("ChangeVacantBackColor");
+            }
+            if (dataItem.get("ForStepIncrement") == 1) {
+                row.addClass("ChangeStepIncrementBackColor");
+            }
+        }
+
+    }
+    function ResizePlantillaDIV() {
+        if (document.getElementById("GridSizeIndicator").value == 0) {
+            $('#PlantillaGridDiv').css("position", "fixed");
+            $('#PlantillaGridDiv').css("top", "0");
+            $('#PlantillaGridDiv').css("bottom", "0");
+            $('#PlantillaGridDiv').css("right", "0");
+            $('#PlantillaGridDiv').css("left", "0");
+            $('#PlantillaGridDiv').css("background", "#FFF");
+            $('#PlantillaGridDiv').css("z-index", "10000");
+            $('#PlantillaGridDiv').css("padding", "20px 10px 10px 10px");
+            $("html").css("overflow-y", "hidden");
+            $('#PlantillaGridDiv').css("overflow-y", "auto");
+            document.getElementById("GridSizeIndicator").value = 1
+            $('#legendDIV').css("display", "inline-block");
+            $("#platillanmaxid").replaceWith('<i id="platillanmaxid" class="fa fa-compress"></i>')
+            $("#plantitleid").replaceWith('<button id="plantitleid" class="k-button k-button-icontext" onclick="ResizePlantillaDIV()" title="Minimize"> <i id="platillanmaxid" class="fa fa-compress"></i></button')
+            
+        }
+        else {
+            $('#PlantillaGridDiv').css("position", "");
+            $('#PlantillaGridDiv').css("top", "");
+            $('#PlantillaGridDiv').css("bottom", "");
+            $('#PlantillaGridDiv').css("right", "");
+            $('#PlantillaGridDiv').css("left", "");
+            $('#PlantillaGridDiv').css("background", "");
+            $('#PlantillaGridDiv').css("z-index", "");
+            $('#PlantillaGridDiv').css("padding", "");
+            $('#PlantillaGridDiv').css("margin", "0px 10px 0px 0px");
+            $("html").css("overflow-y", "auto");
+            $('#PlantillaGridDiv').css("overflow-y", "hidden");
+            document.getElementById("GridSizeIndicator").value = 0
+            $('#legendDIV').css("display", "none");
+            $("#platillanmaxid").replaceWith('<i id="platillanmaxid" class="fa fa-arrows-alt"></i>')
+            $("#plantitleid").replaceWith('<button id="plantitleid" class="k-button k-button-icontext" onclick="ResizePlantillaDIV()" title="Maximize"> <i id="platillanmaxid" class="fa fa-arrows-alt"></i></button')
+           
+        }
+    }
+    function ResizeCasualDIV() {
+        if (document.getElementById("GridSizeIndicatorCasual").value == 0) {
+            MaximizeDIV("CasualGridDiv");
+            document.getElementById("GridSizeIndicatorCasual").value = 1
+            $("#casualmaxid").replaceWith('<i id="casualmaxid" class="fa fa-compress"></i>')
+            $("#casualtitleid").replaceWith('<button id="casualtitleid" class="k-button k-button-icontext" onclick="ResizeCasualDIV()" title="Minimize"> <i id="casualtitleid" class="fa fa-compress"></i></button')
+        }
+        else {
+            MinimizeDIV("CasualGridDiv");
+            document.getElementById("GridSizeIndicatorCasual").value = 0
+            $("#casualmaxid").replaceWith('<i id="casualmaxid" class="fa fa-arrows-alt"></i>')
+            $("#casualtitleid").replaceWith('<button id="casualtitleid" class="k-button k-button-icontext" onclick="ResizeCasualDIV()" title="Maximize"> <i id="casualtitleid" class="fa fa-arrows-alt"></i></button')
+        }
+
+    }
+
+    function ExcludeInHazard(SeriesID,EmployeeName) {
+        var isForFunding = 0
+        if( EmployeeName == "(For Funding)"){
+            isForFunding = 1;
+        }
+        else {
+            isForFunding = 0;
+        }
+        swal({
+            title: "Are you sure?",
+            text: "This Action will Exclude the selected Item from the Hazard Pay Computation!",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, Exclude It!",
+            closeOnConfirm: false
+        }, function () {
+            var url = "@Url.Action("ReqExcludeOnHazard", "Maintenance")";
+            $.get(url, { PlantillaItemNo: SeriesID,isForFunding:isForFunding }, function (d) {
+                if (d == "1") {
+                    swal({
+                        title: "Success!",
+                        text: "Item Succesffuly Excluded.",
+                        type: "success",
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    GetButton(SeriesID,EmployeeName);
+                } else {
+                    swal("Error!", d, "error");
+                }
+            });
+        });
+    }
+    function ExcludeInSubsistence(SeriesID,EmployeeName) {
+        var isForFunding = 0
+        if( EmployeeName == "(For Funding)"){
+            isForFunding = 1;
+        }
+        else {
+            isForFunding = 0;
+        }
+        swal({
+            title: "Are you sure?",
+            text: "This Action will Exclude the selected Item from the Subsistence Computation!",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, Exclude It!",
+            closeOnConfirm: false
+        }, function () {
+            var url = "@Url.Action("ReqExcludeOnSubsistence", "Maintenance")";
+            $.get(url, { PlantillaItemNo: SeriesID,isForFunding:isForFunding }, function (d) {
+                if (d == "1") {
+                    swal({
+                        title: "Success!",
+                        text: "Item Succesffuly Excluded.",
+                        type: "success",
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    GetButton(SeriesID,EmployeeName);
+                } else {
+                    swal("Error!", d, "error");
+                }
+            });
+        });
+    }
+    function IncludeInHazard(SeriesID,EmployeeName) {
+        var isForFunding = 0
+        if( EmployeeName == "(For Funding)"){
+            isForFunding = 1;
+        }
+        else {
+            isForFunding = 0;
+        }
+        swal({
+            title: "Are you sure?",
+            text: "This Action will Include the selected Item from the Hazard Pay Computation!",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#02a771",
+            confirmButtonText: "Yes, Include It!",
+            closeOnConfirm: false
+        }, function () {
+            var url = "@Url.Action("ReqIncludeOnHazard", "Maintenance")";
+            $.get(url, { PlantillaItemNo: SeriesID,isForFunding:isForFunding }, function (d) {
+                if (d == "1") {
+                    swal({
+                        title: "Success!",
+                        text: "Item Succesffuly Included.",
+                        type: "success",
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    GetButton(SeriesID,EmployeeName);
+                } else {
+                    swal("Error!", d, "error");
+                }
+            });
+        });
+    }
+    function IncludeInSubsistence(SeriesID,EmployeeName) {
+        var isForFunding = 0
+        if( EmployeeName == "(For Funding)"){
+            isForFunding = 1;
+        }
+        else {
+            isForFunding = 0;
+        }
+        swal({
+            title: "Are you sure?",
+            text: "This Action will Include the selected Item from the Subsistence Computation!",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#02a771",
+            confirmButtonText: "Yes, Include It!",
+            closeOnConfirm: false
+        }, function () {
+            var url = "@Url.Action("ReqIncludeOnSubsistence", "Maintenance")";
+            $.get(url, { PlantillaItemNo: SeriesID,isForFunding:isForFunding }, function (d) {
+                if (d == "1") {
+                    swal({
+                        title: "Success!",
+                        text: "Item Succesffuly Included.",
+                        type: "success",
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    GetButton(SeriesID,EmployeeName);
+                } else {
+                    swal("Error!", d, "error");
+                }
+            });
+        });
+    }
+    function GetButton(SeriesID,EmployeeName) {
+        var isForFunding = 0
+        if( EmployeeName == "(For Funding)"){
+            isForFunding = 1;
+        }
+        else {
+            isForFunding = 0;
+        }
+        var url = "@Url.Action("CheckHazardAndSubsistence", "Maintenance")";
+        $.post(url,{ SeriesID:SeriesID, OfficeID:$("#ddlOffices").val(),isForFunding:isForFunding}, function (result) {
+            if (result == 'HazardOnly') {
+                $('#'+SeriesID+'').replaceWith( "<div id=" + SeriesID + "> <div class=\"k-button\" onclick=\"ExcludeInHazard("+ SeriesID +",'"+ EmployeeName +"')\" style=\"inline-block\" title=\"Exclude on Hazard Computation\"> <span style=\"color:red\" class=\"fa fa-user-times\"></span> Hazard</div>" +
+                                                "<div class=\"k-button\" onclick=\"IncludeInSubsistence("+ SeriesID +",'"+ EmployeeName +"')\" style=\"inline-block\" title=\"Include on Subsistence Computation\"> <span style=\"color:green\" class=\"fa fa-user-plus\"></span> Subsistence</div></div>" );
+            }
+            else if(result == 'SubsistenceOnly') {
+                $('#'+SeriesID+'').replaceWith( "<div id=" + SeriesID + "> <div class=\"k-button\" onclick=\"IncludeInHazard("+ SeriesID +",'"+ EmployeeName +"')\" style=\"inline-block\" title=\"Include on Hazard Computation\"> <span style=\"color:green\" class=\"fa fa-user-plus\"></span> Hazard</div>" +
+                                                "<div class=\"k-button\" onclick=\"ExcludeInSubsistence("+ SeriesID +",'"+ EmployeeName +"')\" style=\"inline-block\" title=\"Exclude on Subsistence Computation\"> <span style=\"color:red\" class=\"fa fa-user-times\"></span> Subsistence</div></div>");
+            }
+            else if(result == 'CompleteExclude'){
+                $('#'+SeriesID+'').replaceWith( "<div id=" + SeriesID + "> <div class=\"k-button\" onclick=\"ExcludeInHazard("+ SeriesID +",'"+ EmployeeName +"')\" style=\"inline-block\" title=\"Exclude on Hazard Computation\"> <span style=\"color:red\" class=\"fa fa-user-times\"></span> Hazard</div>" +
+                                                "<div class=\"k-button\" onclick=\"ExcludeInSubsistence("+ SeriesID +",'"+ EmployeeName +"')\" style=\"inline-block\" title=\"Exclude on Subsistence Computation\"> <span style=\"color:red\" class=\"fa fa-user-times\"></span> Subsistence</div></div>" );
+            }
+            else if(result == 'CompleteInclude'){
+                $('#'+SeriesID+'').replaceWith( "<div id=" + SeriesID + "> <div class=\"k-button\" onclick=\"IncludeInHazard("+ SeriesID +",'"+ EmployeeName +"')\" style=\"inline-block\" title=\"Include on Hazard Computation\"> <span style=\"color:green\" class=\"fa fa-user-plus\"></span> Hazard</div>" +
+                                                "<div class=\"k-button\" onclick=\"IncludeInSubsistence("+ SeriesID +",'"+ EmployeeName +"')\" style=\"inline-block\" title=\"Include on Subsistence Computation\"> <span style=\"color:green\" class=\"fa fa-user-plus\"></span> Subsistence</div></div>" );
+            }
+            else if(result == 'None'){
+                $('#'+SeriesID+'').replaceWith("<div id=" + SeriesID + "></div>");
+            }
+            else {
+                $('#'+SeriesID+'').replaceWith("<div id=" + SeriesID + ">" + result + "</div>");
+            }
+        })
+    }
+    function ReqEditCasual(SeriesID,DivID,AppointmentDate) {
+        OfficeID = $("#ddlOffices").val();
+        var url = "@Url.Action("ReqEditCasual", "Home")";
+        $.post(url,{SeriesID:SeriesID,CasualRateID:DivID,EffectivityDate:AppointmentDate,OfficeID:OfficeID}, function (pvData) {
+            $(window).scrollTop(0);
+            $('#ProposeNewCasual').html(pvData);
+            $('#ProposeNewCasual').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Update Casual").center().open();
+        })
+    }
+    function reqRemoveCasual(SeriesID) {
+        swal({
+            title: "Are you sure?",
+            text: "This Action will Remove the selected Item from the List!",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, Remove It!",
+            closeOnConfirm: false
+        }, function () {
+            var url = "@Url.Action("reqRemoveCasual", "Maintenance")";
+            $.get(url, { SeriesID: SeriesID}, function (d) {
+                if (d == "1") {
+                    swal({
+                        title: "Success!",
+                        text: "Item Succesffuly Removed.",
+                        type: "success",
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    $("#grdCasualList").data("kendoGrid").dataSource.read();
+                } else {
+                    swal("Error!", d, "error");
+                }
+            });
+        });
+    }
+    function OnTabstripActivate() {
+        var SelectedTabIndex = $("#tabstrip").data("kendoTabStrip").select().index();
+        var OfficeID = $("#ddlOffices").val();
+        if (OfficeID != '') {
+            if (SelectedTabIndex == 0) {
+                $("#grdPlantillaList").data("kendoGrid").dataSource.read();
+            }
+            else {
+                $("#grdCasualList").data("kendoGrid").dataSource.read();
+            }
+        }
+    }
+    function UpdateFormulaUsed() {
+        if (document.getElementById("HazardFormulaLabel").style.display != 'none') {
+            var url = "@Url.Action("reqUpdateHazardFormulaUsed", "Maintenance")";
+            $.get(url, { SeriesID: $("#ddlHazardComputation").val(),OfficeID:$("#ddlOffices").val()}, function (d) {
+                if (d == "1") {
+                    swal({
+                        title: "Success!",
+                        text: "Formula Successfuly Updated.",
+                        type: "success",
+                        showConfirmButton: true
+                    });
+                } else {
+                    swal("Error!", d, "error");
+                }
+            });
+        }
+    }
+</script>
+<div id="MotherOfficeDiv">
+    <label style="display:inline-block">Main Office: <span id="lblMotherOffice"></span> </label>
+    <div style="width : 32%;">
+        <input type="checkbox" id="cbChildOfficeSelected" class="k-checkbox" value="7015" onclick="ChangeSelectedOffice()" >
+        <label class="k-checkbox-label" for="cbChildOfficeSelected">View Sub Office Data</label>
+    </div>
+</div>
+
+
+<label style="margin-left: 0px;margin-right:5px;margin-top: 10px;margin-bottom: 2px; display : inline-block">
+    Office :&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    @(Html.Kendo().ComboBox()
+                         .Name("ddlOffices")
+                         .DataTextField("OfficeName")
+                         .DataValueField("OfficeID")
+                         .Filter("contains")
+                         .MinLength(1)
+                         .Placeholder("Select Office...")
+                         .HtmlAttributes(new { @style = "width: 520px;margin-left:px" })
+                         .DataSource(source => source.Read(read => read.Action("ddlOfficeUP", "User")))
+                         .Events(e => e.Change("LoadPlantillaItems"))
+    )
+</label>
+<label style="float:top;margin-left: 0px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px; ">
+    Plantilla Year :&nbsp;&nbsp;&nbsp;&nbsp;
+    @(Html.Kendo().DropDownList()
+                        .Name("PlanYear")
+                        .DataTextField("ProposalYear")
+                        .DataValueField("ProposalYear")
+                        .OptionLabel("Year")
+                        .SelectedIndex(1)
+                        .Events(e => e.Change("LoadPlantillaItems"))
+                        .HtmlAttributes(new { @style = "width: 80px;text-align:left;margin-right:5px;" })
+    //ddlProposalYearNew
+    //.DataSource(source => source.Read(read => read.Action("Years", "Dropdowns")))
+                        .DataSource(source => source.Read(read => read.Action("ddlProposalYearNew", "Dropdowns")))
+
+    )
+</label>
+<label id="HazardFormulaLabel" style="margin-left: 0px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px; display : none">
+    Hazard Formula Used :&nbsp;&nbsp;&nbsp;&nbsp;
+    @(Html.Kendo().ComboBox()
+                         .Name("ddlHazardComputation")
+                         .DataTextField("Text")
+                         .DataValueField("Value")
+                         .Filter("contains")
+                         .MinLength(1)
+                         .Placeholder("Select Formula...")
+                         .HtmlAttributes(new { @style = "width: 413px;" })
+                         .DataSource(source => source.Read(read => read.Action("ddlHazardComputation", "Maintenance")))
+                         .Events(e => e.Change("UpdateFormulaUsed"))
+    )    
+</label>
+
+<div style="width:60%;display:inline-block">
+    <label style="margin-left: 0px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px; display : inline-block">
+        Legend :
+        <span class='fa fa-circle' style='color:yellow;' id='circle-id'></span> Proposed New Position For Funding
+        <br /> <span class='fa fa-circle' style='color:red; margin-left:67px' id='circle-id'></span> Proposed New Position For Funding(Submitted)
+        <br /> <span class='fa fa-user-times' style='color:red; margin-left:67px' id='circle-id'></span> Included on Hazard Pay Or Subsistence
+        <br /> <span class='fa fa-user-plus' style='color:green; margin-left:67px' id='circle-id'></span> Excluded on Hazard Pay Or Subsistence
+    </label>
+</div>
+    @*<div style="width:35%; display:inline-block;font-size:13px">
+            <label style="margin-left: 0px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px; display : inline-block">
+                Funded Position : <span id="FundedTotal"></span>
+                <br />
+                Proposed Casual : <span id="CasualTotal"></span>
+                <br />
+                Proposed Position : <span id="ProposedPositionTotal"></span>
+            </label>
+        </div>*@
+
+
+    @(Html.Kendo().TabStrip()
+          .Name("tabstrip")
+          .Navigatable(false)
+          .Animation(animation =>
+              animation.Open(effect =>
+              effect.Fade(FadeDirection.In)))
+          .Events(e => e.Activate("OnTabstripActivate"))
+          .Items(tabstrip =>
+          {
+              tabstrip.Add().Text("Plantilla").Selected(true).LoadContentFrom("pv_PlantillaOfPersonel", "Maintenance");
+              tabstrip.Add().Text("Casual").LoadContentFrom("pv_CasualEmployees", "Maintenance");
+          })
+    )
+
+
+
+    @(Html.Kendo().Window()
+    .Name("ProposeNewItem")
+    .Title("Propose New Position")
+    .Width(540)
+    .Height(570)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(true)
+    .AutoFocus(true)
+    .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        }).Actions(a => { a.Close(); }))
+    @(Html.Kendo().Window()
+    .Name("ProposeNewCasual")
+    .Title("Propose New Casual")
+    .Width(540)
+    .Height(300)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(true)
+    .AutoFocus(true)
+    .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        }).Actions(a => { a.Close(); }))
+
+    <script>
+        $(document).ready(function () {
+            setTimeout(function () {
+                if ('@Account.UserInfo.UserTypeDesc.ToString()' == 'Budget In-Charge') {
+                    $("#ddlOffices").data("kendoComboBox").value(@Account.UserInfo.Department.ToString());
+                    $("#ddlOffices").data("kendoComboBox").enable(false);
+                    var url2 = "@Url.Action("CheckMotherOffice", "Maintenance")";
+                    $.post(url2,{OfficeID:$("#ddlOffices").val()}, function (d) {
+                        if (d == '') {
+                            document.getElementById("MotherOfficeDiv").style.display = "none";
+                            document.getElementById("cbChildOfficeSelected").checked = false;
+                        }
+                        else {
+                            document.getElementById('lblMotherOffice').innerHTML = d;
+                            document.getElementById("cbChildOfficeSelected").checked = true;
+                        }
+                    })
+                    $("#grdPlantillaList").data("kendoGrid").dataSource.read();
+                }
+                else {
+                    document.getElementById("MotherOfficeDiv").style.display = "none";
+                    //                $("#ddlOffices").data("kendoComboBox").enable(false);
+                    $("#ddlOffices").data("kendoComboBox").enable();
+                }
+            }, 500);
+        });
+    </script>
+    <style>
+        .ChangeVacantBackColor {
+            background-color: #FFFF80;
+        }
+
+        .ChangeStepIncrementBackColor {
+            background-color: #80FF80;
+        }
+        .k-dropdown-wrap.k-state-default {
+            border-left-style:solid
+        }
+    </style>

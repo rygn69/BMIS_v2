@@ -1,0 +1,125 @@
+﻿
+<script>
+    function getParamPosted() {
+        var programid = $("#Program_supplemental_null").val() == "" ? 0 : $("#Program_supplemental_null").val()
+        var accountid = $("#account_list_supplemental_null").val() == "" ? 0 : $("#account_list_supplemental_null").val()
+        return {
+            office: $("#office_supplemental_req").val(),
+            programid: programid,
+            accountid: accountid,
+            status: 7,
+            yearof: $("#tyear").val(),
+            monthof: $("#Months_supplemental_null").val()
+        }
+    }
+    function searchApprove() {
+        var $filter = new Array();
+        $filter = [];
+
+        if ($('#searchApprove').val().length > 0) {
+            $filter.push({ field: "AccountName", operator: "contains", value: $('#searchApprove').val() }),
+            $filter.push({ field: "MonthOf", operator: "contains", value: $('#searchApprove').val() }),
+            $filter.push({ field: "subaccountname", operator: "contains", value: $('#searchApprove').val() })
+        }
+
+        $('#grd_supplemental_approved').data('kendoGrid').dataSource.filter({
+            logic: "or",
+            filters: $filter
+        });
+    }
+
+    $(function () {
+        $("#searchApprove").keypress(function (e) {
+            if (e.keyCode == 13) {
+                searchApprove();
+            }
+        });
+    });
+</script>
+<div id="searchAccountid" style="height: 30px; margin-top: 0px; float: right; margin-left: 200px;">
+    <input type="text" style="width:406px;border-collapse:collapse;margin:0px;border-style:solid;margin-left:0px;height:70%;outline:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search..." id="searchApprove" name="searchApprove">
+    <div class="k-button k-button-icontext" style="height:30px;width:40px;border-style:solid;" onclick="searchApprove()"><span class="mif-search"></span></div>
+</div>
+<div class="fa fa-re">
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Monthly_DD_Model>()
+    .Name("grd_supplemental_approved")
+    .Scrollable()
+    .Columns(col =>
+    {
+    
+    col.Bound(m => m.AccountName).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                    .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Account</div></text>)
+                    .Width(120)
+                    .HeaderHtmlAttributes(new { style = "text-align:left; vertical-align: middle; overflow: visible; white-space: normal" })
+                    .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> Total :</label></div>");
+     col.Bound(m => m.subaccountname).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                    .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Sub-Account</div></text>)
+                    .Width(120)
+                    .HeaderHtmlAttributes(new { style = "text-align:left; vertical-align: middle; overflow: visible; white-space: normal" });
+    col.Bound(m => m.Amount)
+                    .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                    .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Amount</div></text>)
+                    .Width(60)
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                    .ClientTemplate("<div>#=kendo.toString(Amount,'c2')# </div>");
+    col.Bound(m => m.AmountApprove)
+                    .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                    .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Approved <br />Amount</div></text>)
+                    .Width(60)
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                    .ClientTemplate("<div>#=kendo.toString(AmountApprove,'c2')# </div>")
+                     .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> </label><label> #=kendo.toString(sum, 'c2')#</label></div>");
+    col.Bound(m => m.MonthOf).HtmlAttributes(new { style = "text-align:center;height:30px" })
+                    .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Month</div></text>)
+                    .Width(60)
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+    col.Bound(m => m.YearOf).HtmlAttributes(new { style = "text-align:center;height:30px" })
+                    .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Year</div></text>)
+                    .Width(30)
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+    col.Bound(m => m.dtetime).HtmlAttributes(new { style = "text-align:center;height:30px" })
+                    .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Date and Time <br />Posted</div></text>)
+                    .Width(60)
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+
+    col.Bound(m => m.supplementalbudget_id).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                    .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">ID</div></text>)
+                    .Hidden()
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+    })
+
+        .Sortable()
+        .Scrollable()
+        .HtmlAttributes(new { style = "height:350px;" })
+        .Pageable(pageable => pageable
+            .Refresh(true)
+            .ButtonCount(3))
+        .DataSource(d => d
+        .Ajax()
+        .Aggregates(a =>
+        {
+            a.Add(c => c.AmountApprove).Sum();
+        })
+        .PageSize(1000)
+        .Model(m => m.Id(i => i.supplementalbudget_id))
+        .Read(read => read.Action("GetSupplementlist", "Release").Data("getParamPosted")))
+    )
+</div>
+
+<div style="float:right;margin-top:15px;width:280px;margin-right:10px">
+    <div class="k-button k-button-icontext"  style="bottom: 15px; right: 25px;width: 100px;background-color:indianred; color:white;border-radius:50px;margin-left:10px" onclick="frmclose()"><span class="fa fa-close"></span> Close</div>
+</div>
+
+<script>
+    
+    //$(document).ready(function(){
+    //    $("#grd_supplemental_approved").data("kendoGrid").dataSource.read();
+      
+
+    //});
+
+   
+    function frmclose() {
+        $("#suppleapproved").data("kendoWindow").close();
+    }
+</script>

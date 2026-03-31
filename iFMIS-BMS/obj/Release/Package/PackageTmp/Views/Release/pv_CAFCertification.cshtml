@@ -1,0 +1,45 @@
+﻿
+
+@model iFMIS_BMS.BusinessLayer.Models.TransFundsModel
+
+<script>
+    $(document).ready(function () {
+        $("#certificationid").val('@ViewBag.certificate')
+    });
+
+    function fn_close() {
+        $("#addCAFStatement").data("kendoWindow").close();
+    }
+
+    function fn_preview() {
+        var cafno = $("#cafhistory").val();
+        var year = $("#ddlYear").val();
+        var issuedate = $("#datepicker").val();
+        var certid = $("#certificationid").val();
+        var applynewdate = $("#applynewdate").val();
+        //alert(certid)
+        $.ajax({
+            async: false,
+            dataType: 'html',
+            success: window.open("../Reports/ReportViewer.aspx?rid=34&cafno=" + cafno + "&year=" + year + "&issuedate=" + issuedate + "&certid=" + certid + "&applynewdate" + applynewdate + "")
+        });
+    }
+
+</script>
+
+<div>   
+<label>Certification :</label>
+
+</div><div>
+    <textarea id="certificationid" rows="4" cols="50" style="width:470px;height:106px;text-align:justify"></textarea>
+</div>
+
+<div style="float:right;margin-left:130px">
+    <div style="float:left;margin-top:9px;margin-left:150px">
+        <div class="k-button k-button-icontext" style=" bottom: 15px; right: 220px;width: 100px; border-radius:7px;color:#ffffff;background-color:#1FA67A;" onclick="fn_preview()"><span class='mif-printer' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'></span> Preview</div>
+    </div>
+
+    <div style="float:left;margin-top:-30px;margin-left:253px">
+        <div class="k-button k-button-icontext" style=" bottom: 15px; right: 220px;width: 80px; border-radius:7px;color:#ffffff;background-color:#DE5555;" onclick="fn_close()"><span class='fa fa-times' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'></span> Close</div>
+    </div>
+</div>

@@ -1,0 +1,65 @@
+﻿<script>
+
+</script>
+<form id="formProgram" method="post">
+    <div style="margin-top:20px;">
+        <label>FMIS Office</label>
+        @(Html.Kendo().DropDownList()
+              .Name("office_id")
+              .DataTextField("office_name")
+              .OptionLabel("Select Office . .")
+              .DataValueField("office_id")
+              .HtmlAttributes(new { @style = "width: 80%;" })
+              .DataSource(source => { source.Read(read => { read.Action("ddlOffice", "Dropdowns"); }); })
+
+        )
+    </div>
+    <div style="margin-top:20px;">
+        <label>Program</label>
+        <script>
+            function filterProgram() {
+                var OfficeDropdown = $("#office_id").val();
+                return {
+                    OfficeDropdown: OfficeDropdown
+                }
+            }
+        </script>
+        @(Html.Kendo().DropDownList()
+                //PoPOut design || Text Field Drop codes
+                                    .Name("program_id")
+                                    .DataTextField("program_name")
+                                    .OptionLabel("Select Program . .")
+                                            .DataValueField("program_id")
+                                            .HtmlAttributes(new { @style = "width: 80%;" })
+                //dropdown connector to EmployeeController
+                                                    .DataSource(source =>
+                                                    {
+                                                        source.Read(read =>
+                                                            {
+                                                                read.Action("ddlProgram", "Dropdowns")
+                                                                    .Data("filterProgram");
+                                                            })
+                                                            .ServerFiltering(true);
+                                                    })
+                                    .Enable(false)
+                                    .AutoBind(false)
+                                    .CascadeFrom("office_id")
+
+        )
+    </div>
+    <div style="margin-top:20px;">
+        <label>Obj. of Expenditure</label>
+        @(Html.Kendo().DropDownList()
+                                    .Name("ooe_id")
+                                    .DataTextField("ooe_name")
+                                    .OptionLabel("Select OOE . .")
+                                    .DataValueField("ooe_id")
+                                    .HtmlAttributes(new { @style = "width: 80%;" })
+                                    .DataSource(source => { source.Read(read => { read.Action("ddlOOE", "Dropdowns"); }); })
+
+        )
+    </div>
+    <div>
+
+    </div>
+</form>

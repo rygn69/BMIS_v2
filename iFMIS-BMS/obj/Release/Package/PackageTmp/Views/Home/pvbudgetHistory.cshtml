@@ -1,0 +1,80 @@
+﻿@model iFMIS_BMS.BusinessLayer.Models.Maintenance.ooe
+
+
+<script></script>
+
+
+
+
+
+
+
+
+<div style="border: outset;clear:both;border-width:1px;border-color:#1fa67a; width: 875px; padding-left:0px;padding-right:0px;padding-top:0px;padding-bottom:7px;margin-top: 10px;">
+    <div style=" width: 0;height: 0; border-right: 5px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;margin-top: -1px; ">
+        <div style="float: left; width: 809px; margin-top:1px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 36px solid #1fa67a; ">
+
+            <div style="float: left; height:28px; margin-left:-59px; margin-top: 5px;">
+                <i class="fa fa-tasks fa-2x fg-white"></i>
+                 </div>
+            <div style="float:left;margin-left:100px;margin-top:3px;margin-bottom:10px;width:850px">
+                <label style="float:left; margin-right: 10px;" class="fg-white">Expense Class :</label>
+                @(Html.Kendo().DropDownListFor(m => m.ooe_id)
+                                .Name("ooe_idHistory")
+                                .DataTextField("ooe_name")
+                                .DataValueField("ooe_id")
+                                .OptionLabel("Select Expenses...")
+                                .HtmlAttributes(new { @style = "width: 500px;" })
+                                //.Events(e => e.Change("fn_dprefresher"))
+                                .DataSource(source => source.Read(read => read.Action("ddlOOENonOfficeLevel", "Dropdowns")))
+                )
+            </div>
+
+        </div>
+
+    </div>
+
+
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.ProgramsModel>()
+    .Name("grd_AnnualBudget1111")
+    .HtmlAttributes(new { style = "height:430px" })
+    .Columns(col =>
+    {
+        col.Bound(m => m.ProgramDescription).Title("Accounts");
+        col.Bound(m => m.ProgramDescription).Title("Amount");
+        col.Bound(m => m.ProgramDescription).Title("Date");
+
+        col.Template(t => { }).ClientTemplate(
+                        "<a class='cus-button' title='View Details' onclick='reqEdit(#=ProgramID#)'><span class='fa fa-edit' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'></span></a>"
+                        ).HtmlAttributes(new { style = "vertical-align: top;" }).Width(53);
+
+    }).ToolBar(toolbar =>
+       {
+           toolbar.Template(@<text>
+            <div style="float: right; height:28px;margin-top:2px;">
+                <link href="~/Content/metroui/css/docs.css" rel="stylesheet" />
+                <div style="background-color:white;border:solid;border-color:whitesmoke;border-width:thin;width:310px;height:30px;float:right;padding:0px;margin-top:-3px;" id="search">
+                    <input type="text" style="width:260px;border-collapse:collapse;border-color:white;margin:0px;margin-left:-10px;height:70%;outline:none;border-left-style:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search Accounts" id="SearchAccount" name="SearchAccount">
+                    <div class="k-button k-button-icontext" style="height:29px;width:40px;margin-top:0.6px;" onclick="searchAccount()"><span class="mif-search"></span></div>
+                </div>
+
+            </div>
+        </text>);
+       })
+
+                                          .Pageable(page => page.Refresh(true)
+                                          .Enabled(true)
+                                          .ButtonCount(4)
+                                          .PreviousNext(true)
+                                                                 )
+                                           .Selectable()
+                                              .DataSource(d => d
+                                              .Ajax()
+                                              .PageSize(10)
+                                              .Model(m => m.Id(i => i.ProgramID))
+                                                      .Read(read => read.Action("Programs_read2", "Annual").Data("fn_Program"))
+                                                                  )
+    )
+
+
+</div>  

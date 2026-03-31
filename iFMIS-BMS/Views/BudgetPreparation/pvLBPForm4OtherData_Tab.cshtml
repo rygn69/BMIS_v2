@@ -1,0 +1,141 @@
+﻿<script>
+    function AddLBPForm4OtherData() {
+        var Mode = "Add"
+        var url = "@Url.Action("pvLBPForm4OtherData_Window", "BudgetPreparation")";
+        $('#LBPForm4OtherDataWindow').html('<div style="width: 100%;height:100%;"><img src="@Url.Content("~/Content/images/loading.gif")" alt="Loading..." style="position: absolute;top: 20%;left: 30%;margin-top: 0px;margin-left: 0px;" /></div>');
+        $.post(url,{Mode:Mode,Series:'NONE'}, function (pvData) {
+            $(window).scrollTop(0);
+            $('#LBPForm4OtherDataWindow').html(pvData);
+            $('#LBPForm4OtherDataWindow').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Add New Item").center().open();
+        })
+    }
+    function reqEditForm4OtherData(SeriesID) {
+        var Mode = "Edit"
+        var url = "@Url.Action("pvLBPForm4OtherData_Window", "BudgetPreparation")";
+        $('#LBPForm4OtherDataWindow').html('<div style="width: 100%;height:100%;"><img src="@Url.Content("~/Content/images/loading.gif")" alt="Loading..." style="position: absolute;top: 20%;left: 30%;margin-top: 0px;margin-left: 0px;" /></div>');
+        $.post(url, { Mode: Mode, Series: SeriesID }, function (pvData) {
+            $(window).scrollTop(0);
+            $('#LBPForm4OtherDataWindow').html(pvData);
+            $('#LBPForm4OtherDataWindow').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Add New Item").center().open();
+        })
+    }
+    function reqRemoveForm4OtherData(SeriesID) {
+        var url = "@Url.Action("DeleteForm4OtherData", "BudgetPreparation")";
+        $.post(url, {SeriesID: SeriesID }, function (d) {
+            if (d == "1") {
+                $("#grdLBPForm4OtherData").data("kendoGrid").dataSource.read();
+                swal({
+                    title: "Success",
+                    text: "Data Successfully Removed!",
+                    type: "success",
+                    showConfirmButton: true
+                });
+            } else {
+                swal({
+                    title: "Error",
+                    text: e,
+                    type: "error",
+                    showConfirmButton: true
+                });
+            }
+        })
+    }
+    
+</script>
+<div style="border: outset;clear:both;border-width:1px;border-color:#1fa67a; width: 100%; padding-left:0px;padding-right:0px;padding-top:0px;padding-bottom:7px;margin-top: 10px;">
+    <div style=" width: 91.5%;height: 100%; border-right: 0px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;margin-top: -1px; ">
+        <div style="float: left; width: 100%; margin-top:1px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 36px solid #1fa67a; ">
+            <div style="float:right; width:100%">
+                <div style="float:left;margin-left:405px;margin-top:5px;">
+                    <button class="k-button k-button-icontext" onclick="CopyPriorEntry()"> <i class="fa fa-copy"></i> Copy Prior Year Entry </button>
+                </div>
+                <div style="float:right;margin-right:6px;margin-top:5px;">
+                    <button class="k-button k-button-icontext" onclick="AddLBPForm4OtherData()"> <i class="fa fa-plus-circle"></i> Add </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Budget_Preparation.LBPForm4OtherDataModel>()
+            .Name("grdLBPForm4OtherData")
+            .Columns(columns =>
+            {
+                columns.Bound(c => c.SeriesID).Hidden();
+                columns.Bound(c => c.DataTypeDesc).Hidden()
+                .ClientGroupHeaderTemplate("<div style='display:inline-block'>#= value #</div>");
+                columns.Bound(c => c.Description).Title("Description").Width(200).Encoded(false)
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+                columns.Template(t => { })
+                    .ClientTemplate("<div class='k-button' onclick='reqEditForm4OtherData(#=SeriesID#)' style='inline-block' title='Edit'>Edit</div>")
+                    .Width(85);
+                columns.Template(t => { })
+                    .ClientTemplate("<div class='k-button' onclick='reqRemoveForm4OtherData(#=SeriesID#)' style='inline-block' title='Remove'>Remove</div>")
+                    .Width(85);
+
+            })
+            .HtmlAttributes(new { style = "height: 525px;" })
+            .Scrollable(s => s.Enabled(true))
+            .Selectable()
+            .AutoBind(false)
+            .Pageable(p => p.ButtonCount(4).Refresh(true))
+            .DataSource(dataSource => dataSource
+                .Ajax()
+                .Batch(true)
+                .ServerOperation(true)
+                .Model(m => m.Id(i => i.SeriesID))
+                .AutoSync(true)
+                .Read(read => read.Action("grLBPForm4OtherData", "BudgetPreparation").Data("GridParameters"))
+                .Group(g =>
+                {
+                    g.Add(c => c.DataTypeDesc);
+                })
+                .Sort(s =>
+                {
+                    s.Add(c => c.OrderNo);
+                })
+            )
+    )
+</div>
+<script>
+    function CopyPriorEntry() {
+        var officeid = $("#ddlAIPOffices").val()
+        var transyear = $("#propsYears").val()
+        var url = "@Url.Action("copylbp4entry", "Report")";
+        swal({
+            title:"",
+            text: "This will copy the previous year office mandate, vision, mission and organizational outcome. Do you want to proceed?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes",
+            closeOnConfirm: false
+        }, function () {
+            $.get(url, { officeid: officeid, transyear: transyear }, function (e) {
+                if (e == "success") {
+                    swal("", "Done!", "success");
+                    $("#grdLBPForm4OtherData").data("kendoGrid").dataSource.read();
+                } else {
+                    swal("Error!", "Something wrong!", "error");
+                    $("#grdLBPForm4OtherData").data("kendoGrid").dataSource.read();
+                }
+            });
+        });
+    }
+</script>
+@(Html.Kendo().Window()
+    .Name("LBPForm4OtherDataWindow")
+    .Title("Add New Item")
+    .Width(500)
+    .Height(300)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(true)
+    .AutoFocus(true)
+    .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        }).Actions(a => { a.Close(); }))

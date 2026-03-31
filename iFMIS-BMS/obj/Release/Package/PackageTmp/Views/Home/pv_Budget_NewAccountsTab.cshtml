@@ -1,0 +1,208 @@
+﻿<script>
+    function onShow(e) {
+        var element = e.element.parent(),
+            eWidth = element.width(),
+            eHeight = element.height(),
+            wWidth = $(window).width(),
+            wHeight = $(window).height(),
+            newTop, newLeft;
+
+        newLeft = Math.floor(wWidth - (eWidth + 5));
+        newTop = 5;
+
+        e.element.parent().css({ top: newTop, left: newLeft });
+    }
+</script>
+
+<script>
+
+    var thisculture = kendo.culture();
+    thisculture.numberFormat.currency.symbol = '₱'; // Script For Changing The Currency Sign
+
+    $("#btnApproveNewAccounts").click(function () {
+            var notifi = new $("#popupNotification").data("kendoNotification");
+            notifi.hide();
+            var url = "@Url.Action("ApproveProposal", "Home")";
+            var idsToSend = [];
+            var AmountsToSend = [];
+            var grid = $("#grd_BudgetNewAccounts").data("kendoGrid")
+            var ds = grid.dataSource.view();
+
+            for (var i = 0; i < ds.length; i++) {
+                var row = grid.table.find("tr[data-uid='" + ds[i].uid + "']");
+                var checkbox = $(row).find(".checkbox");
+                if (checkbox.is(":checked")) {
+                    idsToSend.push(ds[i].ProposalID);
+                    AmountsToSend.push(ds[i].ProposalAmmount);
+                }
+            }
+            if (idsToSend == "") {
+                notifi.show("Please mark the accounts first", "error");
+            } else {
+                $.post(url, { ProposalID: idsToSend, ProposedAmounts: AmountsToSend }, function (d) {
+                    if (d == 1) {
+                        notifi.show("Selected Accounts Approved!", "success");
+                        $("#grd_BudgetNewAccounts").data("kendoGrid").dataSource.read();
+                    }
+                    else {
+                        notifi.show(d, "error");
+                    }
+                })
+            }
+    })
+    $("#btnDisapproveNewAccounts").click(function () {
+        var notifi = new $("#popupNotification").data("kendoNotification");
+        notifi.hide();
+        var url = "@Url.Action("ShowRemarskWindow", "Home")";
+        var idsToSend = [];
+        var grid = $("#grd_BudgetNewAccounts").data("kendoGrid")
+        var ds = grid.dataSource.view();
+
+        for (var i = 0; i < ds.length; i++) {
+            var row = grid.table.find("tr[data-uid='" + ds[i].uid + "']");
+            var checkbox = $(row).find(".checkbox");
+            if (checkbox.is(":checked")) {
+                idsToSend.push(ds[i].ProposalID);
+            }
+        }
+        if (idsToSend == "") {
+            notifi.show("Please mark the accounts first", "error");
+        } else {
+            $.get(url, function (d) {
+                $('#RemarksWindow').html(d);
+            })
+            $(window).scrollTop(0);
+            $('#RemarksWindow').data('kendoWindow').wrapper.css({
+                width: 335,
+                height: 235
+            });
+            $('#RemarksWindow').data('kendoWindow').center().open().title('Decline Selected Accounts');
+        }
+    })
+    function CheckAll(e) {
+        $("#grd_BudgetNewAccounts tbody input:checkbox").prop("checked", e.checked);
+    }
+    function myFunction(event) {
+        if ($.inArray(event.keyCode, [46, 8, 9, 27, 13, 110]) !== -1 ||
+            // Allow: Ctrl+A, Command+A
+           (event.keyCode == 65 && (event.ctrlKey === true || event.metaKey === true)) ||
+            // Allow: home, end, left, right, down, up
+           (event.keyCode >= 35 && event.keyCode <= 40)) {
+            // let it happen, don't do anything
+            return;
+        }
+        // Ensure that it is a number and stop the keypress
+        if ((event.shiftKey || (event.keyCode < 48 || event.keyCode > 57)) && (event.keyCode < 96 || event.keyCode > 105)) {
+            event.preventDefault();
+        }
+    }
+    function onGridEdit(arg) {
+        arg.container.find("input[name='ProposalAmmount']").attr('maxlength', '15');
+    }
+</script>
+
+@(Html.Kendo().Notification()
+            .Name("popupNotification")
+            .Stacking(NotificationStackingSettings.Up)
+            .Position(p => p.Top(-5))
+            .HideOnClick(true)
+            .Animation(a => { a.Close(c => { c.SlideIn(SlideDirection.Left); c.Reverse(true); }); a.Open(o => o.SlideIn(SlideDirection.Left)); })
+            .Events(e => e.Show("onShow"))
+            .AppendTo("#note-field")
+)
+
+@(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.AccountsModel>()
+            .Name("grd_BudgetNewAccounts")
+            .HtmlAttributes(new { style = "height:550px" })
+        .Scrollable()
+    .Columns(col =>
+    {
+        col.Template(@<text></text>)
+                        .ClientTemplate("<input type='checkbox' class='checkbox'/>")
+                        .Title("<input onclick=CheckAll(this) type='checkbox'   class='checkbox'/>")
+                        .Width(30)
+                        .HtmlAttributes(new { @onclick = "click", style = "align:center;float:none;text-align:center; font-size:12px; vertical-align: middle;" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;">Accounts</div></text>)
+                        .Width(300)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div>#=AccountName# </div>");
+
+
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;">OOE</div></text>)
+                        .Width(50)
+                        .HtmlAttributes(new { style = "text-align:center;height:30px" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div>#=OOEName# </div>");
+
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;">Year</div></text>)
+                        .Width(50)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div>#=ProposalYear# </div>");
+
+        if (ViewBag.UserType != "Budget Committee / Local Finance Committee")
+        {
+            col.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;">Proposed Amount</div></text>)
+                        .Width(150)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px"})
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div>#=kendo.toString(ProposalAmmount,'c2')# </div>");
+        }
+        else
+        {
+            col.Bound(m => m.ProposalAmmount).HtmlAttributes(new { style = "text-align:left;height:30px", onkeydown = "myFunction(event)" }).Title("Proposed Amount")
+            .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+            .Width(150);
+        }
+    })
+    .ToolBar(toolbar =>
+                                                    {
+        toolbar.Template(@<text>
+            <div style="float: left; height:28px;margin-top:2px;">
+                <div id="btnApproveNewAccounts" class="k-button"><i class="fa fa-thumbs-o-up"></i> Approve Marked</div>
+                <div id="btnDisapproveNewAccounts" class="k-button"><i class="fa fa-times"></i> Decline Marked</div>
+            </div>
+        </text>);
+                                                    })
+                                 .Editable(editable => editable.Mode(GridEditMode.InCell))
+                                 .Pageable(page => page.Refresh(true)
+                                 .Enabled(true)
+                                 .ButtonCount(4)
+                                 .PreviousNext(true)
+                                     )
+                                       .Events(e => e.SaveChanges("reqSave").Edit("onGridEdit"))
+                                       .Selectable()
+                                       .DataSource(d => d
+                                       .Ajax()
+                                       .Batch(true)
+                                       .PageSize(10)
+                                       .Model(m => m.Id(i => i.AccountID))
+                                       .Read(read => read.Action("BudgetAccounts_read_NewAccounts", "Home").Data("fn_Program"))
+                                       .Update("_update", "Home"))
+)
+
+@(Html.Kendo().Window()
+    .Name("RemarksWindow")
+    .Title("Remarks")
+    .Width(335)
+    .Height(190)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(true)
+    .AutoFocus(true)
+    .Animation(a =>
+    {
+        a.Open(o => o.SlideIn(SlideDirection.Down));
+        a.Close(c => { c.SlideIn(SlideDirection.Down); c.Reverse(true); });
+    })
+    .Actions(a => { a.Close(); }))
+
+
+

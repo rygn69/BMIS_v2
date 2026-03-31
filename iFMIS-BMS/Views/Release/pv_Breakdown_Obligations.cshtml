@@ -1,0 +1,267 @@
+﻿
+<script>
+    function PGO_() {
+        if (document.getElementById('pgo_').checked) {
+
+            document.getElementById("type_pgo").value = 2;
+
+        } else {
+
+            document.getElementById("type_pgo").value = 1;
+
+        }
+    }
+
+    function reqPrint() {
+        var officeID = $("#offs").val();
+        var year_ = $("#ddlYear").val();
+        var month_ = $("#Months").val();
+        var type_pgo = $("#type_pgo").val();
+
+
+
+        if (officeID == null || officeID == "" || officeID == '') {
+
+            $.ajax({
+                async: false,
+                dataType: 'html',
+                success: window.open("../Reports/ReportViewer.aspx?rid=11&Year=" + year_ + "&month_=" + month_ + "&type_pgo=" + type_pgo + "")
+            });
+
+        }
+        else {
+            $.ajax({
+                async: false,
+                dataType: 'html',
+                success: window.open("../Reports/ReportViewer.aspx?rid=9678&Year=" + year_ + "&month_=" + month_ + "&OfficeID=" + officeID + "&type_pgo=" + type_pgo + "")
+            });
+
+        }
+
+       
+    }
+    
+    //function fn_dprefresherOOied() {
+
+    //}
+    //function fn_dprefresherprogs() {
+
+    //}
+    var thisculture = kendo.culture();
+    thisculture.numberFormat.currency.symbol = '₱'; // Script For Changing The Currency Sign
+
+    function ocake() {
+        setTimeout(function () {
+
+            fn_Offices();
+
+        }, 1000);
+    }
+
+
+    function repris() {
+        $("#offs").data("kendoComboBox").dataSource.read();
+        }
+
+    function Select_Office() {
+
+        var classtype = $("#classtype").val();
+
+        if (classtype == null || classtype == "") {
+
+            return { classtype: 2 }
+        }
+        else {
+            return { classtype: classtype }
+        }
+    }
+    function fn_dprefresherOOied() {
+        $("#account_list").data("kendoComboBox").dataSource.read();
+    }
+    function fn_dprefresherprogs() {
+        $("#ooe_id").data("kendoDropDownList").dataSource.read();
+        $("#account_list").data("kendoComboBox").dataSource.read();
+    }
+
+
+
+
+
+    function fn_dprefresher() {
+
+        ocake();
+        $("#Progss").data("kendoDropDownList").dataSource.read();
+        $("#ooe_id").data("kendoDropDownList").dataSource.read();
+        $("#account_list").data("kendoComboBox").dataSource.read();
+
+    }
+    function ExpenseClassOnChange() {
+        $("#grd_BudgetApprovalBudget").data("kendoGrid").dataSource.read();
+    }
+  
+</script>
+
+<h2><span class="fa fa-print"></span> Generate Breakdown of Obligations Incurred Report</h2>
+
+<font size="3"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>Note:</strong> You can generate report with or without Office </font>
+<br /><br />
+<div style="float: none;clear:both;">
+
+    <div style="float: left;margin-right:10px;margin-top:2px;">
+        <label style="float:left;margin-left: 50px;">
+            Office    :
+        </label>
+    </div>
+
+    <div style="float: right;margin-right:70px;margin-top:0px;">
+
+
+        @(Html.Kendo().ComboBox()
+                            .Name("offs")
+                            .DataTextField("OfficeName")
+                            .DataValueField("OfficeID")
+                            .Placeholder("Select office...")
+                            .Filter("contains")
+                            .MinLength(1)
+                            .HtmlAttributes(new { @style = "width: 512px;" })
+                            //.Events(e => e.Change("fn_dprefresher"))
+                            .DataSource(source => source.Read(read => read.Action("GetOffice_MO", "Release").Data("Select_Office")))
+        )
+
+
+
+    </div>
+
+    <div style="height:10px;">
+
+    </div>
+</div>
+   
+
+    <div id="MonthDepartment" style="float: none;clear:both; margin-top: 20px">
+
+        <div style="float:left;margin-left:50px;margin-top:5px;">
+            <label>
+                Month    :
+            </label>
+        </div>
+        <div style="float:left;margin-left:72px;margin-top:5px;">
+
+            @(Html.Kendo().DropDownList()
+            .Name("Months")
+            .DataTextField("Text")
+            .DataValueField("Value")
+                    //.Events(e => e.Change("change"))
+            .BindTo(new List<SelectListItem>() {
+                new SelectListItem() {
+                    Text = "January",
+                    Value = "1"
+                },
+                new SelectListItem() {
+                    Text = "Febuary",
+                    Value = "2"
+                },
+                new SelectListItem() {
+                    Text = "March",
+                    Value = "3"
+                },
+                new SelectListItem() {
+                    Text = "April",
+                    Value = "4"
+                },
+                new SelectListItem() {
+                    Text = "May",
+                    Value = "5"
+                },
+                new SelectListItem() {
+                    Text = "June",
+                    Value = "6"
+                },
+                new SelectListItem() {
+                    Text = "July",
+                    Value = "7"
+                },
+                new SelectListItem() {
+                    Text = "August",
+                    Value = "8"
+                },
+                new SelectListItem() {
+                    Text = "September",
+                    Value = "9"
+                },
+                new SelectListItem() {
+                    Text = "October",
+                    Value = "10"
+                },
+                new SelectListItem() {
+                    Text = "November",
+                    Value = "11"
+                },
+                new SelectListItem() {
+                    Text = "December",
+                    Value = "12"
+                }
+            })
+            .Value(@ViewBag.MonthVaue)
+            .HtmlAttributes(new { style = "width: 150px" })
+            )
+
+
+        </div>
+
+
+        <div style="float:right;margin-right:70px;margin-top:5px;">
+
+            @(Html.Kendo().DropDownList()
+                        .Name("ddlYear")
+                        .DataTextField("ProposalYear")
+                        .DataValueField("ProposalYear")
+                        .SelectedIndex(1)
+                        .HtmlAttributes(new { @style = "width: 95px;" })
+                        .Events(e => e.Change("ocake"))
+                        .DataSource(source => source.Read(read => read.Action("GetPropYear2", "PYear")))
+            )
+
+     
+
+        </div>
+
+        <div style="float:right;margin-right:50px;margin-top:5px;">
+            <label>
+                Year :
+            </label>
+        </div>
+
+        <div id="MonthDepartment" style="float: none;clear:both; margin-top: 20px">
+
+            <div style="float:left;margin-left:50px;margin-top:5px;">
+                <label>
+                    Fund Type     :
+                </label>
+            </div>
+            <div style="float:left;margin-left:45px;margin-top:5px;">
+
+                @(Html.Kendo().DropDownList()
+                              .Name("classtype")
+                              .DataTextField("Class_Type")
+                              .DataValueField("Class_ID")
+                              .SelectedIndex(0)
+                              .HtmlAttributes(new { @style = "width: 180px;" })
+                              .DataSource(source => source.Read(read => read.Action("ddlClasses", "Dropdowns")))
+                              .Events(e => e.Change("repris"))
+                )
+            </div>
+           
+            <div style="float:left;margin-left:150px;margin-top:5px;">
+
+                <input type='checkbox' class='checkbox' id="pgo_" onclick=PGO_() /> <font style="font-size:15px">Include PGO Control</font>
+            </div>
+        </div>
+
+
+            <div id="btnPrint" class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 90px;float:right; margin-top: 15px; margin-right:69px; margin-bottom:0px" onclick="reqPrint()"><span class="mif-printer"></span> PRINT</div>
+
+        </div>
+<div>
+    <input type="text" style="width:20px" name="type_pgo" id="type_pgo" value="1" hidden disabled>
+</div>

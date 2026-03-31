@@ -1,0 +1,124 @@
+﻿
+
+<script>
+    function fn_closeSupplemental_subs() {
+        var class_koh = $("#classtype").val();
+        if (class_koh == 1 || class_koh == 2) { 
+        $("#SupplementalWindow").data("kendoWindow").close();
+        } else { 
+            $("#SupplementalWindow_EE").data("kendoWindow").close();
+        }
+    }
+    function fn_Supplemental_add() {
+        $(window).scrollTop(0);
+
+        var url = "@Url.Action("Supplemental_add", "Release")";
+
+        $.get(url, {}, function (d) {
+            $('#SupplementalWindow_').html(d);
+        })
+
+        $('#SupplementalWindow_').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Supplemental").center().open();
+
+    }
+
+    function fn_Supplemental_subtract() {
+        $(window).scrollTop(0);
+
+        var url = "@Url.Action("Supplemental_subtract", "Release")";
+
+        $.get(url, {}, function (d) {
+            $('#SupplementalWindow_sub').html(d);
+        })
+
+        $('#SupplementalWindow_sub').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Reversion").center().open();
+
+    }
+
+
+
+</script>
+<div style="margin-left:40px;margin-top:30px;">
+
+    <div style="margin-top:5px;">
+        <div class="k-button k-button-icontext" style=" bottom: 15px; right: 220px;width: 180px; border-radius:75px;color:#ffffff;font-size:18px;background-color:#666565;font-size:12px" onclick="fn_Supplemental_add()"> Supplemental</div>
+
+
+    </div>
+
+    <div style="margin-top:10px;">
+        <div class="k-button k-button-icontext" style=" bottom: 15px; right: 220px;width: 180px; border-radius:75px;color:#ffffff;font-size:18px;background-color:#666565;font-size:12px" onclick="fn_Supplemental_subtract()">  Reversion / Reappropriation</div>
+    </div>
+
+   
+</div>
+<div style="margin-left:140px;margin-top:25px;">
+    <div>
+        <div class="k-button k-button-icontext" style=" bottom: 15px; right: 220px;width: 80px; border-radius:50px;color:#ffffff;background-color:#DE5555;font-size:12px" onclick="fn_closeSupplemental_subs()"><span class='fa fa-times' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'></span> Close</div>
+    </div>
+</div>
+    @(Html.Kendo().Window()
+        .Name("legal_basis_window_null")
+        .Title("New Entry")
+        .Width(780)
+        .Height(550)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+       //  .Events(e => e.Close("Close_Sup"))
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+                .Actions(a => { a.Close(); })
+    )
+
+    @(Html.Kendo().Window()
+        .Name("SupplementalWindow_")
+        .Title("New Entry")
+        .Width(769)
+        .Height(537)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+       // .Events(e => e.Close("Close"))
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+                .Actions(a => { a.Close(); })
+    )
+    @(Html.Kendo().Window()
+        .Name("SupplementalWindow_sub")
+        .Title("New Entry")
+        .Width(790)
+        .Height(637)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+            // .Events(e => e.Close("Close"))
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+                .Actions(a => { a.Close(); })
+    )
+

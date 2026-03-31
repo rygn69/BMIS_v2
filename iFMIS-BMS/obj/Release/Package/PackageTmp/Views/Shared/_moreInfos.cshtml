@@ -1,0 +1,21 @@
+﻿@model IEnumerable<BusinessLayer.Statistics>
+
+<div style="min-height: 10px;border: 1px solid #dadada;margin-top: 5px;">
+    <div style="height: 20px;background-color: #a66000;padding: 6px;padding-left: 10px;color: #9a0192;vertical-align: bottom;margin: 1px;padding-top: 6px;padding-bottom: 4px;"><span style="background-color: #333;height: 100%;width: 100px;padding: 6px;margin-left: -10px;margin-top: 500px;"><i class="icon-pie fg-color3" style="margin-bottom: 0px;"></i></span><h3 style="margin-left: 10px;display: inline;">Statistics</h3></div>
+    <div style="margin: 5px;">
+        @(Html.Kendo().Chart(Model)
+            .Name("chStatistic")
+            .Title("Year: " + (@DateTime.Now.Year + 1))
+            .Legend(l => l.Position(ChartLegendPosition.Bottom))
+            .Series(s => {
+                s.Pie(
+                        model => model.Percentage,
+                        model => model.Program,
+                        model => model.Color
+                    ).StartAngle(150);
+                
+            })
+            .Tooltip(t => t.Template("${ category } - ${ value }%").Visible(true))
+        )
+    </div>
+</div>

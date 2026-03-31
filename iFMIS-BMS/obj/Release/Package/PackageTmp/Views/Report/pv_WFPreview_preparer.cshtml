@@ -1,0 +1,109 @@
+﻿<script>
+    function natloffice(){
+        return{
+            natloffice: $("#natofficeid").val()
+        }
+    }
+    function nationalagency_load(){
+        if (document.getElementById("natofficeid").checked){
+            $("#natofficeid").val(1)
+        }
+        else{
+            $("#natofficeid").val(0)
+        }
+        $("#preparernew").data("kendoComboBox").dataSource.read()
+        $("#depthead").data("kendoComboBox").dataSource.read()
+    }
+</script>
+<div style="margin-left:10px">
+    <input type="checkbox" value="0" id="natofficeid" onclick="nationalagency_load()" style="zoom:1.2;float:left;margin-top:3px;margin-right:5px;"/>
+    <label style="display:inline-block"> National Agency</label>
+</div>
+<label style="display:inline-block;margin-left:10px;margin-top:5px;">
+    Preparer
+</label>
+<div style="margin-left:10px;width:487px;margin-top:0px;">
+    @(Html.Kendo().ComboBox()
+            .Name("preparernew")
+            .DataTextField("EmpName")
+            .DataValueField("eid")
+            .AutoBind(true)
+            .Placeholder("Select an employee from the list!")
+            .Filter("contains")
+            .MinLength(3)
+            //.Events(e => e.Change("fnMainaccount"))
+            .SelectedIndex(-1)
+            .HtmlAttributes(new { style = "width:100%; height:100%", @class = "form-control autoselect" })
+            .DataSource(source =>
+            {
+                source.Read(read =>
+                {
+                    read.Action("GetEmployeelist", "Report").Data("natloffice");
+                })
+            .ServerFiltering(false);
+            })
+    )
+</div>
+<br />
+<label style="display:inline-block;margin-left:10px;margin-top:0px;">
+    Department Head
+</label>
+<div style="margin-left:10px;width:487px;margin-top:0px;">
+    @(Html.Kendo().ComboBox()
+            .Name("depthead")
+            .DataTextField("EmpName")
+            .DataValueField("eid")
+            .AutoBind(true)
+            .Placeholder("Select an employee from the list!")
+            .Filter("contains")
+            .MinLength(3)
+            //.Events(e => e.Change("fnMainaccount"))
+            .SelectedIndex(-1)
+            .HtmlAttributes(new { style = "width:100%; height:100%", @class = "form-control autoselect" })
+            .DataSource(source =>
+            {
+                source.Read(read =>
+                {
+                    read.Action("GetEmployeelist", "Report").Data("natloffice");
+                })
+            .ServerFiltering(false);
+            })
+    )
+</div>
+<div class="k-button k-button-icontext" style="width: 100px;float:right; margin-top: 20px; margin-right:7px;border-radius:50px;background-color:cornflowerblue;color:white; margin-bottom:0px" onclick="transferprep()"><span class="fa fa-save"></span> Save</div>
+<script>
+    $(document).ready(function () {
+
+    })
+
+    function transferprep() {
+        var docid= @Session["id"];
+        var eid=$("#preparernew").val()
+        var eid_dh=$("#depthead").val()
+        var natofficeid= $("#natofficeid").val()
+
+        swal({
+            title: "This action will result in a modification to the assigned WFP preparer. Do you want to proceed?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: status,
+            closeOnConfirm: false,
+            showLoaderOnConfirm: true
+        },
+            function (isConfirm) {
+                if (isConfirm) {
+                    var url = "@Url.Action("TransferPrep", "Report")";
+                    $.get(url, { docid:docid,eid:eid,eid_dh:eid_dh,natofficeid:natofficeid }, function (e) {
+
+                        if (e == "success") {
+                            swal("Success", "The WFP preparation's designated preparer has been modified successfully.", "success");
+
+                        } else {
+                            swal("Warning", e, "warning");
+                        }
+                    });
+                }
+            });
+    }
+</script>

@@ -1,0 +1,122 @@
+﻿
+<script>
+    function getParam() {
+        return {
+            office:'@Session["office"]',
+            tyear: '@Session["tyear"]',
+            ooeid:'@Session["ooeid"]',
+            qtr:'@Session["qtr"]'
+        }
+    }
+  
+    function frmclose() {
+        $("#vwrelease_wndow_office").data("kendoWindow").close();
+    }
+    function searchPrep() {
+        var $filter = new Array();
+        $filter = [];
+
+        if ($('#searchPrepOff').val().length > 0) {
+            $filter.push({ field: "AccountName", operator: "contains", value: $('#searchPrepOff').val() }),
+            $filter.push({ field: "username", operator: "contains", value: $('#searchPrepOff').val() })
+        }
+
+        $('#grd_dffptrelease_office').data('kendoGrid').dataSource.filter({
+            logic: "or",
+            filters: $filter
+        });
+
+    }
+
+    $(function () {
+        $("#searchPrepOff").keypress(function (e) {
+            if (e.keyCode == 13) {
+                searchPrep();
+            }
+        });
+    });
+</script>
+<div id="searchAccountid" style="height: 30px; margin-top: 0px; float: right; margin-left: 200px;">
+    <input type="text" style="width:406px;border-collapse:collapse;margin:0px;border-style:solid;margin-left:0px;height:70%;outline:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search..." id="searchPrepOff" name="searchPrepOff">
+    <div class="k-button k-button-icontext" style="height:30px;width:40px;border-style:solid;" onclick="searchPrep()"><span class="mif-search"></span></div>
+</div>
+<div class="fa fa-re">
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.WFP>()
+        .Name("grd_dffptrelease_office")
+        .HtmlAttributes(new { style = "height:450px;" })
+        .Scrollable()
+        .Columns(col =>
+        {
+        col.Template(@<text></text>)
+            .HeaderTemplate(@<text>Account</text>)
+            .Width(200)
+            .HtmlAttributes(new { style = "text-align:left;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=AccountName# </div>");
+        col.Template(@<text></text>)
+            .HeaderTemplate(@<text>Amount</text>)
+            .Width(100)
+            .HtmlAttributes(new { style = "text-align:right;height:30px" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=kendo.toString(amount,'c2')# </div>");
+        col.Template(@<text></text>)
+            .HeaderTemplate(@<text>Batch</text>)
+            .Width(50)
+            .HtmlAttributes(new { style = "text-align:center;height:30px" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=Batch# </div>");
+        col.Template(@<text></text>)
+            .HeaderTemplate(@<text>Released Date</text>)
+            .Width(130)
+            .HtmlAttributes(new { style = "text-align:left;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=DateReleased# </div>");
+        col.Template(@<text></text>)
+            .HeaderTemplate(@<text>User</text>)
+            .Width(150)
+            .HtmlAttributes(new { style = "text-align:left;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=username# </div>");
+
+        })
+            //.Editable(editable => editable.Mode(GridEditMode.InCell))
+            .Pageable(pageable => pageable
+            .Refresh(true)
+            .ButtonCount(3))
+            .Selectable()
+            .Resizable(s => s.Columns(true))
+            .Sortable(sortable => sortable
+            .AllowUnsort(true)
+            .SortMode(GridSortMode.MultipleColumn))
+            //  .ShowIndexes(true))
+            //     .Events(e => e.Change("WFPgrid"))
+         //   .Events(e => e.DataBound("onDataBound"))
+            .DataSource(dataSource => dataSource
+            .Ajax()
+            .Batch(true)
+            .Model(m => m.Id(i => i.trnno))
+            .ServerOperation(false)
+
+
+            //.Aggregates(a =>
+            //{
+            //    a.Add(c => c.Amount).Sum();
+            //})
+            .PageSize(10)
+            .Read(read => read.Action("GetDFPPTrelease", "Release").Data("getParam"))
+            )
+)
+</div>
+<div style="margin-top:45px">
+    <div  class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 100px;float:right;background-color:indianred; color:white; margin-top: 20px; margin-right:80px;border-radius:50px;margin-top:-30px; margin-bottom:0px" onclick="frmclose()"><span class="fa fa-close"></span> Close</div>
+</div>
+<script>
+    $(document).ready(function(){
+        $("#grd_dffptrelease_office").data("kendoGrid").dataSource.read();
+    });
+
+    function frmclose() {
+        $('#vwrelease_wndow_office').data('kendoWindow').close()
+    }
+
+</script>

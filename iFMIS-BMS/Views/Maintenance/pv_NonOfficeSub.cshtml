@@ -1,0 +1,1443 @@
+﻿@model dynamic
+@using iFMIS_BMS.Models
+@using iFMIS_BMS.Base
+
+
+<style>
+    .media img {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+    }
+
+    .img-photo {
+        border: 1px solid #e4e5e7 !important;
+    }
+
+    .m-g {
+        width: 50px;
+        height: 50px;
+    }
+
+    .disable-bg {
+        background-color: white !important;
+        background-image: none !important;
+    }
+
+        .disable-bg .k-dropdown-wrap {
+            background-color: white !important;
+            background-image: none !important;
+        }
+
+
+    #NonOfficeSub .k-header {
+        display: normal;
+    }
+
+    .k-tabstrip-items, .k-item {
+        /*border-radius: 10px 10px 0 0 !important;*/
+        border-width: 1px !important;
+    }
+
+    .m-g {
+        width: 55px;
+        height: 55px;
+    }
+
+    h3 {
+        margin-top: 0 !important;
+    }
+</style>
+<script>
+    var thisculture = kendo.culture();
+    var subppaid = 0;
+    thisculture.numberFormat.currency.symbol = '₱';
+    function onData() {
+        return {
+            program: $('#program').val(),
+            accountTemp: $('#accountTemp').val(),
+            year: $('#ProposalYear').val(),
+            excessid: $("#excessid").val(),
+            showallid: $("#showallid").val(),
+            motherAccountid: $("#MotherAccount").val(),
+            showllexcessid: $("#showllexcessid").val(),
+            fund:$("#tempradid").val()
+        }
+    }
+    function onDatav2() {
+        return {
+            program: $('#program').val(),
+            accountTemp: $('#accountTemp').val(),
+            year: $('#ProposalYear').val(),
+            showallid: $("#showallid").val(),
+            motherAccountid:0
+        }
+    }
+    function onclickGF() {
+        document.getElementById("radGF").value = "1";
+        document.getElementById("rad20").value = "0";
+        document.getElementById("radldrrmf").value = "0";
+        document.getElementById("radesmf").value = "0";
+        document.getElementById("radeco").value = "0";
+        document.getElementById("radSEF").value = "0";
+        document.getElementById("radSEF").checked = false;
+        document.getElementById("rad20").checked = false;
+        document.getElementById("radldrrmf").checked = false;
+        document.getElementById("radesmf").checked = false;
+        document.getElementById("radeco").checked = false;
+        $("#tempradid").val(1);
+        $("#accountTemp").data("kendoComboBox").dataSource.read();
+        $("#NonOfficeSub").data("kendoGrid").dataSource.read();
+    }
+    function onclick20() {
+        document.getElementById("radGF").value = "0";
+        document.getElementById("rad20").value = "1";
+        document.getElementById("radldrrmf").value = "0";
+        document.getElementById("radesmf").value = "0";
+        document.getElementById("radeco").value = "0";
+        document.getElementById("radSEF").value = "0";
+        document.getElementById("radSEF").checked = false;
+        document.getElementById("radGF").checked = false;
+        document.getElementById("radldrrmf").checked = false;
+        document.getElementById("radesmf").checked = false;
+        document.getElementById("radeco").checked = false;
+        $("#tempradid").val(2);
+        $("#accountTemp").data("kendoComboBox").dataSource.read();
+        $("#NonOfficeSub").data("kendoGrid").dataSource.read();
+    }
+    function onclickLDRRMF() {
+        document.getElementById("radGF").value = "0";
+        document.getElementById("rad20").value = "0";
+        document.getElementById("radldrrmf").value = "1";
+        document.getElementById("radesmf").value = "0";
+        document.getElementById("radeco").value = "0";
+        document.getElementById("radSEF").value = "0";
+        document.getElementById("radSEF").checked = false;
+        document.getElementById("radGF").checked = false;
+        document.getElementById("rad20").checked = false;
+        document.getElementById("radesmf").checked = false;
+        document.getElementById("radeco").checked = false;
+        $("#tempradid").val(3);
+        $("#accountTemp").data("kendoComboBox").dataSource.read();
+        $("#NonOfficeSub").data("kendoGrid").dataSource.read();
+    }
+    function onclickESMF() {
+        document.getElementById("radGF").value = "0";
+        document.getElementById("rad20").value = "0";
+        document.getElementById("radldrrmf").value = "0";
+        document.getElementById("radesmf").value = "1";
+        document.getElementById("radeco").value = "0";
+        document.getElementById("radSEF").value = "0";
+        document.getElementById("radSEF").checked = false;
+        document.getElementById("radGF").checked = false;
+        document.getElementById("rad20").checked = false;
+        document.getElementById("radldrrmf").checked = false;
+        document.getElementById("radeco").checked = false;
+        $("#tempradid").val(4);
+        $("#accountTemp").data("kendoComboBox").dataSource.read();
+        $("#NonOfficeSub").data("kendoGrid").dataSource.read();
+    }
+    function onclickECO() {
+        document.getElementById("radGF").value = "0";
+        document.getElementById("rad20").value = "0";
+        document.getElementById("radldrrmf").value = "0";
+        document.getElementById("radesmf").value = "0";
+        document.getElementById("radeco").value = "1";
+        document.getElementById("radSEF").value = "0";
+        document.getElementById("radSEF").checked = false;
+        document.getElementById("radGF").checked = false;
+        document.getElementById("rad20").checked = false;
+        document.getElementById("radldrrmf").checked = false;
+        document.getElementById("radesmf").checked = false;
+        $("#tempradid").val(5);
+        $("#accountTemp").data("kendoComboBox").dataSource.read();
+        $("#NonOfficeSub").data("kendoGrid").dataSource.read();
+    }
+    function onclicSEF() {
+        document.getElementById("radGF").value = "0";
+        document.getElementById("rad20").value = "0";
+        document.getElementById("radldrrmf").value = "0";
+        document.getElementById("radesmf").value = "0";
+        document.getElementById("radeco").value = "0";
+        document.getElementById("radSEF").value = "1";
+        document.getElementById("radGF").checked = false;
+        document.getElementById("rad20").checked = false;
+        document.getElementById("radldrrmf").checked = false;
+        document.getElementById("radesmf").checked = false;
+        document.getElementById("radeco").checked = false;
+        $("#tempradid").val(6);
+        $("#accountTemp").data("kendoComboBox").dataSource.read();
+        $("#NonOfficeSub").data("kendoGrid").dataSource.read();
+    }
+
+    function searchChildGrid(accountnameid, searchText) {
+        var childGrid = $("#NonOfficeSubv2_" + accountnameid).data("kendoGrid");
+
+        if (childGrid) {
+            childGrid.dataSource.filter({
+                logic: "or",
+                filters: [
+                    { field: "accountname", operator: "contains", value: searchText },
+                    { field: "amount", operator: "eq", value: parseFloat(searchText) }
+                    // Add more fields as needed
+                ]
+            });
+        } else {
+            console.log("Child grid not found. Is the parent row expanded?");
+        }
+    }
+
+    function searchAccount() {
+        var showallid = $("#showallid").val();
+        var $filter = new Array();
+        $filter = [];
+
+        if (showallid == 0) {
+            if ($('#SearchData').val().length > 0) {
+                $filter.push({ field: "accountname", operator: "contains", value: $('#SearchData').val() }),
+                $filter.push({ field: "excessaccount", operator: "contains", value: $('#SearchData').val() }),
+                $filter.push({ field: "linkaccount", operator: "contains", value: $('#SearchData').val() });
+            }
+
+            $('#NonOfficeSub').data('kendoGrid').dataSource.filter({
+                logic: "or",
+                filters: $filter
+            });
+        }
+        else {
+          
+            if ($('#SearchData').val().length > 0) {
+                $filter.push({ field: "accountname", operator: "contains", value: $('#SearchData').val() }),
+                $filter.push({ field: "excessaccount", operator: "contains", value: $('#SearchData').val() }),
+                $filter.push({ field: "linkaccount", operator: "contains", value: $('#SearchData').val() });
+            }
+
+            $('#NonOfficeSubv2').data('kendoGrid').dataSource.filter({
+                logic: "or",
+                filters: $filter
+            });
+        
+        }
+    }
+
+    $(function () {
+        $("#SearchData").keypress(function (e) {
+            if (e.keyCode == 13) {
+                searchAccount();
+            }
+        });
+    });
+    function btnShowAll() {
+        if (document.getElementById("showallid").checked) {
+            document.getElementById("showallid").value=1
+            $("#buildup_idv1").hide()
+            $("#buildup_idv2").show()
+            $('#NonOfficeSubv2').data('kendoGrid').dataSource.read();
+        }
+        else {
+            document.getElementById("showallid").value = 0
+            $("#buildup_idv1").show()
+            $("#buildup_idv2").hide()
+            $('#NonOfficeSub').data('kendoGrid').dataSource.read();
+        }
+       
+    }
+    //function edittransv2(nonofficeid, nonofficeidparent, accountname, amount, accountnameid, officeid, programid, actualaccountid, accountid) {
+
+    //    // Perform your edit logic here (maybe open a popup, submit form, etc.)
+
+    //    // After successful edit operation:
+    //    $('#NonOfficeSubv2').data('kendoGrid').dataSource.read();
+
+    //    setTimeout(function () {
+    //        refreshChildGrid(accountnameid);
+    //    }, 200);  // Optional slight delay to allow for data processing
+    //}
+    function refreshChildGrid(accountnameid) {
+        
+
+        var childGrid = $("#NonOfficeSubv2" + accountnameid).data("kendoGrid");
+
+        if (childGrid) {
+            childGrid.dataSource.read();
+        } else {
+            console.log("Child grid not found, trying to expand parent row...");
+
+            var mainGrid = $("#NonOfficeSubv2").data("kendoGrid");
+
+            // Find the row that matches accountnameid
+            mainGrid.tbody.find("tr.k-master-row").each(function () {
+                var dataItem = mainGrid.dataItem(this);
+                if (dataItem.accountnameid == accountnameid) {
+                    // Expand the row
+                    mainGrid.expandRow(this);
+
+                    // After short delay, refresh the child grid
+                    setTimeout(function () {
+                        var newChildGrid = $("#NonOfficeSubv2" + accountnameid).data("kendoGrid");
+                        if (newChildGrid) {
+                            newChildGrid.dataSource.read();
+                        }
+                    }, 500);
+
+                    return false;
+                }
+            });
+        }
+        
+    }
+    function DivFullScreen() {
+        $('#NonOfficeSubv2').css("position", "fixed");
+        $('#NonOfficeSubv2').css("top", "0");
+        $('#NonOfficeSubv2').css("bottom", "0");
+        $('#NonOfficeSubv2').css("right", "0");
+        $('#NonOfficeSubv2').css("left", "0");
+        $('#NonOfficeSubv2').css("height", "auto");
+        $('#NonOfficeSubv2').css("background", "#FFF");
+        $('#NonOfficeSubv2').css("z-index", "10000");
+        $('#NonOfficeSubv2').css("padding", "10px 10px 10px 10px");
+        $("html").css("overflow-y", "hidden");
+        //$('#grd_BudgetApprovalBudget_Div').css("overflows -y", "auto");
+
+        //if ($("#ddlYear").val() != '' && $("#offs").val() != '') {
+        //    ChangeTotalAmounts();
+        //}
+        //$("#utilization_labelid").css("margin-top,-1")
+        //$("#utilization_labelid").css("float", "left")
+        //$("#searchAccountid").css("margin-top", 0);
+        //$("#searchAccountid").css("float", "right");
+        //$("#searchAccountid").css("margin-left", 200);
+        //$(".k-widget k-grid k-editable, k-grid-footer, k-grid-footer-wrap, table,  colgroup > col:nth-child(1)").css('width', 195)
+
+        $("#SearchData").css("width", 700);
+    }
+    function DivRestoreScreen() {
+        $('#NonOfficeSubv2').css("position", "");
+        $('#NonOfficeSubv2').css("top", "");
+        $('#NonOfficeSubv2').css("bottom", "");
+        $('#NonOfficeSubv2').css("right", "");
+        $('#NonOfficeSubv2').css("left", "");
+        $('#NonOfficeSubv2').css("background", "");
+        $('#NonOfficeSubv2').css("z-index", "");
+        $('#NonOfficeSubv2').css("padding", "");
+        $("html").css("overflow-y", "auto");
+        //   $('#grd_BudgetApprovalBudget_Div').css("overflow-y", "hidden");
+
+        $("#NonOfficeSubv2").css("margin-top", 0);
+
+        //$("#searchAccountid").css("margin-top", -20);
+        //$("#searchAccountid").css("float", "right");
+        //$("#searchAccountid").css("margin-left", 200);
+        $("#SearchData").css("width", 310);
+        //margin-left: 200px; margin-top: -5px; float: right;
+    }
+</script>
+<h2><span class="fa fa-gears"></span> Build-up PPA </h2>
+
+<br />
+<div id ="radBttnid" style="display:none">
+    <div style="margin-left:150px">
+        <input id="radGF" name="radGF" style="float:left;width:20px;" type="radio" value="0"  onclick="onclickGF()" />
+        <label style="float:left;margin-top:-4px;margin-left:5px;font-size:14px;width:15px">GF</label>
+    </div>
+    <div style="margin-left:230px">
+        <input id="rad20" name="rad20" style="float:left;width:20px;" type="radio" value="0" onclick="onclick20()" />
+        <label style="float:left;margin-top:-4px;margin-left:5px;font-size:14px;width:55px">20% DF</label>
+    </div>
+    <div style="margin-left:340px">
+        <input id="radldrrmf" name="radldrrmf" style="float:left;width:20px;" type="radio" value="0"  onclick="onclickLDRRMF()" />
+        <label style="float:left;margin-top:-4px;margin-left:5px;font-size:14px;width:55px">LDRRMF</label>
+    </div>
+    <div style="margin-left:460px">
+        <input id="radesmf" name="radesmf" style="float:left;width:20px;" type="radio" value="1" checked onclick="onclickESMF()" />
+        <label style="float:left;margin-top:-4px;margin-left:5px;font-size:14px;width:55px">ESMF</label>
+    </div>
+    <div style="margin-left:560px">
+        <input id="radeco" name="radeco" style="float:left;width:20px;" type="radio" value="0" onclick="onclickECO()" />
+        <label style="float:left;margin-top:-4px;margin-left:5px;font-size:14px;width:55px">ECO</label>
+    </div>
+    <div style="margin-left:560px">
+        <input id="radSEF" name="radSEF" style="float:left;width:20px;" type="radio" value="0" onclick="onclicSEF()" />
+        <label style="float:left;margin-top:-4px;margin-left:5px;font-size:14px;width:55px">SEF</label>
+    </div>
+</div>
+<br/>
+<div style="margin-top:20px;width:200px;margin-left:260px">
+    <input id="currentid" name="currentid" style="zoom:1.2;float:left" type="checkbox" value="1" checked onclick="onclickCurrent()" />
+    <label style="float:left;margin-top:-5px;margin-left:5px">Current</label>
+
+    <input id="excessid" name="excessid" style="zoom:1.2;float:left;margin-left:30px" type="checkbox" value="0" onclick="onclickExcess()" />
+    <label style="float:left;margin-top:-24px;margin-left:135px ">Continuing/Excess</label>
+</div>
+<br />
+<div style="margin-top:20px">
+    <label style="margin-left:121px;font-size:12px;">Year :</label>
+    <div style="float:left;margin-top:-30px;margin-left:160px">
+        @(Html.Kendo().DropDownList()
+                        .Name("ProposalYear")
+                        .DataTextField("ProposalYear")
+                        .DataValueField("ProposalYear")
+                        .SelectedIndex(0)
+                        .HtmlAttributes(new { style = "width:150px; height:100%;font-size:14px;", @class = "form-control autoselect" })
+                        .Events(e => e.Change("ocakeyear"))
+                        .DataSource(source => source.Read(read => read.Action("WFPYears", "PYear")))
+        )
+    </div>
+</div>
+
+<div style="margin-top:20px">
+    <label style="margin-left:111px;font-size:12px;">Office :</label>
+    <div style="float:left;margin-top:-30px;margin-left:160px;">
+        @(Html.Kendo().ComboBox()
+        .Name("office")
+        .DataTextField("offname")
+        .DataValueField("OfficeID")
+        .AutoBind(true)
+        .Placeholder("Select Office...")
+        .Filter("contains")
+        .MinLength(3)
+        .Events(e => e.Change("fnOffice"))
+        .SelectedIndex(-1)
+        .HtmlAttributes(new { style = "width:500px;height: 100%;", @class = "form-control autoselect" })
+        .DataSource(source =>
+        {
+            source.Read(read =>
+            {
+                read.Action("GetOfficeOtherPPA", "Report");//.Data("fnMainPPA");
+            })
+        .ServerFiltering(false);
+        })
+        )
+
+    </div>
+</div>
+
+<div style="margin-top:20px">
+    <label style="margin-left:96px;font-size:12px;">Program :</label>
+    <div style="float:left;margin-top:-30px;margin-left:160px">
+        @(Html.Kendo().ComboBox()
+                            .Name("program")
+                            .DataTextField("ProgramDescription")
+                            .DataValueField("ProgramID")
+                            .AutoBind(true)
+                            .Placeholder("Select Program...")
+                            .Filter("contains")
+                            .MinLength(3)
+                            .Events(e => e.Change("fnprogram"))
+                            .SelectedIndex(-1)
+                            .HtmlAttributes(new { style = "width:500px; height:100%", @class = "form-control autoselect" })
+                            .DataSource(source =>
+                            {
+                                source.Read(read =>
+                                {
+                                    read.Action("GetProgram", "Report").Data("officeval");
+                                })
+                                .ServerFiltering(false);
+                            })
+                            @*.Value(Model == null ? "0" : Model.program + "")*@
+        )
+    </div>
+</div>
+
+<div id="accountorigid" style="margin-top:20px;display:none">
+    <label style="margin-left:98px;font-size:12px;">Account :</label>
+    <div style="float:left;margin-top:-30px;margin-left:160px">
+        @(Html.Kendo().ComboBox()
+                            .Name("accountactual")
+                            .DataTextField("AccountName")
+                            .DataValueField("AccountID")
+                            .AutoBind(true)
+                            .Placeholder("Select account...")
+                            .Filter("contains")
+                            .MinLength(3)
+                            .SelectedIndex(-1)
+                            //.CascadeFrom("program")
+                            .HtmlAttributes(new { style = "width:500px; height:100%", @class = "form-control autoselect" })
+                            .DataSource(source =>
+                            {
+                                source.Read(read =>
+                                {
+                                    read.Action("GetAccountactual", "Report").Data("programaccount");
+                                })
+                                .ServerFiltering(false);
+                            })
+                            @*.Value(Model == null ? "0" : Model.accountTemp + "")*@
+        )
+    </div>
+</div>
+
+<div style="margin-top:20px">
+    <label id="excessaccountnameid" style="margin-left:58.5px;font-size:12px;">Excess Account :</label>
+    <div style="float:left;margin-top:-30px;margin-left:160px">
+        @(Html.Kendo().ComboBox()
+                            .Name("accountTemp")
+                            .DataTextField("AccountName")
+                            .DataValueField("AccountID")
+                            .AutoBind(true)
+                            .Placeholder("Select excess account...")
+                            .Filter("contains")
+                            .MinLength(3)
+                            .Events(e => e.Change("fnaccount"))
+                            .SelectedIndex(-1)
+                            //.CascadeFrom("program")
+                            .HtmlAttributes(new { style = "width:500px; height:100%", @class = "form-control autoselect" })
+                            .DataSource(source =>
+                            {
+                                source.Read(read =>
+                                {
+                                    read.Action("GetAccountPPAS", "Report").Data("program");
+                                })
+                                .ServerFiltering(false);
+                            })
+                            @*.Value(Model == null ? "0" : Model.accountTemp + "")*@
+        )
+    </div>
+</div>
+<div style="margin-top:20px">
+    <label style="margin-left:45px;font-size:12px;">Approved Budget :</label>
+    <div style="float:left;margin-top:-30px;margin-left:160px">
+        <div class="col-sm-9" style="height:80%">
+            <input id="approvedamountid" name="approvedamountid" value="" type="text" min="0" readonly style="width:139px;height:100%;font-size:16px;color:blue" onkeyup="sync()" class="form-control">
+        </div>
+    </div>
+</div>
+<div style="border-color:gray;border-width:1px;border-style:solid;width:757px;margin-top:3px;float:left"></div>
+    <div style="margin-top:20px">
+        <label style="margin-left:71px;font-size:12px;">Group Under :</label>
+        <div style="float:left;margin-top:-30px;margin-left:160px">
+            @(Html.Kendo().ComboBox()
+                            .Name("MotherAccount")
+                            .DataTextField("accountname")
+                            .DataValueField("accountnameid")
+                            .AutoBind(true)
+                            .Placeholder("Select particular (parent)...")
+                            .Filter("contains")
+                            .MinLength(3)
+                            .Events(e => e.Change("fnMainaccount"))
+                            .SelectedIndex(-1)
+                            //.CascadeFrom("program")
+                            .HtmlAttributes(new { style = "width:500px; height:100%", @class = "form-control autoselect" })
+                            .DataSource(source =>
+                            {
+                                source.Read(read =>
+                                {
+                                    read.Action("GetNOAccount", "Report").Data("program");
+                                })
+                                .ServerFiltering(false);
+                            })
+                            @*.Value(Model == null ? "0" : Model.accountTemp + "")*@
+            )
+        </div>
+    </div>
+    <div id="MainAppropriationid" style="margin-top:20px;display:none;">
+        <label style="font-size:12px;margin-left:35px">Main Appropriation :</label>
+        <div style="float:left;margin-top:-30px;margin-left:160px">
+            <div  style="height:80%">
+                <input id="MainAppropriation" name="MainAppropriation" type="text" value="0.00" readonly style="width:139px;height:100%;color:#050afc" class="form-control">
+            </div>
+        </div>
+    </div>
+    <div id="SubAppropriationid" style="margin-top:20px;display:none;">
+        <label style="margin-left:9px;font-size:12px;">less : Total Appropriated :</label>
+        <div style="float:left;margin-top:-30px;margin-left:160px">
+            <div class="col-sm-9" style="height:80%">
+                <input id="SubAppropriation" name="SubAppropriation" type="text" value="0.00" readonly style="width:139px;height:100%;color:#ff0000" class="form-control">
+            </div>
+        </div>
+    </div>
+    <div id="BalAppropriationid" style="margin-top: -20px;display:none;">
+        <label style="margin-left:70px;font-size:12px;width:100px;margin-top:20px;">Balance to be Appropriated :</label>
+        <div style="float:left;margin-top:-31px;margin-left:160px">
+            <div class="col-sm-9" style="height:80%">
+                <input id="BalAppropriation" name="BalAppropriation" type="text" value="0.00" readonly style="width:139px;height:100%;color:#ffd800" class="form-control">
+            </div>
+        </div>
+    </div>
+    <div style="margin-top:20px;">
+        <label style="margin-left:92px;font-size:12px;">Particular :</label>
+        <div style="float:left;margin-top:-30px;margin-left:160px">
+            <div class="col-sm-9" style="height:80%">
+                <input id="particularname" name="particularname" value="@(Model == null ? "" : Model.AccountName)" type="text" style="width:489px;height:100%" class="form-control">
+            </div>
+        </div>
+    </div>
+    <div style="margin-top:20px">
+        <label style="margin-left:67px;font-size:12px;">Appropriation :</label>
+        <div style="float:left;margin-top:-30px;margin-left:160px">
+            <div class="col-sm-9" style="height:80%">
+                <input id="amountid" name="amountid" value="" type="number" min="0" style="width:139px;height:100%;font-size:16px;color:green" onkeyup="sync()" class="form-control">
+            </div>
+        </div>
+    </div>
+
+    <div style="display:none">
+        <input id="actioncode" name="actioncode" type="number" value="1"/>
+        <input id="nonofficeidtemp" name="nonofficeidtemp" type="number" />
+        <input id="amountTemp" name="amountTemp" type="number" />
+        <input id="accountnameid" name="accountnameid" type="number"/>
+        <input id="appBalTemp" name="appBalTemp" type="number" />
+        <input id="mainAccountUsed" name="mainAccountUsed" type="number" />
+        <input id="nonofficeidparentTemp" name="nonofficeidparentTemp" type="number"/>
+        <input id="accountnameAppropriation" name="accountnameAppropriation" type="number" />
+        <input id="accountnameAllotment" name="accountnameAllotment" type="number" />
+        <input id="accountnameBal" name="accountnameBal" type="number" />
+        <input id="tempapprovedamountid" name="tempapprovedamountid" value="" type="number" min="0" readonly>
+        <input id="tempapprovedamountBal" name="tempapprovedamountBal" value="" type="number" readonly>
+        <input id="tempradid" name="tempradid" value="" type="number" readonly>
+           
+    </div>
+    <div id="btnSave" class="k-button k-button-icontext" style="bottom: 15px; right: 15px;width: 90px;float:right; margin-right:200px; margin-bottom:0px;margin-top:10px;border-radius:50px;background-color:cornflowerblue;color:white" onclick="btnSave()"><span class="fa fa-save"></span> Save </div>
+    <div class="k-button k-button-icontext" style="bottom: 15px; right: 15px;width: 90px;float:right;margin-right:-190px; margin-bottom:0px;margin-top:10px;border-radius:50px" onclick="btnClear(1)"><span class="fa fa-eraser"></span> Clear </div>
+
+    <div style="clear:both"></div>
+    <div style="float:left;margin-top:25px">
+        <input type="checkbox" id="showallid" style="zoom:1.2" value="0" onclick="btnShowAll()"/>
+        <label style="font-size:12px;display:inline-block"> All PPA's</label>
+
+    </div>
+    <div style="float:left;margin-top:25px;margin-left:20px">
+        <input type="checkbox" id="showdetailsid" style="zoom:1.2" value="0" onclick="btnShowDetails()" />
+        <label style="font-size:12px;display:inline-block"> Details</label>
+    </div>
+    <div style="float:left;margin-top:25px;margin-left:20px">
+        <input type="checkbox" id="showllexcessid" style="zoom:1.2" value="0" onclick="btnShowAllExcess()"  />
+        <label style="font-size:12px;display:inline-block"> All Excess</label>
+    </div>
+   <div style="float:left;margin-top:25px;margin-left:20px">
+    <input type="checkbox" id="showlstatusid" style="zoom:1.2" value="0" onclick="btnShowStatus()" />
+    <label style="font-size:12px;display:inline-block"> Status</label>
+</div>
+    <br />
+    <div id="searchAccountid" style="height: 30px; margin-top: -30px; float: right; margin-left:200px;">
+        <input type="text" style="width:310px;border-collapse:collapse;margin:0px;border-style:solid;margin-left:0px;height:70%;outline:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search particular..." id="SearchData" name="SearchData">
+        <div class="k-button k-button-icontext" style="height:30px;width:40px;border-style:solid;" onclick="searchAccount()"><span class="mif-search"></span></div>
+    </div>
+    <div class="transition animated fadeInUp" style="margin-top:0px">
+        <div id="buildup_idv1">
+        @(Html.Kendo().Grid<iFMIS_BMS.Models.NonOfficeSubAccount>()
+        .Name("NonOfficeSub")
+        .Columns(columns =>
+        {
+            columns.Template(@<text></text>).Hidden().ClientTemplate("<div>#=nonofficeid# </div>");
+            columns.Template(@<text></text>).Hidden().ClientTemplate("<div>#=officeid# </div>");
+            columns.Template(@<text></text>).Hidden().ClientTemplate("<div>#=programid# </div>");
+            columns.Template(@<text></text>).Hidden().ClientTemplate("<div>#=accountid# </div>");
+            columns.Template(@<text></text>).Hidden().ClientTemplate("<div>#=nonofficeidparent# </div>");
+            columns.Template(@<text></text>).Hidden().ClientTemplate("<div>#=accountnameid# </div>");
+            columns.Template(@<text></text>).Hidden().ClientTemplate("<div>#=actualaccountid# </div>");
+            columns.Bound(m => m.excessaccount)
+                     .HeaderTemplate(@<text><div style="text-align:center; vertical-align: middle; overflow: visible; white-space: normal;color:white">Excess <br />Account</div></text>)
+                     .HtmlAttributes(new { style = "text-align:left" })
+                     .HeaderHtmlAttributes(new { style = "text-align:center", @class = "metro-header" })
+                     .Width(200)
+                     .ClientTemplate("<div>#=excessaccount# </div>");
+            columns.Bound(m => m.linkaccount)
+                     .HeaderTemplate(@<text><div style="text-align:center; vertical-align: middle; overflow: visible; white-space: normal;color:white">Link <br />Account</div></text>)
+                     .HtmlAttributes(new { style = "text-align:left" })
+                     .HeaderHtmlAttributes(new { style = "text-align:center", @class = "metro-header" })
+                     .Width(200)
+                     .ClientTemplate("<div>#=linkaccount# </div>");
+            columns.Template(@<text></text>)
+                     .HeaderTemplate(@<text><div style="text-align:center; vertical-align: middle; overflow: visible; white-space: normal;color:white">Particular</div></text>)
+                     .HtmlAttributes(new { style = "text-align:left" })
+                     .HeaderHtmlAttributes(new { style = "text-align:center", @class = "metro-header" })
+                     //.Width(a)
+                     .ClientTemplate("<div>#=accountname# </div>")
+                     .ClientFooterTemplate("<div style='text-align:center;'><label> </label><label>TOTAL</label></div>");
+            columns.Bound(m => m.amount)
+                     //  columns.Template(@<text></text>)
+                     .HeaderTemplate(@<text><div style="text-align:center; vertical-align: middle; overflow: visible; white-space: normal;color:white">Appropriation</div></text>)
+                     .HtmlAttributes(new { style = "text-align:right" })
+                     .HeaderHtmlAttributes(new { style = "text-align:center;", @class = "metro-header" })
+                     .Width(120)
+                     .ClientTemplate("<div>#=kendo.toString(amount, 'n2')# </div>")
+                     .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> </label><label> #=kendo.toString(sum, 'c2')#</label></div>");
+            columns.Template(t => { })
+                     .HeaderHtmlAttributes(new { style = "text-align:center", @class = "metro-header" })
+                     .ClientTemplate(
+               "<div class='btn-edit'>  <a  title='Edit' onclick='edittrans(#=nonofficeid#,#=nonofficeidparent#,\"#=kendo.htmlEncode(accountname)#\",#=amount#,#=accountnameid#,#=officeid#,#=programid#,#=actualaccountid#,#=accountid#)'><span class='fa fa-edit' style ='font-size: 15pt;color:blue'></span></a></div>"
+               ).HtmlAttributes(new { style = "margin-left:5px;" }).Width(40);
+            columns.Template(t => { })
+                     .HeaderHtmlAttributes(new { style = "text-align:center", @class = "metro-header" })
+                     .ClientTemplate(
+               "<div class='btn-delete'> <a  title='Delete' onclick='deletetrans(#=accountnameid#)'><span class='fa fa-trash' style='font-size: 15pt;color:red'></span></a></div>"
+               ).HtmlAttributes(new { style = "margin-left:5px;" }).Width(40);
+        })
+        .Sortable()
+        .Pageable(pageable => pageable.Refresh(true))
+        .Scrollable()
+        .HtmlAttributes(new { @class = "table-responsive", style = "height:450px;overflow-y:hidden;" })
+        .Selectable(selectable => selectable
+        .Mode(GridSelectionMode.Single)
+        .Type(GridSelectionType.Row))
+        //   .Events(events => events.Change("selectedrow"))
+        .DataSource(dataSource => dataSource
+            .Ajax()
+            .Aggregates(a =>
+            {
+                a.Add(c => c.amount).Sum();
+            })
+            .Model(model => model.Id(u => u.nonofficeid))
+            .PageSize(10)
+            .ServerOperation(false)
+            .Read(read => read.Action("BuilNonOffice", "Maintenance").Data("onData"))
+        )
+
+            )
+        </div>
+
+        @*Show all PPA's*@
+        <div id="buildup_idv2" style="display:none">
+        @(Html.Kendo().Grid<iFMIS_BMS.Models.NonOfficeSubAccount>()
+        .Name("NonOfficeSubv2")
+        .Columns(columns =>
+        {
+            columns.Template(@<text></text>).Hidden().ClientTemplate("<div>#=nonofficeid# </div>");
+            columns.Template(@<text></text>).Hidden().ClientTemplate("<div>#=officeid# </div>");
+            columns.Template(@<text></text>).Hidden().ClientTemplate("<div>#=programid# </div>");
+            columns.Template(@<text></text>).Hidden().ClientTemplate("<div>#=accountid# </div>");
+            columns.Template(@<text></text>).Hidden().ClientTemplate("<div>#=nonofficeidparent# </div>");
+            columns.Template(@<text></text>).Hidden().ClientTemplate("<div>#=accountnameid# </div>");
+            columns.Template(@<text></text>).Hidden().ClientTemplate("<div>#=actualaccountid# </div>");
+            columns.Template(@<text></text>).Hidden().ClientTemplate("<div>#=YearOf# </div>");
+            columns.Template(@<text></text>)
+                     .HeaderTemplate(@<text><div style="text-align:center; vertical-align: middle; overflow: visible; white-space: normal;color:white">Particular</div></text>)
+                     .HtmlAttributes(new { style = "text-align:left" })
+                     .HeaderHtmlAttributes(new { style = "text-align:center", @class = "metro-header" })
+                     //.Width(a)
+                     .ClientTemplate("<div>#=accountname# </div>")
+                     .ClientFooterTemplate("<div style='text-align:center;'><label> </label><label>TOTAL</label></div>");
+            columns.Bound(m => m.amount)
+                     //  columns.Template(@<text></text>)
+                     .HeaderTemplate(@<text><div style="text-align:center; vertical-align: middle; overflow: visible; white-space: normal;color:white">Appropriation</div></text>)
+                     .HtmlAttributes(new { style = "text-align:right" })
+                     .HeaderHtmlAttributes(new { style = "text-align:center;", @class = "metro-header" })
+                     .Width(120)
+                     .ClientTemplate("<div>#=kendo.toString(amount, 'n2')# </div>")
+                     .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> </label><label> #=kendo.toString(sum, 'c2')#</label></div>");
+            columns.Template(t => { })
+                     .HeaderHtmlAttributes(new { style = "text-align:center", @class = "metro-header" })
+                     .ClientTemplate(
+               "<div class='btn-edit'>  <a  title='Edit' onclick='edittransv2(#=nonofficeid#,#=nonofficeidparent#,\"#=kendo.htmlEncode(accountname)#\",#=amount#,#=accountnameid#,#=officeid#,#=programid#,#=actualaccountid#,#=accountid#)'><span class='fa fa-edit' style ='font-size: 15pt;color:blue'></span></a></div>"
+               ).HtmlAttributes(new { style = "margin-left:5px;" }).Width(40);
+            columns.Template(t => { })
+                     .HeaderHtmlAttributes(new { style = "text-align:center", @class = "metro-header" })
+                     .ClientTemplate(
+               "<div class='btn-delete'> <a  title='Delete' onclick='deletetransv2(#=accountnameid#,#=nonofficeidparent#)'><span class='fa fa-trash' style='font-size: 15pt;color:red'></span></a></div>"
+               ).HtmlAttributes(new { style = "margin-left:5px;" }).Width(40);
+        })
+        //.ToolBar(toolbar =>
+        //{
+        //    toolbar.Custom().Text("<span class='fa fa-arrows-alt'> </span> View in Fullscreen").Name("btnFullScreen").Url("javascript:void(0)").HtmlAttributes(new { onclick = "DivFullScreen()" });
+        //    toolbar.Custom().Text("<span class='fa fa-compress'> </span> Restore Screen").Name("btnRestoreScreen").Url("javascript:void(0)").HtmlAttributes(new { onclick = "DivRestoreScreen()" });
+        //})
+        .Sortable()
+        .ClientDetailTemplateId("templateforsub")
+        .Pageable(pageable => pageable.Refresh(true))
+        .Scrollable()
+        .Resizable(e => e.Columns(true))
+        .HtmlAttributes(new { @class = "table-responsive", style = "height:450px;overflow-y:hidden;" })
+        .Selectable(selectable => selectable
+        .Mode(GridSelectionMode.Single)
+        .Type(GridSelectionType.Row))
+        //   .Events(events => events.Change("selectedrow"))
+        .DataSource(dataSource => dataSource
+            .Ajax()
+            .Aggregates(a =>
+            {
+                a.Add(c => c.amount).Sum();
+            })
+            .Model(model => model.Id(u => u.nonofficeid))
+            .PageSize(1000)
+            .ServerOperation(false)
+            .Read(read => read.Action("BuilNonOffice_SubGrid", "Maintenance").Data("onDatav2"))
+        )
+
+            )
+        </div>
+        <script id="templateforsub" type="text/kendo-tmpl">
+            @(Html.Kendo().Grid<iFMIS_BMS.Models.NonOfficeSubAccount>()
+            .Name("NonOfficeSubv2#=accountnameid#")
+            // .Scrollable()
+            .Columns(col =>
+            {
+
+            col.Template(@<text></text>)
+            .HtmlAttributes(new { style = "text-align:left;height:30px" })
+            .HeaderTemplate(@<text>
+                <div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size:12px;">Particular</div></text>)
+            .Width(200)
+            .ClientTemplate("<div font-size:11px;>\\#=accountname\\# </div>")
+            .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal;background-color:\\#ffd800;font-size:14px;color:black;" })
+            .ClientFooterTemplate("<div style='text-align:center;color:darkgreen'><label> </label><label> Total</label></div>"); ;
+            
+            col.Bound(m => m.amount)
+            .HtmlAttributes(new { style = "text-align:right;height:30px" })
+            .HeaderTemplate(@<text>
+                <div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;color:black;font-size:12px;">Appropriation</div></text>)
+            .Width(120)
+            .ClientTemplate("<div font-size:11px;>\\#=kendo.toString(amount, 'c2')\\# </div>")
+            .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal;background-color:\\#ffd800;font-size:14px;" })
+            .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> </label><label> \\#=kendo.toString(sum, 'c2')\\#</label></div>");
+
+            col.Template(t => { })
+                .HeaderHtmlAttributes(new { style = "text-align:center", @class = "metro-header" })
+                .ClientTemplate(
+               "<div class='btn-edit'>  <a  title='Edit' onclick='edittransv2(\\#=nonofficeid\\#,\\#=nonofficeidparent\\#,\"\\#=kendo.htmlEncode(accountname)\\#\",\\#=amount\\#,\\#=accountnameid\\#,\\#=officeid\\#,\\#=programid\\#,\\#=actualaccountid\\#,\\#=accountid\\#)'><span class='fa fa-edit' style ='font-size: 15pt;color:blue'></span></a></div>"
+               ).HtmlAttributes(new { style = "margin-left:5px;" }).Width(20);
+            col.Template(t => { })
+                 .HeaderHtmlAttributes(new { style = "text-align:center", @class = "metro-header" })
+                 .ClientTemplate(
+           "<div class='btn-delete'> <a  title='Delete' onclick='deletetransv2(\\#=accountnameid\\#,\\#=nonofficeidparent\\#)'><span class='fa fa-trash' style='font-size: 15pt;color:red'></span></a></div>"
+           ).HtmlAttributes(new { style = "margin-left:5px;" }).Width(20);
+
+            col.Bound(m => m.YearOf)
+            .HtmlAttributes(new { style = "text-align:left;height:30px" })
+            .HeaderTemplate(@<text>
+                <div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Year</div></text>)
+                .Hidden();
+            })
+            .Sortable()
+            .Scrollable()
+            .Resizable(e => e.Columns(true))
+            .HtmlAttributes(new { style = "height:750px;overflow-y:hidden;" })
+            .Pageable(pageable => pageable
+            .Refresh(true)
+            .ButtonCount(2))
+            .Selectable()
+            .DataSource(d => d
+            .Ajax()
+            .Aggregates(a =>
+            {
+                a.Add(c => c.amount).Sum();
+            })
+            .ServerOperation(false)
+            .PageSize(1000)
+            .Model(m => m.Id(i => i.officeid))
+            .Read(read => read.Action("BuilNonOffice_SubGrid", "Maintenance", new { program = "#=programid#", accountTemp = "#=accountid#", year = "#=YearOf#", showallid = 2, motherAccountid= "#=accountnameid#" }))
+            )
+            .Pageable()
+            .ToClientTemplate()
+            )
+        </script>
+</div>
+    <script>
+        $(document).ready(function () {
+            var grid = $('#NonOfficeSub').data('kendoGrid');
+            document.getElementById("excessaccountnameid").innerHTML = "Account :"
+            document.getElementById("excessaccountnameid").style = "margin-left:98px;font-size:12px;"
+            $("#accountTemp").data("kendoComboBox").input.attr("placeholder", "Select account...");
+            grid.hideColumn('excessaccount');
+            grid.hideColumn('linkaccount');
+        })
+        function Close() {
+            document.getElementById("showlstatusid").checked = false
+            document.getElementById("showlstatusid").value = 0
+        }
+        function btnShowDetails() {
+            var grid = $('#NonOfficeSub').data('kendoGrid');
+            var options = $('#NonOfficeSub').data("kendoGrid").getOptions()
+
+            if (document.getElementById("showdetailsid").checked) {
+                document.getElementById("showdetailsid").value = 1
+                grid.showColumn('excessaccount');
+                grid.showColumn('linkaccount');
+            }
+            else {
+                document.getElementById("showdetailsid").value = 0
+                grid.hideColumn('excessaccount');
+                grid.hideColumn('linkaccount');
+            }
+        }
+        function btnShowAllExcess() {
+
+            if (document.getElementById("showllexcessid").checked) {
+                document.getElementById("showllexcessid").value = 1
+            }
+            else {
+                document.getElementById("showllexcessid").value = 0
+            }
+            $('#NonOfficeSub').data('kendoGrid').dataSource.read();
+        }
+        function btnShowStatus() {
+            $(window).scrollTop(0);
+            var url = "@Url.Action("excessStatusreport", "Maintenance")";
+
+            if (document.getElementById("showlstatusid").checked == true) {
+                $.get(url,
+                function (d) {
+                    $('#excesswindow').html(d);
+                })
+
+                $('#excesswindow').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Status of Excess/Continuing Account").center().open();
+            }
+        }
+        function PGO_() {
+            if (document.getElementById('pgo_').checked) {
+
+                document.getElementById("pgo_").value = 1;
+
+            } else {
+
+                document.getElementById("pgo_").value = 0;
+            }
+        }
+        function SummaryPPA() {
+            if (document.getElementById('SummaryPPA').checked) {
+                document.getElementById("SummaryPPA").value = 1;
+            } else {
+                document.getElementById("SummaryPPA").value = 0;
+            }
+        }
+
+        function fnOffice() {
+
+            setTimeout(function () {
+                $("#program").data("kendoComboBox").dataSource.read();
+            }, 500);
+            ocake4();
+        }
+        function fnprogram() {
+            setTimeout(function () {
+                $("#accountactual").data("kendoComboBox").dataSource.read();
+                $("#accountTemp").data("kendoComboBox").dataSource.read();
+            }, 500);
+            ocake2();
+        }
+
+        function officeval() {
+            return {
+                year: $("#ProposalYear").val(),
+                office: $("#office").val()
+            };
+        }
+        function program() {
+            return {
+                year: $("#ProposalYear").val(),
+                program: $("#program").val(),
+                account: $("#accountTemp").val(),
+                excessid: $("#excessid").val(),
+                tempradid: $("#tempradid").val()
+            };
+        }
+        function programaccount() {
+            return {
+                year: $("#ProposalYear").val(),
+                program: $("#program").val()
+            }
+        }
+        //function getaccount() {
+        //    return {
+        //        year: $("#ProposalYear").val(),
+        //        program: $("#program").val(),
+        //        accountTemp: $("#accountTemp").val()
+        //    };
+        //}
+
+
+        //var thisculture = kendo.culture();
+        //thisculture.numberFormat.currency.symbol = '₱'; // Script For Changing The Currency Sign
+
+
+        function ocake() {
+
+            $("#office").data("kendoComboBox").dataSource.read()
+            $("#office").data("kendoComboBox").value("")
+            $("#program").data("kendoComboBox").dataSource.read()
+            $("#program").data("kendoComboBox").value("")
+            $("#accountTemp").data("kendoComboBox").dataSource.read()
+            $("#accountTemp").data("kendoComboBox").value("")
+           // $('#NonOfficeSub').data('kendoGrid').dataSource.read({ program: $("#program").val(), accountTemp: $("#accountTemp").val(), year: $("#ProposalYear").val() });
+        }
+        function ocake2() {
+
+            $("#accountTemp").data("kendoComboBox").dataSource.read()
+            $("#accountTemp").data("kendoComboBox").value("")
+
+            //}, 500);
+        }
+
+        function ocake4() {
+            $("#program").data("kendoComboBox").dataSource.read()
+            $("#program").data("kendoComboBox").value("")
+            $("#accountTemp").data("kendoComboBox").dataSource.read()
+            $("#accountTemp").data("kendoComboBox").value("")
+
+        }
+        function btnClear(id) {
+
+            $("#MotherAccount").data("kendoComboBox").value("");
+            $("#particularname").val("");
+            $("#amountid").val(0);
+            $("#amountTemp").val(0);
+            $("#MainAppropriation").val(0.00);
+            $("#SubAppropriation").val(0.00);
+            $("#btnSave").html("<span class='fa fa-save' style='color:black'> </span> Save");
+            $("#btnSave").attr("onclick", "btnSave()");
+            $('#NonOfficeSub').data('kendoGrid').dataSource.read();
+            $("#MotherAccount").data("kendoComboBox").dataSource.read()
+            $("#actioncode").val(1)
+            $("#MainAppropriationid").hide();
+            $("#SubAppropriationid").hide();
+            $("#BalAppropriationid").hide();
+            $("#nonofficeidparentTemp").val("");
+            $("#accountnameAppropriation").val("");
+            $("#accountnameAllotment").val("");
+            $("#accountnameBal").val("");
+            $("#accountactual").data("kendoComboBox").value("")
+            if (id == 1) {
+                document.getElementById("currentid").value = "1";
+                document.getElementById("excessid").value = "0";
+                $("#currentid").prop("checked", true)
+                $("#excessid").prop("checked", false)
+                onclickCurrent()
+                $("#accountTemp").data("kendoComboBox").dataSource.read()
+                $("#accountTemp").data("kendoComboBox").value("")
+            }
+            fnaccount()
+        }
+        function edittrans(nonofficeid, nonofficeidparent, accountname, amount, accountnameid, officeid, programid, actualaccountid, accountid) {
+            btnClear(2)
+
+            $("#MotherAccount").data("kendoComboBox").value(nonofficeidparent);
+            if (nonofficeidparent != 0) {
+                fnMainaccount()
+            }
+            $("#accountnameid").val(accountnameid);
+            $("#particularname").val(accountname);
+            $("#amountid").val(amount);
+            $("#amountTemp").val(amount);
+            $("#btnSave").attr("onclick", "btnSave()");
+            $("#btnSave").html("<span class='fa fa-edit'> </span> Update");
+            $("#nonofficeidtemp").val(nonofficeid)
+            $("#actioncode").val(2)
+            $("#nonofficeidparentTemp").val(nonofficeidparent)
+            var ProposalYear = $("#ProposalYear").val();
+
+            $("#office").data("kendoComboBox").value(officeid)
+            $("#program").data("kendoComboBox").dataSource.read()
+            $("#program").data("kendoComboBox").value(programid)
+            $("#accountactual").data("kendoComboBox").dataSource.read()
+            $("#accountactual").data("kendoComboBox").value(actualaccountid)
+            $("#accountTemp").data("kendoComboBox").dataSource.read()
+            $("#accountTemp").data("kendoComboBox").value(accountid)
+
+
+            var url = "@Url.Action("AccountSAAB", "Maintenance")"
+            $.get(url, { accountnameid: $("#accountnameid").val(), ProposalYear: ProposalYear }, function (d) {
+                $("#accountnameAppropriation").val(MoneyFormat(d.Appropriation));
+                $("#accountnameAllotment").val(MoneyFormat(d.AllotedAmount));
+                $("#accountnameBal").val(MoneyFormat(d.BalanceAllotment));
+            });
+        }
+        function edittransv2(nonofficeid, nonofficeidparent, accountname,amount, accountnameid, officeid, programid, actualaccountid, accountid) {
+            btnClear(2)
+            var showallid = $("#showallid").val();
+
+            if (showallid == 1) {
+                subppaid = nonofficeidparent
+            }
+            else {
+                subppaid = 0;
+            }
+            //var amount = 0;
+            $("#MotherAccount").data("kendoComboBox").value(nonofficeidparent);
+            if (nonofficeidparent != 0) {
+                fnMainaccount()
+            }
+            $("#accountnameid").val(accountnameid);
+            $("#particularname").val(accountname);
+            $("#amountid").val(amount);
+            $("#amountTemp").val(amount);
+            $("#btnSave").attr("onclick", "btnSave()");
+            $("#btnSave").html("<span class='fa fa-edit'> </span> Update");
+            $("#nonofficeidtemp").val(nonofficeid)
+            $("#actioncode").val(2)
+            $("#nonofficeidparentTemp").val(nonofficeidparent)
+            var ProposalYear = $("#ProposalYear").val();
+
+            $("#office").data("kendoComboBox").value(officeid)
+            $("#program").data("kendoComboBox").dataSource.read()
+            $("#program").data("kendoComboBox").value(programid)
+            $("#accountactual").data("kendoComboBox").dataSource.read()
+            $("#accountactual").data("kendoComboBox").value(actualaccountid)
+            $("#accountTemp").data("kendoComboBox").dataSource.read()
+            $("#accountTemp").data("kendoComboBox").value(accountid)
+
+
+            var url = "@Url.Action("AccountSAAB", "Maintenance")"
+            $.get(url, { accountnameid: $("#accountnameid").val(), ProposalYear: ProposalYear }, function (d) {
+                $("#accountnameAppropriation").val(MoneyFormat(d.Appropriation));
+                $("#accountnameAllotment").val(MoneyFormat(d.AllotedAmount));
+                $("#accountnameBal").val(MoneyFormat(d.BalanceAllotment));
+            });
+
+         // Optional slight delay to allow for data processing
+        }
+        function deletetrans(accountnameid) {
+            var url = "@Url.Action("DeleteSubAccount", "Maintenance")";
+            swal({
+                title: "Confirmation!",
+                text: "Do you want to delete this particular?.",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                closeOnConfirm: false
+            }, function () {
+                $.get(url, { accountnameid: accountnameid }, function (d) {
+                    if (d == "success") {
+                        swal("", "Particular successfully deleted!", "success")
+                        btnClear(3);
+                        $('#NonOfficeSub').data('kendoGrid').dataSource.read();
+                    }
+                    else {
+                        swal("",d, "error")
+                    }
+                })
+            });
+        }
+
+        function deletetransv2(accountnameid, nonofficeidparent) {
+            var showallid = $("#showallid").val();
+            var url = "@Url.Action("DeleteSubAccount", "Maintenance")";
+            swal({
+                title: "Confirmation!",
+                text: "Do you want to delete this particular?.",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                closeOnConfirm: false
+            }, function () {
+                $.get(url, { accountnameid: accountnameid }, function (d) {
+                    if (d == "success") {
+                        swal("", "Particular successfully deleted!", "success")
+                        btnClear(3);
+                        $('#NonOfficeSub').data('kendoGrid').dataSource.read();
+
+                        if (showallid == 1) {
+                            if (subppaid == 0) {
+                                $('#NonOfficeSubv2').data('kendoGrid').dataSource.read();
+                            }
+                            else {
+                                setTimeout(function () {
+                                    refreshChildGrid(nonofficeidparent);
+                                }, 200);
+                            }
+                        }
+
+                    }
+                    else {
+                        swal("",d, "error")
+                    }
+                })
+            });
+        }
+
+        function sync() {
+            var amount = $("#amountid").val();
+            var amountTemp = $("#amountTemp").val() == "" ? 0 : $("#amountTemp").val();
+            var appBal = 0;
+            var nonofficeidtemp = $("#nonofficeidtemp").val()
+            var MotherAccountTemp = $("#MotherAccount").val()
+
+            var MotherAccount = MotherAccountTemp == 0 ? nonofficeidtemp : $("#MotherAccount").val();
+            var ProposalYear = $("#ProposalYear").val();
+            var nonofficeidparentTemp = $("#nonofficeidparentTemp").val();
+            //var accountnameAppropriation = $("#accountnameAppropriation").val();
+            //var accountnameAllotment = $("#accountnameAllotment").val();
+            //var accountnameBal = $("#accountnameBal").val();
+
+            var url2 = "@Url.Action("getParticularBalance", "Maintenance")";
+            var noidparentTemp = 0;
+
+            $.get(url2, { MotherAccount: MotherAccount, ProposalYear: ProposalYear }, function (e) {
+       //
+                if (MotherAccountTemp != 0) { //Sub-account
+
+                    if (MotherAccount != nonofficeidparentTemp) {
+                        noidparentTemp = amountTemp;
+                    } else {
+                        noidparentTemp = 0;
+                    }
+
+                    appBal = parseFloat(Number(e)).toFixed(2) - Number(noidparentTemp) - parseFloat(Number(amount)).toFixed(2)
+
+                    appBal = Number(appBal) + Number(amountTemp)
+                    $("#mainAccountUsed").val(1)
+                }
+                else {//main account
+
+                    appBal = Number(amountTemp) - Number(e)
+                    appBal = Number(amount) - Number(appBal)
+              //
+                    $("#mainAccountUsed").val(0)
+                }
+
+                $("#appBalTemp").val(appBal)
+
+            });
+        }
+
+        //$("#amountid").change(function () {
+        //    sync();
+        //}).keypress(function (e) {
+        //    if (e.keyCode == 13) {
+        //        sync();
+        //    }
+        //});
+
+        function btnSave() {
+
+            sync()
+            var nonofficeidtemp = $("#nonofficeidtemp").val() == ""? 0:$("#nonofficeidtemp").val();
+            var office = $("#office").val();
+            var program = $("#program").val();
+            var accountTemp = $("#accountTemp").val();
+            var MotherAccount = $("#MotherAccount").val() == "" ? 0 : $("#MotherAccount").val();
+            var particularname = $("#particularname").val();
+            var amount = $("#amountid").val();
+            var ProposalYear = $("#ProposalYear").val();
+            var actioncode = $("#actioncode").val();
+            var accountnameid = $("#accountnameid").val() == "" ? 0 : $("#accountnameid").val();
+            var bal = 0.00;
+            var appBal = 0.00;
+            var amountTemp = $("#amountTemp").val() == "" ? 0 : $("#amountTemp").val();
+            var actioncodeStatus = $("#actioncode").val() == 1 ? "save" : "update";
+            var accountnameAllotment = $("#accountnameAllotment").val();
+
+            var accountnameAllotmentBal = Number(amount) - Number(accountnameAllotment)
+            var tempapprovedamountBal2 = $("#tempapprovedamountBal").val() == "" ? 0 : $("#tempapprovedamountBal").val()
+
+            var tempapprovedamountBaltemp = (Number(tempapprovedamountBal2) + Number(amountTemp)) - Number(amount);
+
+            var appBalTemp = $("#appBalTemp").val() == "" ? 0 : $("#appBalTemp").val()
+            var excessid = $("#excessid").val()
+            var tempradid = $("#tempradid").val()
+            var accountactual = $("#accountactual").val()
+            var showallid = $("#showallid").val();
+
+            var url = "@Url.Action("InsertSubAccount", "Maintenance")";
+          
+            //tempapprovedamountBaltemp
+            //if (excessid == 1)
+            //{
+            //    tempapprovedamountBaltemp=9999999999999
+            //}
+
+            if (parseFloat(amount).toFixed(2) < 0)
+            {
+                swal("", "Please enter the right appropriation!", "warning")
+            }
+            else if (particularname == "") {
+                swal("", "Please enter the particular!", "warning")
+            }
+            else if ((office == "" || program == "" || accountTemp == "") && (tempradid == 0)) {
+                swal("", "Please select the office, program and account respectively!", "warning")
+            }
+            else if ((office == "" || program == "" || accountTemp == "" || accountactual.length == 0) && (excessid != 0)) {
+                swal("", "Please select the office, program and account respectively!", "warning")
+            }
+            else if (accountactual.length == 0 && excessid != 0) {
+                swal("", "Please select account in the dropdown list!", "warning")
+            }
+            else {
+
+                if ($("#appBalTemp").val() < 0 || accountnameAllotmentBal < 0) {
+
+                        if (Number(accountnameAllotmentBal) < 0) {
+
+                            swal("", "This particular amount has already been used for the appropriation of sub-accounts!\nPlease check your entry.", "warning");
+                            $("#amountid").val("");
+                            $("#amountid").focus();
+                        }
+                        else {
+                                if ($("#mainAccountUsed").val() == 1) {
+                                    swal("", "Amount must NOT be greater than the balance to be appropriated!", "warning");
+                                    $("#amountid").val("");
+                                    $("#amountid").focus();
+                                }
+                                else if (tempapprovedamountBaltemp < 0 && MotherAccount == 0 && parseFloat(amount).toFixed(2) > parseFloat(amountTemp).toFixed(2)) {
+
+                                    swal("", "Please be reminded, that the total amount of sub-account must not be greater than the APPROVED BUDGET!", "warning");
+                                    $("#amountid").val(amountTemp);
+                                    $("#amountid").focus();
+                                }
+                                else {
+
+                                    swal("", "This particular amount has already been used for the appropriation of sub-accounts!\nPlease check your entry.", "warning");
+                                    $("#amountid").val("");
+                                    $("#amountid").focus();
+                                }
+                            }
+                    }
+                else if (tempapprovedamountBaltemp < 0 && MotherAccount == 0 && parseFloat(amount).toFixed(2) > parseFloat(amountTemp).toFixed(2)) {
+
+                    swal("", "Please be reminded, that the total amount of sub-account must not be greater than the APPROVED BUDGET!", "warning");
+                    $("#amountid").val(amountTemp);
+                    $("#amountid").focus();
+                }
+                else {
+                    swal({
+                        title: "Confirmation!",
+                        text: "Do you want to " + actioncodeStatus + " this transaction?",
+                        type: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#DD6B55",
+                        confirmButtonText: "Yes",
+                        closeOnConfirm: false
+                    }, function () {
+                        $.get(url, { office: office, program: program, accountTemp: accountTemp, MotherAccount: MotherAccount, particularname: particularname, amount: amount, ProposalYear: ProposalYear, nonofficeidtemp: nonofficeidtemp, actioncode: actioncode, accountnameid: accountnameid, excessid: excessid, accountactual: accountactual }, function (d) {
+                            if (d == "success") {
+                                swal("", "Transaction has been " + actioncodeStatus + "d", "success")
+                                $('#NonOfficeSub').data('kendoGrid').dataSource.read();
+                                $("#MotherAccount").data("kendoComboBox").dataSource.read()
+                                btnClear(0);
+
+                                if (showallid == 1) {
+                                    if (subppaid == 0) {
+                                        $('#NonOfficeSubv2').data('kendoGrid').dataSource.read();
+                                    }
+                                    else {
+                                        setTimeout(function () {
+                                            refreshChildGrid(subppaid);
+                                        }, 200);
+                                    }
+                                }
+                            }
+                            else {
+                                swal("Error", d, "error")
+                            }
+                        })
+
+                    });
+                }
+            }
+        }
+        function fnaccount() {
+            var office = $("#office").val();
+            var program = $("#program").val();
+            var accountTemp = $("#accountTemp").val();
+            var ProposalYear = $("#ProposalYear").val();
+            var tempradid= $("#tempradid").val()
+            setTimeout(function () {
+                var url = "@Url.Action("GetApprovedBudget", "Maintenance")";
+                $.get(url, { program: program, accountTemp: accountTemp, ProposalYear: ProposalYear, tempradid:tempradid }, function (d) {
+                    $("#approvedamountid").val(MoneyFormat(d.Appropriation));
+                    $("#tempapprovedamountid").val(d.Appropriation);
+                    $("#tempapprovedamountBal").val(d.BalanceAllotment);
+
+                })
+                $('#NonOfficeSub').data('kendoGrid').dataSource.read();
+                $('#MotherAccount').data('kendoComboBox').dataSource.read();
+
+            }, 500);
+        }
+
+        function fnMainaccount() {
+
+            $("#MainAppropriationid").show();
+            $("#SubAppropriationid").show();
+            $("#BalAppropriationid").show();
+            var MotherAccount = $("#MotherAccount").val();
+            var ProposalYear = $("#ProposalYear").val();
+
+            var url = "@Url.Action("SubAccountSAAB", "Maintenance")";
+            $.get(url, { MotherAccount: MotherAccount, ProposalYear: ProposalYear }, function (d) {
+                $("#MainAppropriation").val(MoneyFormat(d.Appropriation));
+                $("#SubAppropriation").val(MoneyFormat(d.AllotedAmount));
+                $("#BalAppropriation").val(MoneyFormat(d.BalanceAllotment));
+                $('#NonOfficeSub').data('kendoGrid').dataSource.read();
+            })
+            sync();
+        }
+
+        function ocakeyear() {
+            $('#NonOfficeSub').data('kendoGrid').dataSource.read({ program: $("#program").val(), accountTemp: $("#accountTemp").val(), year: $("#ProposalYear").val() });
+            $('#MotherAccount').data('kendoComboBox').dataSource.read();
+        }
+
+        function onclickCurrent()
+        {
+            if (document.getElementById('currentid').checked) {
+                document.getElementById("currentid").value = "1";
+                document.getElementById("excessid").value = "0";
+                //$("#accountTemp").data("kendoComboBox").dataSource.read();
+
+                $("#approvedamountid").val(0)
+                $("#accountorigid").hide();
+                document.getElementById("excessaccountnameid").innerHTML = "Account :"
+                document.getElementById("excessaccountnameid").style = "margin-left:98px;font-size:12px;"
+                $("#accountTemp").data("kendoComboBox").input.attr("placeholder", "Select account...");
+
+            } else {
+                document.getElementById("currentid").value = "1";
+                document.getElementById("excessid").value = "0";
+             //   $("#accountorigid").show();
+            }
+            $("#currentid").prop("checked", true)
+            $("#excessid").prop("checked", false)
+            $("#MotherAccount").data("kendoComboBox").dataSource.read();
+            $("#NonOfficeSub").data("kendoGrid").dataSource.read();
+            document.getElementById("radBttnid").style.display = "none"
+            $("#tempradid").val(0);
+            $("#accountTemp").data("kendoComboBox").dataSource.read();
+            $("#accountTemp").data("kendoComboBox").value("");
+        }
+        function onclickExcess() {
+            if (document.getElementById('excessid').checked) {
+                document.getElementById("excessid").value = "1";
+                document.getElementById("currentid").value = "0";
+                $("#currentid").prop("checked", false)
+                document.getElementById("radBttnid").style.display = "inline"
+                document.getElementById("radesmf").value = "1";
+                document.getElementById("radesmf").checked = true;
+                onclickESMF();
+                $("#office").data("kendoComboBox").value("");
+                $("#program").data("kendoComboBox").value("");
+                $("#program").data("kendoComboBox").dataSource.read();
+                $("#accountorigid").val();
+                $("#accountorigid").show();
+                document.getElementById("excessaccountnameid").innerHTML = "Excess Account :"
+                document.getElementById("excessaccountnameid").style = "margin-left:58.5px;font-size:12px;"
+                $("#accountTemp").data("kendoComboBox").input.attr("placeholder", "Select excess account...");
+
+
+            } else {
+                document.getElementById("excessid").value = "1";
+                document.getElementById("currentid").value = "0";
+                $("#currentid").prop("checked", true)
+                document.getElementById("radBttnid").style.display = "none"
+                $("#tempradid").val(0);
+                $("#accountorigid").hide();
+            }
+            $("#MotherAccount").data("kendoComboBox").dataSource.read();
+            $("#NonOfficeSub").data("kendoGrid").dataSource.read();
+            $("#accountTemp").data("kendoComboBox").dataSource.read();
+            $("#accountTemp").data("kendoComboBox").value("");
+
+        }
+
+    </script>
+@(Html.Kendo().Window()
+        .Name("excesswindow")
+        //.Title("")
+        .Width(1260)
+        .Height(560)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+          .Events(e => e.Close("Close"))
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+        .Actions(a => { a.Close(); })
+)

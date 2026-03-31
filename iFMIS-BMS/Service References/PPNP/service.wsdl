@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://tempuri.org/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://tempuri.org/">
+      <s:element name="PODetails">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="pono" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="PODetailsResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="PODetailsResult">
+              <s:complexType>
+                <s:sequence>
+                  <s:any minOccurs="0" maxOccurs="unbounded" namespace="http://www.w3.org/2001/XMLSchema" processContents="lax" />
+                  <s:any minOccurs="1" namespace="urn:schemas-microsoft-com:xml-diffgram-v1" processContents="lax" />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="POItems">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="officeid" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="POItemsResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="POItemsResult">
+              <s:complexType>
+                <s:sequence>
+                  <s:any minOccurs="0" maxOccurs="unbounded" namespace="http://www.w3.org/2001/XMLSchema" processContents="lax" />
+                  <s:any minOccurs="1" namespace="urn:schemas-microsoft-com:xml-diffgram-v1" processContents="lax" />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="PPMPAmount">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="year" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="officeid" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="programid" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="accountid" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="PPMPAmountResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="PPMPAmountResult" type="s:double" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="PPMPItems">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="year" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="officeid" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="programid" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="accountid" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="PPMPItemsResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="PPMPItemsResult">
+              <s:complexType>
+                <s:sequence>
+                  <s:any minOccurs="0" maxOccurs="unbounded" namespace="http://www.w3.org/2001/XMLSchema" processContents="lax" />
+                  <s:any minOccurs="1" namespace="urn:schemas-microsoft-com:xml-diffgram-v1" processContents="lax" />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="PPMPLumpsum">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="year" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="officeid" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="programid" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="accountid" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="PPMPLumpsumResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="PPMPLumpsumResult">
+              <s:complexType>
+                <s:sequence>
+                  <s:any minOccurs="0" maxOccurs="unbounded" namespace="http://www.w3.org/2001/XMLSchema" processContents="lax" />
+                  <s:any minOccurs="1" namespace="urn:schemas-microsoft-com:xml-diffgram-v1" processContents="lax" />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="PPMPNonOffice">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="year" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="officeid" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="accountid" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="PPMPNonOfficeResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="PPMPNonOfficeResult">
+              <s:complexType>
+                <s:sequence>
+                  <s:any minOccurs="0" maxOccurs="unbounded" namespace="http://www.w3.org/2001/XMLSchema" processContents="lax" />
+                  <s:any minOccurs="1" namespace="urn:schemas-microsoft-com:xml-diffgram-v1" processContents="lax" />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="PODetailsSoapIn">
+    <wsdl:part name="parameters" element="tns:PODetails" />
+  </wsdl:message>
+  <wsdl:message name="PODetailsSoapOut">
+    <wsdl:part name="parameters" element="tns:PODetailsResponse" />
+  </wsdl:message>
+  <wsdl:message name="POItemsSoapIn">
+    <wsdl:part name="parameters" element="tns:POItems" />
+  </wsdl:message>
+  <wsdl:message name="POItemsSoapOut">
+    <wsdl:part name="parameters" element="tns:POItemsResponse" />
+  </wsdl:message>
+  <wsdl:message name="PPMPAmountSoapIn">
+    <wsdl:part name="parameters" element="tns:PPMPAmount" />
+  </wsdl:message>
+  <wsdl:message name="PPMPAmountSoapOut">
+    <wsdl:part name="parameters" element="tns:PPMPAmountResponse" />
+  </wsdl:message>
+  <wsdl:message name="PPMPItemsSoapIn">
+    <wsdl:part name="parameters" element="tns:PPMPItems" />
+  </wsdl:message>
+  <wsdl:message name="PPMPItemsSoapOut">
+    <wsdl:part name="parameters" element="tns:PPMPItemsResponse" />
+  </wsdl:message>
+  <wsdl:message name="PPMPLumpsumSoapIn">
+    <wsdl:part name="parameters" element="tns:PPMPLumpsum" />
+  </wsdl:message>
+  <wsdl:message name="PPMPLumpsumSoapOut">
+    <wsdl:part name="parameters" element="tns:PPMPLumpsumResponse" />
+  </wsdl:message>
+  <wsdl:message name="PPMPNonOfficeSoapIn">
+    <wsdl:part name="parameters" element="tns:PPMPNonOffice" />
+  </wsdl:message>
+  <wsdl:message name="PPMPNonOfficeSoapOut">
+    <wsdl:part name="parameters" element="tns:PPMPNonOfficeResponse" />
+  </wsdl:message>
+  <wsdl:portType name="serviceSoap">
+    <wsdl:operation name="PODetails">
+      <wsdl:input message="tns:PODetailsSoapIn" />
+      <wsdl:output message="tns:PODetailsSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="POItems">
+      <wsdl:input message="tns:POItemsSoapIn" />
+      <wsdl:output message="tns:POItemsSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="PPMPAmount">
+      <wsdl:input message="tns:PPMPAmountSoapIn" />
+      <wsdl:output message="tns:PPMPAmountSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="PPMPItems">
+      <wsdl:input message="tns:PPMPItemsSoapIn" />
+      <wsdl:output message="tns:PPMPItemsSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="PPMPLumpsum">
+      <wsdl:input message="tns:PPMPLumpsumSoapIn" />
+      <wsdl:output message="tns:PPMPLumpsumSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="PPMPNonOffice">
+      <wsdl:input message="tns:PPMPNonOfficeSoapIn" />
+      <wsdl:output message="tns:PPMPNonOfficeSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="serviceSoap" type="tns:serviceSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="PODetails">
+      <soap:operation soapAction="http://tempuri.org/PODetails" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="POItems">
+      <soap:operation soapAction="http://tempuri.org/POItems" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="PPMPAmount">
+      <soap:operation soapAction="http://tempuri.org/PPMPAmount" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="PPMPItems">
+      <soap:operation soapAction="http://tempuri.org/PPMPItems" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="PPMPLumpsum">
+      <soap:operation soapAction="http://tempuri.org/PPMPLumpsum" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="PPMPNonOffice">
+      <soap:operation soapAction="http://tempuri.org/PPMPNonOffice" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="serviceSoap12" type="tns:serviceSoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="PODetails">
+      <soap12:operation soapAction="http://tempuri.org/PODetails" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="POItems">
+      <soap12:operation soapAction="http://tempuri.org/POItems" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="PPMPAmount">
+      <soap12:operation soapAction="http://tempuri.org/PPMPAmount" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="PPMPItems">
+      <soap12:operation soapAction="http://tempuri.org/PPMPItems" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="PPMPLumpsum">
+      <soap12:operation soapAction="http://tempuri.org/PPMPLumpsum" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="PPMPNonOffice">
+      <soap12:operation soapAction="http://tempuri.org/PPMPNonOffice" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="service">
+    <wsdl:port name="serviceSoap" binding="tns:serviceSoap">
+      <soap:address location="http://192.168.2.104/epsws/service.asmx" />
+    </wsdl:port>
+    <wsdl:port name="serviceSoap12" binding="tns:serviceSoap12">
+      <soap12:address location="http://192.168.2.104/epsws/service.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

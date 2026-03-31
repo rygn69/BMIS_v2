@@ -1,0 +1,265 @@
+﻿
+<script>
+    function onGridEdit(arg) {
+
+        //  var gridName = $('#grd_utilizationsum').data('kendoGrid');
+
+        var entityGrid = $("#grd_proposalsummary").data("kendoGrid");
+        var selectedItem = entityGrid.dataItem(entityGrid.select());
+        var tyear= $("#proyear").val()
+        //  $("#EDIT_Amount").val(coma_sepa(selectedItem.Amount_release));
+
+        var officeid = selectedItem.OfficeID
+        var accountid = $("#account").val();
+        var url = "@Url.Action("proposal_summary_tabstrip", "Report")";
+
+        $.get(url, { officeid: officeid, accountid: accountid, tyear: tyear }, function (d) {
+            $('#proposalsummary_tabstrip').html(d);
+        })
+        $('#proposalsummary_tabstrip').data('kendoWindow').center().open();
+        $('#proposalsummary_tabstrip').data('kendoWindow').title(selectedItem.OfficeName);
+    }
+    function searchAccount_pro() {
+        var $filter = new Array();
+        $filter = [];
+
+        if ($('#SearchDataPro').val().length > 0) {
+            $filter.push({ field: "OfficeName", operator: "contains", value: $('#SearchDataPro').val() });
+            //$filter.push({ field: "Description", operator: "contains", value: $('#SearchDataPro').val() });
+
+            //Description
+        }
+
+        $('#grd_proposalsummary').data('kendoGrid').dataSource.filter({
+            logic: "or",
+            filters: $filter
+        });
+    }
+
+    $(function () {
+        $("#SearchDataPro").keypress(function (e) {
+            if (e.keyCode == 13) {
+                searchAccount_pro();
+            }
+        });
+    });
+    function getPar() {
+        return {
+            account: $("#account").val(),
+            tyear: $("#proyear").val()
+        }
+    }
+
+    function fnyear() {
+        $("#account").data("kendoComboBox").dataSource.read();
+        if ($("#account").val() != "") {
+            $("#grd_proposalsummary").data("kendoGrid").dataSource.read()
+        }
+    }
+    function btnict_assess() {
+        var tyear = $("#proyear").val()
+
+        var url = "@Url.Action("proposalict", "Report")";
+        if (tyear == 0) {
+            swal("", "Please select year!", "info");
+        }
+   
+        else {
+
+            $.get(url,
+                { 
+                    tyear: tyear
+                },
+            function (d) {
+                $('#proposalict').html(d);
+            })
+            $('#proposalict').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Assessment Report").center().open();
+        }
+    }
+</script>
+<div style="float:left;display:inline-block">
+    <label>
+        Proposal Summary (ICT Equipment/ Internet Subscription Expenses/ Other Supplies and Materials Expenses
+    </label>
+</div>
+<br />
+<label style="display:inline-block;margin-top:10px;">
+    Budget Year <span id=""></span>
+</label> <br />
+<div style="display:inline-block; margin-left:0px;width:150px;margin-top:0px;">
+    @(Html.Kendo().ComboBox()
+                .Name("proyear")
+                .DataTextField("ProposalYear")
+                .DataValueField("ProposalYear")
+                .SelectedIndex(-1)
+                .Events(e => e.Change("fnyear"))
+                .HtmlAttributes(new { style = "width:100%; height:100%", @class = "form-control autoselect" })
+
+                .DataSource(source => source.Read(read => read.Action("Tyear_ict", "PYear")))
+    )
+
+</div>
+<br />
+<label style="display:inline-block;margin-top:10px;">
+    Account <span id="" ></span>
+</label> <br />
+<div style="display:inline-block; margin-left:0px;width:350px;margin-top:0px;">
+    @(Html.Kendo().ComboBox()
+            .Name("account")
+            .DataTextField("AccountName")
+            .DataValueField("AccountID")
+            .AutoBind(true)
+            .Placeholder("Select account...")
+            .Filter("contains")
+            .MinLength(3)
+            .Events(e => e.Change("fnaccount_sel"))
+            .SelectedIndex(-1)
+            .HtmlAttributes(new { style = "width:100%; height:100%", @class = "form-control autoselect" })
+            .DataSource(source =>
+            {
+                source.Read(read =>
+                {
+                    read.Action("GetaccountPropose", "Report").Data("fnaccount");
+                })
+            .ServerFiltering(false);
+            })
+    )
+    
+</div>
+<div id="searchAccountid" style="height: 30px; margin-top:-28px; float: right; margin-left: 200px;">
+    <input type="text" style="width:300px;border-collapse:collapse;margin:0px;border-style:solid;border-color:black;margin-left:0px;height:70%;outline:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search..." id="SearchDataPro" name="SearchDataPro">
+    <div class="k-button k-button-icontext" style="height:30px;width:40px;border-style:solid;border-color:black;" onclick="searchAccount_pro()"><span class="mif-search"></span></div>
+</div>
+<div style="margin-top:3px">
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.BudgetControlModel>()
+        .Name("grd_proposalsummary")
+        .HtmlAttributes(new { style = "height:650px;" })
+        .Scrollable()
+    .Columns(col =>
+    {
+        col.Template(@<text></text>)
+                    .HeaderTemplate(@<text><div style="font-weight:600;">Office</div></text>)
+                    .Width(270)
+                    .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                    .ClientTemplate("<div>#=OfficeName# </div>")
+                    .ClientFooterTemplate("<div style='text-align:center;font-weight:bold'> TOTAL </div>");
+        col.Bound(m => m.qty2)
+                    .HtmlAttributes(new { style = "font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;" })
+                    .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Proposal<br /> (Qty)</div></text>    )
+                    .HeaderHtmlAttributes(new { style = "text-align:center" })
+                    .Width(150)
+                    .ClientTemplate("<div>#=kendo.toString(qty2,'N0')# </div>")
+                    .ClientFooterTemplate("<div style='text-align:center;color:darkgreen'><label> </label><label> #=kendo.toString(sum, 'N0')#</label></div>");
+        col.Bound(m => m.Amount)
+                    .HtmlAttributes(new { style = "font-weight:600;text-align:right; vertical-align: middle; overflow: visible; white-space: normal;" })
+                    .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Proposal<br />(Amount)</div></text>    )
+                    .HeaderHtmlAttributes(new { style = "text-align:center" })
+                    .Width(150)
+                    .ClientTemplate("<div>#=kendo.toString(Amount,'N2')# </div>")
+                    .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> </label><label> #=kendo.toString(sum, 'N2')#</label></div>");
+        col.Bound(m => m.qty)
+                    .HtmlAttributes(new { style = "font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;" })
+                    .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Existing<br /> (Qty)</div></text>    )
+                    .HeaderHtmlAttributes(new { style = "text-align:center" })
+                    .Width(150)
+                    .ClientTemplate("<div>#=kendo.toString(qty,'N0')# </div>")
+                    .ClientFooterTemplate("<div style='text-align:center;color:darkgreen'><label> </label><label> #=kendo.toString(sum, 'N0')#</label></div>");
+
+        col.Bound(m => m.OfficeID).Title("office").Hidden();
+
+
+        //
+
+    }).ToolBar(toolbar =>
+         {
+             toolbar.Custom().Text("<span  class='fa fa-search' ></span> View Assessment Report").Url("javascript:void(0)").HtmlAttributes(new { onclick = "btnict_assess()", style = "float:left;margin-left:0px;background-color:cornflowerblue;color:white", title = "Click to view assessment report!" });  
+         })
+         .AutoBind(false)
+         .Pageable(page => page.Refresh(true)
+            .Enabled(true)
+            .ButtonCount(4)
+            .PreviousNext(true)
+         )
+         // .ClientDetailTemplateId("template_table")
+         .Selectable()
+          .Events(e => e.Change("onGridEdit"))
+
+           .Scrollable()
+
+         .DataSource(d => d
+         .Ajax()
+         .Batch(true)
+         .ServerOperation(false)
+         .Aggregates(a =>
+         {
+             a.Add(c => c.qty2).Sum();
+             a.Add(c => c.qty).Sum();
+             a.Add(c => c.Amount).Sum();
+         })
+         .PageSize(12)
+         .Model(m => m.Id(i => i.ooeid_uti))
+         .Read(read => read.Action("proposal_summary", "Report").Data("getPar"))
+         )
+)
+</div>
+
+<script>
+        $(document).ready(function () {
+            $("#grd_proposalsummary").data("kendoGrid").dataSource.read()
+        });
+
+        function fnaccount_sel() {
+            $("#grd_proposalsummary").data("kendoGrid").dataSource.read()
+        }
+        function closeproposal() {
+            $("#grd_proposalsummary").data("kendoGrid").dataSource.read()
+        }
+        function fnaccount() {
+            return {
+                programid: 4,
+                tyear: $("#proyear").val()
+            }
+        }
+
+</script>
+
+@(Html.Kendo().Window()
+    .Name("proposalsummary_tabstrip")
+    @*.Title("$("#offs").data('kendoComboBox').text()")*@
+    .Width(1250)
+    .Height(610)
+    .Modal(true)
+    .AutoFocus(true)
+    .Events(e => e.Close("closeproposal"))
+    .Draggable(true)
+    // .Height(550)
+    .Animation(a => { a.Open(o => o.SlideIn(SlideDirection.Down)); a.Close(c => { c.SlideIn(SlideDirection.Down); c.Reverse(true); }); }).Actions(a => { a.Close(); })
+    // .Width(1200)
+    .Scrollable(true)
+    .Visible(false)
+    .Actions(actions => actions.Close())
+
+)
+
+@(Html.Kendo().Window()
+        .Name("proposalict")
+        //.Title("")
+        .Width(1280)
+        .Height(730)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+        //  .Events(e => e.Close("closewfpapproved_lce"))
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+                .Actions(a => { a.Close(); })
+)

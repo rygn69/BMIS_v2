@@ -1,0 +1,574 @@
+﻿<script>
+    function change_text_EE() {
+        var ooe_ids = $('#float_ooe_id_EE').val()
+        $("#float_account_list_EE").data("kendoComboBox").dataSource.read();
+        if (ooe_ids == 1) {
+            //alert(ooe_ids)
+            document.getElementById("float_PS_EE").disabled = false;
+            document.getElementById("float_MOOE_EE").disabled = true;
+            document.getElementById("float_CO_EE").disabled = true;
+            //document.getElementById("float_PS_EE").placeholder = "OTIN";
+        }
+        else if (ooe_ids == 2) {
+            document.getElementById("float_PS_EE").disabled = true;
+            document.getElementById("float_MOOE_EE").disabled = false;
+            document.getElementById("float_CO_EE").disabled = true;
+        }
+        else if (ooe_ids == 3) {
+            document.getElementById("float_PS_EE").disabled = true;
+            document.getElementById("float_MOOE_EE").disabled = true;
+            document.getElementById("float_CO_EE").disabled = false;
+        }
+        else {
+            document.getElementById("float_PS_EE").disabled = true;
+            document.getElementById("float_MOOE_EE").disabled = true;
+            document.getElementById("float_CO_EE").disabled = true;
+        }
+    }
+    function fn_reqSave_Float_EE() {
+
+        var url = "@Url.Action("Save_Flaot", "Release")";
+
+
+
+
+        var office_id = $("#float_offs_EE").val();
+        var program_id = $("#float_Progss_EE").val();
+        var ooe_id = $("#float_ooe_id_EE").val();
+        var account_id = $("#float_account_list_EE").val();
+        var month_ = $("#float_Months_EE").val();
+        var numeric_ = $("#float_numeric_EE").val();
+        var year_ = $("#float_ddlYear_EE").val();
+
+        var ps_ = $("#float_PS_EE").val();
+        var mooe_ = $("#float_MOOE_EE").val();
+        var co_ = $("#float_CO_EE").val();
+
+        var _PS = $("#balance_amount_ps_EE").val();
+        var _MOOE = $("#balance_amount_mooe_EE").val();
+        var _CO = $("#balance_amount_co_EE").val();
+
+        var float_id = $("#float_id_EE").val();
+
+        var balance_ps = _PS - ps_;
+        var balance_mooe = _MOOE - mooe_;
+        var balance_co = _CO - co_;
+
+        if (ps_ == '' || ps_ == "" || ps_ == null || (ooe_id == 2 && ooe_id == 3)) { ps_ = 0; }
+         if (mooe_ == '' || mooe_ == "" || mooe_ == null || (ooe_id == 1 && ooe_id == 3)) { mooe_ = 0; }
+         if (co_ == '' || co_ == "" || co_ == null || (ooe_id == 2 && ooe_id == 1)) { co_ = 0; }
+
+
+         if (balance_ps < 0 || balance_mooe < 0 || balance_co < 0)
+         {
+             swal({
+                 title: "Error!",
+                 text: "System Error! Please Check Balance Amount.",
+                 timer: 2000,
+                 type: "error",
+                 showConfirmButton: false
+             })
+         }
+         else {
+            
+             swal({
+                 title: "Are you sure?",
+                 text: "This Float will be SAVED!",
+                 type: "info",
+                 showCancelButton: true,
+                 closeOnConfirm: false,
+                 confirmButtonColor: "#1fa67a",
+                 confirmButtonText: "Yes, Save It!",
+                 showLoaderOnConfirm: true,
+             }, function () {
+                 //  $.post(url, { office_id: office_id, program_id: program_id, ooe_id: ooe_id, account_id: account_id, month_: month_, numeric_: numeric_, year_: year_, ps_: ps_ , mooe_: mooe_, co_: co_, balance_ps: balance_ps, balance_mooe: balance_mooe, balance_co: balance_co }, function (e) {
+                 $.post(url, {
+                     office_id: office_id,
+                     program_id: program_id,
+                     ooe_id: ooe_id,
+                     account_id: account_id,
+                     month_: month_,
+                     numeric_: numeric_,
+                     year_: year_,
+
+                     ps_: ps_,
+                     mooe_: mooe_,
+                     co_: co_,
+
+                     balance_ps: balance_ps,
+                     balance_mooe: balance_mooe,
+                     balance_co: balance_co,
+
+                     float_id: float_id
+
+                 }, function (e) {
+                     $("#float_PS_EE").val('');
+                     $("#float_MOOE_EE").val('');
+                     $("#float_CO_EE").val('');
+                     get_Balance_EE();
+                     if (e == "1") {
+                         swal({
+                             title: "Success!",
+                             text: "Float has been Added.",
+                             timer: 2000,
+                             type: "success",
+                             showConfirmButton: false
+                         })
+                         $("#grd_Float_EE").data("kendoGrid").dataSource.read();
+                         $('#EconomicEnterprise_Grid').data('kendoGrid').dataSource.read();
+                     } else {
+                         swal({
+                             title: "Error!",
+                             text: "System Error! Please try again.",
+                             timer: 2000,
+                             type: "error",
+                             showConfirmButton: false
+                         })
+                     }
+                 });
+             });
+         }
+
+
+    }
+
+
+
+
+
+
+
+
+    function addFloat_EE() {
+        var url = "@Url.Action("addFloatD", "Release")";
+    var idsToSend = [];
+    var grid = $("#grd_Float_EE").data("kendoGrid")
+    var ds = grid.dataSource.view();
+
+    for (var i = 0; i < ds.length; i++) {
+        var row = grid.table.find("tr[data-uid='" + ds[i].uid + "']");
+        var checkbox = $(row).find(".checkbox");
+        if (checkbox.is(":checked")) {
+            idsToSend.push(ds[i].release_float_id);
+        }
+        if (idsToSend == "") {
+            swal({ title: "Error!", text: "Please mark the float first", timer: 1000, showConfirmButton: false, type: "error" });
+        } else {
+            swal({
+                title: "Are you sure?",
+                text: "You want to Release this allotment as Float?",
+                type: "info",
+                showCancelButton: true,
+                closeOnConfirm: false,
+                confirmButtonColor: "#1fa67a",
+                confirmButtonText: "Yes, Save It!",
+                showLoaderOnConfirm: true, }, 
+            function () {
+
+                $.post(url, { release_float_id: idsToSend }, function (d) {
+                    if (d == 1) {
+                        swal({ title: "Success!", text: "Selected Float RELEASE!", timer: 1000, showConfirmButton: false, type: "success" });
+                        $("#grd_Float_EE").data("kendoGrid").dataSource.read();
+                    }
+                    else {
+                        swal("Something Went Wrong!", d, "error");
+                    }
+                });
+            });
+        }
+    } $("#grd_Float_EE").data("kendoGrid").dataSource.read();
+    $('#EconomicEnterprise_Grid').data('kendoGrid').dataSource.read();
+}
+    function fn_refresher_float_EE() {
+
+        $("#FloatWindow_EE").data("kendoWindow").close();
+    }
+        setTimeout(function () {
+
+            FundGrid_Load_EE();
+
+        }, 1000);
+
+        function fn_grid_refresh_div_EE() {
+
+            setTimeout(function () {
+                get_Balance_EE();
+                FundGrid_Load_EE();
+                fn_OfficesF_EE();
+                $("#grd_Float_EE").data("kendoGrid").refresh();
+                $("#grd_Float_EE").data("kendoGrid").dataSource.read();
+            }, 500);
+        }
+        function get_Balance_EE() {
+            var url = "@Url.Action("get_Balance", "Release")"
+
+            var office_id = $("#float_offs_EE").val();
+            var program_id = $("#float_Progss_EE").val();
+            var ooe_id = $("#float_ooe_id_EE").val();
+            var account_id = $("#float_account_list_EE").val();
+            var month_ = $("#float_Months_EE").val();
+            var numeric_ = $("#float_numeric_EE").val();
+            var year_ = $("#float_ddlYear_EE").val();
+
+
+            $.get(url, { office_id: office_id, program_id: program_id, ooe_id: ooe_id, account_id: account_id, month_: month_, numeric_: numeric_, year_: year_ }, function (d) {
+                document.getElementById("balance_amount_ps_EE").value = d.balance_amount_ps;
+                document.getElementById("balance_amount_mooe_EE").value = d.balance_amount_mooe;
+                document.getElementById("balance_amount_co_EE").value = d.balance_amount_co;
+                document.getElementById("available_amount_EE").value = d.available_amount;
+
+                //alert(d.balance_amount)
+            })
+        }
+        function FundGrid_Load_EE() {
+
+            var url = "@Url.Action("Float_Grid_EE", "Release")";
+        var office_id = $("#float_offs_EE").val();
+        var program_id = $("#float_Progss_EE").val();
+        var ooe_id = $("#float_ooe_id_EE").val();
+        var account_id = $("#float_account_list_EE").val();
+        var month_ = $("#float_Months_EE").val();
+        var numeric_ = $("#float_numeric_EE").val();
+        var year_ = $("#float_ddlYear_EE").val();
+        var classtype = $("#classtype").val();
+
+
+        $.get(url, { office_id: office_id, program_id: program_id, ooe_id: ooe_id, account_id: account_id, month_: month_, numeric_: numeric_, year_: year_ }, function (d) {
+            $("#FundGrid_id_EE").html(d);
+        })
+
+    }
+    function fn_dprefresher_fund_null() {
+
+
+        setTimeout(function () {
+            $("#float_Progss_EE").data("kendoDropDownList").dataSource.read();
+            $("#float_ooe_id_EE").data("kendoDropDownList").dataSource.read();
+            $("#float_account_list_EE").data("kendoComboBox").dataSource.read();
+
+        }, 1000);
+
+    }
+
+</script>
+
+
+
+<div style="border: outset;clear:both;border-width:1px;border-color:#1fa67a; width: 739px; padding-left:0px;padding-right:0px;padding-top:0px;padding-bottom:7px;margin-top: 0px;">
+    <div style=" width: 0;height: 0; border-right: 5px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;margin-top: -1px; ">
+        <div style="float: left; width: 673px; margin-top:1px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 36px solid #1fa67a; ">
+            <div style="float: left; height:28px; margin-left:-59px; margin-top: 5px;">
+                <i class="fa fa-tasks fa-2x fg-white"></i>
+
+            </div>
+
+            <div style="text-align: right;float: right;margin-right:10px;margin-top:2px;">
+
+
+                @(Html.Kendo().DropDownList()
+                        .Name("float_ddlYear_EE")
+                        .DataTextField("ProposalYear")
+                        .DataValueField("ProposalYear")
+                        .SelectedIndex(1)
+                        .HtmlAttributes(new { @style = "width: 70px;" })
+                        .Events(e => e.Change("fn_grid_refresh_div_EE"))
+                        .DataSource(source => source.Read(read => read.Action("GetPropYear2", "PYear")))
+                )
+
+
+
+
+            </div>
+            <div style="float: right;margin-right:10px;margin-top:2px;">
+                <i class="fa fa-calendar fa-2x #33333"></i>
+            </div>
+
+
+        </div>
+    </div>
+
+    <div class="demo-section k-content" style=" float:right;margin-top: 7px;margin-right:7px ">
+
+    </div>
+    <div id="FundGrid_id_EE" class="demo-section k-content">
+
+
+    </div>
+
+</div>
+
+
+
+
+
+<div style="float: none;clear:both;margin-top:12px;">
+    <div style="float: left;margin-right:10px;margin-top:2px;">
+        <label style="float:left;margin-left: 50px;">
+            Office    :
+        </label>
+    </div>
+    <div style="float: right;margin-right:60px;margin-top:0px;">
+
+
+        @(Html.Kendo().ComboBox()
+                            .Name("float_offs_EE")
+                            .DataTextField("OfficeName")
+                            .DataValueField("OfficeID")
+                            .Placeholder("Select office...")
+                            .Filter("contains")
+                            .MinLength(1)
+                            .HtmlAttributes(new { @style = "width: 500px;" })
+                            .Events(e => e.Change("fn_dprefresher_fund_null"))
+                       .DataSource(source => source.Read(read => read.Action("GetOffice_EE", "Release")))
+        )
+
+
+
+    </div>
+
+    <div style="height:10px;">
+
+    </div>
+
+    <div id="ProgramAndExpenseClassDiv" style="float: none;clear:both; margin-top: 25px">
+
+        <div style="float: left;margin-right:10px;margin-top:2px;">
+            <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                Program :
+            </label>
+        </div>
+        <div style="float: right;margin-right:60px;margin-top:0px;">
+            <script>
+              function fn_OfficesF_EE() {
+                  var proyy = $("#float_ddlYear_EE").val();
+                  var off_id = $("#float_offs_EE").val();
+                  var ooe_id = $("#float_ooe_id_EE").val();
+
+                  return {
+                      propYear: proyy,
+                      office_ID: off_id,
+                      ooe_id: ooe_id
+                  }
+              }
+            </script>
+
+            @(Html.Kendo().DropDownList()
+                            .Name("float_Progss_EE")
+                            .DataTextField("ProgramDescription  ")
+                            .DataValueField("ProgramID")
+                            .OptionLabel("Select programs...")
+                            .HtmlAttributes(new { @style = "width: 500px;" })
+                   .DataSource(source => source.Read(read => read.Action("GetPrograms2", "dpPrograms").Data("fn_OfficesF_EE")))
+            )
+
+        </div>
+
+        <div style="float: left;margin-right:10px;margin-top:10px;">
+            <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                Expense Class    :
+            </label>
+        </div>
+        <div style="float: right;margin-right:60px;margin-top: 5px;">
+            @(Html.Kendo().DropDownList()
+                        .Name("float_ooe_id_EE")
+                        .DataTextField("ooe_name")
+                        .DataValueField("ooe_id")
+                        .OptionLabel("Select Expenses...")
+                        .Events(e => e.Change("change_text_EE"))
+                        .HtmlAttributes(new { @style = "width: 500px;" })
+
+                        .DataSource(source => source.Read(read => read.Action("ddlOOENonOfficeLevel", "Dropdowns")))
+            )
+        </div>
+        <div style="float: left;margin-right:10px;margin-top:10px;">
+            <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                Account    :
+            </label>
+        </div>
+        <div style="float: right;margin-right:60px;margin-top:5px;">
+            <script>
+                    function fn_ForAccount_float_null() {
+                        var propYear = $("#float_ddlYear_EE").val();
+                        var office_ID = $("#float_offs_EE").val();
+                        var ooe_id = $("#float_ooe_id_EE").val();
+                        var prog_id = $("#float_Progss_EE").val();
+                        return {
+                            propYear: propYear,
+                            office_ID: office_ID,
+                            ooe_id: ooe_id,
+                            prog_id: prog_id
+                        }
+                    }
+            </script>
+
+            @(Html.Kendo().ComboBox()
+                        .Name("float_account_list_EE")
+                        .DataTextField("account_name")
+                        .DataValueField("account_id")
+                        .Filter("contains")
+                        .MinLength(1)
+                        .Placeholder("Select Account...")
+                        .HtmlAttributes(new { @style = "width: 500px;" })
+                        .Events(e => e.Change("fn_grid_refresh_div_EE"))
+                        .DataSource(source => source.Read(read => read.Action("MOS_Account", "Dropdowns").Data("fn_ForAccount_float_null")))
+            )
+        </div>
+
+
+    </div>
+
+    <div id="MonthDepartment" style="float: none;clear:both; margin-top: 20px">
+
+        <div style="float:left;margin-left:50px;margin-top:5px;">
+            <label>
+                Release Month    :
+            </label>
+        </div>
+        <div style="float:left;margin-left:28px;margin-top:5px;">
+            @(Html.Kendo().DropDownList()
+                          .Name("float_Months_EE")
+                          .DataTextField("Text")
+                          .DataValueField("Value")
+                          .Events(e => e.Change("fn_grid_refresh_div_EE"))
+                          .BindTo(new List<SelectListItem>() {
+                              new SelectListItem() {
+                                  Text = "January",
+                                  Value = "1"
+                              },
+                              new SelectListItem() {
+                                  Text = "Febuary",
+                                  Value = "2"
+                              },
+                              new SelectListItem() {
+                                  Text = "March",
+                                  Value = "3"
+                              },
+                              new SelectListItem() {
+                                  Text = "April",
+                                  Value = "4"
+                              },
+                              new SelectListItem() {
+                                  Text = "May",
+                                  Value = "5"
+                              },
+                              new SelectListItem() {
+                                  Text = "June",
+                                  Value = "6"
+                              },
+                              new SelectListItem() {
+                                  Text = "July",
+                                  Value = "7"
+                              },
+                              new SelectListItem() {
+                                  Text = "August",
+                                  Value = "8"
+                              },
+                              new SelectListItem() {
+                                  Text = "September",
+                                  Value = "9"
+                              },
+                              new SelectListItem() {
+                                  Text = "October",
+                                  Value = "10"
+                              },
+                              new SelectListItem() {
+                                  Text = "November",
+                                  Value = "11"
+                              },
+                              new SelectListItem() {
+                                  Text = "December",
+                                  Value = "12"
+                              }
+                          })
+                          .Value(@ViewBag.MonthVaue)
+                          .HtmlAttributes(new { style = "width: 150px" })
+            )
+
+        </div>
+
+
+        <div style="float:right;margin-right:60px;margin-top:5px;">
+            @(Html.Kendo().NumericTextBox<double>()
+            .Name("float_numeric_EE")
+            .Value(1)
+            .Placeholder("Enter numeric value")
+            .HtmlAttributes(new { style = "width: 110px" })
+            )
+        </div>
+        <div style="float:right;margin-right:30px;margin-top:5px;">
+            <label>
+                Monthly Release Batch    :
+            </label>
+        </div>
+    </div>
+
+
+
+
+
+    <div id="AmountDepartment" style="float: none;clear:both; margin-top: 20px">
+        <div style="float:left;margin-left:50px;margin-top:5px;">
+            <label>
+                Available   :
+            </label>
+        </div>
+        <div style="float:left;margin-left:68px;margin-top:5px;">
+            <input type="text" style="width:190px" name="available_amount_EE" id="available_amount_EE" placeholder="        Available Amount" disabled>
+        </div>
+
+
+        <div style="float:left;margin-left:-340px;margin-top:40px;">
+            <label>
+                Amount    :
+            </label>
+        </div>
+        <div style="float:left;margin-left:-201px;margin-top:40px;">
+            <input type="text" style="width:140px" name="float_PS_EE" id="float_PS_EE" placeholder="PS" disabled>
+        </div>
+        <div style="float:left;margin-left:-24px;margin-top:40px;">
+            <input type="text" style="width:140px" name="float_MOOE_EE" id="float_MOOE_EE" placeholder="MOOE" disabled>
+        </div>
+        <div style="float:left;margin-left:24px;margin-top:40px;">
+            <input type="text" style="width:140px" name="float_CO_EE" id="float_CO_EE" placeholder="CO" disabled>
+        </div>
+
+
+
+
+
+
+
+        <div style="float:left;margin-left:24px;margin-top:-9115px;">
+            <input type="text" style="width:140px" name="balance_amount_ps_EE" id="balance_amount_ps_EE" disabled hidden>
+        </div>
+        <div style="float:left;margin-left:24px;margin-top:-9125px;">
+            <input type="text" style="width:140px" name="balance_amount_mooe_EE" id="balance_amount_mooe_EE" disabled hidden>
+        </div>
+        <div style="float:left;margin-left:24px;margin-top:-9135px;">
+            <input type="text" style="width:140px" name="balance_amount_co_EE" id="balance_amount_co_EE" disabled hidden>
+        </div>
+        <div style="float:left;margin-left:24px;margin-top:-9135px;">
+            <input type="text" style="width:140px" name="float_id_EE" id="float_id_EE" disabled hidden>
+        </div>
+        <div style="float:left;margin-left:424px;margin-top: 10px;">
+            <div class="k-button k-button-icontext" style="bottom: 55px; right: 220px;width: 80px;" onclick="fn_reqSave_Float_EE()">Add</div>
+        </div>
+        <div style="float:left;margin-left:524px;margin-top: -28px;">
+            <div class="k-button k-button-icontext" style=" bottom: 55px; right: 120px;width: 80px;" onclick="addFloat_EE()">Release</div>
+            <div style="float:left;margin-left:100px;margin-top: -29px;">
+                <div class="k-button k-button-icontext" style="bottom: 55px; right: 20px;width: 80px;" onclick="fn_refresher_float_EE()">Close</div>
+            </div>
+
+        </div>
+    </div>
+
+    @*<div class="k-button k-button-icontext" style="position: absolute; bottom: 55px; right: 220px;width: 80px;" onclick="fn_reqSave_Float_EE()">Add</div>
+    <div class="k-button k-button-icontext" style="position: absolute; bottom: 55px; right: 120px;width: 80px;" onclick="addFloat_EE()">Release</div>
+    <div class="k-button k-button-icontext" style="position: absolute; bottom: 55px; right: 20px;width: 80px;" onclick="fn_refresher_float_EE()">Clear</div>*@
+</div>
+
+
+<label style="height:120px">
+
+</label>
+

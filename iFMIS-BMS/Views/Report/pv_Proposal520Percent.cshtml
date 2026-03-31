@@ -1,0 +1,175 @@
+﻿
+<script>
+    function getPar(){
+        return {
+            yearof : $("#proyear").val(),
+            fundid: $("#fund").val()
+        }
+    }
+    function searchAccount_fund() {
+        var $filter = new Array();
+        $filter = [];
+
+        if ($('#SearchDataFund').val().length > 0) {
+            $filter.push({ field: "office", operator: "contains", value: $('#SearchDataFund').val() }),
+            $filter.push({ field: "accountname", operator: "contains", value: $('#SearchDataFund').val() }),
+            $filter.push({ field: "item", operator: "contains", value: $('#SearchDataFund').val() });
+
+            //Description
+        }
+
+        $('#grd_proposalfund').data('kendoGrid').dataSource.filter({
+            logic: "or",
+            filters: $filter
+        });
+    }
+
+    $(function () {
+        $("#SearchDataFund").keypress(function (e) {
+            if (e.keyCode == 13) {
+                searchAccount_fund();
+            }
+        });
+    });
+</script>
+<label style="display:inline-block;margin-top:10px;">
+    Proposal Year <span id=""></span>
+</label> <br />
+<div style="display:inline-block; margin-left:0px;width:150px;margin-top:0px;">
+    @(Html.Kendo().ComboBox()
+                .Name("proyear")
+                .DataTextField("ProposalYear")
+                .DataValueField("ProposalYear")
+                .SelectedIndex(-1)
+                //.Events(e => e.Change("fnyear"))
+                .HtmlAttributes(new { style = "width:100%; height:100%", @class = "form-control autoselect" })
+
+                .DataSource(source => source.Read(read => read.Action("Tyear_ict", "PYear")))
+    )
+
+</div>
+<br />
+<label style="display:inline-block;margin-top:10px;">
+    Account <span id=""></span>
+</label> <br />
+<div style="display:inline-block; margin-left:0px;width:150px;margin-top:0px;">
+    @(Html.Kendo().DropDownList()
+        .Name("fund")
+        .DataTextField("Text")
+        .DataValueField("Value")
+        .Events(e => e.Change("change"))
+        .BindTo(new List<SelectListItem>() {
+            new SelectListItem() {
+                Text = "",
+                Value = "0"
+            },
+            new SelectListItem() {
+                Text = "5% Reserve",
+                Value = "1"
+            },
+            new SelectListItem() {
+                Text = "20% PDF",
+                Value = "2"
+            }
+        })
+        .HtmlAttributes(new { style = "width: 150px" })
+     )
+
+</div>
+<div id="searchAccountid" style="height: 30px; margin-top:3px; float: right; margin-left: 200px;">
+    <input type="text" style="width:300px;border-collapse:collapse;margin:0px;border-style:solid;border-color:black;margin-left:0px;height:70%;outline:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search..." id="SearchDataFund" name="SearchDataFund">
+    <div class="k-button k-button-icontext" style="height:30px;width:40px;border-style:solid;border-color:black;" onclick="searchAccount_fund()"><span class="mif-search"></span></div>
+</div>
+<div style="margin-top:6px">
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.WFPrepare>()
+        .Name("grd_proposalfund")
+        .HtmlAttributes(new { style = "height:650px;" })
+        .Scrollable()
+        .Columns(col =>
+        {
+            col.Template(@<text></text>)
+            .HeaderTemplate(@<text><div style="font-weight:600;">Office</div></text>)
+            .Width(100)
+            .HtmlAttributes(new { style = "text-align:left;height:30px" })
+            .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+            .ClientTemplate("<div>#=office# </div>")
+            .ClientFooterTemplate("<div style='text-align:center;font-weight:bold'> TOTAL </div>");
+
+            col.Template(@<text></text>)
+            .HeaderTemplate(@<text><div style="font-weight:600;">Account</div></text>)
+            .Width(250)
+            .HtmlAttributes(new { style = "text-align:left;height:30px" })
+            .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+            .ClientTemplate("<div>#=accountname# </div>");
+
+             col.Template(@<text></text>)
+            .HeaderTemplate(@<text><div style="font-weight:600;">Item</div></text>)
+            .Width(400)
+            .HtmlAttributes(new { style = "text-align:left;height:30px" })
+            .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+            .ClientTemplate("<div>#=item# </div>");
+
+            col.Bound(m => m.amount)
+            .HtmlAttributes(new { style = "font-weight:600;text-align:right; vertical-align: middle; overflow: visible; white-space: normal;" })
+            .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Amount</div></text>    )
+            .HeaderHtmlAttributes(new { style = "text-align:center" })
+            .Width(90)
+            .ClientTemplate("<div>#=kendo.toString(amount,'N2')# </div>");
+            
+            col.Bound(m => m.qty)
+            .HtmlAttributes(new { style = "font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;" })
+            .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Qty</div></text>    )
+            .HeaderHtmlAttributes(new { style = "text-align:center" })
+            .Width(70)
+            .ClientTemplate("<div>#=kendo.toString(qty,'N0')# </div>");
+            
+            col.Bound(m => m.mon)
+            .HtmlAttributes(new { style = "font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;" })
+            .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Month</div></text>    )
+            .HeaderHtmlAttributes(new { style = "text-align:center" })
+            .Width(70)
+            .ClientTemplate("<div>#=kendo.toString(mon,'N0')# </div>");
+
+            col.Bound(m => m.totalamount)
+            .HtmlAttributes(new { style = "font-weight:600;text-align:right; vertical-align: middle; overflow: visible; white-space: normal;" })
+            .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Total<br />Amount</div></text>    )
+            .HeaderHtmlAttributes(new { style = "text-align:center" })
+            .Width(150)
+            .ClientTemplate("<div>#=kendo.toString(totalamount,'N2')# </div>")
+            .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> </label><label> #=kendo.toString(sum, 'N2')#</label></div>");
+
+        })
+         //.ToolBar(toolbar =>
+         //{
+         //    toolbar.Custom().Text("<span  class='fa fa-search' ></span> View Assessment Report").Url("javascript:void(0)").HtmlAttributes(new { onclick = "btnict_assess()", style = "float:left;margin-left:0px;background-color:cornflowerblue;color:white", title = "Click to view assessment report!" });
+         //})
+         .AutoBind(false)
+         .Pageable(page => page.Refresh(true)
+            .Enabled(true)
+            .ButtonCount(4)
+            .PreviousNext(true)
+         )
+         // .ClientDetailTemplateId("template_table")
+         .Selectable()
+           //.Events(e => e.Change("onGridEdit"))
+           .Scrollable()
+         .DataSource(d => d
+         .Ajax()
+         .Batch(true)
+         .ServerOperation(false)
+         .Aggregates(a =>
+         {
+             a.Add(c => c.totalamount).Sum();
+         })
+         .PageSize(1000)
+         .Model(m => m.Id(i => i.officeid))
+         .Read(read => read.Action("proposalfund", "Report").Data("getPar"))
+         )
+)
+</div>
+
+<script>
+    function change() {
+        $("#grd_proposalfund").data("kendoGrid").dataSource.read();
+    }
+</script>

@@ -1,0 +1,368 @@
+﻿@model iFMIS_BMS.BusinessLayer.Models.ReportModel
+<script>
+    function DeleteData(trnno) {
+
+        @*var YearN = $("#YearGrid").val();
+        var url = "@Url.Action("RemoveNon","Report")";
+        $.get(url, { trnno: trnno, YearN: YearN }, function (d) {
+            $('#NonGrid').data('kendoGrid').dataSource.read();
+        })*@
+        var url = "@Url.Action("RemoveNon","Report")";
+        var YearN = $("#YearGrid").val();
+        if (trnno == 0) {
+            swal({
+                title: "Error!",
+                text: "Only Proposed Account can be Deleted!",
+                timer: 2000,
+                type: "warning",
+                showConfirmButton: false
+            })
+        }
+        else {
+
+            swal({
+                title: "System Notice!",
+                text: "This will remove your Non-Office Account. This Action can't be undone. Are you sure you want to Proceed?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                cancelButtonText: "Cancel",
+                closeOnConfirm: false
+            }, function () {
+                $.get(url, { trnno: trnno, YearN: YearN }, function (e) {
+                    if (e == "success") {
+                        swal({
+                            title: "Success!",
+                            text: "Non-Office Account has been Removed.",
+                            timer: 2000,
+                            type: "success",
+                            showConfirmButton: false
+                        })
+                        $('#NonGrid').data('kendoGrid').dataSource.read();
+                    } else {
+                        swal({
+                            title: "Error!",
+                            text: "System Error! Please try again.",
+                            timer: 2000,
+                            type: "error",
+                            showConfirmButton: false
+                        })
+                    }
+                });
+
+            });
+        }
+    }
+
+    function reqAddNon() {
+        var url = "@Url.Action("pv_AddNon", "Report")";
+
+        var Year = $("#ddlYear").val()
+
+        $.get(url, { Year: Year }, function (d) {
+            $('#addNonOff').html(d);
+        })
+        $('#addNonOff').data('kendoWindow').center().open();
+    }
+
+    function reqPrintNon(e) {
+        if ($("#ddlOffices").val() != "") {
+            var officeID = $("#ddlOffices").val()
+            var officeName = $("#ddlOffices").data("kendoComboBox").text();
+            var Year = $("#ddlYear").val()
+            $.ajax({
+                async: false,
+                dataType: 'html',
+                success: window.open("../Reports/ReportViewer.aspx?rid=4&OfficeID=" + officeID + "&OfficeName=" + officeName + "&Year=" + Year + "")
+            });
+        }
+        else {
+            alert("Please Select Office and Program");
+        }
+
+    }
+
+    setTimeout(function () {
+
+        ProgramData()
+        $("#NonGrid").data("kendoGrid").dataSource.read();
+    }, 1000);
+    function ProgramData() {
+
+
+        var proyy = $("#YearGrid").val();
+        var off_id = $("#ddlOffices").val();
+
+
+        return {
+            propYear: proyy,
+            office_ID: off_id,
+
+
+        }
+    }
+    function LoadPrograms() {
+
+        $("#NonGrid").data("kendoGrid").dataSource.read();
+    }
+
+
+
+
+
+    function onGridEdit() {
+        //var gridName = $('#NonGrid').data('kendoGrid');
+        //var dataRows = gridName.items();
+        //var rowIndex = dataRows.index(gridName.select());
+        //var ds = gridName.dataSource.view();
+        //var FMISAccountCode = ds[dataRows].FMISAccountCode;
+
+        var gview = $("#NonGrid").data("kendoGrid");
+
+        var selectedItem = gview.dataItem(gview.select());
+
+
+        //alert(selectedItem.FMISAccountCode);
+
+        if (selectedItem.FMISAccountCode == 334) {
+
+
+            gview.closeCell();
+            gview.edtable = false;
+            this.closeCell();
+
+        }
+        else if (selectedItem.FMISAccountCode == 336) {
+
+            gview.closeCell();
+
+            gview.edtable = false;
+            this.closeCell();
+        } else if (selectedItem.FMISAccountCode == 342) {
+
+            gview.closeCell();
+            gview.edtable = false;
+            this.closeCell();
+
+
+        }
+        else {
+
+            alert("Please don't Forget To Save Changes");
+        }
+    }
+
+
+
+
+
+
+
+</script>
+<div style="width : 100%; margin-top: 0px;border-style: solid; border-color: #1fa67a;">
+    <div style="width:100%;height : 35px ; background-color:#1fa67a; color: white;">
+        <label class="fa fa-file-text-o fa-lg" style="margin-left: 5px; display:inline-block;margin-top:10px">  PRINT REPORT</label>
+    </div>
+    <div style="margin-left: 5px; margin-bottom:5px">
+        <label style="margin-left: 0px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px; display : inline-block">
+            &nbsp;&nbsp;&nbsp;&nbsp; Office &nbsp;&nbsp;:&nbsp;&nbsp;
+
+            @(Html.Kendo().ComboBox()
+                         .Name("ddlOffices")
+                         .DataTextField("OfficeName")
+                         .DataValueField("OfficeID")
+                         .Filter("contains")
+                         .MinLength(1)
+                         .Placeholder("Select Office...")
+                         .HtmlAttributes(new { @style = "width: 400px;" })
+                         .DataSource(source => source.Read(read => read.Action("ddlOffice", "User")))
+                         
+            )
+
+        </label>
+
+        @*<label style="margin-left: 0px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px; display : inline-block">*@
+            &nbsp;&nbsp;&nbsp;&nbsp; Budget Year &nbsp;&nbsp;: &nbsp;&nbsp; @(Html.Kendo().DropDownList()
+                        .Name("ddlYear")
+                        .DataTextField("ProposalYear")
+                        .DataValueField("ProposalYear")
+                        .SelectedIndex(0)
+                        .HtmlAttributes(new { @style = "width: 90px;" })
+                        .DataSource(source => source.Read(read => read.Action("GetPropYear", "PYear")))
+                      //  .Events(e => e.Change("LoadPrograms"))
+            )
+        @*</label>*@
+        <script>
+    $(document).ready(function () {
+        if ('@Model.UserTypeDesc' == 'Budget In-Charge') {
+            $("#ddlOffices").data("kendoComboBox").value(@Model.OfficeID);
+                    $("#ddlOffices").data("kendoComboBox").enable(@Model.OfficeName);
+                }
+                else {
+                    $("#ddlOffices").data("kendoComboBox").enable(@Model.OfficeID);
+            $("#ddlOffices").data("kendoComboBox").value(@Model.OfficeName);
+        }
+    });
+        </script>
+
+
+        <div id="btnPrint" class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 90px;float:right; margin-top: 5px; margin-right:34px; margin-bottom:5px" onclick="reqPrintNon()"><span class="mif-printer"></span> PRINT</div>
+
+
+    </div>
+    <br /><br />
+
+    
+
+
+    <div style="border: outset;clear:both;border-width:1px;border-color:#1fa67a; width: 754px; padding-left:0px;padding-right:0px;padding-top:0px;padding-bottom:0px;margin-top: 10px;">
+        <div style=" width: 0;height: 0; border-right: 5px solid #333333; border-bottom: 30px solid #333333; border-left: 65px solid #333333;margin-top: -1px; ">
+            <div style="float: left; width: 688px; margin-top:1px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 29px solid #A9BBB7; ">
+                <label  style="margin-left: 5px; display:inline-block;margin-top:4px">  Set Non-Office</label>
+                <div style="float: left; height:28px; margin-left:-59px; margin-top: 0px;">
+                    <i class="fa fa-tasks fa-2x fg-white"></i>
+
+                </div>
+               
+
+            </div>
+        </div>
+
+        <div class="k-button" onclick="reqAddNon()" style="float: left;margin-bottom:1px;margin-top:3px">
+            <span class="k-icon k-i-plus" style="margin-left: -2px;margin-right: 3px;margin-top: 0px;margin-bottom: 3px;"></span>
+            Add Non-Office
+            </div>
+        <div style="float: left;margin-bottom:1px;margin-top:8px"><label style="color:red; font-size:12px; margin-bottom: 10px">&nbsp;&nbsp;&nbsp;&nbsp;* Note: you must not exceed the amount to the alloted amount</label></div>
+        <div style="text-align: right;float: right;margin-right:10px;margin-top:2px;">
+
+            @(Html.Kendo().DropDownList()
+                        .Name("YearGrid")
+                        .DataTextField("ProposalYear")
+                        .DataValueField("ProposalYear")
+                        .SelectedIndex(1)
+                        .HtmlAttributes(new { @style = "width: 100px;" })
+                        .DataSource(source => source.Read(read => read.Action("GetPropYear", "PYear")))
+                        .Events(e => e.Change("LoadPrograms"))
+            )
+
+
+
+
+        </div>
+        <div style="float: right;margin-right:10px;margin-top:2px;">
+            <i class="fa fa-calendar fa-2x #33333"></i>
+        </div>
+        
+        <div style="float: right;">
+
+
+
+            @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.SOONon_Model>()
+    .Name("NonGrid")
+    .Columns(columns =>
+    {
+        columns.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;">Account Name</div></text>)
+                        .Width(200)
+                        .HtmlAttributes(new { style = "text-align:center" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: left; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div>#=BudgetAcctName# </div>");
+        columns.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;">Year</div></text>)
+                        .Width(60)
+                        .HtmlAttributes(new { style = "text-align:center" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div>#=Yearof# </div>");
+        columns.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;">Alloted Amount </div></text>)
+                        .Width(110)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div>#=kendo.toString(AllotedAmount, 'c2')# </div>");
+        columns.Bound(p => p.FMISAccountCode).Hidden();
+        //columns.Bound(p => p.BudgetAcctName);
+        // columns.Bound(p => p.Yearof).Width(80);
+        // columns.Bound(p => p.AllotedAmount).Width(130);
+        columns.Bound(p => p.SooAmount).Width(110).Title("Propose Amount");
+        columns.Template(@<text></text>)
+                        .ClientTemplate(
+                         "# if( FMISAccountCode == 336 || FMISAccountCode == 334 || FMISAccountCode == 342) { # " +
+                        "<div class='k-button k-state-disabled' title='Edit Details (?)' '> <span class='fa fa-close' style='font-size: 12pt;'></span> Delete </div>" +
+                        "# } else{ #" +
+                        "<div class='k-button' title='Edit Details (?)' onclick='DeleteData( #=trnno# )'> <span class='fa fa-close' style='font-size: 12pt;'></span> Delete </div>" +
+                        "# } #").Width(80);
+        //columns.Command(command => command.Destroy()).Width(80);
+    })
+
+                .ToolBar(toolbar =>
+                {
+                    toolbar.Save();
+                })
+                .Selectable()
+                .Editable(editable => editable.Mode(GridEditMode.InCell))
+                .Pageable()
+                .Events(e => e.Edit("onGridEdit"))
+                .Navigatable()
+                .Sortable()
+                .Scrollable()
+                .DataSource(dataSource => dataSource
+                    .Ajax()
+                    .Batch(true)
+                    .PageSize(20)
+                    .ServerOperation(false)
+                    .Events(events => events.Error("error_handler"))
+                    .Model(model => model.Id(p => p.trnno))
+                    //.Create("Editing_Create", "Report")
+                    .Read(read => read.Action("SOOnon", "Report").Data("ProgramData"))
+                    //.Update("Editing_Update", "Report")
+                    .Update(update => update.Action("Editing_Update", "Report").Data("ProgramData"))
+                    .Destroy(destroy => destroy.Action("Editing_Destroy", "Report").Data("ProgramData"))
+                    //.Destroy("Editing_Destroy", "Report")
+                )
+)
+            <script type="text/javascript">
+                function error_handler(e) {
+                    if (e.errors) {
+                        var message = "Errors:\n";
+                        $.each(e.errors, function (key, value) {
+                            if ('errors' in value) {
+                                $.each(value.errors, function () {
+                                    message += this + "\n";
+                                });
+                            }
+                        });
+                        alert(message);
+                    }
+                }
+            </script>
+
+
+
+        </div>
+
+    </div>
+
+
+
+
+
+
+        <div style="display:inline-block;width:100%">
+        </div>
+
+
+    </div>
+@(Html.Kendo().Window().Name("addNonOff").Title("New Entry").Width(335).Height(120).Visible(false).Modal(true).Draggable(true).AutoFocus(true).Animation(a => { a.Open(o => o.SlideIn(SlideDirection.Down)); a.Close(c => { c.SlideIn(SlideDirection.Down); c.Reverse(true); }); }).Actions(a => { a.Close(); }))
+
+<script>
+    $(document).ready(function () {
+        if ('@Account.UserInfo.UserTypeDesc' == 'Budget In-Charge') {
+            $("#ddlOffices").data("kendoComboBox").value(@Account.UserInfo.Department);
+            $("#ddlOffices").data("kendoComboBox").enable(false);
+        }
+        else {
+            $("#ddlOffices").data("kendoComboBox").enable();
+            $("#ddlOffices").data("kendoComboBox").value("");
+        }
+    });
+</script>

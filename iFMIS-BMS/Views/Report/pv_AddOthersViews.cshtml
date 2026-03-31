@@ -1,0 +1,36 @@
+﻿
+@model iFMIS_BMS.BusinessLayer.Models.OthersModel
+
+<script>
+
+
+
+
+    function reqSave() {
+        var notifi = new $("#popupNotification").data("kendoNotification");
+
+        var url = "@Url.Action("SaveOthers", "Report")";
+
+        var Others_Name = $('#Others_Name').val()
+        var Others_Amount = $('#Others_Amount').val()
+        var Year = $("#ddlYear").val()
+        $.post(url, { Others_Name: Others_Name, Others_Amount: Others_Amount, Year: Year }, function (d) {
+
+                $('#addeditothers').data('kendoWindow').close();
+                $('#OthersGrid').data('kendoGrid').dataSource.read();
+
+        })
+    }
+
+</script>
+
+
+
+
+<label>Others :</label>
+<input type="text" class="k-textbox" style="width: 310px;" id="Others_Name" name="Others_Name" />
+
+<label>Amount :</label>
+<input type="text" class="k-textbox" style="width: 310px;" id="Others_Amount" name="Others_Amount" />
+
+<div class="k-button k-button-icontext" style="position: absolute; bottom: 15px; right: 20px;width: 80px;" onclick="reqSave()">Save</div>

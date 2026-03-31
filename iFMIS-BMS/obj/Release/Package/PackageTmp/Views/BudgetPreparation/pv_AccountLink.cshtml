@@ -1,0 +1,302 @@
+﻿
+@model iFMIS_BMS.BusinessLayer.Models.Maintenance.PlantillaModel
+
+<script>
+    function getOffice() {
+        return {
+            OfficeID: $("#officeLink").val(),
+            TransactionYear: '@Session["ProposalYear"]'
+        }
+    }
+
+    function getOfficeto() {
+        
+        return {
+            OfficeID: $("#officeLinkto").val(),
+            TransactionYear: $("#linkyear").val()
+        }
+    }
+    function getProgram() {
+        return {
+            programID:$("#programLink").val(),
+            TransactionYear: '@Session["ProposalYear"]'
+        }
+    }
+    function getProgramTo() {
+        return {
+            programID:$("#programLinkto").val(),
+            TransactionYear:   $("#linkyear").val()
+        }
+    }
+    function SelOffice() {
+        $("#programLink").data("kendoComboBox").value("");
+        $("#accountLinkfrom").data("kendoComboBox").value("");
+        $("#programLink").data("kendoComboBox").dataSource.read();
+        $("#programLinkto").data("kendoComboBox").dataSource.read();
+    }
+    function SelOfficeTo() {
+        $("#programLinkto").data("kendoComboBox").value("");
+        $("#accountLinkto").data("kendoComboBox").value("");
+        $("#programLinkto").data("kendoComboBox").dataSource.read();
+        $("#accountLinkto").data("kendoComboBox").dataSource.read();
+    }
+    function SelProgram() {
+        $("#accountLinkfrom").data("kendoComboBox").dataSource.read();
+    }
+    function SelProgramTo() {
+        $("#accountLinkto").data("kendoComboBox").dataSource.read();
+    }
+    function ReqClose() {
+        $("#newAccountsLink").data("kendoWindow").close();
+    }
+    function SelLinkyear(){
+        $("#programLinkto").data("kendoComboBox").dataSource.read();
+    }
+    function mergepropose_click(){
+        if (document.getElementById("mergeaccountid").checked){
+            document.getElementById("linkid").style="font-size:17px;margin-left:5px;"
+            document.getElementById("linkid").innerHTML ="MERGE TO"
+            $("#mergeaccountid").val(1)
+        }
+        else{
+            document.getElementById("linkid").style="font-size:17px;margin-left:5px;"
+            document.getElementById("linkid").innerHTML ="LINK TO"
+            $("#mergeaccountid").val(0)
+        }
+    }
+</script>
+<div style="margin-left:85px;">
+    <input type="checkbox" value="0" id="mergeaccountid" style="zoom:1.1" onclick="mergepropose_click()"/>
+    <span style="color:red"><b> Merge Propose Account</b></span>
+</div>
+<div style="display:inline-block;margin-top:15px;margin-left:5px">
+    <label> Office : </label>
+    <div style="float:left;margin-top:-25px;margin-left:80px">
+        @(Html.Kendo().ComboBox()
+        .Name("officeLink")
+        .DataTextField("office_name")
+        .DataValueField("office_id")
+        .Filter("contains")
+        .MinLength(3)
+        .Placeholder("Select office...")
+        .SelectedIndex(-1)
+        .HtmlAttributes(new { @style = "width: 440px;" })
+        .Events(e => e.Change("SelOffice"))
+        .DataSource(source => source.Read(read => read.Action("ddlOffice", "Dropdowns")))
+
+        )
+    </div>
+    @*<div class="k-button k-button-icontext" id="removelink" style="height:30px;width:40px;border-style:solid;" onclick="removelink()"><span class="fa fa-remove"></span></div>*@
+</div>
+
+<div style="display:inline-block;margin-top:15px;margin-left:5px">
+    <label> Program : </label>
+    <div style="float:left;margin-top:-25px;margin-left:80px">
+        @(Html.Kendo().ComboBox()
+        .Name("programLink")
+        .DataTextField("setProgramDesc")
+        .DataValueField("setProgramID")
+        .Filter("contains")
+        .MinLength(3)
+        .Placeholder("Select program...")
+        .SelectedIndex(-1)
+        .HtmlAttributes(new { @style = "width: 440px;" })
+        .DataSource(source => source.Read(read => read.Action("ddlgetPrograms", "Dropdowns").Data("getOffice")))
+        .Events(e => e.Change("SelProgram"))
+        )
+    </div>
+</div>
+
+<div style="display:inline-block;margin-top:15px;margin-left:5px">
+    <label> Account : </label>
+    <div style="float:left;margin-top:-25px;margin-left:80px">
+        @(Html.Kendo().ComboBox()
+        .Name("accountLinkfrom")
+        .DataTextField("setAccountname")
+        .DataValueField("setAccountID")
+        .Filter("contains")
+        .MinLength(3)
+        .Placeholder("Select account...")
+        .SelectedIndex(-1)
+        .HtmlAttributes(new { @style = "width: 440px;" })
+        .DataSource(source => source.Read(read => read.Action("ddlgetAccount", "Dropdowns").Data("getProgram")))
+        //.Events(e => e.Change("GetSelectedCasualRate"))
+        )
+    </div>
+</div>
+<div style="border-color:gray;border-width:1px;border-style:solid;width:550px;margin-top:20px;float:left;height:200px">
+    <div  style="background-color:white;width:160px;margin-top:-12px;margin-left:15px;"><span id="linkid" style="font-size:17px;margin-left:5px;">LINK TO :</span></div>
+    <div style="display:inline-block;margin-top:15px;margin-left:5px">
+        <label> F.Y. : </label>
+        <div style="float:left;margin-top:-25px;margin-left:80px">
+            @(Html.Kendo().ComboBox()
+            .Name("linkyear")
+            .DataTextField("trnYear")
+            .DataValueField("trnYear")
+            .Filter("contains")
+            .MinLength(3)
+            .Placeholder("Select year...")
+            .SelectedIndex(0)
+            .HtmlAttributes(new { @style = "width: 440px;" })
+            .Events(e => e.Change("SelLinkyear"))
+            .DataSource(source => source.Read(read => read.Action("linkyear", "Dropdowns")))
+
+            )
+        </div>
+    </div>
+
+    <div style="display:inline-block;margin-top:15px;margin-left:5px">
+        <label> Office : </label>
+        <div style="float:left;margin-top:-25px;margin-left:80px">
+        @(Html.Kendo().ComboBox()
+        .Name("officeLinkto")
+        .DataTextField("office_name")
+        .DataValueField("office_id")
+        .Filter("contains")
+        .MinLength(3)   
+        .Placeholder("Select office...")
+        .SelectedIndex(-1)
+        .HtmlAttributes(new { @style = "width: 440px;" })
+        .Events(e => e.Change("SelOfficeTo"))
+        .DataSource(source => source.Read(read => read.Action("ddlOffice", "Dropdowns")))
+
+            )
+        </div>
+    </div>
+    <div style="display:inline-block;margin-top:15px;margin-left:5px">
+        <label> Program : </label>
+        <div style="float:left;margin-top:-25px;margin-left:80px">
+            @(Html.Kendo().ComboBox()
+        .Name("programLinkto")
+        .DataTextField("setProgramDesc")
+        .DataValueField("setProgramID")
+        .Filter("contains")
+        .MinLength(3)
+        .Placeholder("Select program...")
+        .SelectedIndex(-1)
+        .HtmlAttributes(new { @style = "width: 440px;" })
+        .DataSource(source => source.Read(read => read.Action("ddlgetProgramsPastyear", "Dropdowns").Data("getOfficeto")))
+        .Events(e => e.Change("SelProgramTo"))
+            )
+        </div>
+    </div>
+    <div style="display:inline-block;margin-top:25px;margin-left:5px">
+        <label style="font-size:15px;width:70px;float:left;margin-top:-10px"> Account : </label>
+        <div style="float:left;margin-top:-25px;margin-left:80px">
+            @(Html.Kendo().ComboBox()
+        .Name("accountLinkto")
+        .DataTextField("setAccountname")
+        .DataValueField("setAccountID")
+        .Filter("contains")
+        .MinLength(3)
+        .Placeholder("Select account...")
+        .SelectedIndex(-1)
+        .HtmlAttributes(new { @style = "width: 440px;" })
+        .DataSource(source => source.Read(read => read.Action("getAccountsLink", "Dropdowns").Data("getProgramTo")))
+        //.Events(e => e.Change("GetSelectedCasualRate"))
+            )
+        </div>
+    </div>
+</div>
+    <script>
+        $(document).ready(function(){
+            var proYer = @Session["ProposalYear"] ;
+
+            var ProgramID =@Session["ProgramID"];
+            var officeID = @Session["selectedOfficeID"];
+
+            var AccountID=@Session["AccountID"];
+            $("#officeLink").data("kendoComboBox").value(officeID)
+            $("#programLink").data("kendoComboBox").dataSource.read()
+            $("#programLinkto").data("kendoComboBox").dataSource.read()
+            $("#programLink").data("kendoComboBox").value(ProgramID)
+            $("#accountLinkfrom").data("kendoComboBox").dataSource.read()
+            $("#accountLinkfrom").data("kendoComboBox").value(AccountID)
+
+        })
+        function reqSave(){
+            var proYer = @Session["ProposalYear"];
+            var linkyear=$("#linkyear").val()
+            var officeID =$("#officeLink").val()
+            var ProgramID =$("#programLink").val()
+            var AccountID=$("#accountLinkfrom").val()
+            var officeTo=$("#officeLinkto").val()
+            var ProgramIDTo =$("#programLinkto").val()
+            var AccountIDTo=$("#accountLinkto").val()
+            var mergeaccountid = $("#mergeaccountid").val()
+
+            var url = "@Url.Action("UpdateLInkAccount", "Maintenance")";
+            var urlmerge = "@Url.Action("UpdateMergeAccount", "Maintenance")";
+            if (mergeaccountid== 0){ //Linking of accounts
+                $.get(url, {officeID:officeID,ProgramID:ProgramID,AccountID:AccountID,ProgramIDTo:ProgramIDTo,AccountIDTo:AccountIDTo,proYer:proYer,officeTo:officeTo,linkyear:linkyear}, function (d) {
+                    if (d == "success") {
+                        swal("Success!", "The account has been successfully linked. We strongly recommend resetting the record through the office.", "success");
+
+                        $("#grd_BudgetApprovalBudget").data("kendoGrid").dataSource.read()
+                        $('#newAccountsLink').data('kendoWindow').close()
+                    }
+                    else {
+                        swal("Error","Something went wrong! Please try again...","error")
+                    }
+                    $("#programLinkto").data("kendoComboBox").value("")
+                    $("#accountLinkto").data("kendoComboBox").value("")
+                });
+            }
+            else{//merge of account
+                
+                $.get(urlmerge, {officeID:officeID,ProgramID:ProgramID,AccountID:AccountID,ProgramIDTo:ProgramIDTo,AccountIDTo:AccountIDTo,proYer:proYer,officeTo:officeTo,linkyear:linkyear}, function (d) {
+                    if (d == "success") {
+                        swal("Success!", "The account has been successfully merged. We strongly recommend resetting the record through the office.", "success");
+
+                        $("#grd_BudgetApprovalBudget").data("kendoGrid").dataSource.read()
+                        $('#newAccountsLink').data('kendoWindow').close()
+                    }
+                    else {
+                        swal("Error","Something went wrong! Please try again...","error")
+                    }
+                    $("#programLinkto").data("kendoComboBox").value("")
+                    $("#accountLinkto").data("kendoComboBox").value("")
+                });
+                
+            }
+        }
+    </script>
+    <br />
+    @*onclick="reqSave()"*@
+    @*onclick="ReqClose()"*@
+    <div style="float:right;margin-top:30px;margin-right:20px">
+        <div id="" class="k-button k-button-icon" style=" bottom: 15px; right: 220px;width: 120px; border-radius:7px;color:#ffffff;background-color:#DE5555;clear:both;" onclick="Removelink()">Remove Link</div>
+        <div id="btnsave" class="k-button k-button-icontext" style="margin-bottom:5px;display:inline-block;background-color:cornflowerblue;color:#ffffff;width: 80px;border-radius:7px;clear:both; margin-top:5px;margin-left:5px;" onclick="reqSave()">Save</div>
+        <div id="" class="k-button k-button-icon" style=" bottom: 15px; right: 220px;width: 80px; border-radius:7px;color:#ffffff;background-color:#DE5555;clear:both;margin-left:5px;" onclick="ReqClose()">Close</div>
+        
+    </div>
+    <script>
+        $(document).ready(function () {
+            //document.getElementById("linkid").innerHTML = "LINK TO (C.Y. " + (parseInt($("#propsYears").val()) -1) +")";
+        });
+
+        function Removelink(){
+            var officeID =$("#officeLink").val()
+            var ProgramID =$("#programLink").val()
+            var AccountID=$("#accountLinkfrom").val()
+            swal({
+                title: "Remove Link",
+                text: "Do you want to remove the link of this account?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                closeOnConfirm: false,
+                showLoaderOnConfirm: true
+            }, function () {
+                var url = "@Url.Action("RemoveLInkAccount", "Maintenance")";
+                $.get(url, {officeID:officeID,ProgramID:ProgramID,AccountID:AccountID}, function (d) {
+                    if (d == "success") {
+                        swal("Success","Account link has been removed!","success")
+                        $("#grd_BudgetApprovalBudget").data("kendoGrid").dataSource.read()
+                    }
+                })
+            });
+           
+        }
+    </script>   

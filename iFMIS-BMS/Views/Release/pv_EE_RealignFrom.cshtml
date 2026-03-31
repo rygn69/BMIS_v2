@@ -1,0 +1,97 @@
+﻿
+<script>
+    function fn_closeRealigned_From_EE() {
+
+        $("#RealignFromWindow_EE").data("kendoWindow").close();
+    }
+
+
+    function readFrom_EE() {
+        var classtype = $("#classtype").val();
+
+        var office_id = $("#offs").val();
+        var program_id = $("#Progss").val();
+        var ooe_id = $("#ooe_id").val();
+        var account_id = $("#account_list").val();
+        var year_ = $("#ddlYear").val();
+
+        return {
+            office_id: office_id,
+            program_id: program_id,
+            ooe_id: ooe_id,
+            account_id: account_id,
+            year_: year_
+        }
+
+
+    }
+</script>
+
+<div style="border: outset;clear:both;border-width:1px;border-color:#1fa67a; width: 749px; padding-left:0px;padding-right:0px;padding-top:0px;padding-bottom:7px;margin-top: 0px;">
+    <div style=" width: 0;height: 0; border-right: 5px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;margin-top: -1px; ">
+        <div style="float: left; width: 683px; margin-top:1px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 36px solid #1fa67a; ">
+            <div style="float: left; height:28px; margin-left:-59px; margin-top: 5px;">
+                <i class="fa fa-tasks fa-2x fg-white"></i>
+
+            </div>
+
+
+
+        </div>
+    </div>
+
+
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Monthly_Realignment_Model>()
+            .Name("Realigned_From_Grid_EE")
+    .Scrollable()
+    .Columns(col =>
+    {
+        col.Bound(m => m.realignment_id).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                       .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Transaction ID</div></text>)
+                        .Width(60)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Bound(m => m.DateTimeEntered).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Date Entered</div></text>)
+                        .Width(100)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Bound(m => m.Amount)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Amount</div></text>)
+                        .Width(100)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div>#=kendo.toString(Amount,'c2')# </div>");
+
+
+        col.Bound(m => m.YearOf).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                       .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Year</div></text>)
+                        .Width(80)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+
+
+
+        //col.Template(t => { }).ClientTemplate(
+
+        //                             "<div class='k-button k-button-icontext' style='border-radius:50px;color:\\#ffffff;background-color:\\#1FA67A;'    onclick='edit_realignment_FROM(#=realignment_id#)'   ><span class='fa fa-pencil-square-o' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'> </span>edit</div> " +
+        //                             "<div class='k-button k-button-icontext' style='border-radius:50px;color:\\#ffffff;background-color:\\#DE5555;'   onclick='delete_realignment_FROM(#=realignment_id#)'   ><span class='fa fa-trash-o' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'> </span>del</div> "
+        //                            ).HtmlAttributes(new { style = "vertical-align: top;" }).Width(100);
+    })
+
+                                                                .Sortable()
+                                                                .Scrollable()
+                                                                .Selectable()
+                                                                .HtmlAttributes(new { style = "height:290px;" })
+                                                                                .DataSource(d => d
+                                                                                .Ajax()
+                                                                                .PageSize(1000)
+                                                                                .Model(m => m.Id(i => i.realignment_id))
+                                                                                .Read(read => read.Action("Realign_From_", "Release").Data("readFrom_EE")))
+    )
+
+
+    <div style="float:left;margin-top:26px;margin-left:630px">
+        <div class="k-button k-button-icontext" style=" bottom: 15px; right: 220px;width: 80px; border-radius:50px;color:#ffffff;background-color:#DE5555;" onclick="fn_closeRealigned_From_EE()"><span class='fa fa-times' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'></span> Close</div>
+    </div>
+
+
+
+</div>

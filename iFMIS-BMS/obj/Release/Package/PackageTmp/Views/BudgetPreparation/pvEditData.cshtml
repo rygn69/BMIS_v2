@@ -1,0 +1,200 @@
+﻿@model iFMIS_BMS.BusinessLayer.Models.UpdateAccountDenomination
+
+<script>
+    function CloseWindow() {
+        $("#EditDetails").data("kendoWindow").close();
+    }
+    function reqUpdate() {
+        //alert(@Model.DenominationAmount);
+        //alert($("#EditDenominationAmount").val());
+        sync()
+        if ($("#UpdateButtonIcon").attr('class') == 'fa fa-check') {
+            $("#UpdateButtonIcon").removeClass('fa fa-check').addClass('fa fa-spinner fa-pulse fa-spin fa-fw');
+            var url = "@Url.Action("UpdateAccountDenominationData", "BudgetPreparation")";
+            var frmData = $('#UpdateAccountDenomination').serialize();
+            frmData = frmData + "&OriginalAmount=" + @Model.TotalAmount + "&OfficeID=" + @Session["selectedOfficeID"];
+            $.post(url, frmData, function(d){
+                if (d == "success") {
+                    getTotalProposed();
+                    $("#EditDetails").data("kendoWindow").close();
+                    var gridName = "#grid_"+@Model.AccountID;
+                    //$(gridName).data("kendoGrid").dataSource.read();
+                    var DenominationAmount = "₱" + formatCurrency($("#DenominationAmount").val())
+                    var TotalDenominationAmount = "₱" + formatCurrency($("#TotalDenominationAmount").val())
+                    var grid = $(gridName).data("kendoGrid")
+                    var ds = grid.dataSource.view();
+                    for (var i = 0; i < ds.length; i++) {
+                        var row = grid.table.find("tr[data-uid='" + ds[i].uid + "']");
+                        var checkbox = $(row).find(".checkbox");
+                        if ($("#EditAccountDenominationID").val() == ds[i].AccountDenominationID) {
+                            var SelectedAccount = $(gridName).data().kendoGrid.dataSource.data()[i];
+                            SelectedAccount.set('DenominationName',$("#EditDenominationName").val());
+                            SelectedAccount.set('DenominationAmount',$("#EditDenominationAmount").val());
+                            SelectedAccount.set('QuantityPercentage',$("#EditQuantityPercentage").val());
+                            SelectedAccount.set('TotalDenominationAmount',$("#EditTotalDenominationAmount").val());
+                            SelectedAccount.set('DenominationMonth',$("#EditDenominationMonth").val());
+                            break;
+                        }
+                    }
+                    swal({
+                        title: "Success!",
+                        text: "Account Denomination Updated.",
+                        type: "success",
+                        timer: 2000,
+                        showConfirmButton: true
+                    });
+                    $("#UpdateButtonIcon").removeClass('fa fa-spinner fa-pulse fa-spin fa-fw').addClass('fa fa-check');
+                }
+                else {
+                    swal({
+                        title: "Error!",
+                        text: d,
+                        type: "error",
+                        timer: 2000,
+                        showConfirmButton: true
+                    });
+                    $("#UpdateButtonIcon").removeClass('fa fa-spinner fa-pulse fa-spin fa-fw').addClass('fa fa-check');
+                }
+            })
+        }
+    }
+    function CheckIfMax() {
+        if (document.getElementById("EditDenominationMonth").value > 12 || document.getElementById("EditDenominationMonth").value < 1) {
+            document.getElementById("EditDenominationMonth").value = 1;
+            sync();
+        }
+    }
+    
+    $(function () {
+        $("#EditQuantityPercentage").keyup(function (e) {
+                sync();
+        });
+    });
+</script>
+<form id="UpdateAccountDenomination">
+    <div style="margin-bottom:5px;margin-top:5px;margin-left:5px;">
+        <input type="text" name="AccountID" value="@Model.AccountID" hidden />
+        <input type="text" id="EditAccountDenominationID" name="AccountDenominationID" value="@Model.AccountDenominationID" hidden />
+        <label>Account Denomination Name</label> <input type="text" id="EditDenominationName" name="DenominationName" disabled style="width:80%" required autofocus value="@Model.DenominationName" />
+    </div>
+    <div style="display:none">
+        <input type="number" id="DenominationAmount_Orig" name="DenominationAmount_Orig" value="@Model.DenominationAmount" />
+        <input type="number" id="EditTotalDenominationAmount_orig" name="EditTotalDenominationAmount_orig" value="@Model.TotalAmount" />
+        <input type="number" id="EditDenominationMonth_orig" name="EditDenominationMonth_orig" value="@Model.DenominationMonth" />
+        <input type="number" id="EditQuantityPercentage_orig" name="EditQuantityPercentage_orig" value="@Model.QuantityPercentage" />
+    </div>
+    <div style="display:inline-block;width:550px;">
+        <div style="margin-bottom:5px;margin-top:5px;margin-left:5px;margin-right:15px;display:inline-block;">
+            <script>
+                function sync() {
+                    var n1 = $("#EditQuantityPercentage").val();
+                    var n2 = document.getElementById("EditDenominationAmount");
+                    var n3 = document.getElementById("EditTotalDenominationAmount");
+                    var n4 = document.getElementById("EditDenominationMonth");
+                    var n5 =0.00;
+                    var AIPTotalAmount=$("#AIPTotalAmount").val();
+                    var TotAmountExpClass=$("#TotAmountExpClass").val();
+                    var EditDenominationAmount=$("#EditDenominationAmount").val()
+                    var DenominationAmount_Orig=$("#DenominationAmount_Orig").val()
+                    var EditTotalDenominationAmount_orig=$("#EditTotalDenominationAmount_orig").val()
+                    var EditTotalDenominationAmount=$("#EditTotalDenominationAmount").val()
+                    var EditDenominationMonth=$("#EditDenominationMonth").val()
+                    var EditDenominationMonth_orig=$("#EditDenominationMonth_orig").val()
+                    var EditQuantityPercentage=$("#EditQuantityPercentage").val()
+                    var EditQuantityPercentage_orig=$("#EditQuantityPercentage_orig").val()
+                    n3.value = n1 * n2.value * n4.value;
+                  
+                    var p1 = TotAmountExpClass - DenominationAmount_Orig;
+                    var p2 = Number(p1) + Number(EditDenominationAmount);
+                    var t1 = TotAmountExpClass - EditTotalDenominationAmount_orig
+                  
+                    var t2 = Number(t1) + Number(EditDenominationAmount * Number(EditDenominationMonth));
+                    var m1 = TotAmountExpClass - EditTotalDenominationAmount_orig
+                    var m2 = Number(m1) + Number(EditDenominationAmount * Number(EditQuantityPercentage) * Number(EditDenominationMonth));
+                   
+                    n5=Number(parseFloat(Number(parseFloat(AIPTotalAmount).toFixed(2)) - Number(parseFloat(p2).toFixed(2))).toFixed(2));
+                    var n6=Number(parseFloat(Number(parseFloat(AIPTotalAmount).toFixed(2)) - Number(parseFloat(t2).toFixed(2))).toFixed(2));
+                    var n7=Number(parseFloat(Number(parseFloat(AIPTotalAmount).toFixed(2)) - Number(parseFloat(m2).toFixed(2))).toFixed(2));
+                   
+             
+                    var x1=parseFloat(Number(AIPTotalAmount)-Number($("#AmountPerAccount").val())).toFixed(2)
+                    var x2=parseFloat(Number(AIPTotalAmount)-Number(EditTotalDenominationAmount_orig)).toFixed(2)
+                    var x3=parseFloat(Number($("#AmountPerAccount").val()) -Number(EditTotalDenominationAmount_orig)).toFixed(2)
+                    var r1= parseFloat(Number(EditDenominationAmount * Number(EditQuantityPercentage) * Number(EditDenominationMonth))).toFixed(2);
+              
+
+                    var r2=parseFloat(Number(AIPTotalAmount) - (Number(x3) + Number(r1))).toFixed(2)
+                   
+                    ////if ((Number(n5) < 0 || Number(n6) < 0 || Number(n7) < 0) && $("#fundid").val() != 201) //By expense class
+              
+                    if (Number(r2) < 0 && $("#fundid").val() != 201) //by account
+                    {
+                        swal({
+                            title: "W A R N I N G ! ! !",
+                            text: "The proposed budget must not be greater than the approved AIP!\n",
+                            type: "warning",
+                            showCancelButton: false,
+                            confirmButtonColor: "#1fa67a",
+                            confirmButtonText: "OK!",
+                            closeOnConfirm: true,
+                        }, function(){
+                        $("#EditDenominationAmount").val(DenominationAmount_Orig);
+                        $("#EditDenominationMonth").val(EditDenominationMonth_orig);
+                        $('#EditQuantityPercentage').siblings('input:visible').focus();
+                        $('#EditQuantityPercentage').val(EditQuantityPercentage_orig);
+                            sync();
+                        })
+                    }
+                }
+            </script>
+            <label>Quantity/Percentage Increase</label>
+            @(Html.Kendo().NumericTextBox<double>()
+            .Name("EditQuantityPercentage")
+            .Value(Model.QuantityPercentage)
+            .Events(e => e.Change("sync").Spin("sync"))
+            .Placeholder("Enter Quantity or Percentage")
+            
+            )
+        </div>
+        <style>
+            #QuantityPercentage {
+                width: 100px;
+            }
+        </style>
+
+
+        <div style="margin-bottom:5px;margin-top:5px;display:inline-block;width:300px">
+            <div style="display:inline-block">
+                <label>Amount</label>
+                <input type="number" id="EditDenominationAmount" name="EditDenominationAmount" style="width:200px" required value="@Model.DenominationAmount" onkeyup="sync()" onclick="sync()" />
+            </div>
+            <div style="display:inline-block; margin-left:10px">
+                <label>Month(s)</label>
+                <input type="number" id="EditDenominationMonth" name="EditDenominationMonth" style="width:50px" required onkeyup="sync()" onclick="sync()" value="@Model.DenominationMonth" max="12" min="1" onblur="CheckIfMax()" />
+            </div>
+        </div>
+        <div></div>
+    </div>
+    <div style="margin-bottom:5px;margin-top:5px;margin-left:5px;">
+        <label>=Total Amount</label> <input type="number" id="EditTotalDenominationAmount" name="EditTotalDenominationAmount" style="width:80%" required value="@Model.TotalAmount" readonly="readonly" />
+    </div>
+    <div style="float:right;margin-top:15px;">
+        <div class="k-button k-state-active" onclick="reqUpdate()"><span id="UpdateButtonIcon" class="fa fa-check"></span> Update Amount</div> <div class="k-button" onclick="CloseKendoWindow('EditDetails')"><span class="fa fa-close"></span> Cancel</div>
+    </div>
+</form>
+<script>
+    $(document).ready(function () {
+        if (@Model.isPPMP == 1){
+            $("#EditDenominationAmount").prop("readonly", true);
+        }
+        else{
+            $("#EditDenominationAmount").prop("readonly", false);
+        }
+        @*if ('@Model.ActionCode' == '1') {
+            $("#EditDenominationAmount").prop("readonly", false);
+        }
+        else {
+            $("#EditDenominationAmount").prop("readonly", true);
+        }*@
+    });
+</script>

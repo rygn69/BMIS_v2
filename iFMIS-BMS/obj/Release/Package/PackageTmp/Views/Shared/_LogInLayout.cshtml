@@ -1,0 +1,51 @@
+﻿@{
+    ViewBag.Title = "Login";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>@ViewBag.Title - BMIS</title>
+    @*<link rel="Shortcut Icon" href="~/Images/PPC.png" type="image/x-icon" />*@
+    <link rel="Shortcut Icon" href="~/Images/Ph_seal_agusan_del_sur.png" type="image/x-icon" />
+    @*<link rel="Shortcut Icon" href="~/Images/pgzn_logo.png" type="image/x-icon" />*@
+    @*<link rel="Shortcut Icon" href="~/Images/tacurong.png" type="image/x-icon" />*@
+    <link href="@Url.Content("~/Content/kendo/2016.2.504/kendo.common.min.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Content/kendo/2016.2.504/kendo.mobile.all.min.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Content/kendo/2016.2.504/kendo.dataviz.min.css")" rel="stylesheet" type="text/css" />
+    @*<link href="@Url.Content("~/Content/kendo/2015.1.408/kendo.dataviz.metro.min.css")" rel="stylesheet" type="text/css" />*@
+    <link href="@Url.Content("~/Content/themes/darkGreen/darkGreen.css")" rel="stylesheet" type="text/css" id="style_color" />
+    @*<link href="@Url.Content("~/Content/themes/lightBrown/kendo-lightBrown.css")" rel="stylesheet" type="text/css" id="style_kendo" />*@
+    <link href="@Url.Content("~/Content/metroui/css/metro-bootstrap.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Content/metroui/css/docs.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Content/css/global.min.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Content/Site.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Content/Theme.css")" rel="stylesheet" type="text/css" />
+
+    <script src="@Url.Content("~/Scripts/jquery.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/jquery-2.1.0.js")"></script>
+    <script src="@Url.Content("~/Scripts/jquery-2.1.0.min.js")"></script>
+
+    <!-- #region Kendo Scripts -->
+
+
+    <script src="@Url.Content("~/Scripts/kendo/2016.2.504/jszip.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/kendo/2016.2.504/kendo.all.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/kendo/2016.2.504/kendo.aspnetmvc.min.js")"></script>
+
+    <!-- #endregion -->
+    <!-- #region Metro Scripts -->
+
+    <script src="@Url.Content("~/Scripts/header-loader.js")"></script>
+    <script src="@Url.Content("~/Scripts/metro.js")"></script>
+    <script src="@Url.Content("~/Content/metroui/js/metro/metro-dropdown.js")"></script>
+
+    <!-- #endregion -->
+</head>
+<body class="metro">
+
+    @RenderBody()
+
+</body>
+</html>
+

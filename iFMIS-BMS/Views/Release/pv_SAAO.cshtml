@@ -1,0 +1,804 @@
+﻿
+@model IEnumerable<iFMIS_BMS.BusinessLayer.Models.DashBoard.DashBoardModel>
+<script>
+    function fn_Details() {
+
+        if (document.getElementById('Detail_type_ch').checked) {
+            document.getElementById("Detail_type").value = "2";
+         
+        } else {
+            document.getElementById("Detail_type").value = "1";
+        }
+    }
+    function fn_all_SAAO() {
+       
+        if (document.getElementById('is_SAAO_Type').checked) {
+            document.getElementById("SAAO_type").value = "2";
+            swal("Warning!", "This Report will Generate Several Minutes")
+            $("#rephistory").data("kendoComboBox").dataSource.read();
+            $("#rephistory").data("kendoComboBox").value("");
+        } else {
+            document.getElementById("SAAO_type").value = "1";
+        }
+    }
+
+    function fn_Earmark() {
+        //alert(document.getElementById('earmark_id').checked)
+        if (document.getElementById('earmark_id').checked) {
+            document.getElementById("earmark_type").value = "3";
+
+        } else {
+            document.getElementById("earmark_type").value = "0";
+        }
+        //      getParameter();
+        if ($("#offs").val() != 0) {
+            getAppSummary();
+        }
+    }
+    function fn_SAAO_summary() {
+        if (document.getElementById('is_SAAO_summary').checked) {
+            document.getElementById("SAAO_summary").value = "1";
+            $("#appsummaryidEC").css("display", "normal")
+            $("#appsummaryid").css("display", "none")
+            $("#AppSummaryEC").data("kendoGrid").dataSource.read();
+            $("#btnPrint").css("display", "none")
+            $("#searchAccountid").css("display", "none")
+        } else {
+            document.getElementById("SAAO_summary").value = "0";
+            $("#appsummaryidEC").css("display", "none")
+            $("#appsummaryid").css("display", "none")
+            //$("#AppSummary").data("kendoGrid").dataSource.read();
+            $("#btnPrint").css("display", "normal")
+            $("#searchAccountid").css("display", "none")
+        }
+        //alert($("#classtype").val())
+    }
+    function TAEEE() {
+        var SAAO_type = $("#SAAO_type").val();
+    }
+    function getParameter() {
+        return {
+            yearof: $("#ddlYear").val(),
+            monof: $("#Months_TO").val(),
+            earmark: $("#earmark_type").val(),
+            officeid: $("#offs").val(),
+            classtype: $("#classtype").val()
+
+        }
+        
+    }
+    function getAppSummary() {
+        //$("#AppSummary").data("kendoGrid").dataSource.read();
+    }
+
+    //function searchAccount() {
+    //    var $filter = new Array();
+    //    $filter = [];
+
+    //    if ($('#SearchData').val().length > 0) {
+    //        $filter.push({ field: "AccountName", operator: "contains", value: $('#SearchData').val() });
+    //    }
+
+    //    $('#AppSummary').data('kendoGrid').dataSource.filter({
+    //        logic: "or",
+    //        filters: $filter
+    //    });
+
+    //}
+
+    $(function () {
+        $("#SearchData").keypress(function (e) {
+            if (e.keyCode == 13) {
+                searchAccount();
+            }
+        });
+    });
+    function PrevDgsign(){
+        var officeID = $("#offs").val()
+        var ReportType = $('input[name=ReportTypeRadioButton]:checked').val();
+        var Year = $("#ddlYear").val()
+        var includeLBP1 = 0;
+        var includeLBP2_SP =0;
+        var userid=@Account.UserInfo.eid.ToString();
+        var includezero=0;
+        var lbp2export=0;
+        var reloadlbp2=0;
+        var sectoral=0;
+        var includeCOE=0;
+        var eco=0;
+        var month_ = $("#Months_TO").val();
+
+        var batch = $("#numerictextbox").val();
+        var sort_ = $("#cake").val();
+        var note_ = "";
+        var classtype = $("#classtype").val();
+        var expclass = $("#expclass").val();
+        var purposeid = "";//$("#purposeid").val();
+        var Fundtype = $("#classtype").val();
+        var packet = $("#is_pocket").val();
+        var reporthistory = $("#reporthistory").val();
+        var is_oldAA = $("#is_oldAA").val();
+        var is_float = $("#is_float").val();
+        var budgettype = $("#budgettype").val();
+        var dateissue = $("#dateissue").val();
+
+        var url = "@Url.Action("dgsignreport", "Report")";
+        swal({
+            title: "Confirmation!",
+            text: "Would you like to create a document for digital signature? \n\n",
+            type: "info",
+            showCancelButton: true,
+            closeOnConfirm: false,
+            confirmButtonColor: "#1fa67a",
+            confirmButtonText: "Yes",
+            showLoaderOnConfirm: true,
+        },
+         //$.ajax({
+         //    async: false,
+         //    dataType: 'html',
+         //    success: window.open("../Reports/ReportViewer.aspx?rid=10&OfficeID=" + officeID + "&Year=" + year_ + "&classtype=" + classtype + "&month_=" + month_ + "&batch=" + batch + "&sort_=" + sort_ + "&note_="
+         //        + note_ + "&expclass=" + expclass + "&purposeid=" + purposeid + "&Fundtype=" + Fundtype + "&packet=" + packet + "&reporthistory=" + reporthistory + "&is_float=" + is_float + "&budgettype=" + budgettype + "&dateissue=" + dateissue + "")
+         //});
+        //$("#reporthistory").data("kendoComboBox").dataSource.read();
+
+         //$.ajax({
+         //    async: false,
+         //    dataType: 'html',
+         //    success: window.open("../Reports/ReportViewer.aspx?rid=14&OfficeID=" + officeID + "&month_=" + month_ + "&month_To=" + month_To + "&Year=" + year_ + "&classtype=" + classtype + "&SAAO_type=" + SAAO_type + "&earmark_type=" + earmark_type + "&repxmlhistory=" + rephistory + "")
+         //});
+
+        function (isConfirm) {
+            if (isConfirm) {
+                $.post(url, { YearOf:Year,OfficeID:officeID, ReportTypeID:classtype,docuid:12,reloadlbp4:month_,includeLBP1:batch,pagnoid:0,includeLBP2_SP:expclass,eid:userid,includezero:includezero,lbp2export:Fundtype,reloadlbp2:reloadlbp2,sectoral:sectoral,includeCOE:dateissue,eco:budgettype,purpose:purposeid,note:note_,sort_:sort_  }, function (d) {
+                    if (d != "") {
+                        //swal.close();
+                        swal("Success","The document generated for digital signature has been sent via SMS and is now available for viewing.","success")
+                        $("#grid_aro").data("kendoGrid").dataSource.read()
+                        //success: window.open(d)
+                    }
+                    else {
+                        swal("Something Went Wrong!", d, "error");
+                    }
+                })
+            }
+        })
+        }
+
+    function reqPrint() {
+      
+        var officeID = $("#offs").val();
+        var month_ = $("#Months").val();
+        var month_To = $("#Months_TO").val();
+        var year_ = $("#ddlYear").val();
+        var classtype = $("#classtype").val();
+        var SAAO_type = $("#SAAO_type").val();
+        var rephistory = $("#rephistory").val();
+        var saaotag = $("#SAAO_type").val() == 2 ? 1 : 0;
+
+        var Detail_type = $("#Detail_type").val();
+        var earmark_type = $("#earmark_type").val();
+        //alert(earmark_type)
+       
+        if (SAAO_type == 2) {
+            if (Detail_type == 1) {
+            $.ajax({
+                async: false,
+                dataType: 'html',
+                success: window.open("../Reports/ReportViewer.aspx?rid=14&OfficeID=" + officeID + "&month_=" + month_ + "&month_To=" + month_To + "&Year=" + year_ + "&classtype=" + classtype + "&SAAO_type=" + SAAO_type + "&earmark_type=" + earmark_type + "&repxmlhistory=" + rephistory + "&saaotag=" + saaotag + "")
+            });
+            } else {
+                $.ajax({
+                    async: false,
+                    dataType: 'html',
+                    success: window.open("../Reports/ReportViewer.aspx?rid=21&OfficeID=" + officeID + "&month_=" + month_ + "&month_To=" + month_To + "&Year=" + year_ + "&classtype=" + classtype + "&SAAO_type=" + SAAO_type + "&Detail_type=" + Detail_type + "")
+                });
+            }
+
+
+        } else { 
+
+        if (officeID == 0 || officeID == null || officeID == '' || officeID == "") {
+            swal({
+                title: "Error!",
+                text: "PLEASE Select Office",
+                timer: 3000,
+                type: "error",
+                showConfirmButton: false
+            })
+
+        } else { 
+            if (Detail_type == 1) {
+        $.ajax({
+            async: false,
+            dataType: 'html',
+            success: window.open("../Reports/ReportViewer.aspx?rid=14&OfficeID=" + officeID + "&month_=" + month_ + "&month_To=" + month_To + "&Year=" + year_ + "&classtype=" + classtype + "&SAAO_type=" + SAAO_type + "&earmark_type=" + earmark_type + "&repxmlhistory=" + rephistory + "")
+        });
+            } else {
+
+                $.ajax({
+                    async: false,
+                    dataType: 'html',
+                    success: window.open("../Reports/ReportViewer.aspx?rid=21&OfficeID=" + officeID + "&month_=" + month_ + "&month_To=" + month_To + "&Year=" + year_ + "&classtype=" + classtype + "&SAAO_type=" + SAAO_type + "&Detail_type=" + Detail_type + "")
+                });
+
+
+            }
+        }
+        }
+
+    }
+    var thisculture = kendo.culture();
+    thisculture.numberFormat.currency.symbol = '₱'; // Script For Changing The Currency Sign
+
+    setTimeout(function () {
+       $("#offs").data("kendoComboBox").dataSource.read();
+    }, 100);
+    function ReloadAppSumm()
+    {
+        ocake();
+        
+        if ($("#SAAO_summary").val() == 1) {
+            $("#AppSummaryEC").data("kendoGrid").dataSource.read();
+        }
+        else {
+            //$("#AppSummary").data("kendoGrid").dataSource.read();
+        }
+    }
+    function ocake() {
+        setTimeout(function () {
+
+            fn_Offices();
+            if ($("#offs").val() != 0){
+                getAppSummary();
+            }
+        }, 1000);
+    }
+
+
+    function repris() {
+        $("#offs").data("kendoComboBox").dataSource.read();
+        if ($("#SAAO_summary").val() == 1) {
+            $("#AppSummaryEC").data("kendoGrid").dataSource.read();
+        }
+        else {
+            //$("#AppSummary").data("kendoGrid").dataSource.read();
+        }
+    }
+
+    //function SelMonth() {
+        
+    //}
+    function Select_Office() {
+
+        var classtype = $("#classtype").val();
+
+        if (classtype == null || classtype == "") {
+
+            return { classtype: 2 }
+        }
+        else {
+            return { classtype: classtype }
+        }
+        }
+        function fn_dprefresherOOied() {
+          
+        }
+        function fn_dprefresherprogs() {
+          
+        }
+
+
+
+
+
+    function fn_dprefresher() {
+
+        ocake();
+        $("#rephistory").data("kendoComboBox").dataSource.read()
+        $("#rephistory").data("kendoComboBox").value("")
+    }
+    function ExpenseClassOnChange() {
+        $("#grd_BudgetApprovalBudget").data("kendoGrid").dataSource.read();
+    }
+
+    function selectedyear() {
+        return {
+            type:1,
+            office:$("#offs").val(),
+            year: $("#ddlYear").val(),
+            saaotag: $("#SAAO_type").val() == 2? 1:0
+        }
+    }
+</script>
+
+<h2><span class="fa fa-search"></span> Generate Status of Appropriation,  Allotment and Obligation Report(SAAO)
+</h2>
+<br /><br />
+
+<div style="float: none;clear:both;">
+    <div style="float: left;margin-left:33px;margin-top:2px;">
+        <label style="float:left;margin-left: 50px;">
+            Office    :
+        </label>
+    </div>
+
+    <div style="float: right;margin-right:70.5px;margin-top:0px;">
+        @(Html.Kendo().ComboBox()
+                            .Name("offs")
+                            .DataTextField("OfficeName")
+                            .DataValueField("OfficeID")
+                            .Placeholder("Select office...")
+                            .Filter("contains")
+                            .MinLength(1)
+                            .HtmlAttributes(new { @style = "width: 496px;" })
+                            .Events(e => e.Change("fn_dprefresher"))
+                            .DataSource(source => source.Read(read => read.Action("GetOffice_MO", "Release").Data("Select_Office")))
+        )
+    </div>
+
+    <div style="height:10px;">
+
+    </div>
+
+    <div id="ProgramAndExpenseClassDiv" style="float: none;clear:both; margin-top: 25px">
+
+        <div style="float: left;margin-left:38.5px;margin-top:2px;">
+            <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                From :
+            </label>
+        </div>
+        <div style="float: left;margin-left:52px;margin-top:0px;">
+            <script>
+              function fn_Offices() {
+                  var proyy = $("#ddlYear").val();
+                  var off_id = $("#offs").val();
+                  var ooe_id = $("#ooe_id").val();
+
+                  return {
+                      propYear: proyy,
+                      office_ID: off_id,
+                      ooe_id: ooe_id
+                  }
+              }
+            </script>
+
+            @(Html.Kendo().DropDownList()
+            .Name("Months")
+            .DataTextField("Text")
+            .DataValueField("Value")
+            //.Events(e => e.Change("SelMonth"))
+            .BindTo(new List<SelectListItem>() {
+                new SelectListItem() {
+                    Text = "January",
+                    Value = "1"
+                },
+                new SelectListItem() {
+                    Text = "Febuary",
+                    Value = "2"
+                },
+                new SelectListItem() {
+                    Text = "March",
+                    Value = "3"
+                },
+                new SelectListItem() {
+                    Text = "April",
+                    Value = "4"
+                },
+                new SelectListItem() {
+                    Text = "May",
+                    Value = "5"
+                },
+                new SelectListItem() {
+                    Text = "June",
+                    Value = "6"
+                },
+                new SelectListItem() {
+                    Text = "July",
+                    Value = "7"
+                },
+                new SelectListItem() {
+                    Text = "August",
+                    Value = "8"
+                },
+                new SelectListItem() {
+                    Text = "September",
+                    Value = "9"
+                },
+                new SelectListItem() {
+                    Text = "October",
+                    Value = "10"
+                },
+                new SelectListItem() {
+                    Text = "November",
+                    Value = "11"
+                },
+                new SelectListItem() {
+                    Text = "December",
+                    Value = "12"
+                }
+            })
+            // .Value(ViewBag.MonthVaue)
+            .HtmlAttributes(new { style = "width: 150px" })
+            )
+
+
+        </div>
+
+        <div style="float: left;margin-right:30px;margin-top:0px;">
+            <label style="margin-left: 150px;margin-right: 5px;margin-top: 5px;margin-bottom: 2px;">
+                To   :
+            </label>
+        </div>
+        <div style="float: right;margin-right:70px;margin-top: -25px;">
+            @(Html.Kendo().DropDownList()
+            .Name("Months_TO")
+            .DataTextField("Text")
+            .DataValueField("Value")
+            .BindTo(new List<SelectListItem>() {
+                new SelectListItem() {
+                    Text = "January",
+                    Value = "1"
+                },
+                new SelectListItem() {
+                    Text = "Febuary",
+                    Value = "2"
+                },
+                new SelectListItem() {
+                    Text = "March",
+                    Value = "3"
+                },
+                new SelectListItem() {
+                    Text = "April",
+                    Value = "4"
+                },
+                new SelectListItem() {
+                    Text = "May",
+                    Value = "5"
+                },
+                new SelectListItem() {
+                    Text = "June",
+                    Value = "6"
+                },
+                new SelectListItem() {
+                    Text = "July",
+                    Value = "7"
+                },
+                new SelectListItem() {
+                    Text = "August",
+                    Value = "8"
+                },
+                new SelectListItem() {
+                    Text = "September",
+                    Value = "9"
+                },
+                new SelectListItem() {
+                    Text = "October",
+                    Value = "10"
+                },
+                new SelectListItem() {
+                    Text = "November",
+                    Value = "11"
+                },
+                new SelectListItem() {
+                    Text = "December",
+                    Value = "12"
+                }
+            })
+            .Events(e => e.Change("ReloadAppSumm"))
+            .Value(@ViewBag.MonthVaue)
+            .HtmlAttributes(new { style = "width: 150px" })
+            .AutoBind(true)
+            )
+
+
+
+        </div>
+
+    </div>
+
+    <div id="MonthDepartment" style="float: none;clear:both; margin-top: 20px">
+
+        <div style="float:left;margin-left:50px;margin-top:5px;">
+            <label>
+                Fund Type     :
+            </label>
+        </div>
+        <div style="float:left;margin-left:57px;margin-top:5px;">
+
+            @(Html.Kendo().DropDownList()
+                              .Name("classtype")
+                              .DataTextField("Class_Type")
+                              .DataValueField("Class_ID")
+                              .SelectedIndex(0)
+                              .HtmlAttributes(new { @style = "width: 160px;" })
+                              .DataSource(source => source.Read(read => read.Action("ddlClasses", "Dropdowns")))
+                              .Events(e => e.Change("repris"))
+            )
+        </div>
+
+
+        <div style="float:right;margin-right:125px;margin-top:5px;">
+
+            @(Html.Kendo().DropDownList()
+                        .Name("ddlYear")
+                        .DataTextField("ProposalYear")
+                        .DataValueField("ProposalYear")
+                        .SelectedIndex(0)
+                        .HtmlAttributes(new { @style = "width: 95px;" })
+                        .Events(e => e.Change("ocake"))
+                        .SelectedIndex(0    )
+                        .DataSource(source => source.Read(read => read.Action("GetPropYear3", "PYear")))
+            )
+
+
+        </div>
+        <div style="float:right;margin-right:21.5px;margin-top:10px;">
+            <label>
+                Year :
+            </label>
+        </div>
+        <div style="float:left;margin-left:-331px;margin-top:40px;">
+            <label>
+                Report History     :
+            </label>
+        </div>
+        <div style="float:left;margin-left:191.5px;margin-top:5px;">
+            @(Html.Kendo().ComboBox()
+                            .Name("rephistory")
+                            .DataTextField("dateprinted")
+                            .DataValueField("rprtid")
+                            .Placeholder("Report history...")
+                            .Filter("contains")
+                            .MinLength(1)
+                            .HtmlAttributes(new { @style = "width: 250px;" })
+                            .DataSource(source => source.Read(read => read.Action("rephistory", "Report").Data("selectedyear")))
+            )
+        </div>
+        <div style="float:left;margin-left:-135px;margin-top:50px;font-size:10px">
+            <input type='checkbox' class='checkbox' style="zoom:1.5" id="is_SAAO_summary" onclick=fn_SAAO_summary() />
+            <label style="margin-left: 25px;margin-right: 5px;margin-top: -22px;margin-bottom: 0px;">
+                Summary
+            </label>
+        </div>
+        <div style="float:left;margin-left:-35px;margin-top:50px;font-size:10px">
+            <input type='checkbox' class='checkbox' style="zoom:1.5" id="is_SAAO_Type" onclick=fn_all_SAAO() />
+            <label style="margin-left: 25px;margin-right: 5px;margin-top: -22px;margin-bottom: 0px;">
+                All Office
+            </label>
+        </div>
+        <div style="float:left;margin-left:10px;margin-top:49px;font-size:10px">
+            <input type='checkbox' class='checkbox' style="zoom:1.5" id="Detail_type_ch" onclick=fn_Details() />
+            <label style="margin-left: 25px;margin-right: 5px;margin-top: -22px;margin-bottom: 0px;">
+                Details
+            </label>
+        </div>
+        <div style="float:left;margin-left:10px;margin-top:49px;font-size:10px">
+            <input type='checkbox' class='checkbox' style="zoom:1.5" id="earmark_id" onclick=fn_Earmark() />
+            <label style="margin-left: 25px;margin-right: 5px;margin-top: -22px;margin-bottom: 0px;">
+                Include Earmark
+            </label>
+        </div>
+        <div>
+            <input type="text" style="width:20px" name="SAAO_summary" id="SAAO_summary" value="0" hidden disabled>
+            <input type="text" style="width:20px" name="SAAO_type" id="SAAO_type" value="1" hidden disabled>
+            <input type="text" style="width:20px" name="Detail_type" id="Detail_type" value="1" hidden disabled>
+            <input type="text" style="width:20px" name="earmark_type" id="earmark_type" value="1" hidden disabled>
+        </div>
+    </div>
+
+    <div id="" class="k-button k-button-icontext" style="width: 152px;float:left; margin-top: 41px; margin-left:435px; margin-bottom:5px;border-radius:50px;background-color:cornflowerblue;color:white" onclick="PrevDgsign()"><span class="mif-printer"></span> Preview Via Dgsign</div>
+    <div id="btnPrint" class="k-button k-button-icontext" style=" right: 25px;width: 90px;float:right; margin-top: 41px; margin-right:65px; margin-bottom:0px;background-color:cornflowerblue;border-radius:50px;color:white" onclick="reqPrint()"><span class="fa fa-print"></span> Preview</div>
+    @*<div style="float:left;margin-top:70px;background-color:darkgrey">
+        <label style="font-size:large;margin-left:5px;margin-bottom:5px;margin-top:5px;margin-right:5px;">SAAO  Summary</label>
+    </div>*@
+    <div id="searchAccountid" style="height: 30px; margin-top: 37px; float: left;display:none">
+        <input type="text" style="width:400px;border-collapse:collapse;margin:0px;border-style:solid;border-color:darkseagreen;margin-left:0px;height:70%;outline:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search account..." id="SearchData" name="SearchData">
+        <div class="k-button k-button-icontext" style="height:30px;width:40px;border-style:solid;border-color:darkseagreen;" onclick="searchAccount()"><span class="mif-search"></span></div>
+    </div>
+    <div id="appsummaryid" style="width:100%;float:left;margin-top:0px;margin-left:0px;display:none">
+        @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.DashBoard.DashBoardModel>()
+            .Name("AppSummary")
+            .HtmlAttributes(new { style = "height:570px;width:760px;" })
+            .Scrollable()
+            .Columns(col =>
+            {
+        col.Template(@<text></text>)
+                .HeaderTemplate(@<text>No.</text>)
+                .Width(40)
+                .HtmlAttributes(new { style = "text-align:center;" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;height:30px;", @class = "metro-header" })
+            @*.HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal"})*@
+        .ClientTemplate("<div>#=trnno# </div>");
+        col.Template(@<text></text>)
+             .HeaderTemplate(@<text>Program Name</text>)
+             .Width(150)
+             .HtmlAttributes(new { style = "text-align:left;" })
+             .HeaderHtmlAttributes(new { style = "text-align:center;height:30px;", @class = "metro-header" })
+            @*.HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal"})*@
+             .ClientTemplate("<div>#=Programname# </div>");
+        col.Template(@<text></text>)
+             .HeaderTemplate(@<text>Account Name</text>)
+             .Width(150)
+             .HtmlAttributes(new { style = "text-align:left;" })
+             .HeaderHtmlAttributes(new { style = "text-align:center;height:30px;", @class = "metro-header" })
+                    @*.HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal"})*@
+             .ClientTemplate("<div>#=AccountName# </div>")
+             .ClientFooterTemplate("<div style='text-align:center;color:darkgreen'><label>Total :</label></div>");
+        col.Bound(c => c.appropriation)
+            .HeaderTemplate(@<text>Appropriation</text>)
+            .Width(135)
+            .HtmlAttributes(new { style = "text-align:right;height:30px" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;height:30px;", @class = "metro-header" })
+                    @*.HeaderHtmlAttributes(new { style = "text-align:right; vertical-align: middle; overflow: visible; white-space: normal" })*@
+            .ClientTemplate("<div>#=kendo.toString(appropriation,'c2')# </div>")
+           .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> </label><label> #=kendo.toString(sum, 'c2')#</label></div>");
+        col.Bound(c => c.allotment)
+            .HeaderTemplate(@<text>Allotment</text>)
+            .Width(135)
+            .HtmlAttributes(new { style = "text-align:right;height:30px" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;height:30px;", @class = "metro-header" })
+                    @*.HeaderHtmlAttributes(new { style = "text-align:right; vertical-align: middle; overflow: visible; white-space: normal" })*@
+            .ClientTemplate("<div>#=kendo.toString(allotment,'c2')# </div>")
+            .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> </label><label> #=kendo.toString(sum, 'c2')#</label></div>");
+        col.Bound(c => c.obligation)
+            .HeaderTemplate(@<text>Obligation</text>)
+            .Width(135)
+            .HtmlAttributes(new { style = "text-align:right;height:30px" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;height:30px;", @class = "metro-header" })
+                    @*.HeaderHtmlAttributes(new { style = "text-align:right; vertical-align: middle; overflow: visible; white-space: normal" })*@
+            .ClientTemplate("<div>#=kendo.toString(obligation,'c2')# </div>")
+            .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> </label><label> #=kendo.toString(sum, 'c2')#</label></div>");
+        col.Bound(c => c.Allotment_balance)
+            .HeaderTemplate(@<text>Allotment Bal.</text>)
+            .Width(135)
+            .HtmlAttributes(new { style = "text-align:right;height:30px" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;height:30px;", @class = "metro-header" })
+            @*.HeaderHtmlAttributes(new { style = "text-align:right; vertical-align: middle; overflow: visible; white-space: normal" })*@
+            .ClientTemplate("<div>#=kendo.toString(Allotment_balance,'c2')# </div>")
+            .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> </label><label> #=kendo.toString(sum, 'c2')#</label></div>");
+        col.Bound(c => c.Appropriation_balance)
+            .HeaderTemplate(@<text>Appropriation Bal.</text>)
+            .Width(135)
+            .HtmlAttributes(new { style = "text-align:right;height:30px" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;height:30px;", @class = "metro-header" })
+            @*.HeaderHtmlAttributes(new { style = "text-align:right; vertical-align: middle; overflow: visible; white-space: normal" })*@
+            .ClientTemplate("<div>#=kendo.toString(Appropriation_balance,'c2')# </div>")
+            .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> </label><label> #=kendo.toString(sum, 'c2')#</label></div>");
+                //Appropriation_balance
+            })
+            .Pageable(pageable => pageable
+                    .Refresh(true)
+                    .ButtonCount(4))
+
+            .DataSource(dataSource => dataSource
+            .Ajax()
+            .Batch(true)
+            .Model(m => m.Id(i => i.id))
+            .ServerOperation(false)
+            .Aggregates(a =>
+            {
+                a.Add(c => c.appropriation).Sum();
+                a.Add(c => c.allotment).Sum();
+                a.Add(c => c.obligation).Sum();
+                a.Add(c => c.Allotment_balance).Sum();
+                a.Add(c => c.Appropriation_balance).Sum();
+            })
+            .PageSize(12)
+            .Read(read => read.Action("GetAppropriationSummary", "Report").Data("getParameter"))
+            )
+)
+    </div>
+    <div id="appsummaryidEC" style="width:100%;float:left;margin-top:0px;margin-left:0px;display:none">
+        @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.DashBoard.DashBoardModel>()
+            .Name("AppSummaryEC")
+            .HtmlAttributes(new { style = "height:570px;width:760px;" })
+            .Scrollable()
+            .Columns(col =>
+            {
+            col.Template(@<text></text>)
+                .HeaderTemplate(@<text>No.</text>)
+                .Hidden()
+        .ClientTemplate("#=officeid#");
+        col.Template(@<text></text>)
+             .HeaderTemplate(@<text>Office</text>)
+             .Width(100)
+             .HtmlAttributes(new { style = "text-align:left;" })
+             .HeaderHtmlAttributes(new { style = "text-align:center;height:30px;", @class = "metro-header" })
+            @*.HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal"})*@
+             .ClientTemplate("<div>#=officename# </div>")
+             .ClientFooterTemplate("<div style='text-align:center;color:darkgreen'><label>Total :</label></div>");
+        col.Bound(c => c.appropriationps)
+            .HeaderTemplate(@<text>Appropriation(PS)</text>)
+                    .Width(150)
+                    .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center;height:30px;", @class = "metro-header" })
+                    @*.HeaderHtmlAttributes(new { style = "text-align:right; vertical-align: middle; overflow: visible; white-space: normal" })*@
+            .ClientTemplate("<div>#=kendo.toString(appropriationps,'c2')# </div>")
+           .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> </label><label> #=kendo.toString(sum, 'c2')#</label></div>");
+        col.Bound(c => c.appropriationmooe)
+            .HeaderTemplate(@<text>Appropriation(MOOE)</text>)
+                    .Width(150)
+                    .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center;height:30px;", @class = "metro-header" })
+                    @*.HeaderHtmlAttributes(new { style = "text-align:right; vertical-align: middle; overflow: visible; white-space: normal" })*@
+            .ClientTemplate("<div>#=kendo.toString(appropriationmooe,'c2')# </div>")
+            .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> </label><label> #=kendo.toString(sum, 'c2')#</label></div>");
+        col.Bound(c => c.appropriationco)
+            .HeaderTemplate(@<text>Appropriation(CO)</text>)
+                    .Width(150)
+                    .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center;height:30px;", @class = "metro-header" })
+                    @*.HeaderHtmlAttributes(new { style = "text-align:right; vertical-align: middle; overflow: visible; white-space: normal" })*@
+            .ClientTemplate("<div>#=kendo.toString(appropriationco,'c2')# </div>")
+            .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> </label><label> #=kendo.toString(sum, 'c2')#</label></div>");
+         col.Bound(c => c.obligationps)
+            .HeaderTemplate(@<text>Obligation(PS)</text>)
+                    .Width(150)
+                    .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center;height:30px;", @class = "metro-header" })
+                    @*.HeaderHtmlAttributes(new { style = "text-align:right; vertical-align: middle; overflow: visible; white-space: normal" })*@
+            .ClientTemplate("<div>#=kendo.toString(obligationps,'c2')# </div>")
+            .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> </label><label> #=kendo.toString(sum, 'c2')#</label></div>");
+         col.Bound(c => c.obligationmooe)
+            .HeaderTemplate(@<text>Obligation(MOOE)</text>)
+                    .Width(150)
+                    .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center;height:30px;", @class = "metro-header" })
+                    @*.HeaderHtmlAttributes(new { style = "text-align:right; vertical-align: middle; overflow: visible; white-space: normal" })*@
+                    .ClientTemplate("<div>#=kendo.toString(obligationmooe,'c2')# </div>")
+                    .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> </label><label> #=kendo.toString(sum, 'c2')#</label></div>");
+         col.Bound(c => c.obligationco)
+            .HeaderTemplate(@<text>Obligation(CO)</text>)
+                    .Width(150)
+                    .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center;height:30px;", @class = "metro-header" })
+                    @*.HeaderHtmlAttributes(new { style = "text-align:right; vertical-align: middle; overflow: visible; white-space: normal" })*@
+                    .ClientTemplate("<div>#=kendo.toString(obligationco,'c2')# </div>")
+                .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> </label><label> #=kendo.toString(sum, 'c2')#</label></div>");
+                //Appropriation_balance
+            })
+                    .Pageable(pageable => pageable
+                            .Refresh(true)
+                            .ButtonCount(4))
+
+                    .DataSource(dataSource => dataSource
+                    .Ajax()
+                    .Batch(true)
+                    .Model(m => m.Id(i => i.id))
+                    .ServerOperation(false)
+                    .Aggregates(a =>
+                    {
+                        a.Add(c => c.appropriationps).Sum();
+                        a.Add(c => c.appropriationmooe).Sum();
+                        a.Add(c => c.appropriationco).Sum();
+                        a.Add(c => c.obligationps).Sum();
+                        a.Add(c => c.obligationmooe).Sum();
+                        a.Add(c => c.obligationco).Sum();
+                    })
+                    .PageSize(12)
+                    .Read(read => read.Action("GetAppropriationSummaryEC", "Report").Data("getParameter"))
+                    )
+)
+            </div>
+
+</div>
+
+<script>
+    $(document).ready(function () {
+        getAppSummary()
+     //   $("#AppSummary").hide();
+    }, 5000);
+
+    
+</script>
+
+<style>
+    .pageContent {
+        border: 1px solid #dadada;
+        padding: 5px;
+        margin-top: 7px;
+        height: 902px;
+        background-color: #fff;
+        padding: 10px;
+    }
+</style>

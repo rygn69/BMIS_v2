@@ -1,0 +1,169 @@
+﻿<script>
+    function UtilizationParam() {
+        var ProgramID = $("#Progss").val();
+        var ProposalYear = $("#ddlYear").val();
+        var OfficeID = $("#offs").val();
+        var OOEID = $("#ooe_id").val();
+        return {
+            ProgramID: ProgramID,
+            ProposalYear: ProposalYear,
+            OfficeID: OfficeID,
+            OOEID: OOEID
+        }
+    }
+</script>
+<h2  stlye="font-style:bold"> Office :  <b><span id="officeH2"></span></b> </h2>
+
+@(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Utilization>()
+    .Name("grd_UtilizationRate")
+    .HtmlAttributes(new { style = "height:500px;" })
+    .Scrollable()
+    .Columns(col =>
+    {
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;">Accounts</div></text>)
+                        .Width(250)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div> #=kendo.toString(AccountName)# </div>" )
+                        .ClientFooterTemplate("<div> <b> <span style='text-align:right;color:black;'> Total : </span> </b> </div>");
+        col.Bound(m => m.Approve5).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Budget Year <br /> <span id="UT1"></span> <br /> (Appropriate)</div></text>)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .Width(105)
+                        .ClientTemplate("<div>#=kendo.toString(Approve5,'c2')# </div>")
+                        .ClientFooterTemplate("<div> <b> <span style='text-align:right;color:black;'> #=kendo.toString(sum, 'c2') # </span> </b> </div>");
+        col.Bound(m => m.Actual5).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Budget Year <br /> <span id="UT1-1"></span> <br /> (Obligate)</div></text>)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .Width(105)
+                        .ClientTemplate("<div>#=kendo.toString(Actual5,'c2')# </div>")
+                        .ClientFooterTemplate("<div> <b> <span style='text-align:right;color:black;'> #=kendo.toString(sum, 'c2') # </span> </b> </div>");
+        col.Bound(m => m.Approve4).HtmlAttributes(new { style = "text-align:left;height:30px" })
+        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Budget Year <br /> <span id="UT-2-2"></span> <br /> (Appropriate)</div></text>)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .Width(105)
+                        .ClientTemplate("<div>#=kendo.toString(Approve4,'c2')# </div>")
+                        .ClientFooterTemplate("<div> <b> <span style='text-align:right;color:black;'> #=kendo.toString(sum, 'c2') # </span> </b> </div>");
+        col.Bound(m => m.Actual4).HtmlAttributes(new { style = "text-align:left;height:30px" })
+        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Budget Year <br /> <span id="UT-2"></span> <br /> (Obligate)</div></text>)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .Width(105)
+                        .ClientTemplate("<div>#=kendo.toString(Actual4,'c2')# </div>")
+                        .ClientFooterTemplate("<div> <b> <span style='text-align:right;color:black;'> #=kendo.toString(sum, 'c2') # </span> </b> </div>");
+        col.Bound(m => m.Approve3).HtmlAttributes(new { style = "text-align:left;height:30px" })
+        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Budget Year <br /> <span id="UT-3-3"></span> <br /> (Appropriate)</div></text>)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .Width(105)
+                        .ClientTemplate("<div>#=kendo.toString(Approve3,'c2')# </div>")
+                        .ClientFooterTemplate("<div> <b> <span style='text-align:right;color:black;'> #=kendo.toString(sum, 'c2') # </span> </b> </div>");
+        col.Bound(m => m.Actual3).HtmlAttributes(new { style = "text-align:left;height:30px" })
+        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Budget Year <br /> <span id="UT-3"></span> <br /> (Obligate)</div></text>)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .Width(105)
+                        .ClientTemplate("<div>#=kendo.toString(Actual3,'c2')# </div>")
+                        .ClientFooterTemplate("<div> <b> <span style='text-align:right;color:black;'> #=kendo.toString(sum, 'c2') # </span> </b> </div>");
+        col.Bound(m => m.Approve2).HtmlAttributes(new { style = "text-align:left;height:30px" })
+        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Budget Year <br /> <span id="UT-4-4"></span> <br /> (Appropriate)</div></text>)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .Width(105)
+                        .ClientTemplate("<div>#=kendo.toString(Approve2,'c2')# </div>")
+                        .ClientFooterTemplate("<div> <b> <span style='text-align:right;color:black;'> #=kendo.toString(sum, 'c2') # </span> </b> </div>");
+        col.Bound(m => m.Actual2).HtmlAttributes(new { style = "text-align:left;height:30px" })
+        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Budget Year <br /> <span id="UT-4"></span> <br /> (Obligate)</div></text>)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .Width(105)
+                        .ClientTemplate("<div>#=kendo.toString(Actual2,'c2')# </div>")
+                        .ClientFooterTemplate("<div> <b> <span style='text-align:right;color:black;'> #=kendo.toString(sum, 'c2') # </span> </b> </div>");
+        col.Bound(m => m.Approve1).HtmlAttributes(new { style = "text-align:left;height:30px" })
+        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Budget Year <br /> <span id="UT-5-5"></span> <br /> (Appropriate)</div></text>)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .Width(105)
+                        .ClientTemplate("<div>#=kendo.toString(Approve1,'c2')# </div>")
+                        .ClientFooterTemplate("<div> <b> <span style='text-align:right;color:black;'> #=kendo.toString(sum, 'c2') # </span> </b> </div>");
+        col.Bound(m => m.Actual1).HtmlAttributes(new { style = "text-align:left;height:30px" })
+        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Budget Year <br /> <span id="UT-5"></span> <br /> (Obligate)</div></text>)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .Width(105)
+                        .ClientTemplate("<div>#=kendo.toString(Actual1,'c2')# </div>")
+                        .ClientFooterTemplate("<div> <b> <span style='text-align:right;color:black;'> #=kendo.toString(sum, 'c2') # </span> </b> </div>");
+        col.Bound(m => m.ProposalAmount).HtmlAttributes(new { style = "text-align:left;height:30px" })
+        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Budget Year <br /> <span id="BudgetYear"></span> <br /> (Proposed)</div></text>)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .Width(105)
+                        .ClientTemplate("<div>#=kendo.toString(ProposalAmount,'c2')# </div>")
+                        .ClientFooterTemplate("<div> <b> <span style='text-align:right;color:black;'> #=kendo.toString(sum, 'c2') # </span> </b> </div>");
+    })
+     //.ToolBar(toolbar =>
+
+     //    {
+     //                      //  toolbar.Custom().Text("<span class='fa fa-arrows-alt'> </span> View in Fullscreen").Name("btnFullScreen").Url("javascript:void(0)").HtmlAttributes(new { onclick = "btnFullScreen()" });
+     //                        toolbar.Custom().Text("<span class='fa fa-arrows-alt'> </span> View in Fullscreen").Name("btnFullScreen").Url("javascript:void(0)").HtmlAttributes(new { onclick = "DivFullScreen()" });
+     //                        toolbar.Custom().Text("<span class='fa fa-arrows-alt'> </span> Restore Screen").Name("btnRestoreScreen").Url("javascript:void(0)").HtmlAttributes(new { onclick = "DivRestoreScreen()" });
+     //    toolbar.Custom().Text("<span class='fa fa-thumbs-o-up'> </span> Approve Marked").Name("btnApprove").Url("javascript:void(0)").HtmlAttributes(new { onclick = "btnApprove()" });
+     //    toolbar.Save();
+     //   })
+
+                                 
+                                
+
+                .Pageable(page => page.Refresh(true)
+                .Enabled(true)
+                .ButtonCount(4)
+                .PreviousNext(true)
+                    )
+                    .Events(e => e.SaveChanges("reqSave").Edit("onGridEdit"))
+                    .Selectable()
+                    .Resizable(s => s.Columns(true))
+                    .DataSource(d => d
+                    .Ajax()
+                        .Aggregates(aggregates =>
+                        {
+                            aggregates.Add(p => p.Actual5).Sum();
+                            aggregates.Add(p => p.Actual4).Sum();
+                            aggregates.Add(p => p.Actual3).Sum();
+                            aggregates.Add(p => p.Actual2).Sum();
+                            aggregates.Add(p => p.Actual1).Sum();
+                            aggregates.Add(p => p.Approve5).Sum();
+                            aggregates.Add(p => p.Approve4).Sum();
+                            aggregates.Add(p => p.Approve3).Sum();
+                            aggregates.Add(p => p.Approve2).Sum();
+                            aggregates.Add(p => p.Approve1).Sum();
+                            aggregates.Add(p => p.ProposalAmount).Sum();
+                        })  
+                    .Batch(true)
+                    .PageSize(10)
+                    .Model(m => m.Id(i => i.ProgramID))
+                    .Read(read => read.Action("BudgetAccounts_Utilization", "Home").Data("UtilizationParam"))
+                    .Update("UpdateProposedAccount", "Home"))
+)
+
+
+<script>
+    $(document).ready(function () {
+        var OfficeNameH2 = $("#offs").data("kendoComboBox").text();
+        document.getElementById("officeH2").innerHTML = OfficeNameH2;
+
+        var BudgetYear = $("#ddlYear").val();
+        var UT5 = BudgetYear - 1;
+        var UT4 = BudgetYear - 2;
+        var UT3 = BudgetYear - 3;
+        var UT2 = BudgetYear - 4;
+        var UT1 = BudgetYear - 5;
+        
+        document.getElementById("UT1").innerHTML = UT1;
+        document.getElementById("UT1-1").innerHTML = UT1;
+        document.getElementById("UT-2").innerHTML = UT2;
+        document.getElementById("UT-2-2").innerHTML = UT2;        
+        document.getElementById("UT-3").innerHTML = UT3;
+        document.getElementById("UT-3-3").innerHTML = UT3;
+        document.getElementById("UT-4").innerHTML = UT4;
+        document.getElementById("UT-4-4").innerHTML = UT4;
+        document.getElementById("UT-5").innerHTML = UT5;
+        document.getElementById("UT-5-5").innerHTML = UT5;
+        document.getElementById("BudgetYear").innerHTML = BudgetYear;
+
+    },1000);
+
+
+</script>

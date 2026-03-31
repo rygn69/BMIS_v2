@@ -1,0 +1,462 @@
+﻿
+<script>
+    function PGO_() {
+        if (document.getElementById('pgo_').checked) {
+
+            document.getElementById("pgo_").value = 1;
+
+        } else {
+
+            document.getElementById("pgo_").value = 0;
+
+        }
+    } 
+    function earmark_() {
+        if (document.getElementById('earmark_').checked) {
+
+            document.getElementById("earmark_").value = 1;
+
+        } else {
+
+            document.getElementById("earmark_").value = 0;
+
+        }
+    }
+    function accountsubppa() {
+        if (document.getElementById('accountsubppa').checked) {
+
+            document.getElementById("accountsubppa").value = 1;
+            $("#accountTemp").data("kendoComboBox").dataSource.read();
+
+        } else {
+
+            document.getElementById("accountsubppa").value = 0;
+            $("#office").data("kendoComboBox").value("")
+            $("#program").data("kendoComboBox").value("")
+            $("#accountTemp").data("kendoComboBox").dataSource.read();
+            $("#accountTemp").data("kendoComboBox").value("")
+
+        }
+
+    }
+    function ExcessCtrl_() {
+        
+        if (document.getElementById('excntrl').checked) {
+
+            document.getElementById("excntrl").value = 1;
+            $("#exaccount").data("kendoComboBox").dataSource.read()
+            $("#exaccount").data("kendoComboBox").value("")
+
+        } else {
+            document.getElementById("excntrl").value = 0;
+            $("#exaccount").data("kendoComboBox").value("")
+
+        }
+        $("#subaccount").data("kendoComboBox").dataSource.read();
+    }
+    function SummaryPPA()
+    {
+        if (document.getElementById('SummaryPPA').checked) {
+
+            document.getElementById("SummaryPPA").value = 1;
+
+        } else {
+
+            document.getElementById("SummaryPPA").value = 0;
+
+        }
+    }
+   
+    //setTimeout(function () {
+    //    $("#ProposalYear").data("DropDownList").dataSource.read();
+    //    //year: $("#ProposalYear").val();\
+    //}, 100);
+    //$("#program").data("kendoComboBox").dataSource.read();
+    
+    function fnOffice() {
+        setTimeout(function () {
+            $("#program").data("kendoComboBox").dataSource.read();
+        }, 500);
+        ocake4();
+    }
+
+    function fnprogram() {
+        setTimeout(function () {
+            $("#accountTemp").data("kendoComboBox").dataSource.read();
+        }, 500);
+        ocake2();
+    }
+    function fnaccount() {
+        //setTimeout(function () {
+        //    $("#subaccount").data("kendoComboBox").dataSource.read();
+        //}, 500);
+        ocake3();
+    }
+    
+    function officeval() {
+        return {
+            year: $("#ProposalYear").val(),
+            //year: $("#ProposalYear").data("kendoComboBox").text(),
+            office: $("#office").val()
+        };
+
+    }
+    function program() {
+        return {
+            year: $("#ProposalYear").val(),
+            program: $("#program").val(),
+            allsubppa: $("#accountsubppa").val()
+        };
+    }
+    function getaccount() {
+        return {
+            year: $("#ProposalYear").val(),
+            program: $("#program").val(),
+            accountTemp: $("#accountTemp").val(),
+            exaccount: $("#exaccount").val(),
+            exaccountoption: $("#excntrl").val(),
+            allsubppa: $("#accountsubppa").val()
+        };
+    } 
+    function getExaccount() {
+        return {
+            accountTemp: $("#accountTemp").val(),
+            year: $("#ProposalYear").val(),
+        };
+    }
+    function reqPrint() {
+        var program = $("#program").val();
+        var accountTemp = $("#accountTemp").val();
+        var subaccount = $("#subaccount").val();
+        var ProposalYear = $("#ProposalYear").val();
+        var monthof = $("#Months").val();
+        var exaccount = $("#exaccount").val();
+        var pgocntrl = $("#pgo_").val();
+        var earmark = $("#earmark_").val();
+        var allsubppa = $("#accountsubppa").val();
+        
+        if ($("#excntrl").val() == 1)
+        {
+            if ($("#subaccount").data("kendoComboBox").text() == "Social Program (20%)")
+            {
+                $("#subaccount").val(20181);
+            }
+            else if ($("#subaccount").data("kendoComboBox").text() == "Livelihood Program (20%)")
+            {
+                $("#subaccount").val(20182);
+            }
+            else if ($("#subaccount").data("kendoComboBox").text() == "Environmental Program (60%)") {
+                $("#subaccount").val(20183);
+            }
+        }
+        //if (accountTemp == 2628 && (subaccount == 0 || subaccount=="" || exaccount == 0 || exaccount=="")) {
+        //    swal({
+        //        title: "Please check sub-account or excess account entry!",
+        //        type: "warning",
+        //        showCancelButton: false,
+        //        confirmButtonColor: "#DD6B55",
+        //        confirmButtonText: "Ok",
+        //        closeOnConfirm: false,
+        //        showLoaderOnConfirm: true
+        //    })
+        //}
+        //else {
+            $.ajax({
+                async: false,
+                dataType: 'html',
+                success: window.open("../Reports/ReportViewer.aspx?rid=27&program=" + program + "&accountTemp=" + accountTemp + "&subaccount=" + $("#subaccount").val() + "&ProposalYear=" + ProposalYear + "&pgocntrl=" + $("#pgo_").val() + "&monthof=" + monthof + "&excesscntrl=" + $("#excntrl").val() + "&exaccount=" + exaccount + "&earmark_type=" + earmark + "&allsubppa=" + allsubppa + "")
+            });
+       // }
+    }
+
+    var thisculture = kendo.culture();
+    thisculture.numberFormat.currency.symbol = '₱'; // Script For Changing The Currency Sign
+
+
+    function ocake() {
+        
+        $("#office").data("kendoComboBox").dataSource.read()
+        $("#office").data("kendoComboBox").value("")
+        //$("#program").data("kendoComboBox").dataSource.read()
+        $("#program").data("kendoComboBox").value("")
+        //$("#accountTemp").data("kendoComboBox").dataSource.read()
+        $("#accountTemp").data("kendoComboBox").value("")
+        //$("#subaccount").data("kendoComboBox").dataSource.read()
+        $("#subaccount").data("kendoComboBox").value("")
+     
+    }
+    function ocake2() {
+
+        $("#accountTemp").data("kendoComboBox").dataSource.read()
+        $("#accountTemp").data("kendoComboBox").value("")
+        $("#subaccount").data("kendoComboBox").dataSource.read()
+        $("#subaccount").data("kendoComboBox").value("")
+        //}, 500);
+    }
+    function ocake3() {
+
+        $("#subaccount").data("kendoComboBox").dataSource.read()
+        $("#subaccount").data("kendoComboBox").value("")
+        //}, 500);
+    }
+    function ocake4() {
+        $("#program").data("kendoComboBox").dataSource.read()
+        $("#program").data("kendoComboBox").value("")
+        $("#accountTemp").data("kendoComboBox").dataSource.read()
+        $("#accountTemp").data("kendoComboBox").value("")
+        $("#subaccount").data("kendoComboBox").dataSource.read()
+        $("#subaccount").data("kendoComboBox").value("")
+    }
+    function fnexcessppas() {
+        $("#subaccount").data("kendoComboBox").dataSource.read();
+    }
+</script>
+
+<h2><span class="fa fa-print"></span> Other PPA's </h2>
+
+@*<font size="3"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>Note:</strong> You can generate report with or without Office </font>*@
+<br />
+
+       
+        <div style="float: left;margin-right:50px;margin-top:2px;">
+            <label style="float:left;margin-left: 69px;">
+                Office    :
+            </label>
+        </div>
+        <div style="float:left;margin-left:2px;width:500px">
+            @(Html.Kendo().ComboBox()
+            .Name("office")
+            .DataTextField("offname")
+            .DataValueField("OfficeID")
+            .AutoBind(true)
+            .Placeholder("Select Office...")
+            .Filter("contains")
+            .MinLength(3)
+            .Events(e => e.Select("fnOffice"))
+            .SelectedIndex(-1)
+            .HtmlAttributes(new { style = "width:100%; height:100%", @class = "form-control autoselect"})
+            .DataSource(source => {
+                source.Read(read =>
+                {
+                    read.Action("GetOfficeOtherPPA", "Report");//.Data("fnMainPPA");
+                })
+            .ServerFiltering(false);
+            })
+        )
+        </div>
+               
+       
+        <div style="float: left;margin-right:10px;margin-top:10px;">
+            <label style="float:left;margin-left: 50px;">
+                Program    :
+            </label>
+        </div>
+        <div style="float:left;margin-left:41px;width:500px;margin-top:10px;">
+                @(Html.Kendo().ComboBox()
+                .Name("program")
+                .DataTextField("ProgramDescription")
+                .DataValueField("ProgramID")
+                .AutoBind(true)
+                .Placeholder("Select Program...")
+                .Filter("contains")
+                .MinLength(3)
+                .Events(e => e.Select("fnprogram"))
+                .SelectedIndex(-1)
+                .HtmlAttributes(new { style = "width:100%; height:100%", @class = "form-control autoselect"})
+                .DataSource(source => {
+                    source.Read(read =>
+                    {
+                        read.Action("GetProgram", "Report").Data("officeval");
+                    })
+                    .ServerFiltering(false);
+                })
+                // .CascadeFrom("offce")
+            )
+            </div>
+                
+        <div style="float: left;margin-right:10px;margin-top:10px;">
+            <label style="float:left;margin-left: 53px;">
+                Account    :
+            </label>
+        </div>
+        <div style="float:left;margin-left:41px;width:500px;margin-top:10px;">
+                @(Html.Kendo().ComboBox()
+                .Name("accountTemp")
+                .DataTextField("AccountName")
+                .DataValueField("AccountID")
+                .AutoBind(true)
+                .Placeholder("Select account...")
+                .Filter("contains")
+                .MinLength(3)
+                .Events(e => e.Change("fnaccount"))
+                .SelectedIndex(-1)
+                //.CascadeFrom("program")
+                .HtmlAttributes(new { style = "width:100%; height:100%", @class = "form-control autoselect"})
+                .DataSource(source => {
+                    source.Read(read =>
+                    {
+                        read.Action("GetAccount", "Report").Data("program");
+                    })  
+                    .ServerFiltering(false);
+                })
+            )
+            <div style="float:right;margin-top:1px;margin-right:-66px;zoom:1.5;;width:60px;">
+                <input type='checkbox' class='checkbox' id="accountsubppa" name="accountsubppa" value="0" title="View all accounts with sub-ppa!" onclick=accountsubppa() /> <font style="font-size:8px;text-wrap:inherit">Sub-PPA</font>
+            </div>        
+        </div>
+        <div style="float: left;margin-right:10px;margin-top:10px;">
+            <label style="float:left;margin-left: 50px;">
+                Sub-PPA    :
+            </label>
+        </div>
+        <div style="float:left;margin-left:41px;width:500px;margin-top:10px;">
+                @(Html.Kendo().ComboBox()
+                .Name("subaccount")
+                .DataTextField("AccountName")
+                .DataValueField("SPO_ID")
+                .AutoBind(true)
+                .Placeholder("Select sub-ppa...")
+                .Filter("contains")
+                .MinLength(3)
+                .SelectedIndex(-1)
+                //.CascadeFrom("account")
+                .HtmlAttributes(new { style = "width:100%; height:100%", @class = "form-control autoselect"})
+                .DataSource(source => {
+                    source.Read(read =>
+                    {
+                        read.Action("GetSubAccount", "Report").Data("getaccount");
+                    })
+                    .ServerFiltering(false);
+                })
+            )
+                       
+        </div>
+        <div style="float: left;margin-right:10px;margin-top:10px;">
+            <label style="float:left;margin-left: 2px;">
+                Excess Account    :
+            </label>
+        </div>
+        <div style="float:left;margin-left:40.5px;width:500px;margin-top:10px;">
+            @(Html.Kendo().ComboBox()
+                        .Name("exaccount")
+                        .DataTextField("Account")
+                        .DataValueField("TransactionNo")
+                        .AutoBind(true)
+                        .Placeholder("Select excess account...")
+                        .Filter("contains")
+                        .MinLength(3)
+                        .SelectedIndex(-1)
+                        .Events(e => e.Change("fnexcessppas"))
+                        .HtmlAttributes(new { style = "width:100%; height:100%", @class = "form-control autoselect" })
+                        .DataSource(source =>
+                        {
+                            source.Read(read =>
+                            {
+                                read.Action("GetExessAccount", "Report");//.Data("getExaccount");
+                            })
+                            .ServerFiltering(false);
+                        })
+            )
+
+        </div>
+        <div style="float: left;margin-right:10px;margin-top:10px;">
+            <label style="float:left;margin-left: 82px;">
+                Year    :
+            </label>
+        </div>
+        <div style="float:left;margin-left:40.5px;width:100px;margin-top:10px;">
+                @(Html.Kendo().ComboBox()
+                .Name("ProposalYear")
+                .DataTextField("ProposalYear")
+                .DataValueField("ProposalYear")
+                .SelectedIndex(0)
+                .HtmlAttributes(new { style = "width:100%; height:100%", @class = "form-control autoselect"})
+                .Events(e => e.Change("ocake"))
+                .DataSource(source => source.Read(read => read.Action("GetPropYear3", "PYear")))
+                    )
+                    
+         </div>
+        
+        <div style="float: left;margin-right:10px;margin-top:13px;">
+            <label style="float:left;margin-left: 50px;">
+                As Of Month    :
+            </label>
+        </div>
+        <div style="float:left;margin-left:30px;width:150px;margin-top:10px;">
+                @(Html.Kendo().DropDownList()
+                .Name("Months")
+                .DataTextField("Text")
+                .DataValueField("Value")
+                //.Events(e => e.Change("change"))
+                .BindTo(new List<SelectListItem>() {
+                    new SelectListItem() {
+                        Text = "January",
+                        Value = "1"
+                    },
+                    new SelectListItem() {
+                        Text = "February",
+                        Value = "2"
+                    },
+                    new SelectListItem() {
+                        Text = "March",
+                        Value = "3"
+                    },
+                    new SelectListItem() {
+                        Text = "April",
+                        Value = "4"
+                    },
+                    new SelectListItem() {
+                        Text = "May",
+                        Value = "5"
+                    },
+                    new SelectListItem() {
+                        Text = "June",
+                        Value = "6"
+                    },
+                    new SelectListItem() {
+                        Text = "July",
+                        Value = "7"
+                    },
+                    new SelectListItem() {
+                        Text = "August",
+                        Value = "8"
+                    },
+                    new SelectListItem() {
+                        Text = "September",
+                        Value = "9"
+                    },
+                    new SelectListItem() {
+                        Text = "October",
+                        Value = "10"
+                    },
+                    new SelectListItem() {
+                        Text = "November",
+                        Value = "11"
+                    },
+                    new SelectListItem() {
+                        Text = "December",
+                        Value = "12"
+                    }
+                })
+                .Value(@ViewBag.MonthVaue)
+                .HtmlAttributes(new { style = "width:100%; height:100%", @class = "form-control autoselect"})
+                .SelectedIndex(DateTime.ParseExact(DateTime.Now.ToString("MMM"), "MMM", null).Month -1 )
+                )
+    </div>
+
+    <input type="text" style="width:20px" name="type_pgo" id="type_pgo" value="1" hidden disabled>
+<div style="display:inline-block;margin-left:185px;">
+    <div style="float: left;margin-left:-12px;margin-top:25px;">
+        <input type='checkbox' class='checkbox' id="pgo_" name="pgo_" onclick=PGO_() /> <font style="font-size:15px">Include PGO Control</font>
+    </div>
+    <div style="float: left;margin-left:50px;margin-top:25px;">
+        <input type='checkbox' class='checkbox' id="earmark_" name="earmark_" onclick=earmark_() /> <font style="font-size:15px">Include Earmark</font>
+    </div>
+    <div style="float: left;margin-left:50px;margin-top:25px;">
+        <input type='checkbox' class='checkbox' id="excntrl" name="excntrl" onclick=ExcessCtrl_() /> <font style="font-size:15px">Excess Control</font>
+    </div>
+  
+</div>
+<div style="float:left;margin-left:550px;width:300px;margin-top:-5px;">
+    <div id="btnPrint" class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 100px;float:right; margin-top: 20px; margin-right:200px;background-color:cornflowerblue;color:white; margin-bottom:0px;border-radius:50px" onclick="reqPrint()"><span class="mif-printer"></span> Preview</div>
+</div>

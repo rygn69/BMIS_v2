@@ -1,0 +1,199 @@
+﻿<script>
+    function OnEdit_grdCCCodeList(arg) {
+        
+
+        //setTimeout(function () {
+        //    $(e.container).find("input[type=number]").select();
+        //}, 1000)
+        if (arg.container.find("input[name=OrderNo]").length <= 0) {
+            $("#grdCCCodeList").data("kendoGrid").closeCell(arg.container)
+        }
+        var gridName = $('#grdCCCodeList').data('kendoGrid');
+        var ds = gridName.dataSource.view();
+        var dataRows = gridName.items();
+        var CCCodeID = "";
+
+        var input = arg.container.find("input[name=OrderNo]");
+        var value = input.val();
+        var OldValue = input.val();
+
+        input.keyup(function () {
+            value = input.val();
+        });
+        input.blur(function () {
+            var rowIndex = dataRows.index(gridName.select());
+            CCCodeID = ds[rowIndex].CCCodeID;
+            if (value != OldValue) {
+                var url = "@Url.Action("UpdateCCCodeOrderNo", "Maintenance")";
+                $.post(url, { CCCodeID: CCCodeID, OrderNo: value }, function (d) {
+                    if (d == "1") {
+                        $("#grdCCCodeList").data("kendoGrid").dataSource.read();
+                    }
+                    else {
+                        swal({
+                            title: "Error!",
+                            text: d,
+                            type: "error",
+                            showConfirmButton: true
+                        });
+                    }
+                })
+            }
+        });
+    }
+    function ReqOpen_AddNewCCCodeWindow() {
+        var Mode = "Add"
+        var url = "@Url.Action("ShowAddNewCCCodeWindow", "Maintenance")";
+        $('#AddNewCCCodeWindow').html('<div style="width: 100%;height:100%;"><img src="@Url.Content("~/Content/images/loading.gif")" alt="Loading..." style="position: absolute;top: 20%;left: 30%;margin-top: 0px;margin-left: 0px;" /></div>');
+        $.post(url,{Mode:Mode,CCCOdeID:'NONE'}, function (pvData) {
+            $(window).scrollTop(0);
+            $('#AddNewCCCodeWindow').html(pvData);
+            $('#AddNewCCCodeWindow').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Add New Climate Change Code").center().open();
+        })
+    }
+    function reqEditCCCode(CCCodeID) {
+        var Mode = "Edit"
+        var url = "@Url.Action("ShowAddNewCCCodeWindow", "Maintenance")";
+        $('#AddNewCCCodeWindow').html('<div style="width: 100%;height:100%;"><img src="@Url.Content("~/Content/images/loading.gif")" alt="Loading..." style="position: absolute;top: 20%;left: 30%;margin-top: 0px;margin-left: 0px;" /></div>');
+        $.post(url, { Mode: Mode, CCCOdeID: CCCodeID }, function (pvData) {
+            $(window).scrollTop(0);
+            $('#AddNewCCCodeWindow').html(pvData);
+            $('#AddNewCCCodeWindow').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Edit Climate Change Code").center().open();
+        })
+    }
+    function reqRemoveCCCode(CCCodeID) {
+        var url = "@Url.Action("RemoveCCCode", "Maintenance")";
+        $.post(url, { CCCodeID: CCCodeID }, function (d) {
+            if (d == "1") {
+                swal({
+                    title: "Success!",
+                    text: "Climate Change Code Successfuly Removed",
+                    type: "success",
+                    showConfirmButton: true
+                });
+                $("#grdCCCodeList").data("kendoGrid").dataSource.read();
+            }
+            else {
+                swal({
+                    title: "Error!",
+                    text: d,
+                    type: "error",
+                    showConfirmButton: true
+                });
+            }
+        })
+    }
+    function searchCode() {
+        var txtSearchData = $("#txtSearchCode").val();
+        var Grid = $("#grdCCCodeList").data("kendoGrid").dataSource;
+        Grid.filter([
+            {
+                logic: "or",
+                filters: [{
+                    field: "CCCode",
+                    operator: "contains",
+                    value: txtSearchData
+                }]
+            }
+        ]);
+    }
+</script>
+<div style="width : 100%; border-style: solid; border-color: #1fa67a">
+    <div style="width:100%;height : 25px ; background-color:#1fa67a; color: white">
+        <label class="fa fa-file-powerpoint-o fa-lg" style="margin-left: 5px; display:inline-block">  Climate Change Codes</label>
+    </div>
+    <div id="AIPGridDIV" value="0">
+        <input type="hidden" value="0" id="AIPGridDIVSizeIndicator" />
+        <div style="border: outset;clear:both;border-width:1px;border-color:#1fa67a; width: 100%; padding-left:0px;padding-right:0px;padding-top:0px;padding-bottom:7px;">
+            <div style=" width: 91.5%;height: 100%; border-right: 0px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;margin-top: -1px; ">
+                <div style="float: left; width: 100%; margin-top:1px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 36px solid #1fa67a; ">
+                    <div style="float:right; width:100%">
+                        <div style="float:right;margin-right:5px;margin-top:5px;">
+                            <button class="k-button k-button-icontext" onclick="ReqOpen_AddNewCCCodeWindow()"> <i class="fa fa-plus-circle"></i> Add </button>
+                        </div>
+                        <div style="float: right; height:28px;margin-top:5px;margin-right:5px">
+                            <div style="background-color:white;border:solid;border-color:whitesmoke;border-width:thin;width:310px;height:30px;float:right;padding:0px;margin-top:-3px;" id="search">
+                                <input type="text" style="width:260px;border-collapse:collapse;border-color:white;margin:0px;margin-left:0px;height:70%;outline:none;border-left-style:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search Climate Change Code" id="txtSearchCode" name="txtSearchCode">
+                                <div class="k-button k-button-icontext" style="height:29px;width:40px;margin-top:0.6px;" onclick="searchCode()"><span class="mif-search"></span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Maintenance.ClimateChangeCodesModel>()
+            .Name("grdCCCodeList")
+            .Columns(columns =>
+            {
+                columns.Bound(c => c.CCCodeID).Hidden();
+                columns.Bound(c => c.OrderNo).Title("Order No.").Width(45)
+                    .HtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+                columns.Bound(c => c.CCCode).Title("Climate Change Code").Width(65)
+                    .HtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+                columns.Bound(c => c.CCCDescription).Title("Description").Width(250)
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+                columns.Template(t => { })
+                    .ClientTemplate("<div class='k-button' onclick='reqEditCCCode(#=CCCodeID#)' style='inline-block' title='Edit'>Edit</div>")
+                    .Width(60);
+                columns.Template(t => { })
+                    .ClientTemplate("<div class='k-button' onclick='reqRemoveCCCode(#=CCCodeID#)' style='inline-block' title='Remove'>Remove</div>")
+                    .Width(60);
+
+            })
+            .HtmlAttributes(new { style = "height: 525px;" })
+            .Scrollable(s => s.Enabled(true))
+            .Selectable()
+            .AutoBind(true)
+            .Pageable(p => p.ButtonCount(4).Refresh(true))
+            .Editable(editable => editable.Mode(GridEditMode.InCell))
+            .Events(e => e.Edit("OnEdit_grdCCCodeList"))
+            .DataSource(dataSource => dataSource
+                 .Ajax()
+                 .Batch(true)
+                 .ServerOperation(true)
+                 .Model(m => m.Id(i => i.CCCodeID))
+                 .AutoSync(true)
+                 .Read(read => read.Action("grdCCCOdeListData", "Maintenance"))
+                 .Sort(s =>
+                 {
+                     s.Add(c => c.CCCode);
+                     s.Add(c => c.OrderNo);
+                 })
+            )
+            )
+        </div>
+    </div>
+</div>
+
+@(Html.Kendo().Window()
+    .Name("AddNewCCCodeWindow")
+    .Width(500)
+    .Height(250)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(true)
+    .AutoFocus(true)
+    .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+    .Actions(a => { a.Close(); })
+)
+<script>
+    document.getElementById('txtSearchCode').onkeydown = function (event) {
+        if (event.keyCode == 13) {
+            searchCode();
+        }
+    }
+    document.getElementById('txtSearchCode').onkeyup = function () {
+        if (($(this).val() == '' || $(this).val() == 'Search Climate Change Code') && $(this).attr('type') != 'hidden') {
+            searchCode()
+        }
+    }
+</script>

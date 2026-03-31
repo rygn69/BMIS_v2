@@ -1,0 +1,199 @@
+﻿<script>
+
+    function CheckAllitem(e) {
+        $("#grid_additem tbody input:checkbox").prop("checked", e.checked);
+    }
+    function getparitem(){
+        var office = @Session["office"]
+        var program= @Session["program"] ;
+        var account= @Session["account"];
+        var tyear= @Session["tyear"];
+        var fundid=@Session["fundid"];
+        var mode_trans=@Session["mode_trans"];
+        var ooeclass=@Session["ooeclass"];
+        return{
+            office:office,
+            program:program,
+            account:account,
+            tyear:tyear,
+            fundid:fundid,
+            mode_trans:mode_trans,
+            ooeclass:ooeclass
+        }
+    }
+    function searchitem() {
+        var $filter = new Array();
+        $filter = [];
+
+        if ($('#SearchDataItem').val().length > 0) {
+            $filter.push({ field: "itemname", operator: "contains", value: $('#SearchDataItem').val() }),
+            $filter.push({ field: "unit", operator: "contains", value: $('#SearchDataItem').val() });
+        }
+
+        $('#grid_additem').data('kendoGrid').dataSource.filter({
+            logic: "or",
+            filters: $filter
+        });
+
+    }
+
+    $(function () {
+        $("#SearchDataItem").keypress(function (e) {
+            if (e.keyCode == 13) {
+                searchitem();
+            }
+        });
+    });
+</script>
+<div id="searchitemid" style="height: 30px; margin-top: 0px; float: right;">
+    <input type="text" style="width:212px;border-collapse:collapse;margin:0px;border-style:solid;margin-left:0px;height:70%;outline:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search..." id="SearchDataItem" name="SearchDataItem">
+    <div class="k-button k-button-icontext" style="height:30px;width:40px;border-style:solid;" onclick="searchitem()"><span class="mif-search"></span></div>
+</div>
+
+<div style="display:inline-block;margin-top:00px">
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.WFPrepare>()
+                .Name("grid_additem")
+                .HtmlAttributes(new { style = "" })
+                .Scrollable()
+                .Columns(col =>
+                {
+        col.Template(@<text></text>)
+                .Hidden()
+                .HeaderTemplate(@<text>item ID</text>)
+                .Hidden()
+                .HtmlAttributes(new { style = "text-align:center;" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:15px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                @*.HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal"})*@
+                .ClientTemplate("<div>#=itemid# </div>");
+        col.Template(@<text></text>)
+                .ClientTemplate("<input id='check#=itemid#'  style='zoom:1.2' type='checkbox'  class='checkbox'/>")
+                .Title("<input type='checkbox' onclick=CheckAllitem(this)  class='checkbox' readonly  style='zoom:1.5'/> <span style='text - align:center; vertical - align:middle; height: 30px; background - color:#ff6a00;font-size:14px;color:beige;font-weight:100;'></span> ")
+                .Width(30)
+                //  .HeaderTemplate(@<text>For Review</text>)#=officeid#
+                .HtmlAttributes(new { style = "text-align:center;height:30px" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" });
+
+        col.Bound(c => c.itemname)
+        .HeaderTemplate(@<text>Item Name</text>)
+                .Width(250)
+                .HtmlAttributes(new { style = "text-align:left;font-size:12px" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:15px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                .ClientTemplate("<div>#=itemname# </div>");
+
+        col.Template(@<text></text>)
+                .HeaderTemplate(@<text>Amount</text>)
+                .Width(250)
+                .HtmlAttributes(new { style = "text-align:center;" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:15px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                @*.HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal"})*@
+                .ClientTemplate("<div>#=kendo.toString(unitcost,'c2')# </div>");
+        col.Template(@<text></text>)
+                .Width(50)
+                .HeaderTemplate(@<text>Unit</text>)
+                .HtmlAttributes(new { style = "text-align:center;" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:15px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                @*.HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal"})*@
+                .ClientTemplate("<div>#=unit# </div>");
+
+        
+                })
+                //.Editable(editable => editable.Mode(GridEditMode.InCell))
+                .Resizable(e => e.Columns(true))
+                .Pageable(pageable => pageable
+                .Refresh(true)
+                .ButtonCount(5))
+                .HtmlAttributes(new { @class = "table-responsive", style = "height:500px;" })
+                .Selectable()
+         //       .Events(e => e.DataBound("onDataBoundResperson"))
+                .DataSource(dataSource => dataSource
+                .Ajax()
+                .Batch(true)
+                .Model(m => m.Id(i => i.itemid))
+                .ServerOperation(false)
+                .PageSize(5000)
+                .Read(read => read.Action("GetPPPMPitem", "Report").Data("getparitem"))
+                )
+    )
+</div>
+<br />
+<div>
+    <div id="btnclose" class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 100px;float:left; margin-top: 20px; margin-left:740px;border-radius:50px;background-color:indianred;color:white; margin-bottom:0px" onclick="reqClose_ppmp()"><span class="fa fa-close"></span> Close</div>
+    <div id="btnPrintSubmitted" class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 100px;float:right; margin-top:20px; margin-right:60px;border-radius:50px;margin-bottom:0px;background-color:cornflowerblue;color:white" onclick="reqadditem()"><span class="fa fa-plus"></span> ADD</div>
+</div>
+<script>
+    function reqClose_ppmp() {
+        $("#WFPPrepareGrid").data("kendoGrid").dataSource.read();
+        $("#wfpadditem").data("kendoWindow").close()
+    }
+    function reqadditem() {
+        var office = @Session["office"]
+        var program= @Session["program"] ;
+        var account= @Session["account"];
+        var tyear= @Session["tyear"];
+        var item=$("#item").val()
+        var fundid=@Session["fundid"];
+        var mode_trans=@Session["mode_trans"];
+      
+        if ($('#SpanOnApproveProgress').css("display") == 'none') {
+            $('#SpanOnApproveProgress').css("display", "auto");
+        $('#spanthumbsup').css("display", "none");
+        @*var url = "@Url.Action("ApproveWFP", "Report")";*@
+        var url = "@Url.Action("additemeproc", "Report")";
+        var idsToSend = [];
+        var grid = $("#grid_additem").data("kendoGrid")
+        var ds = grid.dataSource.view();
+
+        for (var i = 0; i < ds.length; i++) {
+            var row = grid.table.find("tr[data-uid='" + ds[i].uid + "']");
+            var checkbox = $(row).find(".checkbox");
+            if (checkbox.is(":checked")) {
+                idsToSend.push(ds[i].itemid); //loops
+            }
+        }
+        if (idsToSend == "") {
+            swal({ title: "Warning!", text: "Please ticked the checkbox first!", timer: 2500, showConfirmButton: false, type: "warning" });
+            $('#SpanOnApproveProgress').css("display", "none");
+            $('#spanthumbsup').css("display", "auto");
+        }
+        else if ((office ==0 || program ==0 || account==0 || tyear==0) && fundid == 0 && mode_trans == 1){ //gf
+            swal("","Please select office, program and account respectively!","info")
+        }
+        else if ((office ==0 || account==0) && fundid == 1){ //tf
+            swal("","Please select office and account respectively!","info")
+        }
+        else if ((office ==0 || account==0) && mode_trans == 0){ //tf
+            swal("","Please select office and account respectively!","info")
+        }
+        else {
+            $.post(url, { transno: idsToSend,officeid: office, programid: program, accountid: account, tyear: tyear,fundid:fundid,mode_trans:mode_trans}, function (d) {
+                if (d == 1) {
+                    swal({ title: "Success!", text: "Selected item has been added!", timer: 1000, showConfirmButton: false, type: "success" });
+                    $("#grid_additem").data("kendoGrid").dataSource.read();
+                    $('#SpanOnApproveProgress').css("display", "none");
+                    $('#spanthumbsup').css("display", "auto");
+                }
+                else {
+                    swal("Something Went Wrong!", d, "error");
+                    $('#SpanOnApproveProgress').css("display", "none");
+                    $('#spanthumbsup').css("display", "auto");
+                }
+            })
+        }
+        }
+        @*function (isConfirm) {
+            if (isConfirm) {
+                var url = "@Url.Action("additemeproc", "Report")";
+                $.get(url, { officeid: office, programid: program, accountid: account, breakdownid: breakdownid, tyear: tyear,itemid:item }, function (e) {
+                    if (e == "success") {
+                        swal("Success", "Item has been linked!", "success");
+                        $("#WFPPrepareGrid").data("kendoGrid").dataSource.read();
+                     //   $("#wfpadditem").data("kendoWindow").close()
+
+                    } else {
+                        swal("Error", e, "error");
+                    }
+                });
+            }
+        });*@
+    }
+</script>

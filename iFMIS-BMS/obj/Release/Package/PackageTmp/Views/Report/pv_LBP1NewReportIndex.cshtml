@@ -1,0 +1,82 @@
+﻿<script>
+    function reqPrint() {
+        var FundType = $("#ddlFundingSource").val();
+        var YearOf = $("#ddlYear").val();
+        var eid = @Session["ueid"];
+        if (FundType == "" || YearOf == "") {
+            alert('Please Select Fund Type and Year')
+        }
+        else {
+            $.ajax({
+                async: false,
+                dataType: 'html',
+                success: window.open("../Reports/ReportViewer.aspx?rid=20&fundtype=" + FundType + "&Year=" + YearOf + "&eid="+ eid +"")
+            });
+        }
+        
+    }
+</script>
+<div style="width : 100%; border-style: solid; border-color: #1fa67a">
+    <div style="width:100%;height : 25px ; background-color:#1fa67a; color: white">
+        <label class="fa fa-file-powerpoint-o fa-lg" style="margin-left: 5px; display:inline-block">  LBP Form 1 Report (Income)</label>
+    </div>
+    <label style="margin-left: 0px;margin-left: 10px;margin-top: 10px;margin-bottom: 2px; display : inline-block;width:65%">
+        Fund Type :
+        @(Html.Kendo().DropDownList()
+                .Name("ddlFundingSource")
+                .DataValueField("Value")
+                .DataTextField("Text")
+                .OptionLabel("Select Fund Source...")
+                .HtmlAttributes(new { @style = "width: 100%;margin-top:5px" })
+                .DataSource(source => source.Read(read => read.Action("getFundType", "LBPForm1")))
+        )
+    </label>
+    <label style="margin-left: 0px;margin-left: 10px;margin-top: 10px;margin-bottom: 2px; display : inline-block;width:25%">
+        Budget Year :
+        @(Html.Kendo().DropDownList()
+                        .Name("ddlYear")
+                        .DataTextField("ProposalYear")
+                        .DataValueField("ProposalYear")
+                        .SelectedIndex(0)
+                        .HtmlAttributes(new { @style = "width: 90px;" })
+                        .DataSource(source => source.Read(read => read.Action("GetPropYear", "PYear")))
+        )
+    </label>
+    <div style="display:inline-block;width:100%;margin-top:10px">
+        <div id="btnPrintDGsign" class="k-button k-button-icontext" style=" bottom: 15px; right: 25px;width: 150px;float:left; margin-top: 5px;background-color:cornflowerblue;color:white;border-radius:50px; margin-left:510px; margin-bottom:5px" onclick="reqPrintDGsign()"><span class="fa fa-print"></span>&nbsp;Print Via DGSign</div>
+        <div id="btnPrint" class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 80px;float:right; margin-top: 5px; margin-right:10px; margin-bottom:5px;border-radius:50px;" onclick="reqPrint()">Print</div>
+    </div>
+</div>
+<script>
+     function reqPrintDGsign(){
+        //var officeID = $("#ddlOffices").val()
+         var ReportType = $("#ddlFundingSource").val();
+        var Year = $("#ddlYear").val()
+
+        var url = "@Url.Action("dgsignreport", "Report")";
+        swal({
+            title: "Confirmation!",
+            text: "Would you like to create a document for digital signature? \n\n",
+            type: "info",
+            showCancelButton: true,
+            closeOnConfirm: false,
+            confirmButtonColor: "#1fa67a",
+            confirmButtonText: "Yes",
+            showLoaderOnConfirm: true,
+        },
+            function (isConfirm) {
+                if (isConfirm) {
+                    $.post(url, { YearOf:Year,OfficeID:0, ReportTypeID:ReportType,docuid:6  }, function (d) {
+                        if (d != "") {
+                            //swal.close();
+                            swal("Success","The generated document for digital signature through Zimbra is now available for viewing.","success")
+                            //success: window.open(d)
+                        }
+                        else {
+                            swal("Something Went Wrong!", d, "error");
+                        }
+                    })
+                }
+            })
+    }
+</script>

@@ -1,0 +1,71 @@
+﻿@model iFMIS_BMS.BusinessLayer.Models.AmountHistory
+@using System.Globalization
+@{
+    var currencyMoney = Model.ProposalAmount;
+    var displayMoney = string.Format(new CultureInfo("en-US"), "{0:N2}", currencyMoney);
+}
+<script>
+    function HistoryData() {
+        var ProposalID = @Model.ProposalID;
+        return {
+            ProposalID: ProposalID
+        }
+    }
+</script>
+
+<div style="margin-top:10px;">
+    <p style="font-size:18px;"> Account Name: <b>@Model.AccountName</b></p>
+    <p style="font-size:18px;"> Proposed Amount: <b>₱@displayMoney</b></p>
+</div>
+<div style="margin-top:10px;">
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.AmountHistory>()
+    .Name("grd_AmountHistory")
+    .Columns(col =>
+    {
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;">Reviewed By</div></text>)
+                        .Width(150)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center" })
+                        .ClientTemplate("<div> #=UserName# </div>");
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Amount</div></text>)
+                        .Width(150)
+                        .HtmlAttributes(new { style = "text-align:center;height:30px" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center" })
+                        .ClientTemplate("<div> #=kendo.toString(Amount, 'c2')# </div>");
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;">Date</div></text>)
+                        .Width(150)
+                        .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center" })
+                        .ClientTemplate("<div> #=Date# </div>");
+    })
+           .ToolBar(toolbar =>
+           {
+              toolbar.Template(@<text>
+                <div style="float: right; height:28px;margin-top:2px;">
+                    <link href="~/Content/metroui/css/docs.css" rel="stylesheet" />
+                    @*<div style="background-color:white;border:solid;border-color:whitesmoke;border-width:thin;width:310px;height:30px;float:right;padding:0px;margin-top:-3px;" id="search">
+                        <input type="text" style="width:260px;border-collapse:collapse;border-color:white;margin:0px;margin-left:-10px;height:70%;outline:none;border-left-style:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search by Object of Expenditures" id="SearchData" name="SearchData">
+                        <div class="k-button k-button-icontext" style="height:29px;width:40px;margin-top:0.6px;" onclick="searchAccount()"><span class="mif-search"></span></div>
+                    </div>*@
+                </div>
+            </text>);
+           })
+               .Pageable(page => page.Refresh(true)
+                    .Enabled(true)
+                    .ButtonCount(4)
+                    .PreviousNext(true)
+               )
+               .Selectable()
+               .DataSource(d => d
+               .Ajax()
+               .Batch(true)
+               .PageSize(10)
+               .Model(m => m.Id(i => i.AmountHistoryID))
+                      .Read(read => read.Action("AccountHistoryAmount", "Home").Data("HistoryData")))
+    )
+</div>
+
+

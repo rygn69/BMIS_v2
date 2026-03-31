@@ -1,0 +1,37 @@
+﻿@model IEnumerable<iFMIS_BMS.BusinessLayer.Models.ChartModel>
+
+
+
+        <div style="margin: 5px;">
+                @(Html.Kendo().Chart(Model)
+            .Name("chStatistic")
+            .Legend(legend => legend
+                          .Position(ChartLegendPosition.Bottom).Labels(x => x.Font(font: "bold 13px Arial,Helvetica,sans-serif").Template("#=dataItem.naym# (#=dataItem.Years#) :  \n       #=dataItem.EmptySpace# ")))
+            .Title((string)ViewBag.oppis)
+
+            .Series(s => {
+                s.Pie(
+
+                        model => model.Percentage,
+                        model => model.perOfficePA
+
+                    )  
+                    
+                    .StartAngle(150);
+
+            })
+            .Tooltip(t => t.Template("${ category } -  ${ value }%").Visible(true))
+            .SeriesColors("#1FA67A", "#42EF14")
+
+            )
+        </div>
+    
+
+ 
+
+<script>
+        //$(document).ready(function(){
+        //    alert($("#offs").val());
+        //});
+</script>
+

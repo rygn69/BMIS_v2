@@ -1,0 +1,504 @@
+﻿<style>
+    .btn-delete a {
+        color: #000000;
+        background-color: #ffffff;
+        border-style: solid;
+        border-color: #333333;
+        border-width: 1px;
+        /*height: auto;*/
+        /*width: auto;*/
+        padding: 3px;
+        padding-left: 5px;
+        padding-right: 5px;
+        cursor: pointer;
+        margin: auto;
+    }
+
+        .btn-delete a:hover {
+            color: #ffffff;
+            background-color: #000000;
+            border-style: solid;
+            border-color: #333333;
+            /*height: auto;
+            width: auto;*/
+        }
+</style>
+
+<script>
+    var thisculture = kendo.culture();
+    thisculture.numberFormat.currency.symbol = '₱';
+
+
+
+
+    function reqEdit(e) {
+        $(window).scrollTop(0);
+        var url = "@Url.Action("SourceFunds", "Report")";
+        var Year_of = $("#propsYears").val()
+        $.get(url, { Fund_ID: e, Year_of: Year_of }, function (d) {
+            $('#editPorgram').html(d);
+        })
+
+        $('#editPorgram').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Budget Appropriation").center().open();
+    }
+    function reqEditPart(e) {
+        $(window).scrollTop(0);
+        var url = "@Url.Action("Particulars", "Report")";
+        var Year_of = $("#propsYears").val()
+        $.get(url, { Eco_ID: e, Year_of: Year_of }, function (d) {
+            $('#editPorgram').html(d);
+        })
+
+        $('#editPorgram').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Budget Appropriation").center().open();
+    }
+
+
+    function reqDelete(e) {
+        var url = "@Url.Action("RemoveSF", "Report")";
+        var Year_of = $("#propsYears").val()
+
+        swal({
+            title: "System Notice!",
+            text: "This will remove your Source of Fund. This Action can't be undone. Are you sure you want to Proceed?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes",
+            cancelButtonText: "Cancel",
+            closeOnConfirm: false
+        }, function () {
+            $.get(url, { Fund_ID: e, Year_of: Year_of }, function (d) {
+                if (d == "success") {
+                    swal({
+                        title: "Success!",
+                        text: "Successfully Remove.",
+                        timer: 2000,
+                        type: "success",
+                        showConfirmButton: false
+                    })
+                    $('#SourceFundsGrid').data('kendoGrid').dataSource.read();
+                } else {
+                    swal({
+                        title: "Error!",
+                        text: "System Error! Please try again.",
+                        timer: 2000,
+                        type: "error",
+                        showConfirmButton: false
+                    })
+                }
+
+            });
+        });
+
+    }
+
+
+    function reqDeleteEE(e) {
+        var url = "@Url.Action("RemoveSFEE", "Report")";
+        var Year_Of = $("#propsYears").val()
+
+        swal({
+            title: "System Notice!",
+            text: "This will remove your Source of Fund. This Action can't be undone. Are you sure you want to Proceed?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes",
+            cancelButtonText: "Cancel",
+            closeOnConfirm: false
+        }, function () {
+            $.get(url, { Eco_ID: e, Year_Of: Year_Of }, function (d) {
+                if (d == "success") {
+                    swal({
+                        title: "Success!",
+                        text: "Successfully Remove.",
+                        timer: 2000,
+                        type: "success",
+                        showConfirmButton: false
+                    })
+                    $('#EcoEnterGrid').data('kendoGrid').dataSource.read();
+                } else {
+                    swal({
+                        title: "Error!",
+                        text: "System Error! Please try again.",
+                        timer: 2000,
+                        type: "error",
+                        showConfirmButton: false
+                    })
+                }
+
+            });
+        });
+
+    }
+
+
+
+    function reqAddSource() {
+        var url = "@Url.Action("pv_AddSourceViews", "Report")";
+
+        var Year_of = $("#propsYears").val()
+
+        $.get(url, { Year_of: Year_of }, function (d) {
+
+            $('#addSource').html(d);
+        })
+        $('#addSource').data('kendoWindow').center().open();
+    }
+
+
+    function reqParticular() {
+        var url = "@Url.Action("pv_AddParticularViews", "Report")";
+
+        var Year_of = $("#propsYears").val()
+
+        $.get(url, { Year_of: Year_of }, function (d) {
+
+            $('#addPart').html(d);
+        })
+        $('#addPart').data('kendoWindow').center().open();
+    }
+
+
+    setTimeout(function () {
+
+        GetSelectedYear();
+
+        $("#SourceFundsGrid").data("kendoGrid").dataSource.read();
+        $("#EcoEnterGrid").data("kendoGrid").dataSource.read();
+    }, 1000);
+    function GetSelectedYear() {
+        var Year_of = $("#propsYears").val();
+        return {
+            Year_of: Year_of
+        }
+
+    }
+
+    function refreshGrid3333() {
+        $("#SourceFundsGrid").data("kendoGrid").dataSource.read();
+        $("#EcoEnterGrid").data("kendoGrid").dataSource.read();
+    }
+
+
+    function ChangeGrid() {
+        var Class_ID = $("#classtype").val()
+
+        if (Class_ID == 1) {
+            $("#Grid_ID_GF").css("display", "inline-block")
+            $("#Grid_ID_EE").css("display", "none")
+
+            $("#Grid_ID_GF").data("kendoGrid").dataSource.read();
+            $("#Grid_ID_EE").data("kendoGrid").dataSource.read();
+        } else if (Class_ID == 2) {
+            $("#Grid_ID_GF").css("display", "none")
+            $("#Grid_ID_EE").css("display", "inline-block")
+
+            $("#SourceFundsGrid").data("kendoGrid").dataSource.read();
+            $("#EcoEnterGrid").data("kendoGrid").dataSource.read();
+        } else {
+
+            alert("Action Unavailable")
+
+        }
+
+    }
+    function reqPopulateForm1Data()
+    {
+        swal({
+            title: "Are you sure?",
+            text: "This Action will Overwrite the existing data generated",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, Continue!",
+            closeOnConfirm: false,
+            showLoaderOnConfirm: true
+        }, function () {
+            var YearOf = $("#propsYears").val()
+            var url = "@Url.Action("GenerateForm1Data", "Report")";
+            $.get(url, { YearOf: YearOf }, function (d) {
+                if (d == 1){
+                    swal({
+                        title: "Success!",
+                        text: "Data successfuly Generated",
+                        timer: 2000,
+                        type: "success",
+                        showConfirmButton: false
+                    })
+                }
+                else {
+                    swal({
+                        title: "Error!",
+                        text: d,
+                        timer: 2000,
+                        type: "error",
+                        showConfirmButton: false
+                    })
+                }
+            }) 
+        });
+    }
+
+</script>
+
+
+<div style="border: outset;clear:both;border-width:1px;border-color:#1fa67a; width: 745px; padding-left:0px;padding-right:0px;padding-top:0px;padding-bottom:7px;margin-top: 10px;">
+    <div style=" width: 0;height: 0; border-right: 5px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;margin-top: -1px;margin-bottom: 0px; ">
+        <div style="float: left; width: 678px; margin-top:1px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 36px solid #1fa67a; ">
+
+            <div style="float: left; height:28px; margin-left:-59px; margin-top: 5px;">
+                <i class="fa fa-tasks fa-2x fg-white">  &nbsp;&nbsp; </i>
+            </div>
+
+            <div style="float: left; height:28px; margin-left:-30px; margin-top: 5px;">
+                <i class="fa-2x fg-white">  &nbsp;&nbsp; Class :</i>
+            </div>
+            <div style="text-align: right;float: left;margin-left:10px;margin-top:2px;">
+                @(Html.Kendo().DropDownList()
+                              .Name("classtype")
+                              .DataTextField("Class_Type")
+                              .DataValueField("Class_ID")
+                              //.Filter("contains")
+                              .SelectedIndex(0)
+                             // .MinLength(1)
+                              .HtmlAttributes(new { @style = "width: 160px;" })
+                              .DataSource(source => source.Read(read => read.Action("ddlClasses", "Dropdowns")))
+                                      .Events(e => e.Change("ChangeGrid"))
+                )
+            </div>
+            <div style="text-align: right;float: right;margin-right:10px;margin-top:2px;">
+                <div class="k-button" onclick="reqPopulateForm1Data()" style="float: left;margin-bottom: 0px; margin-right: 10px;">
+                    <span class="fa fa-clipboard" style="margin-left: 0px;margin-right:0px;margin-top: 0px;"></span>
+                    Populate Data
+                </div>
+                <div style="float: left;margin-right:10px;margin-top:2px;">
+                    <i class="fa fa-calendar fa-2x #33333"></i>
+                </div>
+                @(Html.Kendo().DropDownList()
+                              .Name("propsYears")
+                              .DataTextField("ProposalYear")
+                              .DataValueField("ProposalYear")
+                             // .Filter("contains")
+                              .SelectedIndex(0)
+                             // .MinLength(1)
+                              .HtmlAttributes(new { @style = "width: 90px;" })
+                              .DataSource(source => source.Read(read => read.Action("ddlProposalYear", "Dropdowns")))
+                                      .Events(e => e.Change("refreshGrid3333"))
+                )
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function onLoadgrdTemplatess() {
+            var Proposalv = $("#propsYears").val();
+            var Estimatev = Proposalv - 1;
+            var Actualv = Proposalv - 2;
+        document.getElementById("tProposalv").innerHTML = Proposalv;
+        document.getElementById("tEstimatev").innerHTML = Estimatev;
+        document.getElementById("tActualv").innerHTML = Actualv;
+        document.getElementById("tDifferencev").innerHTML = Proposalv + ' - ' + Estimatev;
+    }
+    </script>
+
+                                @*General Funds*@
+
+    <div id="Grid_ID_GF" style="display: inline-block;width:100%;" >
+
+        @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.LBPOne_SourceFundsModel>()
+    .Name("SourceFundsGrid")
+    .Columns(col =>
+            {
+                col.Bound(m => m.Fund_ID).Hidden();
+                col.Bound(m => m.Fund_Desc).Title("Source of Funds").Width(570).Encoded(false)
+                    .ClientFooterTemplate("Total Available Resources");
+                col.Bound(e => e.Year1_Amount).Width(90)
+                .HeaderTemplate(@<text><div style="font-weight:600;">&nbsp;&nbsp;&nbsp;Past Year<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="tActualv"></span><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Actual)</div></text>)
+            .ClientFooterTemplate("#=kendo.toString(sum, 'c2')#");
+                col.Bound(e => e.Year2_Amount).Width(90)
+                    .HeaderTemplate(@<text><div style="font-weight:600;">&nbsp;&nbsp;&nbsp;Current Year<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="tEstimatev">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><br>&nbsp;&nbsp;&nbsp;(Estimate)</div></text>)
+            .ClientFooterTemplate("#=kendo.toString(sum, 'c2')#");
+                col.Bound(e => e.Year3_Amount).Width(90)
+                    .HeaderTemplate(@<text><div style="font-weight:600;">&nbsp;&nbsp;&nbsp;Budget Year<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="tProposalv"></span><br>&nbsp;&nbsp;&nbsp;(Proposal)</div></text>)
+            .ClientFooterTemplate("#=kendo.toString(sum, 'c2')#");
+                col.Bound(e => e.Difference).Width(90)
+                    .HeaderTemplate(@<text><div style="font-weight:600;">&nbsp;&nbsp;Difference<br><span id="tDifferencev"></span></div></text>)
+                .ClientFooterTemplate("#=kendo.toString(sum, 'c2')#");
+                col.Template(t => { }).ClientTemplate(
+        "#if( Fund_ID == 0 ) {#" +
+          "<div class='btn-delete'style='inline-block; height: 15px;width:65px;margin-left:5px;'> " +
+          "<a  title='Submit'                              style='margin-left:2px;'><span class='fa fa-search-plus k-state-disabled' style='font-size: 12pt;'></span></a>" +
+          "<a  title='remove'                              style='margin-left:2px;'><span class='fa fa-remove k-state-disabled' style='font-size: 12pt;'></span></a>" +
+          " </div>" +
+        "#} else { #" +
+        //"<div class='k-button' title='View Accounts' onclick='reqEdit(#=Fund_ID#)'><span class='fa fa-edit' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'> </span>View</div> " +
+          "<div class='btn-delete'style='inline-block; height: 15px;width:65px;margin-left:5px;'> " +
+          "<a  title='Submit' onclick='reqEdit(#=Fund_ID#)' style='margin-left:2px;'><span class='fa fa-search-plus' style='font-size: 12pt;'></span></a>" +
+          "<a  title='remove' onclick='reqDelete(#=Fund_ID#)' style='margin-left:2px;'><span class='fa fa-remove' style='font-size: 12pt;'></span></a>" +
+          " </div>" +
+        "# } #"
+        ).HtmlAttributes(new { style = "vertical-align: top;" }).Width(10);
+    })
+             .Events(e => e.DataBound("onLoadgrdTemplatess"))
+    .ToolBar(t => t.Template(@<text>
+        <div class="k-button" onclick="reqAddSource()" style="float: right;margin-bottom: 0px; ">
+            <span class="k-icon k-i-plus" style="margin-left: -2px;margin-right: 3px;margin-top: 0px;"></span>
+            ADD Source Funds
+
+        </div>
+        </text>))
+        .Pageable(page => page.Refresh(true)
+        .Enabled(true)
+        .ButtonCount(4)
+        .PreviousNext(true))
+        .AutoBind(true)
+        .Selectable()
+        .DataSource(d => d
+        .Ajax()
+        .PageSize(10)
+        .Model(m => m.Id(i => i.Fund_ID))
+                 .Aggregates(aggregates =>
+                  {
+
+                      aggregates.Add(p => p.Year1_Amount).Sum();
+                      aggregates.Add(p => p.Year2_Amount).Sum();
+                      aggregates.Add(p => p.Year3_Amount).Sum();
+                      aggregates.Add(p => p.Difference).Sum();
+
+                     })
+        .Read(read => read.Action("LoadSF", "Report").Data("GetSelectedYear")))
+        )
+
+    </div>
+
+                            @*Economic Enterprise*@
+
+
+    <div id="Grid_ID_EE" style="display: none; width:100%">
+
+        @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.LBPone_EEdescModel>()
+                    .Name("EcoEnterGrid")
+                    //.HtmlAttributes(new { style = "overflow: visible; white-space: normal" })
+                    .Scrollable()
+                    .Columns(col =>
+                            {
+                                col.Bound(m => m.Eco_ID).Hidden();
+
+                                col.Bound(m => m.Eco_Desc).Title("Particular").Width(270).Encoded(false)
+                                    .ClientFooterTemplate("Total,  PEEDO - ECONOMIC ENTERPRISE");
+
+                                col.Bound(m => m.Account_Code)
+                                    .HeaderTemplate(@<text><div style="font-weight:600;">Account<br />&nbsp;&nbsp;Code<br />(PCGA)</div></text>)
+                                    .Width(100).Encoded(false);
+
+                                col.Bound(m => m.Classi_)
+                                     .HeaderTemplate(@<text><div style="font-weight:600;">&nbsp;&nbsp;&nbsp;&nbsp; Income<br />Classification</div></text>)
+                                     .Width(120).Encoded(false);
+
+                                col.Bound(e => e.Year1_AmountEE).Width(130)
+                                    .HeaderTemplate(@<text><div style="font-weight:600;">Past Year<br><span id="tActualv"></span><br>&nbsp;&nbsp;(Actual)</div></text>)
+                                 .ClientFooterTemplate("#=kendo.toString(sum, 'c2')#");
+
+                                col.Bound(e => e.Year2_AmountEE).Width(130)
+                                    .HeaderTemplate(@<text><div style="font-weight:600;">Current Year<br><span id="tEstimatev"></span><br>(Estimate)</div></text>)
+                                 .ClientFooterTemplate("#=kendo.toString(sum, 'c2')#");
+
+                                col.Bound(e => e.Year3_AmountEE).Width(130)
+                                    .HeaderTemplate(@<text><div style="font-weight:600;">Budget Year<br><span id="tProposalv"></span><br>(Proposal)</div></text>)
+                                  .ClientFooterTemplate("#=kendo.toString(sum, 'c2')#");
+
+                                col.Bound(e => e.DifferenceEE).Width(130)
+                                   .HeaderTemplate(@<text><div style="font-weight:600;">Difference<br><span id="tDifferencev"></span></div></text>)
+                               .ClientFooterTemplate("#=kendo.toString(sum, 'c2')#");
+
+                                col.Template(t => { }).ClientTemplate(
+                        "#if( Eco_ID == 0 ) {#" +
+                          "<div class='btn-delete'style='inline-block; height: 15px;width:65px;margin-left:5px;'> " +
+                          "<a  title='View Details' style='margin-left:2px;'><span class='fa fa-search-plus k-state-disabled' style='font-size: 12pt;'></span></a>" +
+                          "<a  title='remove' style='margin-left:2px;'><span class='fa fa-remove k-state-disabled' style='font-size: 12pt;'></span></a>" +
+                          " </div>" +
+                        "#} else { #" +
+                                    //"<div class='k-button' title='View Accounts' onclick='reqEdit(#=Fund_ID#)'><span class='fa fa-edit' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'> </span>View</div> " +
+                          "<div class='btn-delete'style='inline-block; height: 15px;width:65px;margin-left:5px;'> " +
+                          "<a  title='View Details' onclick='reqEditPart(#=Eco_ID#)' style='margin-left:2px;'><span class='fa fa-search-plus' style='font-size: 12pt;'></span></a>" +
+                          "<a  title='remove' onclick='reqDeleteEE(#=Eco_ID#)' style='margin-left:2px;'><span class='fa fa-remove' style='font-size: 12pt;'></span></a>" +
+                          " </div>" +
+                        "# } #"
+                        ).HtmlAttributes(new { style = "vertical-align: top;" }).Width(90);
+                            })
+             .Events(e => e.DataBound("onLoadgrdTemplatess"))
+    .ToolBar(t => t.Template(@<text>
+                <div class="k-button" onclick="reqParticular()" style="float: right;margin-bottom: 0px; ">
+                    <span class="k-icon k-i-plus" style="margin-left: -2px;margin-right: 3px;margin-top: 0px;"></span>
+                    ADD Particulars
+
+                </div>
+    </text>))
+                .Pageable(page => page.Refresh(true)
+                .Enabled(true)
+                .ButtonCount(4)
+                .PreviousNext(true))
+                .AutoBind(true)
+                .Selectable()
+                .DataSource(d => d
+                .Ajax()
+                .PageSize(10)
+                .Model(m => m.Id(i => i.Eco_ID))
+                         .Aggregates(aggregates =>
+                          {
+
+                              aggregates.Add(p => p.Year1_AmountEE).Sum();
+                              aggregates.Add(p => p.Year2_AmountEE).Sum();
+                              aggregates.Add(p => p.Year3_AmountEE).Sum();
+                              aggregates.Add(p => p.DifferenceEE).Sum();
+
+                          })
+                .Read(read => read.Action("LoadEE", "Report").Data("GetSelectedYear")))
+        )
+
+    </div>
+
+
+
+
+
+</div>
+<script>
+    $(document).ready(function () {
+        setTimeout(function () {
+            $("#SourceFundsGrid").data("kendoGrid").dataSource.read();
+        }, 500);
+    })
+    function Close() {
+        document.documentElement.style.overflow = 'auto';
+        document.body.scroll = "yes";
+    }
+</script>
+
+@(Html.Kendo().Window().Name("addSource").Title("New Entry").Width(335).Height(130).Visible(false).Modal(true).Draggable(true).AutoFocus(true).Animation(a => { a.Open(o => o.SlideIn(SlideDirection.Down)); a.Close(c => { c.SlideIn(SlideDirection.Down); c.Reverse(true); }); }).Actions(a => { a.Close(); }))
+
+@(Html.Kendo().Window()
+        .Name("editPorgram")
+        .Title("New Entry")
+        .Width(1000)
+        .Height(600)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+        .Events(e => e.Close("Close"))
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+                .Actions(a => { a.Close(); })
+)
+
+@(Html.Kendo().Window().Name("addPart").Title("New Entry").Width(335).Height(180).Visible(false).Modal(true).Draggable(true).AutoFocus(true).Animation(a => { a.Open(o => o.SlideIn(SlideDirection.Down)); a.Close(c => { c.SlideIn(SlideDirection.Down); c.Reverse(true); }); }).Actions(a => { a.Close(); }))

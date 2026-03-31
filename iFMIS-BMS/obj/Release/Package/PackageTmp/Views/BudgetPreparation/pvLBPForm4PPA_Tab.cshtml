@@ -1,0 +1,214 @@
+﻿<script>
+    function reqEditForm4PPA(transno, aiptag) {
+    //    alert(transno)
+        var Mode = "Edit"  
+        var url = "@Url.Action("pvLBPForm4PPA_Window", "BudgetPreparation")";
+        $('#LBPForm4PPADataWindowUpdate').html('<div style="width: 100%;height:100%;"><img src="@Url.Content("~/Content/images/loading.gif")" alt="Loading..." style="position: absolute;top: 20%;left: 30%;margin-top: 0px;margin-left: 0px;" /></div>');
+        $.post(url, { transno: transno, aiptag: aiptag }, function (pvData) {
+            $(window).scrollTop(0);
+            $('#LBPForm4PPADataWindowUpdate').html(pvData);
+            $('#LBPForm4PPADataWindowUpdate').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Update PPA Breakdown").center().open();
+        })
+    }
+    function RemoveForm4PPA(transno) {
+        var url = "@Url.Action("RemoveLBPForm4PPA", "BudgetPreparation")";
+        swal({
+            title: "Are you sure you want to remove this PPA?",
+            text: "",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes Remove it!",
+            showLoaderOnConfirm: true,
+            closeOnConfirm: false
+        },
+                function () {
+                    $.get(url, { transno: transno }, function (e) {
+                        if (e == "success") {
+                            $("#grdPPA").data("kendoGrid").dataSource.read();
+                            swal({
+                                title: "Success",
+                                text: "PPA Successfully Removed!",
+                                type: "success",
+                                showConfirmButton: true
+                            });
+                        } else {
+                            swal({
+                                title: "Error",
+                                text: "Sorry! PPA can't be removed. Please check the PPA's breakdown.  ",
+                                type: "error",
+                                showConfirmButton: true
+                            });
+                        }
+
+                    });
+                });
+    }
+    $(function () {
+        $("#SearchData").keypress(function (e) {
+            if (e.keyCode == 13) {
+                searchAccount();
+            }
+        });
+    });
+    function searchAccount() {
+        var $filter = new Array();
+        $filter = [];
+
+        if ($('#SearchData').val().length > 0) {
+            $filter.push({ field: "PPADesc", operator: "contains", value: $('#SearchData').val() }),
+            $filter.push({ field: "MajorFinalOutput", operator: "contains", value: $('#SearchData').val() }),
+            $filter.push({ field: "PerformanceIndicator", operator: "contains", value: $('#SearchData').val() });
+            //$filter.push({ field: "PSAmount", operator: "contains", value: $('#SearchData').val() }),
+            //$filter.push({ field: "MOOEAmount", operator: "contains", value: $('#SearchData').val() }),
+            //$filter.push({ field: "COAmount", operator: "contains", value: $('#SearchData').val() });
+        }
+
+        $('#grdPPA').data('kendoGrid').dataSource.filter({
+            logic: "or",
+            filters: $filter
+        });
+
+    }
+</script>
+<div style="height: 600px;width:720px">
+    <div id="AIPGridDIV" value="0">
+        <input type="hidden" value="0" id="AIPGridDIVSizeIndicator" />
+        <div style="border: outset;clear:both;border-width:1px;border-color:#1fa67a; width: 100%; padding-left:0px;padding-right:0px;padding-top:0px;padding-bottom:7px;margin-top: 10px;">
+            <div style=" width: 91.5%;height: 100%; border-right: 0px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;margin-top: -1px; ">
+                <div style="float: left; width: 100%; margin-top:1px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 36px solid #1fa67a; ">
+                    <div style="float:right; width:100%">
+                        @*<div id="searchAccountid" style="height: 30px; margin-top: -30px; float: right; margin-left: 200px;">
+                            <input type="text" style="width:400px;border-collapse:collapse;margin:0px;border-style:solid;border-color:black;margin-left:0px;height:70%;outline:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search account..." id="SearchData" name="SearchData">
+                            <div class="k-button k-button-icontext" style="height:30px;width:40px;border-style:solid;border-color:black;" onclick="searchAccount()"><span class="mif-search"></span></div>
+                        </div>*@
+                        <div style="float:right;margin-right:12px;margin-top:5px;">
+                            <input type="text" style="width:290px;border-collapse:collapse;margin:0px;border-style:none;border-color:black;margin-left:-90px;height:23px;outline:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="search..." id="SearchData" name="SearchData">
+                            <div class="k-button k-button-icontext" style="height:30px;width:40px;border-style:none;border-color:black;float:left;margin-left:-25px" onclick="searchAccount()"><span class="mif-search"></span></div>
+                                <button class="k-button k-button-icontext" style="width:50px;float:left;margin-right:-1px;height:25.5px;margin-top:1px;">
+                                    <div onclick="ResizeAIPDIV()" style="float:right;margin-right:-15px;border-radius:7px;width:50px">
+                                        <i id="btnResizeIcon" style="display:inline-block;width:40px;height:15px" class="fa fa-arrows-alt" title="Maximize"></i><div style="display:inline-block; margin-left:2px" id="btnResizeText">
+                                        </div>
+                                    </div>
+                                </button>
+                            
+                            @*<button class="k-button k-button-icontext" onclick="DownloadAIPData()" style="float:left;margin-right:-1px;margin-top:1px;font-family:'Arial Rounded MT'"> <i class="fa fa-download"></i> Download Approved AIP</button>*@
+                            @*<button class="k-button k-button-icontext" onclick="AddNewItem()" style="font-family:'Arial Rounded MT'"> <i class="fa fa-plus-circle"></i> Add </button>*@
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Budget_Preparation.LBPForm4Model>()
+            .Name("grdPPA")
+            .Columns(columns =>
+            {
+                columns.Bound(c => c.SeriesID).Hidden();
+                columns.Bound(c => c.transno).Title("No.").Hidden();
+                columns.Bound(c => c.aiptag).Title("Aip TAG").Hidden();
+                columns.Bound(c => c.OrderNo).Title("Order #").Width(72)
+                    .HtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+                //columns.Bound(c => c.AIPRefCode).Title("AIP Ref Code").Width(70)
+                //    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+                columns.Bound(c => c.PPADesc).Title("Program/Project/Activity Description").Width(200).Encoded(false)
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle;" })
+                    //.HtmlAttributes(new { style= "font-family:'Arial Rounded MT';" })
+                    .ClientTemplate("<pre>#=PPADesc#</pre>");//show white space;
+                columns.Bound(c => c.MajorFinalOutput).Title("Major Final Output").Width(150)
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                     .ClientTemplate("<pre>#=MajorFinalOutput#</pre>");
+                columns.Bound(c => c.PerformanceIndicator).Title("Perfomance/Output Indicator").Width(150)
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                    .ClientTemplate("<pre>#=PerformanceIndicator#</pre>");
+                columns.Bound(c => c.TargetForTheBudgetYear).Title("Target for the Budget Year").Width(150)
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                    .ClientTemplate("<pre>#=TargetForTheBudgetYear#</pre>");
+                columns.Bound(c => c.PSAmountStr).Title("PS").Width(100)
+                    .HtmlAttributes(new { style = "text-align:right; vertical-align: middle; overflow: visible; white-space: normal" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+                columns.Bound(c => c.MOOEAmount).Title("MOOE").Width(100)
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                    .HtmlAttributes(new { style = "text-align:right" });
+                //       .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label>Total : </label></div>");
+                columns.Bound(c => c.COAmount).Title("CO").Width(100)
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                    .HtmlAttributes(new { style = "text-align:right" });
+                //columns.Bound(c => c.Total).Title("Total").Width(100)
+                //    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                //    .HtmlAttributes(new { style = "text-align:right" })
+                //  .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label id='GridFooterTotal'></label></div>");
+                columns.Template(t => { })
+                    .ClientTemplate("<div> <a id='editid#=transno#' class='k-button' onclick='reqEditForm4PPA(#=transno#,#=aiptag#)' style='inline-block;border-radius:50px' title='Edit'>Edit </a> " +
+                                         "<a id='removeid#=transno#' class='k-button' onclick='RemoveForm4PPA(#=transno#)' style='inline-block;color:white;background-color:indianred;border-radius:50px' title='Remove'>Remove </a></div>")
+                    //.ClientTemplate("<div> <a id='removeid#=transno#' class='k-button' onclick='RemoveForm4PPA(#=transno#)' style='inline-block;color:white;background-color:indianred;border-radius:50px' title='Remove'>Remove </a></div>")
+                    .Width(100);
+                //columns.Template(t => { })
+                //    .ClientTemplate("<div id='removeid#=transno#' class='k-button' onclick='RemoveForm4PPA(#=SeriesID#)' style='inline-block;color:white;background-color:indianred;border-radius:50px' title='Remove'>Remove</div>")
+                //    .Width(60);
+
+            })
+            .HtmlAttributes(new { style = "height: 500px;" })
+            .Scrollable(s => s.Enabled(true))
+            .Selectable()
+            .AutoBind(false)
+            .Pageable(p => p.ButtonCount(4).Refresh(true))
+            .Editable(editable => editable.Mode(GridEditMode.InCell))
+            .Events(e => e.DataBound("getAIPGridFooterTotal").Edit("OnAIPGridEdit"))
+            .DataSource(dataSource => dataSource
+                .Ajax()
+                .Batch(true)
+                .ServerOperation(false)
+                .Model(m => m.Id(i => i.transno))
+                //.AutoSync(true)
+                .PageSize(300)
+                .Read(read => read.Action("grLBPForm4PPAs", "BudgetPreparation").Data("GridParameters"))
+                .Sort(s =>
+                {
+                    s.Add(c => c.OrderNo);
+                })
+            )
+            )
+        </div>
+    </div>
+</div>
+@*<div style="color:red;background-color:indianred;border-radius:50px"></div>*@
+<script>
+    function ResizeAIPDIV() {
+        var DIVSize = $("#AIPGridDIVSizeIndicator").val();
+        var DIV_ID = 'AIPGridDIV';
+        if(DIVSize == 0 ){
+
+            MaximizeDIV(DIV_ID);
+            //$("#grdPPA").data("kendoGrid").resize();
+            document.getElementById('AIPGridDIVSizeIndicator').value = 1;
+            document.getElementById('btnResizeText').innerHTML = "";
+            document.getElementById('btnResizeIcon').className ="fa fa-compress";
+            document.getElementById('btnResizeIcon').title = "Minimize"
+        }
+        else {
+            MinimizeDIV(DIV_ID);
+            document.getElementById('AIPGridDIVSizeIndicator').value = 0;
+            document.getElementById('btnResizeText').innerHTML =  "";
+            document.getElementById('btnResizeIcon').className = "fa fa-arrows-alt";
+            document.getElementById('btnResizeIcon').title = "Maximize"
+        }
+    }
+</script>
+@(Html.Kendo().Window()
+    .Name("LBPForm4PPADataWindowUpdate")
+    .Title("Update PPA Breakdown")
+    .Width(570)
+    .Height(630)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(true)
+    .AutoFocus(true)
+    .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        }).Actions(a => { a.Close(); }))

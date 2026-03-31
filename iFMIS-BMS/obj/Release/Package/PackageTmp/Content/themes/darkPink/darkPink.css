@@ -1,0 +1,144 @@
+/***
+Default theme
+***/
+
+
+
+body
+{
+    font-size: 13px;
+    font-family:'Segoe UI';
+    color: #232323;
+    background: url("/Content/images/bg36.gif") #b0acac repeat;
+    text-align:left;
+}
+
+
+/* BEGIN THEME PRIMARY COLORS*/
+.metro .bg-white {
+   background-color: #eee !important;
+}
+.metro .bg-color1 {
+   background-color: #D30068 !important;
+}
+.metro .bg-color2 {
+   background-color: #9E2862 !important;
+}
+.metro .bg-color3 {
+   background-color: #890043	 !important;
+}
+.metro .bg-color4 {
+   background-color: #E93A90 !important;
+}
+.metro .bg-color5 {
+   background-color: #E969A8 !important;
+}
+.metro .bg-color6 {
+   background-color: #800053 !important;
+}
+
+.metro .fg-white {
+    color:#fff !important;
+}
+.metro .fg-color1 {
+    color:#D30068	 !important;
+}
+.metro .fg-color2 {
+    color:#9E2862	 !important;
+}
+.metro .fg-color3 {
+    color:#890043	 !important;
+}
+.metro .fg-coxr4 {
+    color:#E93A90 !important;
+}
+.metro .fg-color5 {
+    color:#800053 !important;
+}
+.metro .fg-color6 {
+    color:#800053 !important;
+}
+
+
+/*BEGIN KENDO METRO MODIFIED THEME*/
+.metro-header
+ {
+    background-color: #890043 !important;
+    color:#fff !important;
+    font-size: 14px;
+    font-family: 'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;
+    font-weight: normal;
+    font-style: normal;
+    padding: 15px;
+    line-height: 15pt;
+    letter-spacing: .02em;
+}
+.k-grid-toolbar, .k-grid-top, .k-toolbar, .k-grouping-header 
+{
+    text-align:center;
+    background-color:#fff;
+}
+.k-pager-wrap, .k-grid-pager 
+    {
+    background-color:#fff !important;
+    }
+.k-grid-toolbar > .k-button
+    {
+    background-color: rgb(255, 255, 255);
+    color: rgb(0, 0, 0);
+    border-color: rgb(60, 164, 240);
+    }
+a.k-grid-delete
+    {
+    background-color: rgb(255, 255, 255);      
+    border-color: rgb(60, 164, 240);
+    background-color: rgb(60, 164, 240);
+    }
+.k-grid-toolbar > .k-button:hover
+    {
+    color: rgb(255, 255, 255);
+    border-color: rgb(60, 164, 240);
+    background-color: rgb(3, 89, 151);
+    }
+#tabstrip .k-tabstrip .k-header
+    {
+    background-color: #fff;
+    }
+.k-autocomplete
+{
+    padding: 0px;
+}
+/*END KENDO METRO MODIFIED THEME*/
+
+
+.small-box {
+    background-color: #D30068;
+    width: 25px;
+    height:25px;
+    float: left;
+}
+.metro .sidebar > ul li {
+    border-color: -moz-use-text-color -moz-use-text-color #9C2765 !important;
+}
+.font-stroke
+{
+    color: white;
+    text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000;  
+}
+.bottom {
+    border-bottom:#800053  solid 3px !important;
+    /*-webkit-box-shadow: 0 2px 2px 0 #ebebeb;
+    box-shadow: 0 2px 2px 0 #ebebeb;*/
+   
+}
+
+.footer-top-border {
+    border-top:rgb(0, 62, 0) 5px solid;
+}
+
+/* END THEME PRIMARY COLORS*/
+

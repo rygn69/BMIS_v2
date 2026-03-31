@@ -1,0 +1,176 @@
+﻿@model iFMIS_BMS.BusinessLayer.Models.Budget_Preparation.NewAccounts
+<script type="text/javascript">
+
+    var thisculture = kendo.culture();
+    thisculture.numberFormat.currency.symbol = '₱';
+
+    function newAccount() {
+        $(window).scrollTop(0);
+        var url = "@Url.Action("CreateNewAccounts", "Home")";
+        //ProgramID = e;
+        var pro_id = $("#Progss").val();
+        //alert(pro_id)
+        $.get(url, { pro_id: pro_id }, function (d) {
+            //alert(ProgramID);
+            $('#newAccounts').html(d);
+        })
+        $('#newAccounts').data('kendoWindow').title("Create New Accounts").center().open();
+    }
+
+    function RefreshGrid() {
+
+        var grid = $("#grd_NewAccounts");
+        var dataSource = grid.data("kendoGrid").dataSource;
+        var colCount = grid.find('.k-grid-header colgroup > col').length;
+
+        if (dataSource._view.length == 0) {
+            swal(
+               "Error!", "No Data to save", "warning");
+        } else {
+            swal({
+                title: "Success!",
+                text: "Sucessfully save.",
+                type: "success"
+            },
+            function () {
+                $("#grd_NewAccounts").data("kendoGrid").dataSource.read();
+            });
+            //swal("Success!", "Sucessfully save!!!", "success");
+        }
+    }
+
+    function ooo(e) {
+        //$("#grd_ApprovalBudget").data("kendoGrid").closeCell(arg.container)
+        this.closeCell();
+    }
+
+    function errorHandler(e) {
+        if (e.errors) {
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "\n";
+                    });
+                }
+            });
+            alert(message);
+        }
+    }
+    function onSaveChanges() {
+        $("#grd_NewAccounts").data("kendoGrid").dataSource.read();
+    }
+    function onGridClick(e) {
+        $("#grd_NewAccounts").data("kendoGrid").editCell("input[name=ProposalAllotedAmount]");
+        return true;
+    }
+
+    function onGridEdit(e) {
+        var gridName = $('#grd_NewAccounts').data('kendoGrid');
+        var dataRows = gridName.items();
+        var rowIndex = dataRows.index(gridName.select());
+        var ds = gridName.dataSource.view();
+        var ProposalStatusHR = ds[rowIndex].ProposalStatusHR;
+        var AccountName = ds[rowIndex].AccountName;
+        if (ProposalStatusHR == '1') {
+            this.closeCell();
+        }
+
+
+    }
+</script>
+
+<div style="width:100%;margin-top:5px;margin-bottom:2px;">
+    <p>Legends:</p>
+    <span class='fa fa-circle' style='color:red;' id='circle-id'></span> <span>Already Reviewed By HRMO or Budget-Incharge <b>(Can't be Edited)</b> </span> <span class='fa fa-circle' style='color:green;' id='circle-id'></span> <span> Not yet Reviewed <b>(Can be Edited)</b></span>
+</div>
+@*<div style="width:100%;background-color:#EEE;height:40px;">
+    <div style="margin:auto;">
+        <button class="k-button k-button-icontext" onclick="newAccount()" style="margin-top:5px;margin-right:5px;float:right;"> <i class="fa fa-plus-circle"></i> Create New Account</button>
+    </div>
+</div>*@
+@(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Budget_Preparation.NewAccounts>()
+        .Name("grd_NewAccounts")
+            .HtmlAttributes(new { style = "height:550px" })
+        .Scrollable()
+    .Columns(col =>
+    {
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;">Accounts</div></text>)
+                        .Width(230)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center" })
+                        .ClientTemplate("<div onclick=onGridClick()>#=AccountName# </div>");
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;">OOE</div></text>)
+                        .Width(50)
+                        .HtmlAttributes(new { style = "text-align:center;height:30px" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center" })
+                        .ClientTemplate("<div onclick=onGridClick()>#=OOE# </div>");
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;">Year</div></text>)
+                        .Width(50)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center" })
+                        .ClientTemplate("<div>#=ProposalYear# </div>");
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Date Added</div></text>)
+                        .Width(150)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center" })
+                        .ClientTemplate("<div>#=ProposalDateTime# </div>");
+        col.Bound(m => m.ProposalAmount).HtmlAttributes(new { style = "text-align:left;height:30px;" }).Title("Proposed Amounts")
+            .HeaderHtmlAttributes(new { style = "text-align:center" }).Width(150).ClientTemplate(
+            "# if( ProposalStatusHR == 1) { #" +
+            " <span class='fa fa-circle' style='color:red;' id='circle-id'></span> #=kendo.toString(ProposalAmount, 'c2')# " +
+            "# } else { #"+
+            " <span class='fa fa-circle' style='color:green;' id='circle-id'></span>  #=kendo.toString(ProposalAmount, 'c2')#" +
+            "# } #"
+            );
+        col.Bound(m => m.ProposalStatusHR).Title("Proposal").Hidden();
+        col.Bound(m => m.ProposalID).Title("Proposal ID").Hidden();
+
+    })
+       .ToolBar(toolbar =>
+       {
+             toolbar.Save();
+
+         })
+         .Events(e => e.SaveChanges("onSaveChanges"))
+         .Editable(editable => editable.Mode(GridEditMode.InCell))
+         .Pageable(page => page.Refresh(true)
+            .Enabled(true)
+            .ButtonCount(4)
+            .PreviousNext(true)
+         )
+         .Events(e => e.SaveChanges("RefreshGrid").Cancel("ooo").Edit("onGridEdit"))
+         .Selectable()
+         .DataSource(d => d
+         .Ajax()
+         .Batch(true)
+         .ServerOperation(false)
+         .PageSize(10)
+         .Model(m => m.Id(i => i.ProposalID))
+         .Read(read => read.Action("ListOfNewAccounts", "Home").Data("fn_Program"))
+         .Update("UpdateNewAccount", "Home"))
+)
+
+
+@(Html.Kendo().Window()
+    .Name("newAccounts")
+    .Title("Create New Accounts")
+    .Width(850)
+    .Height(510)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(false)
+    .AutoFocus(true)
+    .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        }).Actions(a => { a.Close(); }))

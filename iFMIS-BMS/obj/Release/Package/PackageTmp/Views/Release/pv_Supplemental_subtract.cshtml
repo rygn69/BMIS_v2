@@ -1,0 +1,1141 @@
+﻿
+
+<script>
+    function ConvertCommasToEmpty_realign(str) {
+        str = str.toString().replace(/,/g, "");
+        parseInt(str, 20);
+        return str;
+    }
+
+    function get_total_transfere() {
+
+        setTimeout(function () {
+            var url = "@Url.Action("supp_total", "Release")";
+
+            var year_ = $("#ddlYear").val();
+
+
+            //alert(e)
+            $.post(url, {  year_: year_ }, function (e) {
+
+                document.getElementById("total_tobe_transfere").value = commaSeparateNumberRealignment(e);
+            })
+
+        }, 1000);
+    }
+    setTimeout(function () {
+        grid_ref_sup_ok_subs();
+        change_sup();
+        document.getElementById("supplement_Subs_Ammount").style.color = "blue";
+        get_total_transfere();
+    }, 100);
+
+
+
+    function fn_class_type() {
+
+        if (document.getElementById('is_class_type').checked) {
+            document.getElementById("supplement_Subs_Ammount_DUM").value = 0;
+            document.getElementById("supplement_Subs_Ammount_ID").value = 0;
+            document.getElementById("supplement_Subs_Ammount").value = 0;
+            document.getElementById("supplement_Subs_Ammount").style.color = "red";
+            document.getElementById("sup_class").value = "2";
+            change_sup();
+        } else {
+            document.getElementById("supplement_Subs_Ammount_DUM").value = 0;
+            document.getElementById("supplement_Subs_Ammount_ID").value = 0;
+            document.getElementById("supplement_Subs_Ammount").value = 0;
+            document.getElementById("supplement_Subs_Ammount").style.color = "blue";
+            document.getElementById("sup_class").value = "1";
+            change_sup();
+        }
+    }
+    function change_sup() {
+
+        var url = "@Url.Action("ChangeGrid_supplement", "Release")";
+
+        var sup_class = $("#sup_class").val();
+
+        $.get(url, { sup_class: sup_class }, function (d) {
+            $("#supplement_grid").html(d);
+        })
+
+    }
+
+    function sup_Deletes_subs(supplementalbudget_id) {
+        var url = "@Url.Action("Edit_Supplement_", "Release")";
+
+        $.get(url, { supplementalbudget_id: supplementalbudget_id }, function (e) {
+            document.getElementById("supplement_Subs_Ammount_DUM").value = e.Amount;
+        })
+
+        var url = "@Url.Action("delete_Supplement_", "Release")";
+
+        var supplement_available = $('#available_amount_null_SUP_sub').val()
+        var supplement_amount = $('#supplement_Subs_Ammount_DUM').val()
+
+        var Expense = $("#Expense_").val();
+        var Total_Release = $("#total_Release").val();
+
+        var TO_E = Number(Total_Release) - Number(Expense);
+
+        if (Number(Total_Release) < Number(Expense)) {
+            swal({
+                title: "Sorry!",
+                text: "This Transaction has already been used in obligation.",
+                timer: 2000,
+                type: "error",
+                showConfirmButton: false
+            })
+
+        } else {
+
+            if (Number(supplement_amount) > Number(supplement_available)) {
+                swal({
+                    title: "Oopps!",
+                    text: "You Can't Delete this Item",
+                    timer: 2000,
+                    type: "error",
+                    showConfirmButton: false
+                })
+            } else {
+
+                swal({
+                    title: "Are you sure?",
+                    text: "This item will be removed!",
+                    type: "info",
+                    showCancelButton: true,
+                    closeOnConfirm: false,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Yes, Remove It!",
+                    showLoaderOnConfirm: true,
+                }, function () {
+
+                    $.get(url, { supplementalbudget_id: supplementalbudget_id }, function (e) {
+
+                        if (e == "1") {
+                            swal({
+                                title: "Success!",
+                                text: "Item has been Removed.",
+                                timer: 2000,
+                                type: "success",
+                                showConfirmButton: false
+                            })
+
+                            grid_ref_sup_ok_subs();
+                            acc_availble_mount();
+                            get_total_transfere();
+                            $('#GeneralFund_Grid').data('kendoGrid').dataSource.read();
+                            document.getElementById("supplement_Subs_Ammount_DUM").value = 0;
+                            document.getElementById("supplement_Subs_Ammount_ID").value = 0;
+                            document.getElementById("supplement_Subs_Ammount").value = 0;
+                        } else {
+                            swal({
+                                title: "Error!",
+                                text: "System Error! Please try again.",
+                                timer: 2000,
+                                type: "error",
+                                showConfirmButton: false
+                            })
+                        }
+
+                    })
+                });
+            }
+
+        }
+        //}
+    }
+
+    function sup_Edits_subs(supplementalbudget_id) {
+        var url = "@Url.Action("Edit_Supplement_", "Release")";
+
+        $.get(url, { supplementalbudget_id: supplementalbudget_id }, function (e) {
+            document.getElementById("supplement_Subs_Ammount").value = commaSeparateNumberRealignment(e.Amount);
+            document.getElementById("supplement_Subs_Ammount_DUM").value = e.Amount;
+            $("#legalbasis_supplemental_null_subs").data("kendoComboBox").value(e.LegalCode);
+            document.getElementById("supplement_Subs_Ammount_ID").value = e.supplementalbudget_id;
+        })
+    }
+
+    //setTimeout(function () {
+    //    $("#account_list_supplemental_null_subs").data("kendoComboBox").dataSource.read();
+    //    grid_ref_sup_ok_subs();
+
+
+    //}, 500);
+
+    function fn_closeSupplemental_subs_aw() {
+              $("#SupplementalWindow_sub").data("kendoWindow").close();
+    }
+    function SupGrid() {
+        var LegalCode = $('#legalbasis_supplemental_null_subs').val()
+        var office_id = $('#office_supplemental_null_subs').val()
+        var program_id = $('#Program_supplemental_null_subs').val()
+        var ooe_id = $('#ooe_id_supplemental_null_subs').val()
+        var account_id = $('#account_list_supplemental_null_subs').val()
+        var month_ = $('#Months_supplemental_null_subs').val()
+        var year_ = $("#ddlYear").val();
+        return {
+            LegalCode: LegalCode,
+            office_id: office_id,
+            program_id: program_id,
+            ooe_id: ooe_id,
+            account_id: account_id,
+            month_: month_,
+            year_: year_
+        }
+    } 
+    function grid_ref_sup_ok_subs() {
+
+        change_sup();
+      
+        setTimeout(function () {
+            var url = "@Url.Action("datass", "Release")";
+
+            var office_id = $('#office_supplemental_null_subs').val()
+            var program_id = $('#Program_supplemental_null_subs').val()
+            var account_id = $('#account_list_supplemental_null_subs').val()
+            var year_ = $("#ddlYear").val();
+
+            $("#grd_Sups_List_subs").data("kendoGrid").dataSource.read();
+
+            
+            if (account_id == 0 || account_id == null) { document.getElementById("available_amount_null_SUP_sub").value = 0; } else {
+
+                $.post(url, { office_id: office_id, program_id: program_id, account_id: account_id, year_: year_ }, function (e) {
+                    
+                    document.getElementById("available_amount_null_SUP_sub").value = commaSeparateNumberRealignment(e);
+                })
+            }
+        }, 1000);
+    }
+    function fn_Edit_supp_subs() {
+        var url = "@Url.Action("supplement_amountV2", "Release")";
+
+        var legal_code = $('#legalbasis_supplemental_null_subs').val()
+        var office_id = $('#office_supplemental_null_subs').val()
+        var program_id = $('#Program_supplemental_null_subs').val()
+        var ooe_id = $('#ooe_id_supplemental_null_subs').val()
+        var account_id = $('#account_list_supplemental_null_subs').val()
+        var MonthOf = $('#Months_supplemental_null_subs').val()
+        var year_ = $("#ddlYear").val();
+
+        $.get(url, { legal_code: legal_code, office_id: office_id, program_id: program_id, ooe_id: ooe_id, account_id: account_id, MonthOf: MonthOf, year_: year_ }, function (d) {
+            $("#grd_Sups_List_subs").data("kendoGrid").dataSource.read();
+            //document.getElementById("supplement_Subs_Ammount").value = d.Amount_Sup;
+            //document.getElementById("for_ID_SUPP").value = d.supplementalbudget_id;
+        })
+    }
+
+    function fn_legalbasis_null_subs() {
+        var url = "@Url.Action("LegalBasis", "Release")";
+
+        $.get(url, {}, function (d) {
+            $('#legal_basis_window_null_subs').html(d);
+        })
+
+        $('#legal_basis_window_null_subs').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Legal Basis").center().open();
+
+    }
+
+
+    function add_supplement_add() {
+        var url = "@Url.Action("ADD_more_", "Release")";
+
+        $.get(url, {}, function (d) {
+            $('#add_supplement_amount_').html(d);
+        })
+
+        $('#add_supplement_amount_').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Add Amount").center().open();
+
+    }
+
+    function fn_reqSave_supplemental_null_subs() {
+
+        var url_revers = "@Url.Action("Save_Supplement_reverse", "Release")";
+        var url_trans = "@Url.Action("Save_Supplement_transfere", "Release")";
+        var url_revers_Edit = "@Url.Action("Save_Supplement_reverse_Edit", "Release")";
+        var url_trans_Edit = "@Url.Action("Save_Supplement_transfere_Edit", "Release")";
+
+
+        var legal_code = $('#legalbasis_supplemental_null_subs').val() == "" ? -1 : $('#legalbasis_supplemental_null_subs').val()
+        var office_id = $('#office_supplemental_null_subs').val()
+        var program_id = $('#Program_supplemental_null_subs').val()
+        var ooe_id = $('#ooe_id_supplemental_null_subs').val()
+        var account_id = $('#account_list_supplemental_null_subs').val()
+        var supplement_amount = $('#supplement_Subs_Ammount').val()
+        var MonthOf = $('#Months_supplemental_null_subs').val()
+
+        var for_ID_SUPP = $('#for_ID_SUPP').val()
+        var year_ = $("#ddlYear").val();
+
+
+
+        var supplement_id = $('#supplement_Subs_Ammount_ID').val()
+        var supplement_available = $('#available_amount_null_SUP_sub').val()
+        var supplement_amount_DUM = $('#supplement_Subs_Ammount_DUM').val()
+
+        var sup_class = $('#sup_class').val()
+
+        var tobe_transfered = $('#total_tobe_transfere').val()
+
+        var Expense = $("#Expense_").val();
+        var Total_Release = $("#total_Release").val();
+        var transdate = $("#supdatetime").val();
+        var copydatetag = $("#supcopydate").val();
+        
+        if (legal_code == null || legal_code == -1 ||
+              office_id == null || office_id == '' ||
+              program_id == null || program_id == '' ||
+              ooe_id == null || ooe_id == '' ||
+              account_id == null || account_id == '' ||
+              MonthOf == null || MonthOf == '') {
+
+            swal({
+                title: "Error!",
+                text: "System Error! Please Complete the Form.",
+                timer: 3000,
+                type: "error",
+                showConfirmButton: false
+            })
+        }
+        else {
+
+
+            
+        if (supplement_amount == 0 || supplement_amount == null || supplement_amount == "") {
+            swal({
+                title: "Oops!",
+                text: "Please set Amount.",
+                timer: 3000,
+                type: "error",
+                showConfirmButton: false
+            })
+        } else {
+          
+        if (sup_class == 1) {
+
+            if (Number(supplement_id) == 0) {
+
+                //Reverse
+                if (Number(ConvertCommasToEmpty_realign(supplement_available)) < Number(ConvertCommasToEmpty_realign(supplement_amount))) {
+                    swal({
+                        title: "Error!",
+                        text: "Please Check the Available Amount",
+                        timer: 3000,
+                        type: "error",
+                        showConfirmButton: false
+                    })
+
+
+                } else {
+
+            swal({
+                title: "Are you sure?",
+                text: "To revert this Amount?",
+                type: "info",
+                showCancelButton: true,
+                closeOnConfirm: false,
+                confirmButtonColor: "#1fa67a",
+                confirmButtonText: "Yes, Save It!",
+                showLoaderOnConfirm: true,
+            }, function () {
+
+                $.post(url_revers, { legal_code: legal_code, office_id: office_id, program_id: program_id, ooe_id: ooe_id, account_id: account_id, year_: year_, supplement_amount: ConvertCommasToEmpty(supplement_amount), MonthOf: MonthOf}, function (e) {
+                    if (e == "1") {
+                        swal({
+                            title: "Success!",
+                            text: "Supplemental budget has been Saved.",
+                            timer: 2000,
+                            type: "success",
+                            showConfirmButton: false
+                        })
+                        grid_ref_sup_ok_subs();
+                        change_sup();
+                        get_total_transfere();
+                        $('#GeneralFund_Grid').data('kendoGrid').dataSource.read();
+                        document.getElementById("supplement_Subs_Ammount_DUM").value = 0;
+                        document.getElementById("supplement_Subs_Ammount_ID").value = 0;
+                        document.getElementById("supplement_Subs_Ammount").value = 0;
+                    } else {
+                        swal({
+                            title: "Error!",
+                            text: "System Error! Please try again.",
+                            timer: 2000,
+                            type: "error",
+                            showConfirmButton: false
+                        })
+                    }
+                });
+            });
+                }
+            }
+            else {
+                //Edit
+
+                if (Number(ConvertCommasToEmpty_realign(supplement_amount_DUM)) < Number(ConvertCommasToEmpty_realign(supplement_amount))) {
+                    var diffu = Number(ConvertCommasToEmpty_realign(supplement_amount)) - Number(ConvertCommasToEmpty_realign(supplement_amount_DUM))
+
+                    if (Number(ConvertCommasToEmpty_realign(supplement_available)) < Number(ConvertCommasToEmpty_realign(diffu))) {
+                        swal({
+                            title: "Error!",
+                            text: "Please Check the Available Amount",
+                            timer: 3000,
+                            type: "error",
+                            showConfirmButton: false
+                        })
+
+                    } else {
+                        swal({
+                            title: "Are you sure?",
+                            text: "You Want to Edit This Amount?",
+                            type: "info",
+                            showCancelButton: true,
+                            closeOnConfirm: false,
+                            confirmButtonColor: "#1fa67a",
+                            confirmButtonText: "Yes, Save It!",
+                            showLoaderOnConfirm: true,
+                        }, function () {
+
+                            $.post(url_revers_Edit, { legal_code: legal_code, office_id: office_id, program_id: program_id, ooe_id: ooe_id, account_id: account_id, year_: year_, supplement_amount: ConvertCommasToEmpty(supplement_amount), MonthOf: MonthOf, supplement_id: supplement_id, transdate: transdate, copydatetag: copydatetag }, function (e) {
+                                if (e == "1") {
+                                    swal({
+                                        title: "Success!",
+                                        text: "Supplemental budget has been updated.",
+                                        timer: 2000,
+                                        type: "success",
+                                        showConfirmButton: false
+                                    })
+                                    grid_ref_sup_ok_subs();
+                                    change_sup();
+                                    get_total_transfere();
+                                    $('#GeneralFund_Grid').data('kendoGrid').dataSource.read();
+                                    document.getElementById("supplement_Subs_Ammount_DUM").value = 0;
+                                    document.getElementById("supplement_Subs_Ammount_ID").value = 0;
+                                    document.getElementById("supplement_Subs_Ammount").value = 0;
+                                } else {
+                                    swal({
+                                        title: "Error!",
+                                        text: "System Error! Please try again.",
+                                        timer: 2000,
+                                        type: "error",
+                                        showConfirmButton: false
+                                    })
+                                }
+                            });
+                        });
+
+                    }
+
+                } else {
+                    var defff = Number(ConvertCommasToEmpty_realign(supplement_amount_DUM)) - Number(ConvertCommasToEmpty_realign(tobe_transfered));
+
+                    if (Number(ConvertCommasToEmpty_realign(supplement_amount)) < defff) {
+
+                        swal({
+                            title: "Error!",
+                            text: "Insufficient Amount.",
+                            timer: 2000,
+                            type: "error",
+                            showConfirmButton: false
+                        })
+                    }
+                    else {
+
+                        swal({
+                            title: "Are you sure?",
+                            text: "You Want to Edit This Amount?",
+                            type: "info",
+                            showCancelButton: true,
+                            closeOnConfirm: false,
+                            confirmButtonColor: "#1fa67a",
+                            confirmButtonText: "Yes, Save It!",
+                            showLoaderOnConfirm: true,
+                        }, function () {
+
+                            $.post(url_revers_Edit, { legal_code: legal_code, office_id: office_id, program_id: program_id, ooe_id: ooe_id, account_id: account_id, year_: year_, supplement_amount: ConvertCommasToEmpty(supplement_amount), MonthOf: MonthOf, supplement_id: supplement_id, transdate: transdate, copydatetag: copydatetag }, function (e) {
+                                if (e == "1") {
+                                    swal({
+                                        title: "Success!",
+                                        text: "Supplemental budget has been updated.",
+                                        timer: 2000,
+                                        type: "success",
+                                        showConfirmButton: false
+                                    })
+                                    grid_ref_sup_ok_subs();
+                                    change_sup();
+                                    get_total_transfere();
+                                    $('#GeneralFund_Grid').data('kendoGrid').dataSource.read();
+                                    document.getElementById("supplement_Subs_Ammount_DUM").value = 0;
+                                    document.getElementById("supplement_Subs_Ammount_ID").value = 0;
+                                    document.getElementById("supplement_Subs_Ammount").value = 0;
+                                } else {
+                                    swal({
+                                        title: "Error!",
+                                        text: "System Error! Please try again.",
+                                        timer: 2000,
+                                        type: "error",
+                                        showConfirmButton: false
+                                    })
+                                }
+                            });
+                        });
+
+
+                    }
+
+
+                }
+
+
+
+
+            }
+
+
+
+
+
+        } else {
+            //Transfere
+            if (Number(supplement_id) == 0) {
+                if (Number(ConvertCommasToEmpty_realign(tobe_transfered)) < Number(ConvertCommasToEmpty_realign(supplement_amount))) {
+                    swal({
+                        title: "Error!",
+                        text: "Please Check the Amount to Transfer",
+                        timer: 3000,
+                        type: "error",
+                        showConfirmButton: false
+                    })
+
+
+                } else {
+
+            swal({
+                title: "Are you sure?",
+                text: "To reverse this Amount?",
+                type: "info",
+                showCancelButton: true,
+                closeOnConfirm: false,
+                confirmButtonColor: "#1fa67a",
+                confirmButtonText: "Yes, Save It!",
+                showLoaderOnConfirm: true,
+            }, function () {
+
+                $.post(url_trans, { legal_code: legal_code, office_id: office_id, program_id: program_id, ooe_id: ooe_id, account_id: account_id, year_: year_, supplement_amount: ConvertCommasToEmpty(supplement_amount), MonthOf: MonthOf, supplement_id: supplement_id }, function (e) {
+                    if (e == "1") {
+                        swal({
+                            title: "Success!",
+                            text: "Supplemental budget has been Saved.",
+                            timer: 2000,
+                            type: "success",
+                            showConfirmButton: false
+                        })
+                        grid_ref_sup_ok_subs();
+                        change_sup();
+                        get_total_transfere();
+                        $('#GeneralFund_Grid').data('kendoGrid').dataSource.read();
+                        document.getElementById("supplement_Subs_Ammount_DUM").value = 0;
+                        document.getElementById("supplement_Subs_Ammount_ID").value = 0;
+                        document.getElementById("supplement_Subs_Ammount").value = 0;
+                    } else {
+                        swal({
+                            title: "Error!",
+                            text: "System Error! Please try again.",
+                            timer: 2000,
+                            type: "error",
+                            showConfirmButton: false
+                        })
+                    }
+                });
+            });
+
+
+                }
+            } else {
+                //Edit
+               
+                if (Number(ConvertCommasToEmpty_realign(supplement_amount_DUM)) < Number(ConvertCommasToEmpty_realign(supplement_amount))) {
+                    var diffu = Number(ConvertCommasToEmpty_realign(supplement_amount)) - Number(ConvertCommasToEmpty_realign(supplement_amount_DUM))
+                    
+                    if (Number(ConvertCommasToEmpty_realign(tobe_transfered)) < Number(ConvertCommasToEmpty_realign(diffu))) {
+                        swal({
+                            title: "Error!",
+                            text: "Please Check the Available Amount",
+                            timer: 3000,
+                            type: "error",
+                            showConfirmButton: false
+                        })
+
+                    } else {
+                        swal({
+                            title: "Are you sure?",
+                            text: "You Want to Edit This Amount?",
+                            type: "info",
+                            showCancelButton: true,
+                            closeOnConfirm: false,
+                            confirmButtonColor: "#1fa67a",
+                            confirmButtonText: "Yes, Save It!",
+                            showLoaderOnConfirm: true,
+                        }, function () {
+
+                            $.post(url_trans_Edit, { legal_code: legal_code, office_id: office_id, program_id: program_id, ooe_id: ooe_id, account_id: account_id, year_: year_, supplement_amount: ConvertCommasToEmpty(supplement_amount), MonthOf: MonthOf, supplement_id: supplement_id, transdate: transdate, copydatetag: copydatetag }, function (e) {
+                                if (e == "1") {
+                                    swal({
+                                        title: "Success!",
+                                        text: "Supplemental budget has been updated.",
+                                        timer: 2000,
+                                        type: "success",
+                                        showConfirmButton: false
+                                    })
+                                    grid_ref_sup_ok_subs();
+                                    change_sup();
+                                    get_total_transfere();
+                                    $('#GeneralFund_Grid').data('kendoGrid').dataSource.read();
+                                    document.getElementById("supplement_Subs_Ammount_DUM").value = 0;
+                                    document.getElementById("supplement_Subs_Ammount_ID").value = 0;
+                                    document.getElementById("supplement_Subs_Ammount").value = 0;
+                                } else {
+                                    swal({
+                                        title: "Error!",
+                                        text: "System Error! Please try again.",
+                                        timer: 2000,
+                                        type: "error",
+                                        showConfirmButton: false
+                                    })
+                                }
+                            });
+                        });
+
+                    }
+
+                } else {
+                    //alert(2)
+                    //if (Number(ConvertCommasToEmpty_realign(supplement_available)) < Number(ConvertCommasToEmpty_realign(supplement_amount))) {
+                    if (Number(ConvertCommasToEmpty_realign(tobe_transfered)) < Number(ConvertCommasToEmpty_realign(supplement_amount))) {
+                        swal({
+                            title: "Error!",
+                            text: "Please Check the Available Amount",
+                            timer: 3000,
+                            type: "error",
+                            showConfirmButton: false
+                        })
+
+                    } else { 
+
+                    swal({
+                        title: "Are you sure?",
+                        text: "You Want to Edit This Amount?",
+                        type: "info",
+                        showCancelButton: true,
+                        closeOnConfirm: false,
+                        confirmButtonColor: "#1fa67a",
+                        confirmButtonText: "Yes, Save It!",
+                        showLoaderOnConfirm: true,
+                    }, function () {
+
+                        $.post(url_trans_Edit, { legal_code: legal_code, office_id: office_id, program_id: program_id, ooe_id: ooe_id, account_id: account_id, year_: year_, supplement_amount: ConvertCommasToEmpty(supplement_amount), MonthOf: MonthOf, supplement_id: supplement_id, transdate: transdate, copydatetag: copydatetag }, function (e) {
+                            if (e == "1") {
+                                swal({
+                                    title: "Success!",
+                                    text: "Supplemental budget has been updated.",
+                                    timer: 2000,
+                                    type: "success",
+                                    showConfirmButton: false
+                                })
+                                grid_ref_sup_ok_subs();
+                                change_sup();
+                                get_total_transfere();
+                                $('#GeneralFund_Grid').data('kendoGrid').dataSource.read();
+                                document.getElementById("supplement_Subs_Ammount_DUM").value = 0;
+                                document.getElementById("supplement_Subs_Ammount_ID").value = 0;
+                                document.getElementById("supplement_Subs_Ammount").value = 0;
+                            } else {
+                                swal({
+                                    title: "Error!",
+                                    text: "System Error! Please try again.",
+                                    timer: 2000,
+                                    type: "error",
+                                    showConfirmButton: false
+                                })
+                            }
+                        });
+                    });
+
+                }
+            }
+
+
+            }
+        }
+        }
+        }
+
+    }
+
+    function fn_refresher_supplemental_null_subs() {
+
+        $("#office_supplemental_null_subs").val(null);
+        $("#account_list_supplemental_null_subs").val(null);
+        $("#ooe_id_supplemental_null_subs").val(null);
+
+        $("#office_supplemental_null_subs").data("kendoComboBox").text(null);
+        $("#account_list_supplemental_null_subs").data("kendoComboBox").text(null);
+        $("#ooe_id_supplemental_null_subs").data("kendoDropDownList").text(null);
+
+        $("#Program_supplemental_null_subs").data("kendoDropDownList").dataSource.read();
+        $("#ooe_id_supplemental_null_subs").data("kendoDropDownList").dataSource.read();
+        $("#account_list_supplemental_null_subs").data("kendoComboBox").dataSource.read();
+
+    }
+
+    function fn_dprefresherorb_supplemental_null_subs() {
+
+        $("#Program_supplemental_null_subs").data("kendoDropDownList").dataSource.read();
+        $("#ooe_id_supplemental_null_subs").data("kendoDropDownList").dataSource.read();
+        $("#account_list_supplemental_null_subs").data("kendoComboBox").dataSource.read();
+    //    $("#grd_Sups_List_subs").data("kendoGrid").dataSource.read();
+    }
+    function fn_sup_OOE_subs() {
+
+        $("#account_list_supplemental_null_subs").data("kendoComboBox").dataSource.read();
+    //    $("#grd_Sups_List_subs").data("kendoGrid").dataSource.read();
+    }
+    function supcopydate() {
+        if (document.getElementById("supcopydate").checked) {
+            document.getElementById("supcopydate").value = "1"
+        }
+        else {
+            document.getElementById("supcopydate").value = "0"
+        }
+    }
+
+</script>
+
+<div style="border: outset;clear:both;border-width:1px;border-color:#1fa67a; width: 749px; padding-left:0px;padding-right:0px;padding-top:0px;padding-bottom:7px;margin-top: 0px;">
+    <div style=" width: 0;height: 0; border-right: 5px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;margin-top: -1px; ">
+        <div style="float: left; width: 683px; margin-top:1px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 36px solid #1fa67a; ">
+            <div style="float: left; height:28px; margin-left:-59px; margin-top: 5px;">
+                <i class="fa fa-tasks fa-2x fg-white"></i>
+
+            </div>
+
+            <div style="text-align: right;float: right;margin-right:10px;margin-top:2px;">
+
+
+                @*@(Html.Kendo().DropDownList()
+                            .Name("ddlYear")
+                            .DataTextField("ProposalYear")
+                            .DataValueField("ProposalYear")
+                            .SelectedIndex(0)
+                            .HtmlAttributes(new { @style = "width: 70px;" })
+                            .Events(e => e.Change("grid_ref_sup_ok_subs"))
+                            .DataSource(source => source.Read(read => read.Action("GetPropYear2", "PYear")))
+                    )*@
+
+
+
+
+            </div>
+            <div style="float: right;margin-right:10px;margin-top:2px;">
+                @*<i class="fa fa-calendar fa-2x #33333"></i>*@
+            </div>
+
+
+        </div>
+    </div>
+   
+    <div id="supplement_grid" class="demo-section k-content">
+       
+    </div>
+    <div class="demo-section k-content" style=" float:right;margin-top: 7px;margin-right:7px ">
+
+
+    </div>
+
+
+</div>
+
+<div style="float: left;margin-right:10px;margin-top:5px;">
+
+</div>
+<div style="float: none;clear:both;">
+    <div style="float: left;margin-right:10px;margin-top:2px;">
+        <label style="float:left;margin-left: 50px;">
+            Legal Basis :
+        </label>
+    </div>
+    <div style="float: right;margin-right:130px;margin-top:0px;">
+
+
+        @(Html.Kendo().ComboBox()
+                            .Name("legalbasis_supplemental_null_subs")
+                            .DataTextField("LegalDescription")
+                            .DataValueField("LegalCode")
+                            .Placeholder("Select Legal Basis...")
+                            .Filter("contains")
+                            .MinLength(1)
+                            .HtmlAttributes(new { @style = "width: 420px;" })
+                            .Events(e => e.Change("grid_ref_sup_ok_subs"))
+                            .DataSource(source => source.Read(read => read.Action("GetLegalBasis", "Release")))
+        )
+
+
+    </div>
+    <div style="float: right;margin-right:-505px;margin-top:0px;">
+        <div class="k-button k-button-icontext" style=" bottom: 15px; right: 220px;width: 80px; border-radius:50px;color:#000000;background-color:#04eff8;" onclick="fn_legalbasis_null_subs()"><span class='fa fa-plus-circle' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'></span> add</div>
+
+        @*<div class="k-button k-button-icontext" style=" right: 0px;width: 70px;" onclick="fn_legalbasis_null_subs()"> add</div>*@
+    </div>
+
+    <div style="float: left;margin-right:10px;margin-top:5px;">
+        <label style="float:left;margin-left: 50px;">
+            Office    :
+        </label>
+    </div>
+    <div style="float: right;margin-right:50px;margin-top:3px;">
+        <script>
+            function GeneralOfficeID_subs() {
+                var opis_id = $('#offs').val()
+
+                return {
+                    opis_id: opis_id
+                }
+            }
+            function fn_class_GFEE_Subs() {
+
+                var classtype_GFEE = $("#classtype").val();
+
+                return {
+                    classtype_GFEE: classtype_GFEE
+                   
+                }
+             
+            }
+        </script>
+
+        @(Html.Kendo().ComboBox()
+                            .Name("office_supplemental_null_subs")
+                            .DataTextField("OfficeName")
+                            .DataValueField("OfficeID")
+                            .Placeholder("Select office...")
+                            .Filter("contains")
+                            .MinLength(1)
+                            .HtmlAttributes(new { @style = "width: 500px;" })
+                            .Events(e => e.Change("fn_dprefresherorb_supplemental_null_subs"))
+                            .Value(Session["office_id"].ToString())
+                            .DataSource(source => source.Read(read => read.Action("GetOffice_Dynamic", "Release").Data("fn_class_GFEE_Subs")))
+
+        )
+
+
+    </div>
+</div>
+    <div style="height:40px;">
+
+    </div>
+
+    <div id="ProgramAndExpenseClassDiv" style="float: none;clear:both; margin-top: 25px">
+
+        <div style="float: left;margin-right:10px;margin-top:2px;">
+            <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                Program :
+            </label>
+        </div>
+        <div style="float: right;margin-right:50px;margin-top:0px;">
+            <script>
+                function fn_Offices_supplemental_null_subs() {
+
+                    var proyy = $("#ddlYear").val();
+                    var off_id = $("#office_supplemental_null_subs").val();
+                    var ooe_id = $("#ooe_id_supplemental_null_subs").val();
+                    // alert(off_id)
+                    if (off_id == 0 || off_id == null) {
+
+                        return {
+                            propYear: proyy,
+                            office_ID: off_id,
+                            ooe_id: ooe_id
+                        }
+                    }
+                    else {
+
+                        return {
+                            propYear: proyy,
+                            office_ID: off_id,
+                            ooe_id: ooe_id
+                        }
+                    }
+                }
+
+            </script>
+
+            @(Html.Kendo().DropDownList()
+                            .Name("Program_supplemental_null_subs")
+                            .DataTextField("ProgramDescription")
+                            .DataValueField("ProgramID")
+                            .OptionLabel("Select programs...")
+                            .HtmlAttributes(new { @style = "width: 500px;" })
+                            .AutoBind(true)//.Events(e => e.DataBound("Program_supplemental_null_subsDataBound"))
+                            .DataSource(source => source.Read(read => read.Action("GetPrograms2", "Release").Data("fn_Offices_supplemental_null_subs")))
+                    //.Value(Session["program_id"].ToString())
+            )
+
+        </div>
+
+        <div style="float: left;margin-right:10px;margin-top:10px;">
+            <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                Expense Class    :
+            </label>
+        </div>
+        <div style="float: right;margin-right:50px;margin-top: 5px;">
+            @(Html.Kendo().DropDownList()
+                        .Name("ooe_id_supplemental_null_subs")
+                        .DataTextField("ooe_name")
+                        .DataValueField("ooe_id")
+                        .OptionLabel("Select Expenses...")
+                        .HtmlAttributes(new { @style = "width: 500px;" })
+                        .Events(e => e.Change("fn_sup_OOE_subs"))
+                        .Value(Session["ooe_id"].ToString())
+                        .DataSource(source => source.Read(read => read.Action("ddlOOENonOfficeLevel", "Dropdowns")))
+            )
+        </div>
+        <div style="float: left;margin-right:10px;margin-top:10px;">
+            <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                Account    :
+            </label>
+        </div>
+        <div style="float: right;margin-right:50px;margin-top:5px;">
+            <script>
+                function fn_ForAccount_supplemental_null_subs() {
+                    var propYear = $("#ddlYear").val();
+                    var office_ID = $("#office_supplemental_null_subs").val();
+                    var ooe_id = $("#ooe_id_supplemental_null_subs").val();
+                    var prog_id = $("#Program_supplemental_null_subs").val();
+                    return {
+                        propYear: propYear,
+                        office_ID: office_ID,
+                        ooe_id: ooe_id,
+                        prog_id: prog_id,
+                        vwAllAccountsid:1
+                    }
+                }
+
+            </script>
+
+            @(Html.Kendo().ComboBox()
+                        .Name("account_list_supplemental_null_subs")
+                        .DataTextField("account_name")
+                        .DataValueField("account_id")
+                        .Filter("contains")
+                        .MinLength(1)
+                        .Placeholder("Select Account...")
+                        .Events(e => e.Change("grid_ref_sup_ok_subs"))
+                        .HtmlAttributes(new { @style = "width: 500px;" })
+                        .AutoBind(true)
+
+                        .DataSource(source => source.Read(read => read.Action("MOS_Account", "Dropdowns").Data("fn_ForAccount_supplemental_null_subs")))
+                    //  .Value(Session["account_id"].ToString())
+            )
+        </div>
+
+
+        <div style="float:left;margin-left:50px;margin-top:19px;">
+            <label>
+                Available  Amount    :
+            </label>
+        </div>
+        @*1fca03*@
+        <div style="float:left;margin-left:38.5px;margin-top:11px;">
+            <input type="text" style="width:130px;color: #1fca03" name="available_amount_null_SUP_sub" id="available_amount_null_SUP_sub" value="0" onkeyup="commaSeparateNumberversion2('available_amount_null_SUP_sub')" step="0.01" disabled>
+        </div>
+        <div style="float:left;margin-left:0px;margin-top:11px;">
+            <input type="text" style="width:150px" name="supplement_Subs_Ammount_ID" id="supplement_Subs_Ammount_ID" value="0" hidden  disabled>
+        </div>
+        <div style="float:left;margin-left:-30px;margin-top:11px;">
+            <input type="text" style="width:150px" name="supplement_Subs_Ammount_DUM" id="supplement_Subs_Ammount_DUM" value="0" hidden disabled>
+        </div>
+        <div style="float:left;margin-left:15px;margin-top:2px;">
+            <label>
+                Total Amount <br /> to Transfer  
+            </label>
+        </div>
+        <div style="float:left;margin-left:30px;margin-top:12px;">
+            <label>
+                :
+            </label>
+        </div>
+        <div style="float:left;margin-left:30px;margin-top:11px;">
+            <input type="text" style="width:160px;color: #0501fa" name="total_tobe_transfere" id="total_tobe_transfere" value="0" onkeyup="commaSeparateNumberversion2('total_tobe_transfere')" step="0.01" disabled>
+        </div>
+        <div style="float:left;margin-left:39.5px;margin-top:0px;">
+            <div style="float:left;margin-left:10px;margin-top:0px;">
+                <label>
+                    Release Month    :
+                </label>
+            </div>
+            <div style="float:left;margin-left:59px;margin-top:0px;">
+                @(Html.Kendo().DropDownList()
+                          .Name("Months_supplemental_null_subs")
+                          .DataTextField("Text")
+                          .DataValueField("Value")
+                          .Events(e => e.Change("grid_ref_sup_ok_subs"))
+                          .BindTo(new List<SelectListItem>() {
+                              new SelectListItem() {
+                                  Text = "January",
+                                  Value = "1"
+                              },
+                              new SelectListItem() {
+                                  Text = "Febuary",
+                                  Value = "2"
+                              },
+                              new SelectListItem() {
+                                  Text = "March",
+                                  Value = "3"
+                              },
+                              new SelectListItem() {
+                                  Text = "April",
+                                  Value = "4"
+                              },
+                              new SelectListItem() {
+                                  Text = "May",
+                                  Value = "5"
+                              },
+                              new SelectListItem() {
+                                  Text = "June",
+                                  Value = "6"
+                              },
+                              new SelectListItem() {
+                                  Text = "July",
+                                  Value = "7"
+                              },
+                              new SelectListItem() {
+                                  Text = "August",
+                                  Value = "8"
+                              },
+                              new SelectListItem() {
+                                  Text = "September",
+                                  Value = "9"
+                              },
+                              new SelectListItem() {
+                                  Text = "October",
+                                  Value = "10"
+                              },
+                              new SelectListItem() {
+                                  Text = "November",
+                                  Value = "11"
+                              },
+                              new SelectListItem() {
+                                  Text = "December",
+                                  Value = "12"
+                              }
+                          })
+                          .Value(@ViewBag.MonthVaue)
+                          .HtmlAttributes(new { style = "width: 110px" })
+                )
+
+            </div>
+         
+            <div style="float: left;margin-left:-5px;margin-top:1px;">
+                <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                    Amount :
+                </label>
+
+            </div>
+            <div style="float: left;margin-left:10px;margin-top:1px;">
+                <input type="text" style="width:156px" name="supplement_Subs_Ammount" id="supplement_Subs_Ammount" onkeyup="commaSeparateNumberversion2('supplement_Subs_Ammount')" onfocus="this.select();">
+                <div style="display:inline-block;margin-left:2px;margin-top:1px;">
+                    <div class="k-button k-button-icontext" style=" bottom: 15px; right: 220px;width: 90px; border-radius:50px;color:#000000;background-color:#04eff8;" onclick="add_supplement_add()"><span class='fa fa-plus-circle' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'></span> Amount</div>
+                </div>
+            </div>  
+            <div style="float: left;margin-left:-673px;margin-top:30px;">
+                <label style="margin-top: 0px;margin-bottom: 2px;">
+                    Date <br />and Time :
+                </label>
+            </div>
+            <div style="float: left;margin-left:184px;margin-top:9px;">
+                
+                @(Html.Kendo().DateTimePicker()
+              .Name("supdatetime")
+              //.Start(CalendarView.Year)
+              //.Depth(CalendarView.Year)
+              .Format("M/d/yyyy hh:mm:ss tt")
+              //.Events(e => e.Change("numeric_desu"))
+              .HtmlAttributes(new { style = "width: 250px" })
+                )
+                <div style="display:inline-block">
+                    <input type="checkbox" id="supcopydate" value="0" onclick="supcopydate()" style="zoom:1.5" />
+                    <label style="display:inline-block;font-size:14px;color:red"> Copy Original Date/Time </label>
+                </div>
+
+            </div>
+
+         
+            </div>
+       
+            <script>
+
+            </script>
+            
+            <div style="float:left;margin-left:425px;margin-top:-28px;visibility:hidden">
+                <input type="text" style="width:150px" name="sup_class" id="sup_class" value="1" disabled>
+
+
+            </div>
+            <div style="float:left;margin-left:225px;margin-top:10px;width:250px">
+                <input type='checkbox' class='checkbox' style="zoom:1.5" id="is_class_type" onclick=fn_class_type() />
+                <label style="margin-left: 30px;margin-right: 5px;margin-top: -22px;margin-bottom: 0px;">
+                    Transfer of Appropriation
+                </label>
+            </div>  
+            <div style="float:left;margin-top:10px;margin-left:510px">
+                <div class="k-button k-button-icontext" style=" bottom: 15px; right: 220px;width: 80px; border-radius:50px;color:#ffffff;background-color:cornflowerblue;" onclick="fn_reqSave_supplemental_null_subs()"><span class='fa fa-plus-circle' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'></span> Save</div>
+            </div>
+            <div style="float:left;margin-top:-29px;margin-left:600px">
+                <div class="k-button k-button-icontext" style=" bottom: 15px; right: 220px;width: 80px; border-radius:50px;color:#ffffff;background-color:#DE5555;" onclick="fn_closeSupplemental_subs_aw()"><span class='fa fa-times' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'></span> Close</div>
+            </div>
+
+            @*<div class="k-button k-button-icontext" style="position: absolute; bottom: 15px; right: 120px;width: 80px;" onclick="fn_reqSave_supplemental_null_subs()">save</div>
+            <div class="k-button k-button-icontext" style="position: absolute; bottom: 15px; right: 20px;width: 80px;" onclick="fn_refresher_supplemental_null_subs()">reset</div>*@
+            <div style="float:left;margin-left:4000px;margin-top:11px;">
+                <input type="text" style="width:100px" name="for_ID_SUPP" id="for_ID_SUPP" disabled hidden>
+            </div>
+
+        </div>
+
+
+@(Html.Kendo().Window()
+        .Name("legal_basis_window_null_subs")
+        .Title("New Entry")
+        .Width(780)
+        .Height(500)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+        // .Events(e => e.Close("Close_Sup_subs"))
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+                .Actions(a => { a.Close(); })
+)
+@(Html.Kendo().Window().Name("add_supplement_amount_").Title("New Entry").Width(335).Height(170).Visible(false).Modal(true).Draggable(true).AutoFocus(true).Animation(a => { a.Open(o => o.SlideIn(SlideDirection.Down)); a.Close(c => { c.SlideIn(SlideDirection.Down); c.Reverse(true); }); }).Actions(a => { a.Close(); }))
+
+
+<script>
+
+    $(document).ready(function () {
+        var JGKFVNMFKJKJ_subs = $('#Progss').val()
+        $("#Program_supplemental_null_subs").data("kendoDropDownList").value(JGKFVNMFKJKJ_subs);
+        var UUYKELOWPQOKASKO_subs = $('#account_list').val()
+        $("#account_list_supplemental_null_subs").data("kendoComboBox").value(UUYKELOWPQOKASKO_subs);
+    }, 1000);
+ 
+</script>

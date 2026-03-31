@@ -1,0 +1,64 @@
+﻿@model iFMIS_BMS.BusinessLayer.Models.TransFundsModel
+
+<script>
+
+
+
+
+    function reqSave() {
+        var notifi = new $("#popupNotification").data("kendoNotification");
+
+        var url = "@Url.Action("SaveSource", "Report")";
+
+        var Fund_Desc_ID = $('#DLLSource').val()
+        var Fund_Desc = $("#DLLSource").data("kendoComboBox").text();
+     
+
+        var Year_of = $("#propsYears").val()
+        $.post(url, { Fund_Desc_ID: Fund_Desc_ID, Fund_Desc: Fund_Desc, Year_of: Year_of }, function (d) {
+            if (d == "1") {
+                swal({
+                    title: "Success!",
+                    text: "Successfully Added.",
+                    timer: 2000,
+                    type: "success",
+                    showConfirmButton: false
+                })
+                $('#addSource').data('kendoWindow').close();
+                $('#SourceFundsGrid').data('kendoGrid').dataSource.read();
+            } else {
+                swal({
+                    title: "Error!",
+                    text: "System Error! Please try again.",
+                    timer: 2000,
+                    type: "error",
+                    showConfirmButton: false
+                })
+            }
+           
+
+        })
+    }
+
+
+
+
+</script>
+
+
+
+<label>Source of Funds :</label>
+@(Html.Kendo().ComboBox()
+        .Name("DLLSource")
+        .DataTextField("Fund_Desc")
+        .DataValueField("Fund_Desc_ID")
+        .Placeholder("Select or Add Source Funds...")
+        .HtmlAttributes(new { @style = "width: 310px;" })
+            .DataSource(source => source.Read(read => read.Action("GetSF", "Report")))
+
+
+)
+
+
+
+<div class="k-button k-button-icontext" style="position: absolute; bottom: 15px; right: 20px;width: 80px;" onclick="reqSave()">Save</div>

@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Table>
+  <constring>
+    <!--<ConName>Server=DESKTOP-5RINE7I;Database=IFMIS;Uid=sa;pwd=potato231;Pooling=False;</ConName>-->
+    <!--<ConName>Server=BPDWEBSERVER\MSSQLSERVER1;Database=IFMIS;Uid=sa;pwd=1;Pooling=False;</ConName>-->
+    <!--<ConName>Server=192.168.2.1\PGAS;Database=IFMIS;Uid=pgasis;pwd=(@/51u0#2@3n8D0e1L1#0u1R;Pooling=False;</ConName>-->
+    <!--<ConName>Server=.;Database=iFMIS;Uid=sa;pwd=1;Pooling=False;</ConName>-->
+    <!--<ConName>Server=172.16.100.7;Database=IFMIS;Uid=agusan_user;pwd=j.tGsm+]_fZH3~r9udC}%/;Pooling=False;</ConName>-->
+    <ConName>Server=vm_db_pmis.pgas.ph;Database=ifmis;Integrated Security=True;Pooling=False;</ConName>
+    <!--<ConName>Server=10.10.51.110;Database=iFMIS;Uid=sa;pwd=pgzn@*2023;Pooling=False;</ConName>-->
+     <!--<ConName>Server=10.100.100.4;Database=iFMIS;Uid=sa;pwd=pimo@123;Pooling=False;</ConName>-->
+  </constring>
+</Table>

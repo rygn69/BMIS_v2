@@ -1,0 +1,646 @@
+﻿<script>
+    @*function fnofficestatus() {
+        officeid = @Account.UserInfo.Department;
+    }*@
+
+    function getwfparconsol() {
+
+        var showspco = $("#checkshowspco_review").val() == "" ? 0 : $("#checkshowspco_review").val()
+        var officeid= $("#officestatus").val() ==""? 0 : $("#officestatus").val()
+
+        var fundid = $("#gfid").val() == 1 ? 0 : 1
+        var mode_trans = $("#gf_currentid").val()@*// @Session["mode_trans"];*@
+        var year = $("#wfpyear").val()
+      
+        return {
+            year: year,
+            showspco: showspco,
+            officeid:officeid,
+            fundid:fundid,
+            mode_trans:mode_trans
+        }
+    }
+
+    function getwfparpritem() {
+
+        var officeid= $("#officestatus").val() ==""? 0 : $("#officestatus").val()
+
+        var fundid = $("#gfid").val() == 1 ? 0 : 1
+        var mode_trans = $("#gf_currentid").val()@*// @Session["mode_trans"];*@
+        var year = $("#wfpyear").val()
+        var reload =0
+        return {
+            year: year,
+            officeid:officeid,
+            reload: reload
+        }
+    }
+    function btn_review_special_co() {
+        if (document.getElementById("checkshowspco_review").checked == true) {
+            $("#checkshowspco_review").val(1)
+        }
+        else {
+            $("#checkshowspco_review").val(0)
+        }
+        $("#grid_wfpstatusreview").data("kendoGrid").dataSource.read()
+    }
+    //function fnOffice_rev_sel(){
+    //    $("#grid_wfpstatusreview").data("kendoGrid").dataSource.read()
+    //}
+    function searchAccount() {
+        var $filter = new Array();
+        var peritem = $("#chkwfpperitem").val();
+        $filter = [];
+
+        if (peritem == 0) { //summary
+            if ($('#SearchData_Re').val().length > 0) {
+                $filter.push({ field: "office", operator: "contains", value: $('#SearchData_Re').val() }),
+                $filter.push({ field: "accountname", operator: "contains", value: $('#SearchData_Re').val() }),
+                $filter.push({ field: "remarks", operator: "contains", value: $('#SearchData_Re').val() }),
+                $filter.push({ field: "status", operator: "contains", value: $('#SearchData_Re').val() });
+            }
+
+            $('#grid_wfpstatusreview').data('kendoGrid').dataSource.filter({
+                logic: "or",
+                filters: $filter
+            });
+        }
+        else {
+            if ($('#SearchData_Re').val().length > 0) {
+                $filter.push({ field: "office", operator: "contains", value: $('#SearchData_Re').val() }),
+                $filter.push({ field: "accountname", operator: "contains", value: $('#SearchData_Re').val() }),
+                $filter.push({ field: "remarks", operator: "contains", value: $('#SearchData_Re').val() }),
+                $filter.push({ field: "status", operator: "contains", value: $('#SearchData_Re').val() });
+                $filter.push({ field: "itemname", operator: "contains", value: $('#SearchData_Re').val() });
+            }
+
+            $('#grid_wfpstatusreviewperitem').data('kendoGrid').dataSource.filter({
+                logic: "or",
+                filters: $filter
+            });
+        }
+    }
+
+    $(function () {
+        $("#SearchData_Re").keypress(function (e) {
+            if (e.keyCode == 13) {
+                searchAccount();
+            }
+        });
+    });
+
+    function rtpwdp(status, docid, gov_sig, programid, accountid, wfpno, account, ooe) {
+        var officeid = $("#officestatus").val();
+        var yearof = $("#wfpyear").val();
+        var officename = $("#officestatus").data("kendoComboBox").text()
+        if ((accountid == 0 || accountid.length > 6) && repHistory == 0) {
+            swal("Warning", "Please select an account from the dropdown list!", "warning")
+        }
+        else {
+            
+            $.ajax({
+                async: false,
+                dataType: 'html',
+                success: window.open("../Reports/ReportViewer.aspx?rid=44&OfficeID=" + officeid + "&year=" + yearof + "&OfficeName=" + officename + "&accountID=" + accountid + "&accountname=" + account + "&ooeclass=" + ooe + "&account=" + account + "&wfpno=" + wfpno + "")
+
+            });
+           
+        }
+    }
+
+    function rtpwfp(status,docid,gov_sig){
+       
+        success: window.open("https://pgas.ph/dgsign/blank/getPDF_digital_only?pdfData=application/pdf&FormID=" + docid + "")
+        //success: window.open(" https://pgas.ph/dgsign/blank/keuitughhjugjugah?doc_id=" + docid + "") //with signatory tracking
+        
+    }
+
+    function rtpwfpstat(status, docid, gov_sig) {
+
+        //success: window.open("https://pgas.ph/dgsign/blank/getPDF_digital_only?pdfData=application/pdf&FormID=" + docid + "")
+        success: window.open(" https://pgas.ph/dgsign/blank/keuitughhjugjugah?doc_id=" + docid + "") //with signatory tracking
+
+    }
+    function onDataBoundWFP(e) {
+        $(".k-hierarchy-cell").hide();
+        $(".k-hierarchy-col").hide();
+        var grid = $("#grid_wfpstatusreviewperitem").data("kendoGrid")
+        var ds = grid.dataSource.view();
+        var rows = e.sender.tbody.children();
+        var procurement = 0;
+        for (var i = 0; i < ds.length; i++) {
+            procurement = ds[i].procurement;
+            var row = $(rows[i]);
+            if (procurement == 1) {
+                row.addClass("ChangeBackColor");
+                //   $('#deleteid' + trnno + '').css("display", "none");
+            }
+        }
+    }
+    function wfptransfer(id){
+        $(window).scrollTop(0);
+        var url = "@Url.Action("vwWFPpreparer", "Report")";
+    
+        $.get(url,
+            {
+                id:id
+            },
+        function (d) {
+            $('#vwWFPpreparer').html(d);
+        })
+
+        $('#vwWFPpreparer').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Update Preparer").center().open();
+    }
+    function btnShowdetail() {
+        var grid = $('#grid_wfpstatusreviewperitem').data('kendoGrid');
+        if (document.getElementById("btnreviewdetails_id").text == " Show Detail") {
+            $("#btnreviewdetails_id").html("<span class='fa fa-info-circle'></span> Hide Detail");
+            grid.showColumn('m1');
+            grid.showColumn('m2');
+            grid.showColumn('m3');
+            grid.showColumn('m4');
+            grid.showColumn('m5');
+            grid.showColumn('m6');
+            grid.showColumn('m7');
+            grid.showColumn('m8');
+            grid.showColumn('m9');
+            grid.showColumn('m10');
+            grid.showColumn('m11');
+            grid.showColumn('m12');
+            grid.showColumn('amount')
+        }
+        else {
+            $("#btnreviewdetails_id").html("<span class='fa fa-info-circle'></span> Show Detail");
+            grid.hideColumn('m1');
+            grid.hideColumn('m2');
+            grid.hideColumn('m3');
+            grid.hideColumn('m4');
+            grid.hideColumn('m5');
+            grid.hideColumn('m6');
+            grid.hideColumn('m7');
+            grid.hideColumn('m8');
+            grid.hideColumn('m9');
+            grid.hideColumn('m10');
+            grid.hideColumn('m11');
+            grid.hideColumn('m12');
+            grid.hideColumn('amount');
+        }
+    }
+</script>
+
+<div id="searchAccountid" style="height: 30px; margin-top: 0px; float: right; color:cornflowerblue" >
+    <input type="text" style="width:212px;border-collapse:collapse;margin:0px;border-style:solid;margin-left:0px;height:70%;outline:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search..." id="SearchData_Re" name="SearchData_Re">
+    <div class="k-button k-button-icontext" style="height:30px;width:40px;border-style:solid;" onclick="searchAccount()"><span class="mif-search"></span></div>
+</div>
+<div id="wfpsummaryid" style="display:inline-block;width:100%;margin-top:-3px;">
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.WFPrepare>()
+            .Name("grid_wfpstatusreview")
+            .HtmlAttributes(new { style = "" })
+            .Scrollable()
+            .Columns(col =>
+            {
+                col.Template(@<text></text>)
+            .HeaderTemplate(@<text>Office</text>)
+            .Width(50)
+            .HtmlAttributes(new { style = "text-align:left;;font-size:12px;vertical-align:top" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=office# </div>");
+                col.Template(@<text></text>)
+            .HeaderTemplate(@<text>office id</text>)
+            .Width(0)
+            .Hidden()
+            .HtmlAttributes(new { style = "text-align:left;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=officeid# </div>");
+                col.Template(@<text></text>)
+            .HeaderTemplate(@<text>program id</text>)
+            .Width(0)
+            .Hidden()
+            .HtmlAttributes(new { style = "text-align:left;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=programid# </div>");
+                col.Template(@<text></text>)
+            .HeaderTemplate(@<text>account id</text>)
+            .Width(0)
+            .Hidden()
+            .HtmlAttributes(new { style = "text-align:left;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=accountid# </div>");
+                col.Template(@<text></text>)
+            .HeaderTemplate(@<text>Account</text>)
+            .Width(180)
+            .HtmlAttributes(new { style = "text-align:left;;font-size:12px;vertical-align:top" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=accountname# </div>");
+                col.Template(@<text></text>)
+            .HeaderTemplate(@<text>Date/Time <br />Submitted</text>)
+            .Width(0)
+            .Hidden()
+            .HtmlAttributes(new { style = "text-align:left;;font-size:12px" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=datetimeentered# </div>");
+                col.Template(@<text></text>)
+            .HeaderTemplate(@<text>Year</text>)
+            .Width(0)
+            .Hidden()
+            .HtmlAttributes(new { style = "text-align:left;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=yearof# </div>");
+                col.Template(@<text></text>)
+            .HeaderTemplate(@<text>OOE</text>)
+            .Width(0)
+            .Hidden()
+            .HtmlAttributes(new { style = "text-align:left;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=ooe# </div>");
+                col.Template(@<text></text>)
+            .HeaderTemplate(@<text>ooe ID</text>)
+            .Width(0)
+            .Hidden()
+            .HtmlAttributes(new { style = "text-align:left;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=ooeid# </div>");
+                col.Bound(m => m.remarks)
+            .HeaderTemplate(@<text>Remark</text>)
+            .Width(0)
+            .Hidden()
+            .HtmlAttributes(new { style = "text-align:left;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=remarks# </div>");
+            col.Bound(m => m.status)
+            .HeaderTemplate(@<text>Signature <br />Status</text>)
+            .Width(60)
+            .HtmlAttributes(new { style = "text-align:left;vertical-align:top" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=status# </div>");
+            
+            col.Template(@<text></text>)
+            .HeaderTemplate(@<text>Transfer<br /> Signatory</text>)
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate(
+                "<div id='printwfpid#=accountid#' style='color:blue;cursor:pointer' onclick='wfptransfer(#=docid#)'><span class='fa fa-arrow-right-arrow-left' title='Click to transfer preparer!' style='font-size: 16px;margin-top: -1px;margin-left: 1px;margin-right:1px;width:35px;text-align:center;cursor:pointer;'></span>Transfer</div> ")
+            .HtmlAttributes(new { style = "vertical-align: middle;text-align:center;vertical-align:top" })
+            .Width(75);
+
+             col.Template(@<text></text>)
+            .HeaderTemplate(@<text>View<br />WFP/WDP</text>)
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate(
+                "<div id='printwfpid#=accountid#' style='color:red;cursor:pointer' onclick='rtpwdp(\"#=status#\",#=docid#,#=gov_sig#,#=programid#,#=accountid#,\"#=wfpno#\",\"#=account#\",\"#=ooe#\")'><span class='fa fa-file' title='Click to preview WFP!' style='font-size: 16px;margin-top: -1px;margin-left: 1px;margin-right:1px;width:25px;text-align:center;cursor:pointer;'></span>WFP</div> ")
+            .HtmlAttributes(new { style = "vertical-align: middle;text-align:center;vertical-align:top" })
+            .Width(70);
+
+             col.Template(@<text></text>)
+            .HeaderTemplate(@<text>View<br />PDF</text>)
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate(
+                "<div id='printwfpid#=accountid#' style='color:red;cursor:pointer' onclick='rtpwfp(\"#=status#\",#=docid#,#=gov_sig#)'><span class='fa fa-file' title='Click to preview WFP!' style='font-size: 16px;margin-top: -1px;margin-left: 1px;margin-right:1px;width:25px;text-align:center;cursor:pointer;'></span>WFP</div> ")
+            .HtmlAttributes(new { style = "vertical-align: middle;text-align:center;vertical-align:top" })
+            .Width(55);
+
+            col.Template(@<text></text>)
+            .HeaderTemplate(@<text>Signatory<br />Tracking</text>)
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate(
+                "<div id='printwfpid#=accountid#' style='color:red;cursor:pointer' onclick='rtpwfpstat(\"#=status#\",#=docid#,#=gov_sig#)'><span class='fa fa-file' title='Click to preview WFP!' style='font-size: 16px;margin-top: -1px;margin-left: 1px;margin-right:1px;width:25px;text-align:center;cursor:pointer;'></span>WFP</div> ")
+            .HtmlAttributes(new { style = "vertical-align: middle;text-align:center;vertical-align:top" })
+            .Width(55);
+
+                @*col.Template(@<text></text>)
+            .HeaderTemplate(@<text>with approved</text>)
+            .Width(0)
+            .Hidden()
+            .HtmlAttributes(new { style = "text-align:left;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=withapprove# </div>");*@
+                
+                col.Template(@<text></text>)
+            .HeaderTemplate(@<text>Gov Signature</text>)
+            .Width(0)
+            .Hidden()
+            .HtmlAttributes(new { style = "text-align:left;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=gov_sig# </div>");
+
+                col.Bound(m =>m.docid)//Template(@<text></text>)
+            .HeaderTemplate(@<text>document ID</text>)
+            .Width(0)
+            .Hidden()
+            .HtmlAttributes(new { style = "text-align:left;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=docid# </div>");
+            })
+            .ToolBar(toolbar =>
+            {
+                toolbar.Custom().Text("<input id='checkshowspco_review' type='checkbox' value=0 style='zoom:1.2'  title='Ticked checkbox to set as reviewed!'  class='checkbox'/> Show Special Project & CO").Name("btnreview").Url("javascript:void(0)").HtmlAttributes(new { onclick = "btn_review_special_co()", id = "btn_review_special_co_id" });
+            })
+         //   .Editable(editable => editable.Mode(GridEditMode.InCell))
+            .Resizable(e => e.Columns(true))
+            .Pageable(pageable => pageable
+            .Refresh(true)
+            .ButtonCount(1))
+            //.HtmlAttributes(new { @class = "table-responsive", style = "height:410px;" })
+            .HtmlAttributes(new { @class = "table-responsive", style = "height:490px;" })
+            .Selectable()
+          //  .Events(e => e.DataBound("onDataBoundWFP"))
+            .DataSource(dataSource => dataSource
+            .Ajax()
+            .Batch(true)
+            .Model(m => m.Id(i => i.locationid))
+            .ServerOperation(false)
+            .PageSize(5000)
+            .Read(read => read.Action("GetWFPStatus_review", "Report").Data("getwfparconsol"))
+            )
+)
+</div>
+<div id="wfpsummaryid_peritem" style="display:none;width:100%;margin-top:-3px;">
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.WFPrepare>()
+        .Name("grid_wfpstatusreviewperitem")
+        .HtmlAttributes(new { style = "" })
+        .Scrollable()
+        .Columns(col =>
+        {
+            col.Bound(x => x.office)
+        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size:12px;color:white">Office</div></text>)
+        .Width(60)
+        .HtmlAttributes(new { style = "text-align:left;vertical-align:top;font-size:12px" })
+        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+        .ClientTemplate("<div>#=office# </div>");
+            col.Template(@<text></text>)
+        .HeaderTemplate(@<text>office id</text>)
+        .Width(0)
+        .Hidden()
+        .HtmlAttributes(new { style = "text-align:left;" })
+        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+        .ClientTemplate("<div>#=officeid# </div>");
+            col.Template(@<text></text>)
+        .HeaderTemplate(@<text>program id</text>)
+        .Width(0)
+        .Hidden()
+        .HtmlAttributes(new { style = "text-align:left;" })
+        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+        .ClientTemplate("<div>#=programid# </div>");
+            col.Template(@<text></text>)
+        .HeaderTemplate(@<text>account id</text>)
+        .Width(0)
+        .Hidden()
+        .HtmlAttributes(new { style = "text-align:left;" })
+        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+        .ClientTemplate("<div>#=accountid# </div>");
+             col.Bound(m => m.accountname)
+        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size:12px;color:white">Account</div></text>)
+        .Width(230)
+        .HtmlAttributes(new { style = "text-align:left;vertical-align:top;font-size:12px" })
+        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:#fcf7f7;" })
+        .ClientTemplate("<div>#=accountname# </div>")
+        .ClientFooterTemplate("<div style='text-align:center;color:darkgreen;width:170px'><label>Total :</label></div>"); 
+            col.Template(@<text></text>)
+        .HeaderTemplate(@<text>Date/Time <br />Submitted</text>)
+        .Width(0)
+        .Hidden()
+        .HtmlAttributes(new { style = "text-align:left;;font-size:12px" })
+        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+        .ClientTemplate("<div>#=datetimeentered# </div>");
+            col.Template(@<text></text>)
+        .HeaderTemplate(@<text>Year</text>)
+        .Width(0)
+        .Hidden()
+        .HtmlAttributes(new { style = "text-align:left;" })
+        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+        .ClientTemplate("<div>#=yearof# </div>");
+            col.Template(@<text></text>)
+        .HeaderTemplate(@<text>OOE</text>)
+        .Width(0)
+        .Hidden()
+        .HtmlAttributes(new { style = "text-align:left;" })
+        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+        .ClientTemplate("<div>#=ooe# </div>");
+            col.Template(@<text></text>)
+        .HeaderTemplate(@<text>ooe ID</text>)
+        .Width(0)
+        .Hidden()
+        .HtmlAttributes(new { style = "text-align:left;" })
+        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+        .ClientTemplate("<div>#=ooeid# </div>");
+            col.Bound(m => m.itemname)
+        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size:12px;color:white">Item</div></text>)
+        .Width(200)
+        .HtmlAttributes(new { style = "text-align:left;vertical-align:top;" })
+        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+        //.HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+        .ClientTemplate("<div>#=itemname# </div>");
+            col.Bound(m => m.amount)
+        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size:12px;color:white">Amount</div></text>)
+        .Width(110)
+        .Hidden()
+        .HtmlAttributes(new { style = "text-align:right;vertical-align:top;" })
+        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+        .ClientTemplate("<div>#=kendo.toString(amount,'c2')#</div>")
+        .ClientFooterTemplate("<div style='text-align:right;color:darkgreen;font-size:12px;'><label> #=kendo.toString(sum, 'c2')#</label></div>");
+            col.Bound(c => c.m1)
+        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size:12px;color:white">Jan</div></text>)
+        .Width(50)
+        .Hidden()
+        .HtmlAttributes(new { style = "text-align:center;height:30px;vertical-align:top;" })
+        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+        .ClientTemplate("<div>#=m1#</div>");
+            col.Bound(c => c.m2)
+        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size:12px;color:white">Feb</div></text>)
+        .Width(50)
+        .Hidden()
+        .HtmlAttributes(new { style = "text-align:center;height:30px;vertical-align:top;" })
+        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+        .ClientTemplate("<div>#=m2#</div>");
+            col.Bound(c => c.m3)
+        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size:12px;color:white">Mar</div></text>)
+        .Width(50)
+        .Hidden()
+        .HtmlAttributes(new { style = "text-align:center;height:30px;vertical-align:top;" })
+        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+        .ClientTemplate("<div>#=m3#</div>");
+            col.Bound(c => c.m4)
+        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size:12px;color:white">Apr</div></text>)
+        .Width(50)
+        .Hidden()
+        .HtmlAttributes(new { style = "text-align:center;height:30px;vertical-align:top;" })
+        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+        .ClientTemplate("<div>#=m4#</div>");
+            col.Bound(c => c.m5)
+        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size:12px;color:white">May</div></text>)
+        .Width(50)
+        .Hidden()
+        .HtmlAttributes(new { style = "text-align:center;height:30px;vertical-align:top;" })
+        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+        .ClientTemplate("<div>#=m5#</div>");
+            col.Bound(c => c.m6)
+        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size:12px;color:white">Jun</div></text>)
+        .Width(50)
+        .Hidden()
+        .HtmlAttributes(new { style = "text-align:center;height:30px;vertical-align:top;" })
+        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+        .ClientTemplate("<div>#=m6#</div>");
+            col.Bound(c => c.m7)
+        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size:12px;color:white">Jul</div></text>)
+        .Width(50)
+        .Hidden()
+        .HtmlAttributes(new { style = "text-align:center;height:30px;vertical-align:top;" })
+        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+        .ClientTemplate("<div>#=m7#</div>");
+            col.Bound(c => c.m8)
+        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size:12px;color:white">Aug</div></text>)
+        .Width(50)
+        .Hidden()
+        .HtmlAttributes(new { style = "text-align:center;height:30px;vertical-align:top;" })
+        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+        .ClientTemplate("<div>#=m8#</div>");
+            col.Bound(c => c.m9)
+        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size:12px;color:white">Sep</div></text>)
+        .Width(50)
+        .Hidden()
+        .HtmlAttributes(new { style = "text-align:center;height:30px;vertical-align:top;" })
+        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+        .ClientTemplate("<div>#=m9#</div>");
+            col.Bound(c => c.m10)
+        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size:12px;color:white">Oct</div></text>)
+        .Width(50)
+        .Hidden()
+        .HtmlAttributes(new { style = "text-align:center;height:30px;vertical-align:top;" })
+        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+        .ClientTemplate("<div>#=m10#</div>");
+            col.Bound(c => c.m11)
+        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size:12px;color:white">Nov</div></text>)
+        .Width(50)
+        .Hidden()
+        .HtmlAttributes(new { style = "text-align:center;height:30px;vertical-align:top;" })
+        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+        .ClientTemplate("<div>#=m11#</div>");
+            col.Bound(c => c.m12)
+        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size:12px;color:white">Dec</div></text>)
+        .Width(50)
+        .Hidden()
+        .HtmlAttributes(new { style = "text-align:center;height:30px;vertical-align:top;" })
+        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+        .ClientTemplate("<div>#=m12#</div>");
+            col.Bound(m => m.remarks)
+        .HeaderTemplate(@<text>Remark</text>)
+        .Width(0)
+        .Hidden()
+        .HtmlAttributes(new { style = "text-align:left;" })
+        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+        .ClientTemplate("<div>#=remarks# </div>");
+            col.Bound(m => m.status)
+        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size:12px;color:white">Signature <br />Status</div></text>)
+        .Width(100)
+        .HtmlAttributes(new { style = "text-align:left;vertical-align:top;" })
+        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:blue;" }) // Change font color here
+        .ClientTemplate("<div>#=status# </div>");
+
+        col.Template(@<text></text>)
+            .HeaderTemplate(@<text></text>)
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:10px;color:beige;" })
+            .ClientTemplate(
+                "<div id='printwfpid#=accountid#' style='color:blue;cursor:pointer' onclick='wfptransfer(#=docid#)'><span class='fa fa-arrow-right-arrow-left' title='Click to transfer preparer!' style='font-size: 16px;margin-top: -1px;margin-left: 1px;margin-right:1px;width:35px;text-align:center;cursor:pointer;'></span>Transfer</div> ")
+            .HtmlAttributes(new { style = "vertical-align: middle;vertical-align:top;text-align:center" })
+            .Width(75);
+
+        col.Template(@<text></text>)
+            .HeaderTemplate(@<text></text>)
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:10px;color:beige;" })
+            .ClientTemplate(
+                "<div id='printwfpid#=accountid#' style='color:red;cursor:pointer' onclick='rtpwfp(\"#=status#\",#=docid#,#=gov_sig#)'><span class='fa fa-file' title='Click to preview WFP!' style='font-size: 16px;margin-top: -1px;margin-left: 1px;margin-right:1px;width:25px;text-align:center;cursor:pointer;'></span>WFP</div> ")
+            .HtmlAttributes(new { style = "vertical-align: middle;vertical-align:top;text-align:center" })
+            .Width(55);
+
+        col.Template(@<text></text>)
+            .HeaderTemplate(@<text>Gov Signature</text>)
+        .Width(0)
+        .Hidden()
+        .HtmlAttributes(new { style = "text-align:left;" })
+        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+        .ClientTemplate("<div>#=gov_sig# </div>");
+
+        col.Bound(m => m.docid)//Template(@<text></text>)
+        .HeaderTemplate(@<text>document ID</text>)
+            .Width(0)
+            .Hidden()
+            .HtmlAttributes(new { style = "text-align:left;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=docid# </div>");
+        })
+         .ToolBar(toolbar =>
+         {
+             toolbar.Custom().Text("<span class='fa fa-info-circle'></span> Show Detail").Name("btnShowdetail").Url("javascript:void(0)").HtmlAttributes(new { onclick = "btnShowdetail()", id = "btnreviewdetails_id" });
+
+         })
+            //  .Editable(editable => editable.Mode(GridEditMode.InCell))
+            .Resizable(e => e.Columns(true))
+            .Sortable()
+            .Pageable(pageable => pageable
+            .Refresh(true)
+            .ButtonCount(1))
+            //.HtmlAttributes(new { @class = "table-responsive", style = "height:410px;" })
+            .HtmlAttributes(new { @class = "table-responsive", style = "height:490px;" })
+            .Selectable()
+            .Events(e => e.DataBound("onDataBoundWFP"))
+            .DataSource(dataSource => dataSource
+            .Ajax()
+            .Batch(true)
+            .Model(m => m.Id(i => i.locationid))
+            .ServerOperation(false)
+            .Aggregates(a =>
+            {
+                a.Add(c => c.amount).Sum();
+            })
+            .PageSize(5000)
+            .Read(read => read.Action("GetWFPStatus_reviewperitm", "Report").Data("getwfparpritem"))
+            )
+
+)
+</div>
+
+
+
+<br />
+<div class="fa fa-arrow-circle-left" style="display:inline-block; background-color:#54625E;margin-top:-5px;padding-top:5px;padding-bottom:5px;width:100%">
+    <span style="font-weight:bold;color:white;margin-left:5px">NOTE : </span> <span style="color:yellow;margin-right:10px">The activity or item marked with the color yellow indicates it is part of the PPMP.</span>
+</div>
+<div class="k-button k-button-icontext"  style="bottom: 15px; right: 25px;width: 100px;float:left; margin-top: 10px; margin-left:605px;border-radius:50px;background-color:indianred;color:white; margin-bottom:0px" onclick="reqReviewClose()"><span class="fa fa-close"></span> Close</div>
+<script>
+    $(document).ready(function () {
+    
+      
+    })
+    function reqReviewClose(){
+        $("#wfpstatus_review").data("kendoWindow").close()
+    }
+    function closewfpapproved(){
+        $("#grid_wfpstatusreviewperitem").data("kendoGrid").dataSource.read()
+    }
+</script>
+
+@(Html.Kendo().Window()
+        .Name("vwWFPpreparer")
+        //.Title("")
+        .Width(520)
+        .Height(235)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+        .Events(e => e.Close("closewfpapproved"))
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+                .Actions(a => { a.Close(); })
+)
+<style>
+    .ChangeBackColor {
+        background-color: #FFFF80;
+    }
+</style>

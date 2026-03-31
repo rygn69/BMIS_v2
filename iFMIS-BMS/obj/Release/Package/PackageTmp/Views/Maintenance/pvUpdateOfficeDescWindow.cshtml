@@ -1,0 +1,71 @@
+﻿<script>
+    function LoadOfficeDescription() {
+        var OfficeID = $("#ddlOffices_OfficeDesc").val();
+        var url = "@Url.Action("getDescriptionSelectedOffice", "Maintenance")";
+        $.post(url, { OfficeID: OfficeID}, function (d) {
+            document.getElementById("txtOfficeDesc").innerHTML = d
+        })
+    }
+    function reqCloseUpdateOfficeDescWindow() {
+        document.documentElement.style.overflow = 'auto';  // firefox, chrome
+        document.body.scroll = "yes";
+        $("#UpdateOfficeDescriptionWindow").data("kendoWindow").close();
+    }
+    function reqUpdateOfficeDesc() {
+        var OfficeID = $("#ddlOffices_OfficeDesc").val();
+        var OfficeDescription = $("#txtOfficeDesc").val();
+        var url = "@Url.Action("UpdateOfficeDescription", "Maintenance")";
+        $.post(url, { OfficeID: OfficeID, OfficeDescription: OfficeDescription }, function (d) {
+            if (d == 1) {
+                swal({
+                    title: "Success!",
+                    text: "Section Succesffuly Added!",
+                    type: "success",
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+                $("#grOfficeDescriptionList").data("kendoGrid").dataSource.read();
+            }
+            else {
+                swal({
+                    title: "Something went wrong!",
+                    text: d,
+                    type: "error",
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            }
+        })
+    }
+</script>
+
+<div>
+    <label>
+        Office :
+        @(Html.Kendo().ComboBox()
+                         .Name("ddlOffices_OfficeDesc")
+                         .DataTextField("office_name")
+                         .DataValueField("office_id")
+                         .Filter("contains")
+                         .MinLength(1)
+                         .Placeholder("Select Office...")
+                         .HtmlAttributes(new { @style = "width: 510px;" })
+                         .DataSource(source => source.Read(read => read.Action("ddlOfficesWithProposal", "Dropdowns")))
+                         .Events(e => e.Change("LoadOfficeDescription"))
+        )
+    </label>
+    <label>
+        Office Description : <br />
+        <textarea id="txtOfficeDesc" name="txtOfficeDesc" style="height:100px"></textarea>
+    </label>
+    <div style="float:right; margin-top: 10px">
+        <div style="display:inline-block" class="k-button k-button-icontext" onclick="reqUpdateOfficeDesc()"> <i class="fa fa-exchange"></i> Update </div>
+        <div style="display:inline-block" class="k-button k-button-icontext" onclick="reqCloseUpdateOfficeDescWindow()"> <i class="fa fa-times"></i> Close </div>
+    </div>
+</div>
+
+<style>
+    textarea {
+        resize: none;
+    }
+</style>

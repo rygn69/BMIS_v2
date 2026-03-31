@@ -1,0 +1,223 @@
+﻿<script>
+    var SeriesID = 0;
+    function reqSave() {
+        var ddlFundType = $("#ddlFundingSource").val();
+        var ddlYearOf = $("#ddlYear").val();
+        var ddlMainGroup = $("#ddlMainGroup").data("kendoDropDownList").value();
+        var txtIndent = $('#txtIndent').val();
+        var txtParticular = $('#txtParticular').val();
+        var txtAccountCode = $('#txtAccountCode').val();
+        var txtIncomeClassification = $('#txtIncomeClassification').val();
+        var txtPastYear = $('#txtPastYear').val();
+        var txtCurrentYearActual = $('#txtCurrentYearActual').val();
+        var txtCurrentYear = $('#txtCurrentYear').val();
+        var txtBudgetYear = $('#txtBudgetYear').val();
+        var txtOrderNo = $('#txtOrderNo').val();
+        var cbisBold = document.getElementById("cbisBold").checked;
+        var cbisUseAmount = document.getElementById("cbisUseAmount").checked;
+        var cbHasFooterTotal = document.getElementById("cbHasFooterTotal").checked;
+        var cbUseTotalinGraph = document.getElementById("cbUseTotalinGraph").checked;
+        if (document.getElementById("btnSave").innerHTML == "Add") {
+            var url = "@Url.Action("SaveNewParticular", "LBPForm1")";
+            $.post(url, {
+                FundType: ddlFundType,
+                YearOf: ddlYearOf,
+                MainGroup: ddlMainGroup,
+                RowNo: txtIndent,
+                Particular: txtParticular,
+                AccountCode: txtAccountCode,
+                IncomeClassification: txtIncomeClassification,
+                PastYear: txtPastYear,
+                CurrentYear: txtCurrentYear,
+                BudgetYear :txtBudgetYear,
+                OrderNo: txtOrderNo,
+                isBold: cbisBold,
+                isUseAmount: cbisUseAmount,
+                HasFooterTotal: cbHasFooterTotal,
+                UseTotalinGraph: cbUseTotalinGraph,
+                txtCurrentYearActual: txtCurrentYearActual
+            }, function (d) {
+                if (d == 1) {
+                    swal({
+                        title: "Success!",
+                        text: "Income succesfully Added",
+                        type: "success",
+                        showConfirmButton: true
+                    });
+                }
+                else {
+                    swal({
+                        title: "Error!",
+                        text: d,
+                        type: "error",
+                        showConfirmButton: true
+                    });
+                }
+            })
+        }
+        else {
+            var url = "@Url.Action("UpdateParticular", "LBPForm1")";
+            $.post(url, {
+                SeriesID:SeriesID,
+                FundType: ddlFundType,
+                YearOf: ddlYearOf,
+                MainGroup: ddlMainGroup,
+                RowNo: txtIndent,
+                Particular: txtParticular,
+                AccountCode: txtAccountCode,
+                IncomeClassification: txtIncomeClassification,
+                PastYear: txtPastYear,
+                CurrentYear: txtCurrentYear,
+                BudgetYear :txtBudgetYear,
+                OrderNo: txtOrderNo,
+                isBold: cbisBold,
+                isUseAmount: cbisUseAmount,
+                HasFooterTotal: cbHasFooterTotal,
+                UseTotalinGraph: cbUseTotalinGraph,
+                txtCurrentYearActual: txtCurrentYearActual
+            }, function (d) {
+                if (d == 1) {
+                    swal({
+                        title: "Success!",
+                        text: "Income succesfully Updated",
+                        type: "success",
+                        showConfirmButton: true
+                    });
+                }
+                else {
+                    swal({
+                        title: "Error!",
+                        text: d,
+                        type: "error",
+                        showConfirmButton: true
+                    });
+                }
+            })
+        }
+    }
+</script>
+<div>
+    <div style="width:98%;display:inline-block">
+        <label style="margin-left: 0px;margin-left: 10px;margin-top: 5px;margin-bottom: 2px; display : inline-block;width:100%">
+            Group Under : @(Html.Kendo().DropDownList()
+                .Name("ddlMainGroup")
+                .DataValueField("Value")
+                .DataTextField("Text")
+                .OptionLabel("Select Main Particular...")
+                .Filter("contains")
+                .MinLength(1)
+                .HtmlAttributes(new { @style = "width: 80%" })
+                    //.Events(e => e.Change("onDropDownChange"))
+                .DataSource(source => source.Read(read => read.Action("getParticulars", "LBPForm1").Data("GridParameters")))
+            )
+        </label>
+    </div>
+    <div style="width:98%;display:inline-block">
+        <label style="margin-left: 0px;margin-left: 10px;margin-top: 5px;margin-bottom: 2px; display : inline-block;width:100%">
+            Particular :<input id="txtIndent" style="width:10%; margin-left:26px;" placeholder="indent" /> <input id="txtParticular" style="width:68%; margin-left:0px" placeholder="Particular"/>
+        </label>
+    </div>
+    <div style="width:98%;display:inline-block">
+        <label style="margin-left: 0px;margin-left: 10px;margin-top: 5px;margin-bottom: 2px; display : inline-block;width:100%">
+            Account Code : <input id="txtAccountCode" style="width:25%;margin-right:5px" />
+            Income Classification : <input id="txtIncomeClassification" style="width:25%;" />
+        </label>
+    </div>
+    <div style="width:98%;display:inline-block">
+        <label style="margin-left: 0px;margin-left: 10px;margin-top: 5px;margin-bottom: 2px; display : inline-block;text-align:center;background-color:white">
+            Amount :
+        </label>
+        <div style="border:solid;border-color:#1fa67a;padding:5px;margin-top:-10px">
+            <label style="margin-left: 0px;margin-left: 10px;margin-top: 5px;margin-bottom: 2px; display : inline-block;width:100%">
+                <input id="txtPastYear" onkeyup="OnKeyUpConvertToCurrency(event, 'txtPastYear')" onkeydown="FilterNumericOnly(event)" style="margin-right:5px;width:29%" placeholder="Past Year" maxlength="19" />
+                <input id="txtCurrentYearActual" onkeyup="OnKeyUpConvertToCurrency(event, 'txtCurrentYearActual')" onkeydown="    FilterNumericOnly(event)" style="margin-right:5px;width:29%" placeholder="First Sem(Actual)" maxlength="19" />
+                <input id="txtCurrentYear" onkeyup="OnKeyUpConvertToCurrency(event, 'txtCurrentYear')" onkeydown="FilterNumericOnly(event)" style="margin-right:5px;width:29%" placeholder="Current Year" maxlength="19" />
+                
+                <input id="txtBudgetYear" onkeyup="OnKeyUpConvertToCurrency(event, 'txtBudgetYear')" onkeydown="FilterNumericOnly(event)" style="width:29%;margin-top:8px;" placeholder="Budget Year" maxlength="19" />
+            </label>
+        </div>
+    </div>
+    <div style="width:98%;display:inline-block">
+        <label style="margin-left: 0px;margin-left: 10px;margin-top: 5px;margin-bottom: 2px; display : inline-block;text-align:center;background-color:white">
+            Other Controls :
+        </label>
+        <div style="border:solid;border-color:#1fa67a;padding:5px;margin-top:-10px">
+            <label style="margin-left: 0px;margin-left: 10px;margin-top: 5px; display : inline-block;width:100%">
+                <span style="color:red"> *Note : Check if Applicable</span>
+                <input id="txtOrderNo" style="width:100px;float:right;margin-right:20px;" placeholder="Order No" /> 
+                <span style="float:right;margin-right:5px"> Order No : </span> 
+            </label>
+            <div style="display : inline-block; width : 15%;">
+                <input type="checkbox" id="cbisBold" class="k-checkbox" style="display:inline-block">
+                <label class="k-checkbox-label" for="cbisBold" style="display:inline-block">Bold</label>
+            </div>
+            <div style="display : inline-block; width : 24%;">
+                <input type="checkbox" id="cbisUseAmount" class="k-checkbox" style="display:inline-block">
+                <label class="k-checkbox-label" for="cbisUseAmount" style="display:inline-block">Use Amount</label>
+            </div>
+            <div style="display : inline-block; width : 24%;">
+                <input type="checkbox" id="cbHasFooterTotal" class="k-checkbox" style="display:inline-block">
+                <label class="k-checkbox-label" for="cbHasFooterTotal" style="display:inline-block">Has Footer Total</label>
+            </div>
+            <div style="display : inline-block; width : 30%;">
+                <input type="checkbox" id="cbUseTotalinGraph" class="k-checkbox" style="display:inline-block">
+                <label class="k-checkbox-label" for="cbUseTotalinGraph" style="display:inline-block">Use Total in Graph</label>
+            </div>
+        </div>
+    </div>
+    <div style="float:right">
+        <div id="btnSave" class="k-button k-button-icontext" style="display:inline-block;bottom: 15px; right: 20px;width: 80px;clear:both; margin-top: 10px" onclick="reqSave()">Save</div>
+        <div id="btnClose" class="k-button k-button-icontext" style="display:inline-block;bottom: 15px; right: 20px;width: 80px;clear:both; margin-top: 10px" onclick="CloseKendoWindow('AddNewItemWindow')">Close</div>
+    </div>
+</div>
+
+
+<script>
+    function GetNewOrderNo() {
+        var FundType = $("#ddlFundingSource").val();
+        var YearOf = $("#ddlYear").val();
+        var url = "@Url.Action("getNewOrderNo", "LBPForm1")";
+        $.post(url, { FundType: FundType, YearOf: YearOf }, function (d) {
+            $("#txtOrderNo").val(d);
+        })
+    }
+    $(document).ready(function () {
+        var ViewBagData = '@ViewBag.Mode';
+        var arr = ViewBagData.split(',')
+        var Mode = arr[0];
+        SeriesID = arr[1];
+        if (Mode == "Add") {
+            GetNewOrderNo();
+            document.getElementById("btnSave").innerHTML = "Add";
+        }
+        else {
+            document.getElementById("btnSave").innerHTML = "Update";
+            var url = "@Url.Action("GetSelectedDataForEdit", "LBPForm1")";
+            $.post(url, { SeriesID: SeriesID }, function (d) {
+                $("#ddlMainGroup").data("kendoDropDownList").value(d[0]);
+                $('#txtIndent').val(d[1]);
+                $('#txtParticular').val(d[2]);
+                $('#txtAccountCode').val(d[3]);
+                $('#txtIncomeClassification').val(d[4]);
+                $('#txtPastYear').val(d[5]);
+                $('#txtCurrentYear').val(d[6]);
+                $('#txtBudgetYear').val(d[7]);
+                $('#txtOrderNo').val(d[8]);
+                $('#txtCurrentYearActual').val(d[13]);
+                
+                if (d[9] != 0) {
+                    document.getElementById("cbisBold").checked = true;
+                }
+                if (d[10] != 0) {
+                    document.getElementById("cbisUseAmount").checked = true;
+                }
+                if (d[11] != 0) {
+                    document.getElementById("cbHasFooterTotal").checked = true;
+                }
+                if (d[12] != 0) {
+                    document.getElementById("cbUseTotalinGraph").checked = true;
+                }
+            })
+        }
+    });
+</script>

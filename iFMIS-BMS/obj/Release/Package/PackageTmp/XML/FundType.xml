@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Table>
+  <Fundtype>
+    <FundTypeID>1</FundTypeID>
+    <FundTypeName>Special Education Fund</FundTypeName>
+  </Fundtype>
+  <Fundtype>
+    <FundTypeID>2</FundTypeID>
+    <FundTypeName>Local Disaster Risk Reduction and Management Fund</FundTypeName>
+  </Fundtype>
+  <Fundtype>
+    <FundTypeID>3</FundTypeID>
+    <FundTypeName>20% Development Fund</FundTypeName>
+  </Fundtype>
+  <Fundtype>
+    <FundTypeID>4</FundTypeID>
+    <FundTypeName>General Fund Proper</FundTypeName>
+  </Fundtype>
+  <Fundtype>
+    <FundTypeID>5</FundTypeID>
+    <FundTypeName>Economic Enterprises</FundTypeName>
+  </Fundtype>
+</Table>

@@ -1,0 +1,587 @@
+﻿
+<script>
+
+
+    function reqUpdate(e) {
+        var MenuIDs = [];
+        var urlUpdateUsertypeRule = "@Url.Action("updateUsertypeRule", "Maintenance")";
+        var UsertypeID = $('#ddlUserType').val();
+        if (UsertypeID == "") {
+            $.Notify({
+                caption: 'Cannot Complete Request',
+                content: 'Please Select Usertype',
+                type: 'warning'
+            });
+        }
+        else
+        {
+            MenuIDs.push(1);
+            MenuIDs.push(2);
+            if (document.getElementById("cbExcessAppropriation").checked == true
+                    || document.getElementById("cbMonthlyRelease").checked == true || document.getElementById("cbOFAnnualApproPriation").checked == true
+                    || document.getElementById("cbOFRelease").checked == true || document.getElementById("cbSuplementalBudgetRegistry").checked == true) {
+                MenuIDs.push(3);
+            }
+            if (document.getElementById("cbBudgetContolCurrent").checked == true || document.getElementById("cbBudgetControlExcess").checked == true) {
+                MenuIDs.push(10);
+            }
+            if (document.getElementById("cbUsers").checked == true || document.getElementById("cbManagePrograms").checked == true
+                || document.getElementById("cbManageAccounts").checked == true || document.getElementById("cbManageProgramAccounts").checked == true
+                || document.getElementById("cbUserType").checked == true || document.getElementById("cbPlantillaBuildUp").checked == true
+                || document.getElementById("cbMagnaCarta").checked == true || document.getElementById("cbCopyStepIncrement").checked == true
+                 || document.getElementById("cbOtherFunds").checked == true || document.getElementById("cbConfigureLBP1").checked == true) {
+                MenuIDs.push(2002);
+            }
+            if (document.getElementById("cbPrintLBP5").checked == true || document.getElementById("cbPrintLBP4").checked == true
+            || document.getElementById("cbPrintLBP3").checked == true || document.getElementById("cbPrintSOO").checked == true
+            || document.getElementById("cbPrintAIP").checked == true) {
+                MenuIDs.push(4015);
+            }
+            if (document.getElementById("cbBuildUpProgram").checked == true || document.getElementById("cbBuildUpAccount").checked == true
+                || document.getElementById("cbBuildUpProgramAccount").checked == true || document.getElementById("cbCopyProgramAccounts").checked == true
+                || document.getElementById("cbLineGraph").checked == true) {
+                MenuIDs.push(3009);
+            }
+            if (document.getElementById("cbBudgetAppropriation").checked == true) {
+                MenuIDs.push(4);
+            }
+            if (document.getElementById("cbExcessAppropriation").checked == true) {
+                MenuIDs.push(5);
+            }
+            if (document.getElementById("cbMonthlyRelease").checked == true) {
+                MenuIDs.push(6);
+            }
+            if (document.getElementById("cbOFAnnualApproPriation").checked == true) {
+                MenuIDs.push(7);
+            }
+            if (document.getElementById("cbOFRelease").checked == true) {
+                MenuIDs.push(8);
+            }
+            if (document.getElementById("cbSuplementalBudgetRegistry").checked == true) {
+                MenuIDs.push(9);
+            }
+            if (document.getElementById("cbBudgetContolCurrent").checked == true) {
+                MenuIDs.push(11);
+            }
+            if (document.getElementById("cbBudgetControlExcess").checked == true) {
+                MenuIDs.push(1002);
+            }
+            if (document.getElementById("cbUsers").checked == true) {
+                MenuIDs.push(2003);
+            }
+            if (document.getElementById("cbBuildUpProgram").checked == true) {
+                MenuIDs.push(3003);
+            }
+            if (document.getElementById("cbBuildUpAccount").checked == true) {
+                MenuIDs.push(3004);
+            }
+            if (document.getElementById("cbBuildUpProgramAccount").checked == true) {
+                MenuIDs.push(3007);
+            }
+            if (document.getElementById("cbCopyProgramAccounts").checked == true) {
+                MenuIDs.push(3010);
+            }
+            if (document.getElementById("cbManagePrograms").checked == true) {
+                MenuIDs.push(4011);
+            }
+            if (document.getElementById("cbManageAccounts").checked == true) {
+                MenuIDs.push(4012);
+            }
+            if (document.getElementById("cbManageProgramAccounts").checked == true) {
+                MenuIDs.push(4013);
+            }
+            if (document.getElementById("cbUserType").checked == true) {
+                MenuIDs.push(5015);
+            }
+            if (document.getElementById("cbPlantillaBuildUp").checked == true) {
+                MenuIDs.push(6015);
+            }
+            if (document.getElementById("cbMagnaCarta").checked == true) {
+                MenuIDs.push(6016);
+            }
+            if (document.getElementById("cbConfigureLBP5").checked == true) {
+                MenuIDs.push(7015);
+            }
+            if (document.getElementById("cbPrintLBP5").checked == true) {
+                MenuIDs.push(8015);
+            }
+            if (document.getElementById("cbPrintLBP4").checked == true) {
+                MenuIDs.push(9015);
+            }
+            if (document.getElementById("cbPrintLBP3").checked == true) {
+                MenuIDs.push(9016);
+            }
+            if (document.getElementById("cbPrintSOO").checked == true) {
+                MenuIDs.push(9017);
+            }
+            if (document.getElementById("cbPrintAIP").checked == true) {
+                MenuIDs.push(9018);
+            }
+            if (document.getElementById("cbOtherFunds").checked == true) {
+                MenuIDs.push(10015);
+            }
+            if (document.getElementById("cbConfigureLBP1").checked == true) {
+                MenuIDs.push(11016);
+            }
+            if (document.getElementById("cbLineGraph").checked == true) {
+                MenuIDs.push(11017);
+            }
+            $.post(urlUpdateUsertypeRule, { MenuIDs: MenuIDs, UsertypeID: UsertypeID }, function (d) {
+                if (d == 1) {
+                    if (UsertypeID == 3) {
+                        var cbPS;
+                        var cbMOOE;
+                        var cbCO;
+                        var cbFE;
+                        var urlUpdateUserType = "@Url.Action("Updateusertype", "Maintenance")";
+                        if (document.getElementById("cbPS").checked == true) {
+                            cbPS = 1;
+                        }
+                        else {
+                            cbPS = 0;
+                        }
+                        if (document.getElementById("cbMOOE").checked == true) {
+                            cbMOOE = 1;
+                        }
+                        else {
+                            cbMOOE = 0;
+                        }
+                        if (document.getElementById("cbCO").checked == true) {
+                            cbCO = 1;
+                        }
+                        else {
+                            cbCO = 0;
+                        }
+                        if (document.getElementById("cbFE").checked == true) {
+                            cbFE = 1;
+                        }
+                        else {
+                            cbFE = 0;
+                        }
+                        $.post(urlUpdateUserType, { UsertypeID: UsertypeID, PS: cbPS, MOOE: cbMOOE, CO: cbCO, FE: cbFE }, function (data) {
+                            if (data == 1) {
+                                UncheckAllCB();
+                                $("#ddlUserType").data("kendoDropDownList").value(0);
+                                $.Notify({
+                                    caption: 'Success',
+                                    content: 'Successfuly Updated',
+                                    type: 'success'
+                                });
+                            }
+                        })
+                    }
+                    else {
+                        UncheckAllCB();
+                        $("#ddlUserType").data("kendoDropDownList").value(0);
+                        $.Notify({
+                            caption: 'Success',
+                            content: 'Successfuly Updated',
+                            type: 'success'
+                        });
+                    }
+                }
+                else {
+                    UncheckAllCB();
+                    $("#ddlUserType").data("kendoDropDownList").value(0);
+                    document.getElementById("AdditionalRulesDIV").style.display = "none";
+                    $.Notify({
+                        caption: 'Cannot Complete Request',
+                        content: d,
+                        type: 'alert'
+                    });
+                }
+            })
+        }
+    }
+    function loadRoles() {
+        UncheckAllCB();
+
+        var UserTypeID = $('#ddlUserType').val()
+        var url = "@Url.Action("GetUserTypeMenu", "User")";
+        $.post(url, { UserTypeID: UserTypeID }, function (d) {
+
+            for (var i = 0; i <= (d.length - 1) ; i++) {
+                switch (d[i]) {
+                    case 4:
+                        document.getElementById("cbBudgetAppropriation").checked = true;
+                        break;
+                    case 5:
+                        document.getElementById("cbExcessAppropriation").checked = true;
+                        break;
+                    case 6:
+                        document.getElementById("cbMonthlyRelease").checked = true;
+                        break;
+
+                    case 7:
+                        document.getElementById("cbOFAnnualApproPriation").checked = true;
+                        break;
+                    case 8:
+                        document.getElementById("cbOFRelease").checked = true;
+                        break;
+                    case 9:
+                        document.getElementById("cbSuplementalBudgetRegistry").checked = true;
+                        break;
+                    case 11:
+                        document.getElementById("cbBudgetContolCurrent").checked = true;
+                        break;
+                    case 1002:
+                        document.getElementById("cbBudgetControlExcess").checked = true;
+                        break;
+                    case 2003:
+                        document.getElementById("cbUsers").checked = true;
+                        break;
+                    case 3003:
+                        document.getElementById("cbBuildUpProgram").checked = true;
+                        break;
+                    case 3004:
+                        document.getElementById("cbBuildUpAccount").checked = true;
+                        break;
+                    case 3007:
+                        document.getElementById("cbBuildUpProgramAccount").checked = true;
+                        break;
+                    case 3010:
+                        document.getElementById("cbCopyProgramAccounts").checked = true;
+                        break;
+                    case 4011:
+                        document.getElementById("cbManagePrograms").checked = true;
+                        break;
+                    case 4012:
+                        document.getElementById("cbManageAccounts").checked = true;
+                        break;
+                    case 4013:
+                        document.getElementById("cbManageProgramAccounts").checked = true;
+                        break;
+                    case 5015:
+                        document.getElementById("cbUserType").checked = true;
+                        break;
+                    case 6015:
+                        document.getElementById("cbPlantillaBuildUp").checked = true;
+                        break;
+                    case 6016:
+                        document.getElementById("cbMagnaCarta").checked = true;
+                        break;
+                    case 7015:
+                        document.getElementById("cbConfigureLBP5").checked = true;
+                        break;
+                    case 8015:
+                        document.getElementById("cbPrintLBP5").checked = true;
+                        break;
+                    case 9015:
+                        document.getElementById("cbPrintLBP4").checked = true;
+                        break;
+                    case 9016:
+                        document.getElementById("cbPrintLBP3").checked = true;
+                        break;
+                    case 9017:
+                        document.getElementById("cbPrintSOO").checked = true;
+                        break;
+                    case 9018:
+                        document.getElementById("cbPrintAIP").checked = true;
+                        break;
+                    case 10015:
+                        document.getElementById("cbOtherFunds").checked = true;
+                        break;
+                    case 11016:
+                        document.getElementById("cbConfigureLBP1").checked = true;
+                        break;
+                    case 11017:
+                        document.getElementById("cbLineGraph").checked = true;
+                        break;
+
+                }
+            }
+        })
+        if (UserTypeID != 3) {
+            document.getElementById("AdditionalRulesDIV").style.display = "none";
+        }
+        else {
+            document.getElementById("AdditionalRulesDIV").style.display = "block";
+            loadAdditionalRules();
+        }
+        
+    }    
+    function loadAdditionalRules() {
+        var UserTypeID = $('#ddlUserType').val()
+        var url = "@Url.Action("GetAdditionalRules", "Maintenance")";
+        $.post(url, { UserTypeID: UserTypeID }, function (d) {
+
+            for (var i = 0; i <= (d.length - 1) ; i++) {
+                switch (i) {
+                    case 0:                        
+                        if (d[i] == 1) {
+                            document.getElementById("cbPS").checked = true;
+                        }
+                        else {
+                            document.getElementById("cbPS").checked = false;
+                        }
+                        
+                        break;
+                    case 1:
+                        if (d[i] == 1) {
+                            document.getElementById("cbMOOE").checked = true;
+                        }
+                        else {
+                            document.getElementById("cbMOOE").checked = false;
+                        }
+
+                        break;
+                    case 2:
+                        if (d[i] == 1) {
+                            document.getElementById("cbCO").checked = true;
+                        }
+                        else {
+                            document.getElementById("cbCO").checked = false;
+                        }
+
+                        break;
+                    case 3:
+                        if (d[i] == 1) {
+                            document.getElementById("cbFE").checked = true;
+                        }
+                        else {
+                            document.getElementById("cbFE").checked = false;
+                        }
+
+                        break;
+
+                }
+            }
+        })
+    }
+    function UncheckAllCB(e) {
+        document.getElementById("cbBudgetAppropriation").checked = false;
+        document.getElementById("cbExcessAppropriation").checked = false;
+        document.getElementById("cbMonthlyRelease").checked = false;
+        document.getElementById("cbOFAnnualApproPriation").checked = false;
+        document.getElementById("cbOFRelease").checked = false;
+        document.getElementById("cbSuplementalBudgetRegistry").checked = false;
+        document.getElementById("cbBudgetContolCurrent").checked = false;
+        document.getElementById("cbBudgetControlExcess").checked = false;
+        document.getElementById("cbUsers").checked = false;
+        document.getElementById("cbBuildUpProgram").checked = false;
+        document.getElementById("cbBuildUpAccount").checked = false;
+        document.getElementById("cbBuildUpProgramAccount").checked = false;
+        document.getElementById("cbCopyProgramAccounts").checked = false;
+        document.getElementById("cbManagePrograms").checked = false;
+        document.getElementById("cbManageAccounts").checked = false;
+        document.getElementById("cbManageProgramAccounts").checked = false;
+        document.getElementById("cbUserType").checked = false;
+        document.getElementById("cbPlantillaBuildUp").checked = false;
+        document.getElementById("cbMagnaCarta").checked = false;
+        document.getElementById("cbPS").checked = false;
+        document.getElementById("cbMOOE").checked = false;
+        document.getElementById("cbCO").checked = false;
+        document.getElementById("cbFE").checked = false;
+        document.getElementById("cbConfigureLBP5").checked = false;
+        document.getElementById("cbPrintLBP5").checked = false;
+        document.getElementById("cbPrintLBP4").checked = false;
+        document.getElementById("cbPrintLBP3").checked = false;
+        document.getElementById("cbPrintSOO").checked = false;
+        document.getElementById("cbPrintAIP").checked = false;
+        document.getElementById("cbOtherFunds").checked = false;
+        document.getElementById("cbConfigureLBP1").checked = false;
+        document.getElementById("cbLineGraph").checked = false;
+
+    }
+
+    $(document).ready(function () {
+        document.getElementById("AdditionalRulesDIV").style.display = "none";
+    });
+</script>
+<div style="width : 100%; margin-top: 0px;border-style: solid; border-color: #1fa67a;">
+    <div style="width:100%;height : 25px ; background-color:#1fa67a; color: white">
+        <label class="fa fa-male fa-lg" style="margin-left: 5px; display:inline-block">  USER TYPE SETTINGS</label>
+    </div>
+    <div style="margin-left: 5px; margin-bottom:5px">
+        <label style="margin-left: 0px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px; display : inline-block">
+            User Type : @(Html.Kendo().DropDownList()
+                        .Name("ddlUserType")
+                        .DataTextField("UserTypeDesc")
+                        .DataValueField("UserTypeID")
+                        .OptionLabel("Select User Type...")
+                        .HtmlAttributes(new { @style = "width: 250px;" })
+                        .DataSource(source => source.Read(read => read.Action("ddlUserType", "User")))
+                        .Events(e => { e.Change("loadRoles"); })
+            )
+
+        </label>
+        <div style="width:98.5%;border-style: solid; border-color: #1fa67a; margin-top :10px ;">
+            <div style="width:100%;height : 25px ; background-color:#1fa67a; color: white">
+                <label class="fa fa-bars fa-lg" style="margin-left: 5px; display:inline-block">  Default Menu</label>
+            </div>
+            <div style="width:100%;margin: 12px; font-size:12px">
+                <div style="display : inline-block; width : 32%;">
+                    <input type="checkbox" id="cbBudgetAppropriation" class="k-checkbox" value="4">
+                    <label class="k-checkbox-label" for="cbBudgetAppropriation">Budget Appropriation</label>
+                </div>
+                <div style="display : inline-block; width : 32%;">
+                    <input type="checkbox" id="cbExcessAppropriation" class="k-checkbox" value="5">
+                    <label class="k-checkbox-label" for="cbExcessAppropriation">Excess Appropriation</label>
+                </div>
+                <div style="display : inline-block; width : 32%;">
+                    <input type="checkbox" id="cbMonthlyRelease" class="k-checkbox" value="6">
+                    <label class="k-checkbox-label" for="cbMonthlyRelease">Monthly Release</label>
+                </div>
+
+
+            </div>
+            <div style="width:100%;margin: 12px; font-size:12px">
+                <div style="display : inline-block; width : 32%;">
+                    <input type="checkbox" id="cbOFAnnualApproPriation" class="k-checkbox" value="7">
+                    <label class="k-checkbox-label" for="cbOFAnnualApproPriation">Other Funds Annual Approp.</label>
+                </div>
+                <div style="display : inline-block; width : 32%;">
+                    <input type="checkbox" id="cbOFRelease" class="k-checkbox" value="8">
+                    <label class="k-checkbox-label" for="cbOFRelease">Other Funds Release</label>
+                </div>
+                <div style="display : inline-block; width : 32%;">
+                    <input type="checkbox" id="cbSuplementalBudgetRegistry" class="k-checkbox" value="9">
+                    <label class="k-checkbox-label" for="cbSuplementalBudgetRegistry">Suplemental Budget Registry</label>
+                </div>
+
+            </div>
+            <div style="width:100%;margin: 12px; font-size:12px">
+                <div style="display : inline-block; width : 32%;">
+                    <input type="checkbox" id="cbBudgetContolCurrent" class="k-checkbox" value="11">
+                    <label class="k-checkbox-label" for="cbBudgetContolCurrent">Budget Control Current</label>
+                </div>
+                <div style="display : inline-block; width : 32%;">
+                    <input type="checkbox" id="cbBudgetControlExcess" class="k-checkbox" value="1002">
+                    <label class="k-checkbox-label" for="cbBudgetControlExcess">Budget Control Excess</label>
+                </div>
+
+                <div style="display : inline-block; width : 32%;">
+                    <input type="checkbox" id="cbUsers" class="k-checkbox" value="2003">
+                    <label class="k-checkbox-label" for="cbUsers">Add/Update Users</label>
+                </div>
+
+            </div>
+
+            <div style="width:100%;margin: 12px; font-size:12px">
+                <div style="display : inline-block; width : 32%;">
+                    <input type="checkbox" id="cbBuildUpProgram" class="k-checkbox" value="3003">
+                    <label class="k-checkbox-label" for="cbBuildUpProgram">Build-up Program</label>
+                </div>
+                <div style="display : inline-block; width : 32%;">
+                    <input type="checkbox" id="cbBuildUpAccount" class="k-checkbox" value="3004">
+                    <label class="k-checkbox-label" for="cbBuildUpAccount">Build-up Account</label>
+                </div>
+
+                <div style="display : inline-block; width : 32%;">
+                    <input type="checkbox" id="cbBuildUpProgramAccount" class="k-checkbox" value="3007">
+                    <label class="k-checkbox-label" for="cbBuildUpProgramAccount">Build-up Program Account</label>
+                </div>
+
+            </div>
+
+            <div style="width:100%;margin: 12px; font-size:12px">
+                <div style="display : inline-block; width : 32%;">
+                    <input type="checkbox" id="cbCopyProgramAccounts" class="k-checkbox" value="3010">
+                    <label class="k-checkbox-label" for="cbCopyProgramAccounts">Copy Program Accounts</label>
+                </div>
+                <div style="display : inline-block; width : 32%;">
+                    <input type="checkbox" id="cbManagePrograms" class="k-checkbox" value="4011">
+                    <label class="k-checkbox-label" for="cbManagePrograms">Manage Programs</label>
+                </div>
+                <div style="display : inline-block; width : 32%;">
+                    <input type="checkbox" id="cbManageAccounts" class="k-checkbox" value="4012">
+                    <label class="k-checkbox-label" for="cbManageAccounts">Manage Accounts</label>
+                </div>
+            </div>
+            <div style="width:100%;margin: 12px; font-size:12px">
+                <div style="display : inline-block; width : 32%;">
+                    <input type="checkbox" id="cbManageProgramAccounts" class="k-checkbox" value="4013">
+                    <label class="k-checkbox-label" for="cbManageProgramAccounts">Manage Program Accounts</label>
+                </div>
+                <div style="display : inline-block; width : 32%;">
+                    <input type="checkbox" id="cbConfigureLBP5" class="k-checkbox" value="7015">
+                    <label class="k-checkbox-label" for="cbConfigureLBP5">Configure LBP5 Form</label>
+                </div>
+                <div style="display : inline-block; width : 32%;">
+                    <input type="checkbox" id="cbUserType" class="k-checkbox" value="5015">
+                    <label class="k-checkbox-label" for="cbUserType">User Type Settings</label>
+                </div>
+            </div>
+            <div style="width:100%;margin: 12px; font-size:12px">
+                <div style="display : inline-block; width : 32%;">
+                    <input type="checkbox" id="cbPlantillaBuildUp" class="k-checkbox" value="6015">
+                    <label class="k-checkbox-label" for="cbPlantillaBuildUp">Plantilla Build-Up</label>
+                </div>
+                <div style="display : inline-block; width : 32%;">
+                    <input type="checkbox" id="cbMagnaCarta" class="k-checkbox" value="6016">
+                    <label class="k-checkbox-label" for="cbMagnaCarta">Magna-Carta Settings</label>
+                </div>
+                <div style="display : inline-block; width : 32%;">
+                    <input type="checkbox" id="cbPrintLBP5" class="k-checkbox" value="8015">
+                    <label class="k-checkbox-label" for="cbPrintLBP5">Print LBP Form 5</label>
+                </div>
+            </div>
+            <div style="width:100%;margin: 12px; font-size:12px">
+                <div style="display : inline-block; width : 32%;">
+                    <input type="checkbox" id="cbPrintLBP4" class="k-checkbox" value="9015">
+                    <label class="k-checkbox-label" for="cbPrintLBP4">Print LBP Form 4</label>
+                </div>
+                <div style="display : inline-block; width : 32%;">
+                    <input type="checkbox" id="cbPrintLBP3" class="k-checkbox" value="9016">
+                    <label class="k-checkbox-label" for="cbPrintLBP3">Print LBP Form 3</label>
+                </div>
+                <div style="display : inline-block; width : 32%;">
+                    <input type="checkbox" id="cbPrintSOO" class="k-checkbox" value="9017">
+                    <label class="k-checkbox-label" for="cbPrintSOO">Print SOO Form</label>
+                </div>
+            </div>
+            <div style="width:100%;margin: 12px; font-size:12px">
+                <div style="display : inline-block; width : 32%;">
+                    <input type="checkbox" id="cbPrintAIP" class="k-checkbox" value="9018">
+                    <label class="k-checkbox-label" for="cbPrintAIP">Print AIP Form</label>
+                </div>
+                <div style="display : inline-block; width : 32%;">
+                    <input type="checkbox" id="cbOtherFunds" class="k-checkbox" value="10015">
+                    <label class="k-checkbox-label" for="cbOtherFunds">Other Funds</label>
+                </div>
+                <div style="display : inline-block; width : 32%;">
+                    <input type="checkbox" id="cbConfigureLBP1" class="k-checkbox" value="11016">
+                    <label class="k-checkbox-label" for="cbConfigureLBP1">Configure LBP 1</label>
+                </div>
+            </div>
+            <div style="width:100%;margin: 12px; font-size:12px">
+                <div style="display : inline-block; width : 32%;">
+                    <input type="checkbox" id="cbLineGraph" class="k-checkbox" value="11017">
+                    <label class="k-checkbox-label" for="cbLineGraph">Budget History Graph</label>
+                </div>
+            </div>
+        </div>
+        
+        <div id="AdditionalRulesDIV" style="width:98.5%;border-style: solid; border-color: #1fa67a; margin-top :-7px;">
+            <div style="width:100%;height : 25px ; background-color:#1fa67a; color: white">
+                <label class="fa fa-plus-square fa-lg" style="margin-left: 5px; display:inline-block">  Additional Rules</label>
+            </div>
+            <div style="width:100%;margin: 12px; font-size:12px">
+                <div style="display : inline-block; width : 45%;">
+                    <input type="checkbox" id="cbPS" class="k-checkbox">
+                    <label class="k-checkbox-label" for="cbPS">Can Review Personal Services</label>
+                </div>
+                <div style="display : inline-block; width : 45%;">
+                    <input type="checkbox" id="cbMOOE" class="k-checkbox">
+                    <label class="k-checkbox-label" for="cbMOOE">Can Review MOOE</label>
+                </div>
+            </div>
+            <div style="width:100%;margin: 12px; font-size:12px">
+                <div style="display : inline-block; width : 45%;">
+                    <input type="checkbox" id="cbCO" class="k-checkbox">
+                    <label class="k-checkbox-label" for="cbCO">Can Review Capital Outlay</label>
+                </div>
+                <div style="display : inline-block; width : 45%;">
+                    <input type="checkbox" id="cbFE" class="k-checkbox">
+                    <label class="k-checkbox-label" for="cbFE">Can Review Financial Expenses</label>
+                </div>
+
+                
+            </div>
+
+        </div>
+    </div>
+    <div style="display:inline-block;width:100%">
+        <div id="btnUpdate" class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 80px;float:right; margin-top: 5px; margin-right:10px; margin-bottom:5px" onclick="reqUpdate()">Update</div>
+    </div>
+</div>

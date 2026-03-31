@@ -1,0 +1,99 @@
+﻿
+<script>
+    function RealGridSubmitted() {
+        var office_id = $('#office_revert_to_null').val() == "" ? 0 : $('#office_revert_to_null').val()
+        var program_id = $('#Program_revert_to_null').val() == "" ? 0 : $('#Program_revert_to_null').val()
+        var account_id = $('#account_list_revert_to_null').val() == "" ? 0 : $('#account_list_revert_to_null').val()
+        var subaccount = 0
+        return {
+            office_id: office_id,
+            program_id: program_id,
+            account_id: account_id,
+            yearof: $("#ddlYear").val(),
+            subaccount: subaccount,
+            submit: 0,
+            approved: 0,
+            posted: 0,
+            revsumm: $("#revsummaryid").val()
+        }
+    }
+    function searchReAccount() {
+        var $filter = new Array();
+        $filter = [];
+
+        if ($('#SearchRevertSurplus').val().length > 0) {
+            $filter.push({ field: "officename", operator: "contains", value: $('#SearchRevertSurplus').val() })
+        }
+
+        $('#grd_revertsurplus').data('kendoGrid').dataSource.filter({
+            logic: "or",
+            filters: $filter
+        });
+
+    }
+
+    $(function () {
+        $("#SearchRevertSurplus").keypress(function (e) {
+            if (e.keyCode == 13) {
+                searchReAccount();
+            }
+        });
+    });
+    function frmRealignclosesurplus() {
+        $("#reversionsurplus").data("kendoWindow").close();
+    }
+</script>
+<div id="searchAccountid" style="height: 30px; margin-top: -5px; float: right;">
+    <input type="text" style="width:271.5px;border-collapse:collapse;margin:0px;border-style:solid;margin-left:0px;height:70%;outline:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search..." id="SearchRevertSurplus" name="SearchRevertSurplus">
+    <div class="k-button k-button-icontext" style="height:30px;width:40px;border-style:solid;" onclick="searchReAccount()"><span class="mif-search"></span></div>
+</div>
+<br />
+<div style="margin-top:6px;">
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Monthly_DD_Model>()
+    .Name("grd_revertsurplus")
+    // .Scrollable()
+    .Columns(col =>
+    {
+        col.Template(@<text></text>).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Office</div></text>)
+                        .Width(170)
+                        .ClientTemplate("<div>#=officename# </div>")
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+                       
+        col.Template(@<text></text>).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Account</div></text>)
+                        .Width(170)
+                        .ClientTemplate("<div>#=AccountName# </div>")
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientFooterTemplate("<div style='text-align:center;color:darkgreen'><label> </label><label> Total </label></div>"); 
+        col.Bound(m => m.Amount)
+                        .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Balance <br />Amount</div></text>)
+                        .Width(80)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div>#=kendo.toString(Amount,'c2')# </div>")
+                        //.ClientFooterTemplate("<div>#=</div>");
+                        .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> </label><label> #=kendo.toString(sum, 'c2')#</label></div>");
+    })
+
+        .Sortable()
+        .Scrollable()
+        //    .Events(e => e.Change("WFPgrid"))
+        .HtmlAttributes(new { style = "height:400px;" })
+        .Pageable(pageable => pageable
+            .Refresh(true)
+            .ButtonCount(2))
+        .DataSource(d => d
+        .Ajax()
+        .Aggregates(a =>
+        {
+            a.Add(c => c.Amount).Sum();
+        })
+        .PageSize(1000)
+        .Model(m => m.Id(i => i.supplementalbudget_id))
+        .Read(read => read.Action("Load_Reversion_Surplus", "Release").Data("RealGridSubmitted")))
+    )
+
+</div>
+<div style="clear:both"></div>
+<div class="k-button k-button-icontext" style="float:right; bottom: 15px; right: 25px;width: 100px;background-color:indianred; color:white;border-radius:50px;margin-right:50px;margin-top:10px;" onclick="frmRealignclosesurplus()"><span class="fa fa-close"></span> Close</div>

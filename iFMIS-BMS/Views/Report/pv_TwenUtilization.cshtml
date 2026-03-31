@@ -1,0 +1,321 @@
+﻿
+<script>
+    function PGO_() {
+        if (document.getElementById('pgo_').checked) {
+
+            document.getElementById("pgo_").value = 1;
+
+        } else {
+
+            document.getElementById("pgo_").value = 0;
+
+        }
+    }
+    function IncEarmark() {
+        if (document.getElementById('earmark').checked) {
+            document.getElementById("earmark").value = 1;
+        } else {
+            document.getElementById("earmark").value = 0;
+        }
+    }
+    function SummaryPPA()
+    {
+        if (document.getElementById('SummaryPPA').checked) {
+
+            document.getElementById("SummaryPPA").value = 1;
+
+        } else {
+
+            document.getElementById("SummaryPPA").value = 0;
+
+        }
+    }
+    function fn_viewSubPPA() {
+        setTimeout(function () {
+            $("#SubPPa").data("kendoComboBox").dataSource.read();
+        }, 500);
+    }
+
+    function fnMainPPA() {
+        return {
+            actualrootppaid: 0,
+            rootppa: true,
+            ddlYear: $("#ddlYear").val()
+        };
+    }
+    function fnMainPPA2() {
+        return {
+            actualrootppaid: $("#MPPa").val(),
+            rootppa: false,
+            ddlYear: $("#ddlYear").val()
+        };
+    }
+    function reqPrint() {
+        var mppaid = $("#MPPa").val();
+        var sppaid = $("#SubPPa").val();
+        var year_ = $("#ddlYear").val();
+        var year2 = $("#reportYear").val();
+        var month_ = $("#Months").val();
+        var monthname = $("#Months").data("kendoDropDownList").text();
+        var type_pgo = $("#type_pgo").val() ? 1 : 0;
+        var earmark_type = $("#earmark").val();
+        //var reportsum = $("#SummaryPPA").val() ? 1 : 0;
+        
+        $.ajax({
+            async: false,
+            dataType: 'html',
+            success: window.open("../Reports/ReportViewer.aspx?rid=26&Year=" + year_ + "&Year2=" + year2 + "&month_=" + month_ + "&monthname=" + monthname + "&Actualrootppaid=" + mppaid + "&ppaid=" + sppaid + "&pgo_=" + $("#pgo_").val() + "&reportsum=" + $("#SummaryPPA").val() + "&earmark_type=" + earmark_type + "")
+        });
+
+    }
+
+    function Select_Office() {
+
+        var classtype = $("#classtype").val();
+
+        if (classtype == null || classtype == "") {
+
+            return { classtype: 1 }
+        }
+        else {
+            return { classtype: classtype }
+        }
+    }
+    function fn_dprefresherOOied() {
+
+    }
+    function fn_dprefresherprogs() {
+
+    }
+
+    var thisculture = kendo.culture();
+    thisculture.numberFormat.currency.symbol = '₱'; // Script For Changing The Currency Sign
+
+
+    function ocake() {
+      
+        //setTimeout(function () {
+        $("#MPPa").data("kendoComboBox").dataSource.read()
+        $("#MPPa").data("kendoComboBox").value("")
+        //}, 500);
+    }
+
+    function repris() {
+        $("#offs").data("kendoComboBox").dataSource.read();
+        }
+
+    function Select_Office() {
+
+        var classtype = $("#classtype").val();
+
+        if (classtype == null || classtype == "") {
+
+            return { classtype: 1 }
+        }
+        else {
+            return { classtype: classtype }
+        }
+        }
+        function fn_dprefresherOOied() {
+            $("#account_list").data("kendoComboBox").dataSource.read();
+        }
+        function fn_dprefresherprogs() {
+            $("#ooe_id").data("kendoDropDownList").dataSource.read();
+            $("#account_list").data("kendoComboBox").dataSource.read();
+        }
+
+
+    function fn_dprefresher() {
+
+        ocake();
+        $("#Progss").data("kendoDropDownList").dataSource.read();
+        $("#ooe_id").data("kendoDropDownList").dataSource.read();
+        $("#account_list").data("kendoComboBox").dataSource.read();
+
+    }
+    function ExpenseClassOnChange() {
+        $("#grd_BudgetApprovalBudget").data("kendoGrid").dataSource.read();
+    }
+</script>
+
+<h2><span class="fa fa-print"></span> 20% Development Fund Utilization </h2>
+
+@*<font size="3"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>Note:</strong> You can generate report with or without Office </font>*@
+<br />
+<div class="col-lg-12 ">
+    <div class="row" style="margin-top:7px">
+
+
+        <label> PPA Year : </label>
+        @*<div style="margin-left:34px;width:182px;">*@
+        @(Html.Kendo().DropDownList()
+                        .Name("ddlYear")
+                        .DataTextField("ProposalYear")
+                        .DataValueField("ProposalYear")
+                        .SelectedIndex(0)
+                        .HtmlAttributes(new { style = "width:150px; height:100%", @class = "form-control autoselect" })
+                        .Events(e => e.Change("ocake"))
+                        .DataSource(source => source.Read(read => read.Action("PPAYear", "PYear")))
+        )
+        @*</div>*@
+
+
+    </div>
+    <div class="row" style="margin-top:7px">
+
+        <label class="col-sm-3 control-label">Report Year :</label>
+        @*             <div class="col-sm-7" style="margin-left:34px;width:182px;">*@
+        @(Html.Kendo().DropDownList()
+                        .Name("reportYear")
+                        .DataTextField("ProposalYear")
+                        .DataValueField("ProposalYear")
+                        .SelectedIndex(0)
+                        @*.HtmlAttributes(new { @style = "width: 95px;" })*@
+                        .HtmlAttributes(new { style = "width:150px; height:100%", @class = "form-control autoselect" })
+                        .DataSource(source => source.Read(read => read.Action("PPAYear", "PYear")))
+        )
+
+
+        <label class="col-sm-4 control-label"  style="margin-top:7px">As Of Month :</label>
+        @*<div class="col-sm-6" style="margin-left:34px;width:182px;">*@
+        @(Html.Kendo().DropDownList()
+                    .Name("Months")
+                    .DataTextField("Text")
+                    .DataValueField("Value")
+                    //.Events(e => e.Change("change"))
+                    .BindTo(new List<SelectListItem>() {
+                        new SelectListItem() {
+                            Text = "January",
+                            Value = "1"
+                        },
+                        new SelectListItem() {
+                            Text = "Febuary",
+                            Value = "2"
+                        },
+                        new SelectListItem() {
+                            Text = "March",
+                            Value = "3"
+                        },
+                        new SelectListItem() {
+                            Text = "April",
+                            Value = "4"
+                        },
+                        new SelectListItem() {
+                            Text = "May",
+                            Value = "5"
+                        },
+                        new SelectListItem() {
+                            Text = "June",
+                            Value = "6"
+                        },
+                        new SelectListItem() {
+                            Text = "July",
+                            Value = "7"
+                        },
+                        new SelectListItem() {
+                            Text = "August",
+                            Value = "8"
+                        },
+                        new SelectListItem() {
+                            Text = "September",
+                            Value = "9"
+                        },
+                        new SelectListItem() {
+                            Text = "October",
+                            Value = "10"
+                        },
+                        new SelectListItem() {
+                            Text = "November",
+                            Value = "11"
+                        },
+                        new SelectListItem() {
+                            Text = "December",
+                            Value = "12"
+                        }
+                    })
+                    .Value(@ViewBag.MonthVaue)
+                    .HtmlAttributes(new { style = "width:150px; height:100%", @class = "form-control autoselect" })
+                    .SelectedIndex(DateTime.ParseExact(DateTime.Now.ToString("MMM"), "MMM", null).Month - 1)
+        )
+
+
+    </div>
+        <div class="row"  style="margin-top:7px">
+                    <div class="col-sm-12">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" control-label">PPA :</label>
+                        <div class="col-sm-9">
+                            @(Html.Kendo().ComboBox()
+                            .Name("MPPa")
+                            .DataTextField("description")
+                            .DataValueField("ppaid")
+                            .AutoBind(true)
+                            .Placeholder("Select main PPA...")
+                            .Filter("contains")
+                            .MinLength(2)
+                            .SelectedIndex(-1)
+                            .HtmlAttributes(new { style = "width:100%; height:100%", @class = "form-control autoselect"})
+                            .Events(e => e.Select("fn_viewSubPPA"))
+                            .DataSource(source => {
+                                source.Read(read =>
+                                {
+                                    read.Action("GetPPAs", "Report").Data("fnMainPPA");
+                                })
+                                .ServerFiltering(false);
+                            })
+                        )
+                        </div>
+                    </div>
+                </div>
+        </div>
+        <div class="row" style="margin-top:7px">
+                <div class="col-sm-12">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Sub-PPA :</label>
+                        <div class="col-sm-9">
+                           @(Html.Kendo().ComboBox()
+                            .Name("SubPPa")
+                            .DataTextField("description")
+                            .DataValueField("ppaid")
+                            .AutoBind(true)
+                            .Placeholder("Select Sub-PPA...")
+                            .Filter("contains")
+                            .MinLength(2)
+                            .SelectedIndex(-1)
+                            .CascadeFrom("MPPa")
+                            .HtmlAttributes(new { style = "width:100%; height:100%", @class = "form-control autoselect"})
+                            .DataSource(source => {
+                                source.Read(read =>
+                                {
+                                    read.Action("GetPPAs", "Report").Data("fnMainPPA2");
+                                })
+                                .ServerFiltering(true);
+                            })
+                        )
+                        </div>
+                    </div>
+            </div>
+        </div>
+        
+</div>
+     
+<div>
+    <input type="text" style="width:20px" name="type_pgo" id="type_pgo" value="1" hidden disabled>
+</div>
+
+<div style="float: none;clear:both; margin-top: 20px">
+    <div id="OptionBox" style="float: none;clear:both; margin-top: 30px">
+          
+        <div style="float:left;margin-left:250px;margin-top:10px;">
+
+            <input type='checkbox' class='checkbox' style="zoom:1.2" id="pgo_" name="pgo_" onclick=PGO_() /> <font style="font-size:15px">Include PGO Control</font>
+            <input type='checkbox' class='checkbox' style="margin-left:50px;zoom:1.2" id="earmark" name="earmark" value="0" onclick=IncEarmark() /> <font style="font-size:15px">Earmark</font>
+        </div>
+        <div style="float:left;margin-left:50px;margin-top:10px;">
+
+            <input type='checkbox' class='checkbox' style="zoom:1.2" id="SummaryPPA" name="SummaryPPA"  onclick=SummaryPPA() /> <font style="font-size:15px">Summary</font>
+        </div>
+    </div>
+
+    <div id="btnPrint" class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 100px;float:right; margin-top: 30px;background-color:cornflowerblue;color:white; margin-right:155px; margin-bottom:0px;border-radius:50px" onclick="reqPrint()"><span class="mif-printer"></span> Preview</div>
+</div>

@@ -1,0 +1,90 @@
+﻿<script>
+
+    function GetTypeID() {
+        return {
+            Fund_ID: '@Session["Fund_ID"]',
+            Year_of: '@Session["Year_of"]'
+        }
+    }
+    
+
+
+    function reqSave() {
+        var notifi = new $("#popupNotification").data("kendoNotification");
+
+        var url = "@Url.Action("Save_RType", "Report")";
+
+        var Type_Desc_ID = $('#dllRTypes').val()
+        var Type_Desc = $("#dllRTypes").data("kendoComboBox").text();
+
+
+       
+        $.post(url, { Type_Desc_ID: Type_Desc_ID, Type_Desc: Type_Desc, Fund_ID: '@Session["Fund_ID"]', Year_of: '@Session["Year_of"]' }, function (d) {
+            if (d == "1") {
+                swal({
+                    title: "Success!",
+                    text: "Successfully Added.",
+                    timer: 2000,
+                    type: "success",
+                    showConfirmButton: false
+                })
+                $('#newAccounts22').data('kendoWindow').close();
+                $('#Typegrid').data('kendoGrid').dataSource.read();
+            } else {
+                swal({
+                    title: "Error!",
+                    text: "System Error! Please try again.",
+                    timer: 2000,
+                    type: "error",
+                    showConfirmButton: false
+                })
+            }
+            $('#newAccounts22').data('kendoWindow').close();
+            $('#Typegrid').data('kendoGrid').dataSource.read();
+
+        })
+    }
+
+
+
+
+</script>
+<div style="border: outset;border-width:1px;border-color:#038603; width: 580px; padding-left:0px;padding-right:0px;padding-top:0px;padding-bottom:0px;margin-top: 10px;">
+    <div style=" width: 0;height: 0; border-right: 5px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;margin-top: -1px; ">
+        <div style="width: 513px; margin-top:1px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 37px solid #1fa67a; ">
+
+            <div style="float: left; height:28px; margin-left:-59px; margin-top: 5px;">
+                <i class="fa fa-edit fa-2x fg-white"></i>
+            </div>
+
+        </div>
+    </div>
+
+
+
+
+
+
+    <div style="float:inherit; margin-left:50px; margin-top:30px; margin-bottom:50px">
+        <label></label>
+        Revenue : <div style="margin-left:100px;margin-top:-20px">
+                        @(Html.Kendo().ComboBox()
+                        .Name("dllRTypes")
+                        .DataTextField("Type_Desc")
+                        .DataValueField("Type_Desc_ID")
+                        .Placeholder("Select or Add Revenue...")
+                        .HtmlAttributes(new { @style = "width: 380px;" })
+                        .DataSource(source => source.Read(read => read.Action("RType", "Report"))
+
+
+    ))
+                    </div>
+
+    </div>
+    <div class="k-button k-button-icontext" style="position: absolute; bottom: 15px; right: 20px;width: 80px;" onclick="reqSave()">Save</div>
+
+
+
+
+
+</div>

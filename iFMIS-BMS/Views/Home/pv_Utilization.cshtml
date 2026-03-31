@@ -1,0 +1,17 @@
+﻿<div class="demo-section k-content">
+    @(Html.Kendo().TabStrip()
+          .Name("ppp")
+          .Navigatable(false)
+          .Animation(animation =>
+              animation.Open(effect =>
+              effect.Fade(FadeDirection.In)))
+          .Items(tabstrip =>
+          {
+              tabstrip.Add().Text("History").Selected(true).LoadContentFrom("Utilization", "Home");
+              @*tabstrip.Add().Text("Graph").Selected(true).LoadContentFrom("GraphView", "Utility");*@
+              //tabstrip.Add().Text("Declined").LoadContentFrom("pv_Budget_CancelledTab", "Home");
+          })
+         // .Events(e => e.Activate("fn_refresher"))
+
+    )
+</div>

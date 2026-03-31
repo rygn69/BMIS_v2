@@ -1,0 +1,10 @@
+﻿<script>
+    $(document).ready(function () {
+        $.ajax({
+            async: false,
+            dataType: 'html',
+            success: window.open("../Reports/ReportViewer.aspx?rid=6&year=@DateTime.Now.AddYears(1).Year")
+        });
+        
+    });
+</script>

@@ -1,0 +1,193 @@
+﻿<script>
+    function mafgridpar_posting() {
+        return {
+            modeid: $("#realignid").val(),
+            year: $("#ddlYear").val() == "" ? CurrentYear() : $("#ddlYear").val(),
+            statusid: 1,
+            officeid:0
+        }
+    }
+    function frmPreview(docid) {
+        //if (status == "Ready To Print" && gov_sig == 344880){
+        //success: window.open("https://pgas.ph/bmsattachment/" + reportpdf)
+        //success: window.open("https://pgas.ph/dgsign/blank/getPDF_View?pdfData=application/pdf&FormID="+ docid )
+        //success: window.open("https://pgas.ph/dgsign/blank/getPDF_digital_only?pdfData=application/pdf&FormID="+ docid +"") //viewing only
+        success: window.open(" https://pgas.ph/dgsign/blank/keuitughhjugjugah?doc_id=" + docid + "") //with signature status
+        //}
+    }
+    function searchforapproval() {
+        var $filter = new Array();
+        $filter = [];
+
+        if ($('#Searchmafposting').val().length > 0) {
+            $filter.push({ field: "officename", operator: "contains", value: $('#Searchmafposting').val() }),
+            $filter.push({ field: "mafno", operator: "contains", value: $('#Searchmafposting').val() });
+        }
+
+        $('#grd_mafreview_posting').data('kendoGrid').dataSource.filter({
+            logic: "or",
+            filters: $filter
+        });
+
+    }
+
+    $(function () {
+        $("#Searchmafposting").keypress(function (e) {
+            if (e.keyCode == 13) {
+                searchforapproval();
+            }
+        });
+    });
+</script>
+<div id="searchAccountid" style="float:right;height: 30px; margin-top: -5px;">
+    <input type="text" style="width:271.5px;border-collapse:collapse;margin:0px;border-style:solid;margin-left:0px;height:70%;outline:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;font-size:14px" placeholder="Search..." id="Searchmafposting" name="Searchmafposting">
+    <div class="k-button k-button-icontext" style="height:30px;width:40px;border-style:solid;" onclick="searchforapproval()"><span class="mif-search"></span></div>
+</div>
+<div style="display:inline-block">
+@(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Monthly_DD_Model>()
+    .Name("grd_mafreview_posting")
+    // .Scrollable()
+    .Columns(col =>
+    {
+    col.Template(@<text></text>)
+            .ClientTemplate("<input id='check#=FMISOfficeCode#' type='checkbox'  class='checkbox'/>")
+            // .Title("<input onclick=CheckAll(this) type='checkbox'  class='checkbox'/> <span style='text - align:center; vertical - align:middle; height: 30px;font-weight:600;font-size:14px;'>Approve</span> ")
+            .Width(20)
+            .HtmlAttributes(new { style = "text-align:center;height:30px;font-size:12px;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal", @class = "metro-header" });
+    col.Template(@<text></text>).HtmlAttributes(new { style = "text-align:  left;height:30px;font-size:10px;" })
+                        .HeaderTemplate(@<text><div style="font-weight:200;text-align:center;font-size:11px; vertical-align: middle; overflow: visible; white-space: normal;">Trnno</div></text>)
+                        .Width(50)
+                        .ClientTemplate("<div>#=trnno# </div>")
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal", @class = "metro-header" });
+    col.Template(@<text></text>).HtmlAttributes(new { style = "text-align:  left;height:30px;font-size:10px;" })
+                        .HeaderTemplate(@<text><div style="font-weight:200;text-align:center;font-size:11px; vertical-align: middle; overflow: visible; white-space: normal;">Office</div></text>)
+                .Width(120)
+                .ClientTemplate("<div>#=officename# </div>")
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal", @class = "metro-header" });
+    col.Bound(m => m.Amount)
+                .HtmlAttributes(new { style = "text-align:right;height:30px;font-size:10px;" })
+                .HeaderTemplate(@<text><div style="font-weight:200;text-align:center;font-size:11px; vertical-align: middle; overflow: visible; white-space: normal;color:white">Amount</div></text>)
+                        .Width(100)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal", @class = "metro-header" })
+                        .ClientTemplate("<div>#=kendo.toString(Amount,'c2')# </div>");
+    col.Template(@<text></text>)
+                        .HtmlAttributes(new { style = "text-align:right;height:30px;font-size:10px;" })
+                        .HeaderTemplate(@<text><div style="font-weight:200;text-align:center;font-size:11px; vertical-align: middle; overflow: visible; white-space: normal;">Date and Time Reviewed</div></text>)
+            .Width(120)
+            .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal", @class = "metro-header" })
+            .ClientTemplate("<div>#=datetimesubmit# </div>");
+
+    col.Template(@<text></text>)
+                .HtmlAttributes(new { style = "text-align:center;height:30px;font-size:10px;" })
+                .HeaderTemplate(@<text><div style="font-weight:200;text-align:center;font-size:11px; vertical-align: middle; overflow: visible; white-space: normal;color:white">MAF No.</div></text>)
+                        .Width(100)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal", @class = "metro-header" })
+                        .ClientTemplate("<div>#=mafno# </div>");
+        col.Template(t => { }).ClientTemplate(
+                "<div  style='color:\\#ffffff;background-color:\\cornflowerblue;width:25px;text-align:center;display:inline-block;' onclick='frmPreview(#=docid#)'><span class='fa fa-search' style='font-size:10pt;margin:1px;margin-top:-1px;margin-left:1px;margin-right:1px;;cursor:pointer'> </span></div> " 
+              
+                )
+            .HtmlAttributes(new { style = "vertical-align: middle;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal", @class = "metro-header" })
+            .Width(30);
+
+
+    })
+        .ToolBar(toolbar =>
+        {
+            toolbar.Custom().Text("<span id='spanthumbsup' class='fa fa-thumbs-o-up'> </span><span id='SpanOnApproveProgress' style='display:none' class='fa fa-spinner fa-spin'></span> Set As Posted").Name("btnReview").Url("javascript:void(0)").HtmlAttributes(new { onclick = "btnposting()" });
+
+        })
+        .Editable(editable => editable.Mode(GridEditMode.InCell))
+        .Navigatable()
+        .Sortable()
+        //.ClientDetailTemplateId("templateforsub")
+        .Resizable(e => e.Columns(true))
+        .Scrollable()
+        .Selectable(selectable => selectable
+        .Mode(GridSelectionMode.Single)
+        .Type(GridSelectionType.Row))
+        .AutoBind(false)
+        //    .Events(e => e.Change("WFPgrid"))
+        .HtmlAttributes(new { style = "height:600px;overflow-y:hidden;" })
+        .Pageable(pageable => pageable
+            .Refresh(true)
+            .ButtonCount(2))
+        .DataSource(d => d
+        .Ajax()
+         .Aggregates(a =>
+         {
+             a.Add(c => c.Amount).Sum();
+             a.Add(c => c.Amountfrom).Sum();
+         })
+        .PageSize(1000)
+        .Model(m => m.Id(i => i.supplementalbudget_id))
+        .Read(read => read.Action("Load_Realign_ForPosting", "Release").Data("mafgridpar_posting")))
+)
+</div>
+<script>
+    $(document).ready(function () {
+        $("#grd_mafreview_posting").data("kendoGrid").dataSource.read();
+    })
+    function btnposting() {
+        var idsToSend = [];
+        var grid = $("#grd_mafreview_posting").data("kendoGrid")
+        var ds = grid.dataSource.view();
+        var url = "@Url.Action("realignposting", "Report")";
+
+        var officeID = 0;
+        var office="";
+        var Year = $("#ddlYear").val()
+        var userid=@Account.UserInfo.eid.ToString();
+        var eco=0;
+        var purposeid = "";//$("#purposeid").val();
+        var modeid= $("#realignid").val()
+        var lblform="";
+
+        if (modeid == 1){
+            lblform="realigned";
+        }
+        else{
+            lblform="reverted";
+        }
+
+
+        for (var i = 0; i < ds.length; i++) {
+            var row = grid.table.find("tr[data-uid='" + ds[i].uid + "']");
+            var checkbox = $(row).find(".checkbox");
+            if (checkbox.is(":checked")) {
+                idsToSend.push(ds[i].FMISOfficeCode); //loops
+            }
+        }
+
+        if (idsToSend == "") {
+            swal({ title: "Warning!", text: "Please tick the checkbox first!", timer: 2500, showConfirmButton: false, type: "warning" });
+            $('#SpanOnApproveProgress').css("display", "none");
+            $('#spanthumbsup').css("display", "auto");
+        }
+        else {
+             swal({
+                 title: "This MAF will be marked as "+lblform+" upon posting. Do you want to proceed",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                closeOnConfirm: false,
+                showLoaderOnConfirm: true
+            },
+                function () {
+                    $.post(url, {transno: idsToSend, Year:Year,modeid:modeid}, function (d) {
+                        if (d == 'success') {
+                            swal("Success", "The MAF has been successfully posted.", "success")
+                            $("#grd_mafreview_posting").data("kendoGrid").dataSource.read();
+                        }
+                        else {
+                            swal("Warning!", d, "warning")
+                        }
+                    })
+                      
+                })
+        }
+    }
+</script>

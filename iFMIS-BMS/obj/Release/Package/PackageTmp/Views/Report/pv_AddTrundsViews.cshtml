@@ -1,0 +1,53 @@
+﻿@model iFMIS_BMS.BusinessLayer.Models.TransFundsModel
+
+<script>
+
+
+
+
+    function reqSave() {
+        var notifi = new $("#popupNotification").data("kendoNotification");
+
+        var url = "@Url.Action("SaveTrunds", "Report")";
+
+        var Trans_ID = $('#ddlTrunds').val()
+        var Trans_name = $("#ddlTrunds").data("kendoComboBox").text();
+        var Trunds_Amount = $('#Trunds_Amount').val()
+
+        var Year = $("#ddlYear").val()
+        $.post(url, { Trans_ID: Trans_ID, Trans_name: Trans_name, Trunds_Amount: Trunds_Amount, Year: Year }, function (d) {
+
+            $('#addTrustFunds').data('kendoWindow').close();
+            $('#TrundsFundGrid').data('kendoGrid').dataSource.read();
+
+        })
+    }
+
+
+
+
+</script>
+
+
+
+
+
+
+
+
+<label>Trust Funds :</label>
+@(Html.Kendo().ComboBox()
+        .Name("ddlTrunds")
+        .DataTextField("Trans_name")
+        .DataValueField("Trans_ID")
+        .Placeholder("Select TransFunds...")
+        .HtmlAttributes(new { @style = "width: 310px;" })
+        .DataSource(source => source.Read(read => read.Action("GetTrundsName", "Report")))
+
+
+)
+
+<label>Amount :</label>
+<input type="text" class="k-textbox" style="width: 310px;" id="Trunds_Amount" name="Trunds_Amount" />
+
+<div class="k-button k-button-icontext" style="position: absolute; bottom: 15px; right: 20px;width: 80px;" onclick="reqSave()">Save</div>

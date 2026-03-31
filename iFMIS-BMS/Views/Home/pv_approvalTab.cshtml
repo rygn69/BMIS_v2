@@ -1,0 +1,484 @@
+﻿
+
+<script type="text/javascript">
+
+    var BudgetYear = $("#ddlYear").val();
+    var PastYear = BudgetYear - 2;
+    var CurrentYear = BudgetYear - 1;
+    document.getElementById("actualYearApproval").innerHTML = PastYear;
+    document.getElementById("estimatesYearApproval").innerHTML = CurrentYear;
+    document.getElementById("proposedYearApproval").innerHTML = BudgetYear;
+
+    var thisculture = kendo.culture();
+    thisculture.numberFormat.currency.symbol = '₱';
+    function RefreshGrid() {
+
+        var grid = $("#grd_ApprovalBudget");
+        var dataSource = grid.data("kendoGrid").dataSource;
+        var colCount = grid.find('.k-grid-header colgroup > col').length;
+
+        if (dataSource._view.length == 0) {
+            swal(
+               "Error!", "No Data to save", "warning");
+        } else {
+            swal({
+                title: "Success!",
+                text: "Sucessfully save.",
+                type: "success"
+            },
+            function () {
+                $("#grd_ApprovalBudget").data("kendoGrid").dataSource.read();
+            });
+            //swal("Success!", "Sucessfully save!!!", "success");
+        }
+    }
+
+    function errorHandler(e) {
+        if (e.errors) {
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "\n";
+                    });
+                }
+            });
+            alert(message);
+        }
+    }
+    function onSaveChanges() {
+        $("#grd_ApprovalBudget").data("kendoGrid").dataSource.read();
+    }
+    function onGridClick(e) {
+        $("#grd_ApprovalBudget").data("kendoGrid").editCell("input[name=ProposalAllotedAmount]");
+        return true;
+    }
+
+    function onGridEdit(e) {
+        var gridName = $('#grd_ApprovalBudget').data('kendoGrid');
+        var dataRows = gridName.items();
+        var rowIndex = dataRows.index(gridName.select());
+        var ds = gridName.dataSource.view();
+        var ProposalStatusHR = ds[rowIndex].ProposalStatusHR;
+        var ProposalDenominationCode = ds[rowIndex].ProposalDenominationCode;
+        var ProposalStatusINCharge = ds[rowIndex].ProposalStatusInCharge;
+        var AccountName = ds[rowIndex].AccountName;
+        if (ProposalDenominationCode == '1') {
+            this.closeCell();
+        } else if (ProposalStatusHR == '1') {
+            this.closeCell();
+        }
+        else if (ProposalStatusINCharge == '1') {
+            this.closeCell();
+        }
+    }
+    function EditData(AccountID) {
+        $(window).scrollTop(0);
+        var AccountID = AccountID;
+        var grid = "#grid_" + AccountID;
+        var gridName = $(grid).data('kendoGrid');
+        var dataRows = gridName.items();
+        var rowIndex = dataRows.index(gridName.select());
+        var ds = gridName.dataSource.view();
+        var AccountDenominationID = ds[rowIndex].AccountDenominationID;
+        var DenominationName = ds[rowIndex].DenominationName;
+        var DenominationAmount = ds[rowIndex].DenominationAmount;
+        var url = "@Url.Action("EditData", "BudgetPreparation")";
+        $.get(url, { AccountDenominationID: AccountDenominationID, DenominationName: DenominationName, DenominationAmount: DenominationAmount, AccountID: AccountID }, function (d) {
+
+            document.documentElement.style.overflow = 'hidden';  // firefox, chrome
+            document.body.scroll = "no";
+            $('#EditDetails').html(d);
+        })
+        $('#EditDetails').data('kendoWindow').title("<i class='fa fa-navicon'> </i>").center().open();
+    }
+    function onClose() {
+        //var Budget = $("#moneyUpdatedBudget").text();
+        //alert(Budget);
+        //$("#CreateNewDenominationAccount").data("kendoWindow").close();
+        document.documentElement.style.overflow = 'auto';  // firefox, chrome
+        document.body.scroll = "yes";
+
+    }
+
+    function CloseWindow() {
+        //var Budget = $("#moneyUpdatedBudget").text();
+        //alert(Budget);
+        document.documentElement.style.overflow = 'auto';  // firefox, chrome
+        document.body.scroll = "yes";
+        $("#CreateNewDenominationAccount").data("kendoWindow").close();
+    }
+
+    function NewAccountsDenomination(AccountID, ProgramID, ProposalYear, ProposalStatusHR) {
+        if (ProposalStatusHR == 1) {
+            swal("Error!", "Can't Add New Denomination Account. Due to the Pending Status", "error");
+        } else {
+
+            $(window).scrollTop(0);
+            var ProgramID = ProgramID;
+            var AccountID = AccountID;
+            var ProposalYear = ProposalYear;
+            var url = "@Url.Action("NewAccountDenomination", "BudgetPreparation")";
+            $.get(url, { ProgramID: ProgramID, AccountID: AccountID, ProposalYear: ProposalYear }, function (d) {
+                document.documentElement.style.overflow = 'hidden';  // firefox, chrome
+                document.body.scroll = "no";
+                $('#CreateNewDenominationAccount').html(d);
+            });
+            $('#CreateNewDenominationAccount').data('kendoWindow').title("<i class='fa fa-navicon'> </i>").center().open();
+
+        }
+    }
+    function SubmitDenomination(AccountID, ProgramID, ProposalYear, ProposalStatusHR, ProposalID) {
+        var url = "@Url.Action("UpdateDenomination", "BudgetPreparation")";
+        if (ProposalStatusHR == 1) {
+            swal("Error!", "Can't Add New Denomination Account. Due to the Pending Status", "error");
+        } else {
+            swal({
+                title: "System Alert!",
+                text: "This Action will Total all you Denomination and Update it as your Budget Proposal for the Selected Account. Click 'Ok' to Proceed.",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "OK",
+                closeOnConfirm: false
+            }, function () {
+                $.get(url, { AccountID: AccountID, ProgramID: ProgramID, ProposalYear: ProposalYear, ProposalID: ProposalID }, function (d) {
+                    if (d == "success") {
+                        $("#grd_ApprovalBudget").data("kendoGrid").dataSource.read();
+                        swal({
+                            title: "Success!",
+                            text: "Accounts Updated!.",
+                            type: "success",
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+
+                    }
+                })
+
+            });
+        }
+    }
+    function DeleteData(AccountID) {
+        var AccountID = AccountID;
+        //var ProgramID = ProgramID;
+        //var ProposalYear = ProposalYear;
+        var grid = "#grid_" + AccountID;
+        //alert(grid);
+        var gridName = $(grid).data('kendoGrid');
+        var dataRows = gridName.items();
+        var rowIndex = dataRows.index(gridName.select());
+        var ds = gridName.dataSource.view();
+        var AccountDenominationID = ds[rowIndex].AccountDenominationID;
+        swal({
+            title: "Are you sure?",
+            text: "This will Delete your Denomination Account.",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, delete it!",
+            closeOnConfirm: false
+        }, function () {
+            var url = "@Url.Action("DeleteAccountDenomination", "BudgetPreparation")";
+            $.get(url, { AccountDenominationID: AccountDenominationID }, function (d) {
+                if (d == "success") {
+                    $(grid).data("kendoGrid").dataSource.read();
+                    swal({
+                        title: "Success!",
+                        text: "Account Denomination Deleted.",
+                        type: "success",
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                }
+            })
+
+        });
+    }
+    function UpdatePlantilla(ProgramID, AccountID, AccountName, ProposalAmmount) {
+
+        var proyear = $("#ddlYear").val();
+        var url = "@Url.Action("UpdatePlantillaSchedule", "Home")";
+        $.get(url, { ProgramID: ProgramID, AccountID: AccountID, proyear: proyear, ProposalAmmount: ProposalAmmount }, function (d) {
+            document.documentElement.style.overflow = 'hidden'; 
+            document.body.scroll = "no";
+            $('#UpdatePlantillaWin').html(d);
+        })
+        //if (AccountID == 370 || AccountID == 903 || AccountID == 59401) {
+        //    heardertitle="Other General Services"
+        //}else{
+
+        //}
+        $('#UpdatePlantillaWin').data('kendoWindow').title("<i class='fa fa-navicon'> </i> " + AccountName + " - Proposed Amount : " + coma_sepa(ProposalAmmount)  + "").center().open();
+    }
+   
+    function onDataBound(e) {
+        var grid = $("#grd_ApprovalBudget").data("kendoGrid")
+        var ds = grid.dataSource.view();
+        var AccountID = 0;
+        var rows = e.sender.tbody.children();
+
+        for (var i = 0; i < ds.length; i++) {
+            AccountID = ds[i].AccountID;
+            var row = $(rows[i]);
+            //alert(AccountID)
+            if (AccountID == 368 || AccountID == 37230 || AccountID == 373 || AccountID == 371 || AccountID == 59729 || AccountID == 47525 || AccountID == 47639 || AccountID == 59512 || AccountID == 59729 || AccountID == 370 || AccountID == 59401 || AccountID == 903 || AccountID == 901 || AccountID == 47522) {
+                $('#updatesched' + AccountID + '').css("display", "normal");
+            }
+            else {
+                //$('#viewdetailid' + release_float_id + '').css("display", "none");
+                $('#updatesched' + AccountID + '').css("display", "none");
+            }
+        }
+    }
+    function coma_sepa(val) {
+        val = val.toString().replace(/,/g, ''); //remove existing commas first
+
+        var valSplit = val.split('.'); //then separate decimals
+        while (/(\d+)(\d{3})/.test(valSplit[0].toString())) {
+            valSplit[0] = valSplit[0].toString().replace(/(\d+)(\d{3})/, '$1' + ',' + '$2');
+        }
+
+        if (valSplit.length == 2) { //if there were decimals
+            val = valSplit[0] + "." + valSplit[1]; //add decimals back
+        } else {
+            val = valSplit[0];
+        }
+
+        return val;
+    }
+</script>
+<div style="width:100%;margin-top:5px;margin-bottom:2px;">
+    <p>Legends:</p>
+    @*<span class='fa fa-circle' style='color:yellow;' id='circle-id'>
+        </span> <span>Already Reviewed By HRMO <b>(Can't be Edited)</b> </span>
+        <span class='fa fa-circle' style='color:green; margin-left:30px' id='circle-id'></span>
+        <span> Already Reviewed By Budget In-charge <b>(Can't be Edited)</b> </span> <br/>
+        <span class='fa fa-circle' style='color:red;' id='circle-id'></span>
+        <span> Not yet Reviewed <b>(Can be Edited)</b></span>*@
+    <span class='fa fa-circle' style='color:blue;' id='circle-id'>
+    </span> <span> Copied from PPMP</span>
+</div>
+@(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.AccountsModel>()
+        .Name("grd_ApprovalBudget")
+        .HtmlAttributes(new { style = "height:550px" })
+        .Scrollable()
+    .Columns(col =>
+    {
+        @*col.Template(@<text></text>)
+            .HeaderTemplate(@<text><div style="font-weight:600;"></div></text>)
+            .Width(20)
+            .HtmlAttributes(new { style = "text-align:left;height:30px" })
+            .HeaderHtmlAttributes(new { style = "text-align:center" })
+            .ClientTemplate("<div onclick=onGridClick()>#=ColorCircle# </div>");*@
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;">Accounts</div></text>)
+                        .Width(215)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+
+                        .ClientTemplate("<div onclick=onGridClick()>#=AccountName# </div>");
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Account Code</div></text>)
+                        .Width(75)
+                        .HtmlAttributes(new { style = "text-align:center;height:30px" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div onclick=onGridClick()>#=AccountCode# </div>");
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Past Year <span id="actualYearApproval"></span>  (Actual)</div></text>)
+                        .Width(110)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center" })
+                        .ClientTemplate("<div>#=kendo.toString(PastYear,'c2')# </div>");
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Current Year <span id="estimatesYearApproval"></span>   (Estimates)</div></text>)
+                        .Width(120)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center" })
+                        .ClientTemplate("<div>#=kendo.toString(PastProposalAmmount,'c2')# </div>");
+        col.Bound(m => m.ProposalAllotedAmount)
+                        .HtmlAttributes(new { style = "font-weight:600;text-align:left; vertical-align: middle; overflow: visible; white-space: normal;" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Budget Year <span id="proposedYearApproval"></span> (Proposed)</div></text>)
+                        .HeaderHtmlAttributes(new { style = "text-align:center" })
+                        .Width(120)
+                        .ClientTemplate(
+                                "# if(ProposalDenominationCode == 1) { #" +
+                                " <span class='fa fa-circle' style='color:blue;' id='circle-id'></span> #=kendo.toString(ProposalAmmount, 'c2')#" +
+                                "# } else { #" +
+                                "#=kendo.toString(ProposalAmmount, 'c2')#" +
+                                "# } #"
+                                );
+        col.Template(t => { }).ClientTemplate(
+             "<div id='updatesched#=AccountID#' onclick='UpdatePlantilla(#=ProgramID#,#=AccountID#,\"#=AccountName#\",#=ProposalAmmount#)' class='k-button' style='inline-block;width:140px;' title=''> <span class='fa fa-pencil-square-o'></span> Update Schedule </div>")
+             .Width(192);
+        col.Bound(m => m.ProposalStatusHR).Title("Proposal").Hidden();
+        col.Bound(m => m.ProposalStatusInCharge).Title("Proposal").Hidden();
+        col.Bound(m => m.ProposalID).Title("Proposal ID").Hidden();
+        col.Bound(m => m.ProgramID).Title("ProgramID ID").Hidden();
+        col.Bound(m => m.AccountID).Title("Account ID").Hidden();
+        col.Bound(m => m.OOEID).Title("OOE ID").Hidden();
+        col.Bound(m => m.ProposalDenominationCode).Title("ProposalDenominationID").Hidden();
+
+    })
+         .AutoBind(false)
+         .Pageable(page => page.Refresh(true)
+            .Enabled(true)
+            .ButtonCount(4)
+            .PreviousNext(true)
+         )
+         .ClientDetailTemplateId("template")
+         .Selectable()
+         .Events(e => e.DataBound("onDataBound"))
+         .DataSource(d => d
+         .Ajax()
+         .Batch(true)
+         .ServerOperation(false)
+         .PageSize(10)
+         .Model(m => m.Id(i => i.AccountID))
+         .Read(read => read.Action("BudgetInChargeProposedAccounts", "Home").Data("fn_Program"))
+         )
+)
+<script id="template" type="text/kendo-tmpl">
+    @*<div class="k-button" onclick="AddNewRow('#=AccountID#')"><span class="fa fa-plus-circle"></span> Add New Record</div>
+        <div class="k-button" onclick="SaveChanges('#=AccountID#')"><span class="fa fa-check"></span> Save Changes</div>
+        <div class="k-button" onclick="CancelChanges('#=AccountID#')"><span class="fa fa-close"></span> Cancel Changes</div>*@
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.AccountDenomination>()
+            .Name("grid_#=AccountID#")
+            .HtmlAttributes(new { style = "width:650px;" })
+            .Columns(columns =>
+            {
+                columns.Template(@<text></text>)
+                        .HeaderTemplate(@<text>
+        <div style="font-weight:600;">Particular Name</div></text>)
+                        .HeaderHtmlAttributes(new { style = "text-align:left" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center" })
+                        .Width(370)
+                        .ClientTemplate(
+                         "\\# if( isPPMP == 1) { \\# " +
+                        "<div> <span class='fa fa-circle' style='color:blue'></span> \\#=DenominationName\\# </div>" +
+                        "\\# } else if(isPPMP == 0){ \\#" +
+                        "<div>\\#=DenominationName\\# </div>" +
+                        "\\# } \\#");
+                columns.Bound(e => e.AccountDenominationID).Hidden();
+                columns.Template(@<text></text>)
+                        .HeaderTemplate(@<text>
+        <div style="font-weight:600;">Qty/%</div></text>)
+                        .HtmlAttributes(new { style = "text-align:center" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div>\\#=kendo.toString(QuantityPercentage)\\# </div>").Width(80);
+                columns.Template(@<text></text>)
+                        .HeaderTemplate(@<text>
+        <div style="font-weight:600;">Months</div></text>)
+                        .HtmlAttributes(new { style = "text-align:center" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div>\\#=kendo.toString(DenominationMonth)\\# </div>").Width(80);
+                columns.Template(@<text></text>)
+                        .HeaderTemplate(@<text>
+        <div style="font-weight:600;">Rate/Amount</div></text>)
+                        .Width(120)
+                        .HtmlAttributes(new { style = "text-align:left" })
+                        .HeaderHtmlAttributes(new { style = "text-align:left" })
+                        .ClientTemplate("<div>\\#=kendo.toString(DenominationAmount, 'c2')\\# </div>");
+                columns.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;">Total Amount</div></text>)
+                        .Width(130)
+                        .HtmlAttributes(new { style = "text-align:left" })
+                        .HeaderHtmlAttributes(new { style = "text-align:left" })
+                        .ClientTemplate("<div>\\#=kendo.toString(TotalDenominationAmount, 'c2')\\# </div>");
+                //columns.Bound(e => e.DenominationAmount).Width(150);
+            })
+.ToolBar(t => t.Template(@<text>
+                <div style="float: right; height:28px;margin-top:2px;">
+
+                    <link href="~/Content/metroui/css/docs.css" rel="stylesheet" />
+                    @* <div class="k-button" onclick="SubmitDenomination()"><span class="fa fa-cloud-upload"></span> <b>Save Particulars</b></div><div class="k-button" onclick="NewAccountsDenomination('#=AccountID#', '#=ProgramID#', '#=ProposalYear#')"><span class="fa fa-plus-circle"></span> Add New Particular </div> @*<div class="k-button" onclick="SaveChanges('#=AccountID#')"><span class="fa fa-check"></span> Save Changes</div> <div class="k-button" onclick="CancelChanges('#=AccountID#')"><span class="fa fa-close"></span> Cancel Changes</div>*@
+                </div>
+</text>))
+
+        .Selectable()
+        .Scrollable()
+        .Pageable(page => page.Refresh(true)
+                    .Enabled(true)
+                    .ButtonCount(4)
+                    .PreviousNext(true))
+        .DataSource(dataSource => dataSource
+            //.Batch(true)
+            .Ajax()
+            //.Aggregates(aggregates => aggregates.Add(m => m.DenominationAmount).Sum())
+            .ServerOperation(false)
+
+            .PageSize(10)
+            .Model(m =>
+            {
+                m.Id(i => i.AccountDenominationID);
+
+            })
+    .Read(read => read.Action("Proposal_AccountDenomination", "BudgetPreparation", new { ProgramID = "#=ProgramID#", AccountID = "#=AccountID#", ProposalYear = "#=ProposalYear#", OfficeID = Account.UserInfo.Department, suppletag=0 }))
+    .Destroy(update => update.Action("EditingPopup_Destroy", "Grid"))
+        )
+        .Pageable()
+        .ToClientTemplate()
+    )
+
+</script>
+
+@(Html.Kendo().Window()
+    .Name("CreateNewDenominationAccount")
+    .Title("Create New Denomination Account")
+    .Width(450)
+    .Height(250)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(false)
+    .AutoFocus(true)
+    .Events(e => e.Close("onClose"))
+    .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        }).Actions(a => { a.Close(); }))
+
+@(Html.Kendo().Window()
+    .Name("EditDetails")
+    .Title("Edit Account Denomination")
+    .Width(450)
+    .Height(250)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(false)
+    .AutoFocus(true)
+    .Events(e => e.Close("onClose"))
+    .Animation(a =>
+        {
+            a.Open(o => o.Fade(FadeDirection.In));
+            a.Close(c =>
+            {
+                c.Fade(FadeDirection.In);
+                c.Reverse(true);
+            });
+        }).Actions(a => { a.Close(); }))
+
+@(Html.Kendo().Window()
+        .Name("UpdatePlantillaWin")
+        .Title("Schedule")
+        .Width(890)
+        .Height(770)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+        //.Events(e => e.Close("Close"))
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        }).Actions(a => { a.Close(); })
+)

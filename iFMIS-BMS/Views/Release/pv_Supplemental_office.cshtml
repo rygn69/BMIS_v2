@@ -1,0 +1,1069 @@
+﻿
+<script src="~/Scripts/BMS/Release/otherfunction.js"></script>
+<script>
+
+    function fnSupReportHistory() {
+        return {
+            officeid: $("#office").val(),
+            yearof: $("#tyear").val(),
+            qtr: 1//$("#Months_supplemental_null").val()
+        }
+    }
+    function CurrentYearUrl() {
+        return '@Url.Action("CurrentYear", "Global")';
+    }
+    function Close_Sup() {
+        $("#SupplementalWindow_").data("kendoComboBox").dataSource.read();
+    }
+
+    var thisculture = kendo.culture();
+    thisculture.numberFormat.currency.symbol = '₱';
+
+    function sup_Deletes(supplementalbudget_id) {
+        var url = "@Url.Action("delete_dupplemental_req", "Release")";
+
+        swal({
+            title: "Are you sure?",
+            text: "This item will be removed!",
+            type: "info",
+            showCancelButton: true,
+            closeOnConfirm: false,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, Remove It!",
+            showLoaderOnConfirm: true,
+        }, function () {
+
+            $.get(url, { supid: supplementalbudget_id }, function (e) {
+                if (e == "1") {
+                    swal({
+                        title: "Success!",
+                        text: "Item has been Removed.",
+                        timer: 2000,
+                        type: "success",
+                        showConfirmButton: false
+                    })
+                    grid_ref_sup_ok();
+                    fn_reqClear();
+                    $('#grd_sup_office').data('kendoGrid').dataSource.read();
+                    document.getElementById("amount_supplemental_null_DUM").value = 0;
+                    document.getElementById("amount_supplemental_null_ID").value = 0;
+                    document.getElementById("amount_supplemental_null").value = 0;
+                } else {
+                    swal({
+                        title: "Error!",
+                        text: "System Error! Please try again.",
+                        timer: 2000,
+                        type: "error",
+                        showConfirmButton: false
+                    })
+                }
+            })
+        });
+    }
+
+    function sup_Edits(supplementalbudget_id, subaccount, mon,purpose,saipno) {
+        document.getElementById("statusid").innerHTML = "&nbsp;<u>Edit</u> &nbsp;"
+
+        var url = "@Url.Action("Edit_Supplementa_request", "Release")";
+
+        $.get(url, { supplementalbudget_id: supplementalbudget_id }, function (e) {
+            document.getElementById("amount_supplemental_null").value = commaSeparateNumberRealignment(e.Amount);
+            document.getElementById("amount_supplemental_null_DUM").value = e.Amount;
+            //$("#legalbasis_supplemental_null").data("kendoComboBox").value(e.LegalCode);
+            document.getElementById("amount_supplemental_null_ID").value = e.supplementalbudget_id;
+            $("#subaccount").data("kendoComboBox").value(subaccount)
+            $("#Months_supplemental_null").data("kendoDropDownList").value(mon)
+            $("#purpose").val(purpose)
+            if (saipno != 0){
+                document.getElementById("saipno").checked=1
+                saip_click()
+            }
+            else{
+                document.getElementById("aipno").checked=1
+                aip_click()
+            }
+            $("#saipsupplemental").data("kendoComboBox").value(saipno)
+        });
+    }
+
+    function SupGrid() {
+        var office_id = $('#office_supplemental_req').val() ==""? 0: $('#office_supplemental_req').val()
+        var program_id = $('#Program_supplemental_null').val() ==""? 0: $('#Program_supplemental_null').val()
+        var account_id = $('#account_list_supplemental_null').val() ==""? 0: $('#account_list_supplemental_null').val()
+        var month_ = $('#Months_supplemental_null').val()==""? 0: $('#Months_supplemental_null').val()
+        var subaccount = $("#subaccount").val() == "" ? 0 : $("#subaccount").val()
+        return {
+            office_id: office_id,
+            program_id: program_id,
+            account_id: account_id,
+            month_: month_,
+            yearof: $("#tyear").val()==""? 0: $("#tyear").val(),
+            subaccount: subaccount
+        }
+    }
+    function grid_ref_sup_ok() {
+        $("#grd_sup_office").data("kendoGrid").dataSource.read();
+        setTimeout(function () {
+            var url = "@Url.Action("SupplementalAvailable", "Release")";
+
+            var office_id = $('#office_supplemental_req').val()
+            var program_id = $('#Program_supplemental_null').val()
+            var account_id = $('#account_list_supplemental_null').val()
+
+            if (account_id == 0 || account_id == null) { document.getElementById("available_amount_null_SUP").value = 0; } else {
+
+                $.post(url, { office_id: office_id, program_id: program_id, account_id: account_id}, function (e) {
+
+                    document.getElementById("available_amount_null_SUP").value = commaSeparateNumberRealignment(e);
+                })
+            }
+        }, 1000);
+    }
+    function getSupplementalBal() {
+        var url = "@Url.Action("SupplementalAvailable", "Release")";
+
+        var office_id = $('#office_supplemental_req').val()
+        var program_id = $('#Program_supplemental_null').val()
+        var account_id = $('#account_list_supplemental_null').val()
+        var yearof = $("#tyear").val()
+        var subaccountid = $("#subaccount").val()
+
+        $("#grd_sup_office").data("kendoGrid").dataSource.read()
+        if (account_id == 0 || account_id == null) {
+            document.getElementById("available_amount_null_SUP").value = 0;
+        } else {
+            if (subaccountid.length <= 1) {
+                $.post(url, { office_id: office_id, program_id: program_id, account_id: account_id, yearof: yearof,subppa:0 }, function (e) {
+                    document.getElementById("available_amount_null_SUP").value = commaSeparateNumberRealignment(e);
+                    $("#subaccount").data("kendoComboBox").dataSource.read();
+                })
+            }
+            else {
+                $.post(url, { office_id: office_id, program_id: program_id, account_id: account_id, yearof: yearof, subppa: subaccountid }, function (e) {
+                    document.getElementById("available_amount_null_SUP").value = commaSeparateNumberRealignment(e);
+                    $("#subaccount").data("kendoComboBox").dataSource.read();
+                })
+            }
+        }
+    }
+
+    function fn_reqSave_supplemental() {
+
+        var url = "@Url.Action("save_supplememental_request", "Release")";
+        @*var lur = "@Url.Action("Edit_Supplement", "Release")";*@
+
+
+        var legal_code =0// $('#legalbasis_supplemental_null').val()
+        var office_id = $('#office_supplemental_req').val()
+        var program_id = $('#Program_supplemental_null').val()
+        var account_id = $('#account_list_supplemental_null').val()
+        var supplement_amount = covert_empty($('#amount_supplemental_null').val())
+        var MonthOf = $('#Months_supplemental_null').val()
+
+        var supplement_id = $('#amount_supplemental_null_ID').val() == "" ? 0 : $('#amount_supplemental_null_ID').val()
+        var supplement_available = covert_empty($('#available_amount_null_SUP').val())
+        var supplement_amount_DUM = $('#amount_supplemental_null_DUM').val()
+        var subaccount_id = $("#subaccount").val() == ""? 0 : $("#subaccount").val();
+
+        var Expense = $("#Expense_").val();
+        var Total_Release = $("#total_Release").val();
+
+        var TO_E = Number(Total_Release) - Number(Expense);
+        var yearof = $("#tyear").val()
+        var purpose = $("#purpose").val()
+        var saipno = $("#saipsupplemental").val()
+        var saipnotag=$("#saipno").val()
+
+        if (supplement_id == 0 || supplement_id == null) { //new transactions
+            if (//legal_code == null || legal_code == '' ||
+                office_id == null || office_id == '' ||
+                program_id == null || program_id == '' ||
+                account_id == null || account_id == '' ||
+                supplement_amount == null || supplement_amount == '' ||
+                MonthOf == null || MonthOf == '') {
+
+                swal({
+                    title: "Warning!",
+                    text: "Please complete your entry.",
+                    timer: 3000,
+                    type: "warning",
+                    showConfirmButton: false
+                })
+            }
+            else if (purpose.length <=1) {
+                swal("Warning","Please state your reason/purpose!","warning")
+            }
+            else if (saipno == 0 && saipnotag == 1) {
+                swal("Warning", "Please select supplemental AIP number from the dropdown list!", "warning")
+            }
+            else {
+                if (Number(supplement_amount) == 0 || Number(supplement_amount) == null) {
+
+                    swal({
+                        title: "Warning!",
+                        text: "Please set Amount.",
+                        timer: 3000,
+                        type: "warning",
+                        showConfirmButton: false
+                    })
+                }
+                else {
+                    var url2 = "@Url.Action("NonOfficeSubAccount", "BudgetControl")";
+                    $.get(url2, { ProgramID: program_id, AccountID: account_id, TransYear: yearof, status: 0 }, function (e) {
+                        if (e > subaccount_id)//no selected sub-ppa
+                        {
+                            swal({
+                                title: "W A R N I N G",
+                                text: "Please select sub-account!",
+                                type: "warning",
+                                showCancelButton: false,
+                                timer: 1500,
+                                closeOnConfirm: true,
+                                showLoaderOnConfirm: false
+                            });
+                        }
+                        else {
+                            swal({
+                                title: "Are you sure?",
+                                text: "This item will be saved!",
+                                type: "info",
+                                showCancelButton: true,
+                                closeOnConfirm: false,
+                                confirmButtonColor: "#1fa67a",
+                                confirmButtonText: "Yes, Save It!",
+                                showLoaderOnConfirm: true,
+                            }, function () {
+
+                                $.post(url, { legal_code: legal_code, office_id: office_id, program_id: program_id, account_id: account_id, supplement_amount: covert_empty(supplement_amount), MonthOf: MonthOf, supid: supplement_id, yearof: yearof, subaccount_id: subaccount_id, purpose: purpose, saipno: saipno }, function (e) {
+                                    if (e == "1") {
+                                        swal({
+                                            title: "Success!",
+                                            text: "Supplemental has been saved.",
+                                            timer: 2000,
+                                            type: "success",
+                                            showConfirmButton: false
+                                        })
+                                        grid_ref_sup_ok();
+                                        $('#grd_sup_office').data('kendoGrid').dataSource.read();
+                                        document.getElementById("amount_supplemental_null_DUM").value = 0;
+                                        document.getElementById("amount_supplemental_null_ID").value = 0;
+                                        document.getElementById("amount_supplemental_null").value = 0;
+                                    } else {
+                                        swal({
+                                            title: "Error!",
+                                            text: e,//"System Error! Please try again.",
+                                            timer: 2000,
+                                            type: "error",
+                                            showConfirmButton: false
+                                        })
+                                    }
+                                });
+                            });
+                        }
+                    });
+                }
+            }
+        }
+        else { //edit transactions
+            if (Number(supplement_amount) == 0 || Number(supplement_amount) == null) {
+                swal({
+                    title: "Warning!",
+                    text: "Please set Amount.",
+                    timer: 3000,
+                    type: "warning",
+                    showConfirmButton: false
+                })
+            }
+            else if (saipno == 0 && saipnotag == 1) {
+                swal("Warning", "Please select supplemental number in the dropdown list!", "warning")
+            }
+            else{
+                swal({
+                    title: "Are you sure?",
+                    text: "This item will be EDITED and SAVED!",
+                    type: "info",
+                    showCancelButton: true,
+                    closeOnConfirm: false,
+                    confirmButtonColor: "#1fa67a",
+                    confirmButtonText: "Yes, Save It!",
+                    showLoaderOnConfirm: true,
+                }, function () {
+
+                    $.post(url, { legal_code: legal_code, office_id: office_id, program_id: program_id, account_id: account_id, supplement_amount: covert_empty(supplement_amount), MonthOf: MonthOf, supid: $("#amount_supplemental_null_ID").val(), yearof: yearof, subaccount_id: subaccount_id, purpose: purpose, saipno: saipno }, function (e) {
+                    if (e == "1") {
+                        swal({
+                            title: "Success!",
+                            text: "Supplemental amount has been updated.",
+                            timer: 2000,
+                            type: "success",
+                            showConfirmButton: false
+                        })
+                        grid_ref_sup_ok();
+                        $('#grd_sup_office').data('kendoGrid').dataSource.read();
+                        document.getElementById("amount_supplemental_null_DUM").value = 0;
+                        document.getElementById("amount_supplemental_null_ID").value = 0;
+                        document.getElementById("amount_supplemental_null").value = 0;
+                    } else {
+                        swal({
+                            title: "Error!",
+                            text: "System Error! Please try again.",
+                            timer: 2000,
+                            type: "error",
+                            showConfirmButton: false
+                        })
+                    }
+                    });
+                });
+            }
+        }
+    }
+
+    function fn_refresher_supplemental_null() {
+
+        $("#office_supplemental_req").val(null);
+        $("#account_list_supplemental_null").val(null);
+        $("#ooe_id_supplemental_null").val(null);
+
+        $("#office_supplemental_req").data("kendoComboBox").text(null);
+        $("#account_list_supplemental_null").data("kendoComboBox").text(null);
+        $("#ooe_id_supplemental_null").data("kendoDropDownList").text(null);
+
+        $("#Program_supplemental_null").data("kendoDropDownList").dataSource.read();
+        $("#ooe_id_supplemental_null").data("kendoDropDownList").dataSource.read();
+        $("#account_list_supplemental_null").data("kendoComboBox").dataSource.read();
+
+    }
+
+    function fn_dprefresherorb_supplemental_null() {
+        $("#Program_supplemental_null").val("")
+        $("#Program_supplemental_null").data("kendoDropDownList").dataSource.read();
+        //$("#repHistory").val("");
+        //$("#repHistory").data("kendoComboBox").dataSource.read();
+    }
+
+    function Program_supplemental_nullDataBound() {
+        $("#account_list_supplemental_null").data("kendoComboBox").dataSource.read();
+    }
+
+    function fn_sup_OOE() {
+        $("#account_list_supplemental_null").data("kendoComboBox").dataSource.read();
+        $("#grd_sup_office").data("kendoGrid").dataSource.read();
+    }
+
+    function sync() {
+        var tamount = covert_empty($("#amount_supplemental_null").val())
+        var availableamount = covert_empty($("#available_amount_null_SUP").val())
+        var bal = parseFloat(Number(availableamount) - Number(tamount)).toFixed(2)
+        if (bal < 0) {
+            swal("Warning","Insufficient balance! Please check your entry.","warning")
+            $("#amount_supplemental_null").val(0.00)
+        }
+    }
+//    function WFPgrid() {
+
+//        var entityGrid = $("#grd_sup_office").data("kendoGrid");
+//        var selItem = entityGrid.dataItem(entityGrid.select());
+//       // $("#activity").data("kendoComboBox").value(selItem.activityid)
+//    }
+</script>
+<h2 style="font-size:18px;font-weight:bold;"><span class="fa fa-tasks"></span><u> Supplemental <nbsp></nbsp></u> </h2>
+<br />
+<div style="float:left;margin-top:15px;margin-left:0px">
+    <div class="k-button k-button-icontext" style="display:inline-block;" title="Click to view list of submitted supplemental request appropriation!" onclick="vwsubmitsupplemental()"><span class="fa fa-send"></span> Submitted</div>
+    <div class="k-button k-button-icontext" style="display:inline-block" title="Click to view list of approved supplemental request appropriation!" onclick="vwforapprovesupplemental()"><span class="fa fa-thumbs-o-up"></span> Approved</div>
+    <div class="k-button k-button-icontext" style="display:inline-block;margin-left:-4px" title="Click to view list of approved supplemental appropriation!" onclick="vwapprovesupplemental()"><span class="fa fa-save"></span> Posted</div>
+</div>
+<div style="border: outset;clear:both;border-width:1px;border-color:#1fa67a; width: 749px; padding-left:0px;padding-right:0px;padding-top:0px;padding-bottom:7px;margin-top: 0px;height:265px">
+    <div style="width: 0;height: 0; border-right: 5px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;margin-top: -1px;">
+        <div style="float: left; width: 683px; margin-top:1px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 36px solid #1fa67a; ">
+            <div style="float: left; height:28px; margin-left:-59px; margin-top: 5px;">
+                <i class="fa fa-tasks fa-2x fg-white"></i>
+
+            </div>
+            <div style="background-color:#000000;width:100px;padding:4px;float:left;margin-top:3.5px;margin-left:-4px">
+            @*<div style="width:100px;padding:4px;float:left;margin-top:3.5px;margin-left:-4px"> *@
+                <span style="font-size:14px;font-weight:bolder;color:#ffffff"> &nbsp; Mode :</span>
+                <span id="statusid" style="font-size:14px;font-weight:bolder;color:#f9fb05">&nbsp;<u>New</u> &nbsp;</span>
+            </div>
+        </div>
+    </div>
+    <div>
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Monthly_DD_Model>()
+    .Name("grd_sup_office")
+    .Scrollable()
+    .Columns(col =>
+    {
+        
+        col.Template(@<text></text>).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Account</div></text>)
+                        .Width(150)
+                        .ClientTemplate("<div>#=AccountName# </div>")
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientFooterTemplate("<div style='text-align:right;'><label> </label><label> Total</label></div>");
+        col.Bound(m => m.Amount)
+                        .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Amount</div></text>)
+                        .Width(100)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div>#=kendo.toString(Amount,'c2')# </div>")
+                        .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> </label><label> #=kendo.toString(sum, 'c2')#</label></div>");
+
+        col.Bound(m => m.MonthOf).HtmlAttributes(new { style = "text-align:center;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Month</div></text>)
+                        .Width(85)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Bound(m => m.YearOf).HtmlAttributes(new { style = "text-align:center;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Year</div></text>)
+                        .Width(60)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Template(@<text></text>).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Purpose</div></text>)
+                        .Width(150)
+                        .ClientTemplate("<div>#=purpose# </div>")
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Template(@<text></text>).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Reason of <br />Return</div></text>)
+                        .Width(150)
+                        .ClientTemplate("<div>#=purposereturn#</div>")
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Template(t => { }).ClientTemplate(
+                        "<div class='' style='border-radius:50px;color:\\#ffffff;background-color:\\cornflowerblue;width:45px;text-align:center;vertical-align:middle;height:25px' title='Click to edit transaction!' onclick='sup_Edits(#=supplementalbudget_id#,#=subaccount#,#=mon#,\"#=purpose#\",#=saipno#)'><span class='fa fa-pencil-square-o' style='font-size:11pt;margin-top:6px;margin-left:1px;margin-right:1px;margin-bottom:1px;'> </span></div> " +
+                        "<div class='' style='border-radius:50px;display:inline-block;color:\\#ffffff;background-color:\\#DE5555;width:45px;text-align:center;vertical-align:middle;height:25px'  title='Click to delete transaction!'  onclick='sup_Deletes(#=supplementalbudget_id#)'><span class='fa fa-trash-o' style='font-size: 11pt;margin-top:6px;margin-left:1px;margin-right:1px;'> </span></div> "
+                        ).HtmlAttributes(new { style = "vertical-align:middle;" }).Width(70);
+        col.Bound(m => m.supplementalbudget_id).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                    .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Transaction ID</div></text>)
+                        .Hidden()
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Bound(m=> m.subaccount).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">SubAccount</div></text>)
+                        .Hidden()
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Bound(m=> m.mon).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Month</div></text>)
+                        .Hidden()
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Bound(m=> m.saipno).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">saipno</div></text>)
+                        .Hidden()
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        
+
+
+
+    })
+
+        .Sortable()
+        .Scrollable()
+    //    .Events(e => e.Change("WFPgrid"))
+        .HtmlAttributes(new { style = "height:300px;" })
+        .Pageable(pageable => pageable
+            .Refresh(true)
+            .ButtonCount(2))
+        .DataSource(d => d
+        .Ajax()
+        .Aggregates(a =>
+        {
+            a.Add(c => c.Amount).Sum();
+        })
+        .PageSize(1000)
+        .Model(m => m.Id(i => i.supplementalbudget_id))
+        .Read(read => read.Action("Load_Supp_Req", "Release").Data("SupGrid")))
+        )
+
+    </div>
+</div>
+
+<div style="float:right;margin-right:60px;margin-top:75px;">
+    <div class="k-button k-button-icontext" style="bottom:15px; right:220px;width :100px; border-radius:50px;color:#ffffff;background-color:cornflowerblue;margin-left:5px" onclick="fn_reqSubmit()"><span class='fa fa-send-o' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'></span> Submit</div>
+</div>
+<div style="float: none;clear:both;margin-top:25px">
+    <div style="float: left;margin-right:10px;margin-top:14px;">
+        <label style="float:left;margin-left: 50px;">
+            Transaction Year    :
+        </label>
+    </div>
+    <div style="float: right;margin-right:450.5px;margin-top:9px;">
+
+        @(Html.Kendo().ComboBox()
+            .Name("tyear")
+            .DataTextField("ProposalYear")
+            .DataValueField("ProposalYear")
+            .Placeholder("Select year...")
+            .Filter("contains")
+            .MinLength(1)
+            .HtmlAttributes(new { @style = "width: 100px;" })
+            .SelectedIndex(0)
+            .DataSource(source => source.Read(read => read.Action("GetPropYear3", "PYear")))//.Data("fn_class_GFEE")))
+
+        )
+
+
+    </div>
+    <br />
+    <div style="float: left;margin-left:-111.5px;margin-top:30px;">
+        <label style="float:left;margin-left: 50px;">
+            Office    :
+        </label>
+    </div>
+    <div style="float: right;margin-right:50px;margin-top:9px;">
+
+        @(Html.Kendo().ComboBox()
+            .Name("office_supplemental_req")
+            .DataTextField("OfficeName")
+            .DataValueField("OfficeID")
+            .Placeholder("Select office...")
+            .Filter("contains")
+            .MinLength(1)
+            .HtmlAttributes(new { @style = "width: 500px;" })
+            .Events(e => e.Change("fn_dprefresherorb_supplemental_null"))
+            .SelectedIndex(-1)
+            .DataSource(source => source.Read(read => read.Action("GetOfficeSupplement", "Release")))//.Data("fn_class_GFEE")))
+
+        )
+    </div>
+    <div style="height:40px;">
+
+    </div>
+
+    <div id="ProgramAndExpenseClassDiv" style="float: none;clear:both; margin-top: 0px">
+
+        <div style="float: left;margin-left:54.7px;margin-top:8px;">
+            <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                Program :
+            </label>
+        </div>
+        <div style="float: right;margin-right:50px;margin-top:8px;">
+            <script>
+                    function fn_Offices_supplemental_null() {
+
+                        var off_id = $("#office_supplemental_req").val();
+                        return {
+                            office_ID: off_id,
+                            yearof: $("#tyear").val()
+                        }
+                    }
+
+            </script>
+
+            @(Html.Kendo().DropDownList()
+                            .Name("Program_supplemental_null")
+                            .DataTextField("ProgramDescription")
+                            .DataValueField("ProgramID")
+                            .OptionLabel("Select programs...")
+                            .HtmlAttributes(new { @style = "width: 500px;" })
+                            .AutoBind(true)//
+                            .Events(e => e.Change("Program_supplemental_nullDataBound"))
+                            .DataSource(source => source.Read(read => read.Action("GetProgramsSupple", "Release").Data("fn_Offices_supplemental_null")))
+                    //.Value(Session["program_id"].ToString())
+            )
+
+        </div>
+
+       
+        <div style="float: left;margin-left:57px;margin-top:17px;">
+            <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                Account    :
+            </label>
+        </div>
+        <div style="float: right;margin-right:50px;margin-top:8px;">
+            <script>
+                function fn_ForAccount_supplemental_null() {
+                    var prog_id = $("#Program_supplemental_null").val();
+                      
+                        return {
+                            prog_id: prog_id,
+                            yearof: $("#tyear").val()
+                        }
+                    }
+
+            </script>
+
+            @(Html.Kendo().ComboBox()
+                        .Name("account_list_supplemental_null")
+                        .DataTextField("AccountName")
+                        .DataValueField("AccountID")
+                        .Filter("contains")
+                        .MinLength(1)
+                        .Placeholder("Select Account...")
+                        .Events(e => e.Change("getSupplementalBal"))
+                        .HtmlAttributes(new { @style = "width: 500px;" })
+                        .AutoBind(true)
+                        .DataSource(source => source.Read(read => read.Action("GetAccountSupple", "Release").Data("fn_ForAccount_supplemental_null")))
+                    //  .Value(Session["account_id"].ToString())
+            )
+        </div>
+
+        <div style="float: left;margin-left:22.5px;margin-top:17px;">
+            <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                Sub-Account    :
+            </label>
+        </div>
+        <div style="float: right;margin-right:50px;margin-top:8px;">
+            <script>
+                function getparamSub() {
+                    var prog_id = $("#Program_supplemental_null").val();
+                        return {
+                            year: $("#tyear").val(),
+                            program: prog_id,
+                            accountTemp: $("#account_list_supplemental_null").val(),
+                            exaccount: 0,
+                            exaccountoption: 0,
+                            allsubppa: 0
+                        }
+                    }
+            </script>
+
+            @(Html.Kendo().ComboBox()
+                        .Name("subaccount")
+                        .DataTextField("AccountName")
+                        .DataValueField("SPO_ID")
+                        .Filter("contains")
+                        .MinLength(1)
+                        .Placeholder("Select sub-account...")
+                        .Events(e => e.Change("getSupplementalBal"))
+                        .HtmlAttributes(new { @style = "width: 500px;" })
+                        .AutoBind(true)
+                        .DataSource(source => source.Read(read => read.Action("GetSubAccount", "Report").Data("getparamSub")))
+            //  .Value(Session["account_id"].ToString())
+            )
+        </div>
+
+        <div style="float:left;margin-left:34px;margin-top:19px;">
+            <label>
+                Bal.  Appropriation    :
+            </label>
+        </div>
+
+        <div style="float:left;margin-left:32px;margin-top:9px;">
+            @*<input type="text" style="width:150px;color:cornflowerblue" name="available_amount_null_SUP" id="available_amount_null_SUP" value="0.00" onkeyup="commaSeparateNumberversion2('available_amount_null_SUP')" step="0.01" disabled>*@
+            <input type="text" style="width:150px;color:cornflowerblue" name="available_amount_null_SUP" id="available_amount_null_SUP" value="0.00" step="0.01" disabled>
+        </div>
+        <div style="float:left;margin-left:0px;margin-top:11px;">
+            <input type="text" style="width:150px" name="amount_supplemental_null_ID" id="amount_supplemental_null_ID" value="0" hidden disabled>
+        </div>
+        <div style="float:left;margin-left:-30px;margin-top:11px;">
+            <input type="text" style="width:150px" name="amount_supplemental_null_DUM" id="amount_supplemental_null_DUM" value="0" hidden disabled>
+        </div>
+        <div style="float:left;margin-left:34px;margin-top:14px;">
+            <label>
+                Month    :
+            </label>
+        </div>
+        <div style="float:left;margin-left:37px;margin-top:11px;">
+            @(Html.Kendo().DropDownList()
+                          .Name("Months_supplemental_null")
+                          .DataTextField("Text")
+                          .DataValueField("Value")
+                          .Events(e => e.Change("grid_ref_sup_ok"))
+                          .BindTo(new List<SelectListItem>() {
+                              new SelectListItem() {
+                                  Text = "January",
+                                  Value = "1"
+                              },
+                              new SelectListItem() {
+                                  Text = "February",
+                                  Value = "2"
+                              },
+                              new SelectListItem() {
+                                  Text = "March",
+                                  Value = "3"
+                              },
+                              new SelectListItem() {
+                                  Text = "April",
+                                  Value = "4"
+                              },
+                              new SelectListItem() {
+                                  Text = "May",
+                                  Value = "5"
+                              },
+                              new SelectListItem() {
+                                  Text = "June",
+                                  Value = "6"
+                              },
+                              new SelectListItem() {
+                                  Text = "July",
+                                  Value = "7"
+                              },
+                              new SelectListItem() {
+                                  Text = "August",
+                                  Value = "8"
+                              },
+                              new SelectListItem() {
+                                  Text = "September",
+                                  Value = "9"
+                              },
+                              new SelectListItem() {
+                                  Text = "October",
+                                  Value = "10"
+                              },
+                              new SelectListItem() {
+                                  Text = "November",
+                                  Value = "11"
+                              },
+                              new SelectListItem() {
+                                  Text = "December",
+                                  Value = "12"
+                              }
+                          })
+                          .HtmlAttributes(new { style = "width: 150px" })
+            )
+
+        </div>
+
+        <div style="float: left;margin-left:57.5px;margin-top:12px;">
+            <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                Amount :
+            </label>
+        </div>
+        <div style="float: right;margin-right:388.5px;margin-top:5px;">
+            <input type="text" style="width:150px" name="amount_supplemental_null" id="amount_supplemental_null" value="0.00" onfocus="this.select();">
+        </div>
+        <div style="float: left;margin-left:-123px;margin-top:50px;">
+            <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                Purpose :
+            </label>
+        </div>
+        <div style="float: right;margin-right:188.5px;margin-top:8px;">
+            <textarea style="width:350px" id="purpose" value=""></textarea> 
+        </div>
+        <div style="border-color:gray;float:left;margin-left:0px;border-style:solid;border-width:1px;width:750px;margin-top:10px;">
+            <div style="background-color:#ff6a00;width:150px;margin-top:-15px;margin-left:10px;"><span style="font-size:15px;margin-left:5px;color:beige;font-style:italic">AIP Plan</span></div>
+            <input type="radio" id="aipno" value="1" checked="checked" style="display:inline-block;margin-left:40px;zoom:1.2;width:20px" onclick="aip_click()"/>
+            <label style="display:inline-block;font-size:14px;font-weight:normal"> Regular AIP</label>
+
+            <input type="radio" id="saipno" value="0" style="display:inline-block;margin-left:20px;zoom:1.2;width:20px" onclick="saip_click()"/>
+            <label style="display:inline-block;font-size:14px;font-weight:normal"> Supplemental AIP</label>
+
+            <div style="float:left;margin-left:51px;margin-top:30px;">
+                <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                    SAIP No. :
+                </label>
+            </div>
+            <script>
+                function getyear(){
+                    var year = $("#tyear").val() == "" ? CurrentYear() : $("#tyear").val()
+                    return{
+                        year:year
+                    }
+                }
+            </script>
+            <div style="float:right;margin-right:394px;margin-top:2px;margin-bottom:10px;">
+                @(Html.Kendo().ComboBox()
+            .Name("saipsupplemental")
+            .DataTextField("SuplementalNo")
+            .DataValueField("SuplementalNo")
+            .Placeholder("")
+            .Filter("contains")
+            .MinLength(1)
+            .SelectedIndex(-1)
+            .HtmlAttributes(new { @style = "width: 150px;" })
+            .DataSource(source => source.Read(read => read.Action("saipno", "Release").Data("getyear")))
+                )
+            </div>
+        </div>
+    </div>
+
+    <div style="float:left;margin-top:15px;margin-left:400px;width:500px">
+        <div class="k-button k-button-icontext" style="bottom:15px; right:220px;width:90px; border-radius:50px;margin-left:5px" onclick="fn_reqClear()"><span class='fa fa-eraser' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'></span> Clear &nbsp;&nbsp;</div>
+        <div class="k-button k-button-icontext" style="bottom:15px; right: 220px;width: 90px;color:white; background-color:cornflowerblue; border-radius:50px;margin-left:5px" onclick="fn_reqSave_supplemental()"><span class='fa fa-save' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'></span> Save &nbsp;&nbsp;&nbsp;</div>
+    </div>
+    <div style="clear:both"></div>
+</div>
+
+
+<script>
+
+    $(document).ready(function () {
+
+        $("#office_supplemental_req").data("kendoComboBox").dataSource.read();
+        $("#Program_supplemental_null").data("kendoDropDownList").dataSource.read();
+        var todayDate = Number(kendo.toString(kendo.parseDate(new Date()), 'MM'));
+        $("#Months_supplemental_null").data("kendoDropDownList").value(todayDate);
+        $("#saipsupplemental").data("kendoComboBox").enable(false)
+    }, 100);
+
+    function aip_click(){
+        document.getElementById("saipno").checked=0
+        $("#aipno").val(1)
+        $("#saipno").val(0)
+        $("#saipsupplemental").data("kendoComboBox").value("")
+        $("#saipsupplemental").data("kendoComboBox").enable(false)
+    }
+    function saip_click(){
+        document.getElementById("aipno").checked=0
+        $("#aipno").val(0)
+        $("#saipno").val(1)
+        $("#saipsupplemental").data("kendoComboBox").value("")
+        $("#saipsupplemental").data("kendoComboBox").enable(true)
+    }
+    function fn_reqSubmit() {
+
+        var office_id = $('#office_supplemental_req').val()
+        var program_id = $('#Program_supplemental_null').val()
+        var account_id = $('#account_list_supplemental_null').val() == "" ? 0 : $('#account_list_supplemental_null').val()
+        var MonthOf = $('#Months_supplemental_null').val()
+        var yearof = $("#tyear").val()
+        var url = "@Url.Action("submit_supplememental_request", "Release")";
+        if (account_id == 0) {
+            swal({
+                title: "",
+                text: "Please select an account first for supplemental or it will submit all the supplemental request of your office. Do you want to proceed?",
+                type: "info",
+                showCancelButton: true,
+                closeOnConfirm: false,
+                confirmButtonColor: "#1fa67a",
+                confirmButtonText: "Yes, Submit It!",
+                showLoaderOnConfirm: true,
+            }, function () {
+
+                $.post(url, { office_id: office_id, program_id: program_id, account_id: account_id, MonthOf: MonthOf, yearof: yearof }, function (e) {
+
+                    if (e == "1") {
+                        swal({
+                            title: "Success!",
+                            text: "Supplemental request has been submitted",
+                            timer: 2000,
+                            type: "success",
+                            showConfirmButton: false
+                        })
+                        grid_ref_sup_ok();
+                        $('#grd_sup_office').data('kendoGrid').dataSource.read();
+                        document.getElementById("amount_supplemental_null_DUM").value = 0;
+                        document.getElementById("amount_supplemental_null_ID").value = 0;
+                        document.getElementById("amount_supplemental_null").value = 0;
+                    } else {
+                        swal({
+                            title: "Warning!",
+                            text: e,
+                            timer: 2000,
+                            type: "warning",
+                            showConfirmButton: false
+                        })
+                    }
+                });
+            })
+        }
+        else if (account_id != 0) {
+            swal({
+                title: "",
+                text: "Do you want to submit the supplemental request for this account?",
+                type: "info",
+                showCancelButton: true,
+                closeOnConfirm: false,
+                confirmButtonColor: "#1fa67a",
+                confirmButtonText: "Yes, Submit It!",
+                showLoaderOnConfirm: true,
+            }, function () {
+
+                $.post(url, { office_id: office_id, program_id: program_id, account_id: account_id, MonthOf: MonthOf, yearof: yearof }, function (e) {
+                    if (e == "1") {
+                        swal({
+                            title: "Success!",
+                            text: "Supplemental request has been submitted",
+                            timer: 2000,
+                            type: "success",
+                            showConfirmButton: false
+                        })
+                        grid_ref_sup_ok();
+                        $('#grd_sup_office').data('kendoGrid').dataSource.read();
+                        document.getElementById("amount_supplemental_null_DUM").value = 0;
+                        document.getElementById("amount_supplemental_null_ID").value = 0;
+                        document.getElementById("amount_supplemental_null").value = 0;
+                    } else {
+                        swal({
+                            title: "Warning!",
+                            text: e,
+                            timer: 2000,
+                            type: "warning",
+                            showConfirmButton: false
+                        })
+                    }
+                });
+            })
+        }
+    }
+
+    function vwsubmitsupplemental() {
+
+        $(window).scrollTop(0);
+        var url = "@Url.Action("supreqsubmitted", "Release")";
+        var url2 = "@Url.Action("supreqsubmittedforapproval", "Release")";
+        var lbl="";
+        lbl = "Submitted"
+
+        if (@Account.UserInfo.UserTypeID != 4)
+        {
+            $.get(url,
+                {
+                    office: $("#office_supplemental_req").val()
+                    //id:id
+                },
+            function (d) {
+                $('#suplesubmitted').html(d);
+            })
+
+            $('#suplesubmitted').data('kendoWindow').title("<i class='fa fa-navicon'> </i> " + lbl + "").center().open();
+        }
+        else{
+            $.get(url2,
+                {
+                    office: $("#office_supplemental_req").val()
+                    //id:id
+                },
+            function (d) {
+                $('#suplesubmittedforapproval').html(d);
+            })
+
+            $('#suplesubmittedforapproval').data('kendoWindow').title("<i class='fa fa-navicon'> </i> " + lbl + "").center().open();
+        }
+    }
+    function vwapprovesupplemental() {
+        $(window).scrollTop(0);
+        var url = "@Url.Action("supplemantalapproved", "Release")";
+
+        var lbl="";
+
+        lbl="Posted Supplemental"
+
+        $.get(url,
+            {
+                office: $("#office_supplemental_req").val()
+            },
+        function (d) {
+            $('#suppleapproved').html(d);
+        })
+
+        $('#suppleapproved').data('kendoWindow').title("<i class='fa fa-navicon'> </i> " + lbl + "").center().open();
+    }
+    function fn_reqClear() {
+        document.getElementById("statusid").innerHTML = "&nbsp;<u>New</u>&nbsp;"
+        $("#amount_supplemental_null").val(0.00)
+        $("#purpose").val("")
+        document.getElementById("aipno").checked=1
+        document.getElementById("saipno").checked=0
+        $("#aipno").val(1)
+        $("#saipno").val(0)
+        $("#saipsupplemental").data("kendoComboBox").value("")
+        $("#saipsupplemental").data("kendoComboBox").enable(false)
+    }
+    function Close() {
+        //$('#GeneralFund_Grid').data('kendoGrid').dataSource.read();
+        //acc_availble_mount();
+    }
+
+    function vwforapprovesupplemental() {
+
+        $(window).scrollTop(0);
+        var url = "@Url.Action("supreqforapproval", "Release")";
+        //var office=$("#office").val();
+        //var ooeid=$("#ooe_id").val()
+        //var tyear=$("#ProposalYear").val();
+        //var qtr=$("#quarter").val()
+        var lbl="";
+        //if (id == 0){
+        //    lbl="Prepared"
+        //}
+        //else
+        //{
+        lbl="Approved"
+        //}
+        $.get(url,
+            {
+                office: $("#office_supplemental_req").val()
+                //id:id
+            },
+        function (d) {
+            $('#supleforapproval').html(d);
+        })
+
+        $('#supleforapproval').data('kendoWindow').title("<i class='fa fa-navicon'> </i> " + lbl + "").center().open();
+    }
+
+</script>
+@(Html.Kendo().Window()
+        .Name("suplesubmitted")
+        //.Title("")
+        .Width(1010)
+        .Height(450)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+        //.Events(e => e.Close("Close"))
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+        .Actions(a => { a.Close(); })
+)
+
+@(Html.Kendo().Window()
+        .Name("suplesubmittedforapproval")
+        //.Title("")
+        .Width(1010)
+        .Height(510)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+        //.Events(e => e.Close("Close"))
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+        .Actions(a => { a.Close(); })
+)
+
+@(Html.Kendo().Window()
+        .Name("supleforapproval")
+        //.Title("")
+        .Width(1010)
+        .Height(600)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+        //.Events(e => e.Close("Close"))
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+        .Actions(a => { a.Close(); })
+)
+
+@(Html.Kendo().Window()
+        .Name("suppleapproved")
+        //.Title("")
+        .Width(1010)
+        .Height(480)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+        //.Events(e => e.Close("Close"))
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+        .Actions(a => { a.Close(); })
+)

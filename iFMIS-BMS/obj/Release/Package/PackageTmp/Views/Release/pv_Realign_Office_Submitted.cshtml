@@ -1,0 +1,182 @@
+﻿
+<script>
+    function RealGridSubmitted() {
+        var office_id = $('#office_realigned_to_null').val()
+        var program_id = $('#Program_realigned_to_null').val() == "" ? 0 : $('#Program_realigned_to_null').val()
+        var account_id = $('#account_list_realigned_to_null').val() == "" ? 0 : $('#account_list_realigned_to_null').val()
+        var ooe_id_from = $("#ooe_id_realigned_to_null").val() == "" ? 0 : $("#ooe_id_realigned_to_null").val();
+        var subaccount = 0
+        var realignid = $("#realignid").val()
+        return {
+            office_id: office_id,
+            program_id: program_id,
+            account_id: account_id,
+            yearof: $("#ddlYear").val(),
+            subaccount: subaccount,
+            submit:1,
+            approved: 0,
+            posted: 0,
+            ooe_id_from: ooe_id_from,
+            realignid: realignid
+        }
+    }
+    function searchReAccount() {
+        var $filter = new Array();
+        $filter = [];
+
+        if ($('#SearchRealignData').val().length > 0) {
+            $filter.push({ field: "accountfrom", operator: "contains", value: $('#SearchRealignData').val() }),
+            $filter.push({ field: "ppafrom", operator: "contains", value: $('#SearchRealignData').val() }),
+            $filter.push({ field: "accountto", operator: "contains", value: $('#SearchRealignData').val() }),
+            $filter.push({ field: "ppato", operator: "contains", value: $('#SearchRealignData').val() });
+        }
+
+        $('#grd_realignsubmitted').data('kendoGrid').dataSource.filter({
+            logic: "or",
+            filters: $filter
+        });
+
+    }
+
+    $(function () {
+        $("#SearchRealignData").keypress(function (e) {
+            if (e.keyCode == 13) {
+                searchReAccount();
+            }
+        });
+    });
+    function frmRealignclose() {
+        $("#realigsumitted").data("kendoWindow").close();
+    }
+</script>
+<div id="searchAccountid" style="height: 30px; margin-top: -5px; float: right;">
+    <input type="text" style="width:271.5px;border-collapse:collapse;margin:0px;border-style:solid;margin-left:0px;height:70%;outline:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search..." id="SearchRealignData" name="SearchRealignData">
+    <div class="k-button k-button-icontext" style="height:30px;width:40px;border-style:solid;" onclick="searchReAccount()"><span class="mif-search"></span></div>
+</div>
+<br />
+<div style="display:inline-block; margin-top:0px;">
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Monthly_DD_Model>()
+    .Name("grd_realignsubmitted")
+    // .Scrollable()
+    .Columns(col =>
+    {
+
+    col.Template(@<text></text>).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Account <br />(From)</div></text>)
+                        .Width(140)
+                        .ClientTemplate("<div>#=accountfrom# </div>")
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientFooterTemplate("<div style='text-align:center;color:darkgreen;font-size:10px'><label>Total </label></div>");
+        col.Template(@<text></text>).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">PPA <br />(From)</div></text>)
+                        .Width(140)
+                        .ClientTemplate("<div>#=ppafrom# </div>")
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+    //    .ClientFooterTemplate("<div style='text-align:right;'><label> </label><label> Total</label></div>");
+        col.Bound(m => m.Amountfrom)
+                        .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Amount<br />(From)</div></text>)
+                    .Width(70)
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                    .ClientTemplate("<div>#=kendo.toString(Amountfrom,'c2')# </div>")
+                    .ClientFooterTemplate("<div style='text-align:right;color:darkgreen;font-size:10px'><label> </label><label> ₱#=kendo.toString(sum, 'c2')#</label></div>");
+        col.Template(@<text></text>).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Account <br />(To)</div></text>)
+                        .Width(140)
+                        .ClientTemplate("<div>#=accountto# </div>")
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Template(@<text></text>).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">PPA <br />(To)</div></text>)
+                        .Width(140)
+                        .ClientTemplate("<div>#=ppato# </div>")
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Bound(m => m.Amount)
+                        .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Amount<br />(To)</div></text>)
+                    .Width(70)
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                    .ClientTemplate("<div>#=kendo.toString(Amount,'c2')# </div>")
+                    .ClientFooterTemplate("<div style='text-align:right;color:darkgreen;font-size:10px'><label> </label><label> ₱#=kendo.toString(sum, 'c2')#</label></div>");
+        col.Bound(m => m.datetimesubmit)
+                        .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Date and Time <br />Submitted</div></text>)
+                .Width(160)
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                .ClientTemplate("<div>#=datetimesubmit# </div>");
+    //  .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> </label><label> #=kendo.toString(sum, 'c2')#</label></div>");
+
+        //col.Template(t => { }).ClientTemplate(
+        //            "<div class='k-button k-button-icontext' style='border-radius:50px;color:\\#ffffff;background-color:\\cornflowerblue;' onclick='sup_Edits(#=realignmentid#,#=fromprogram#,#=fromaccount#,#=toprogram#,#=toaccount#,#=subaccount#,#=Amount#,#=tooffice#,#=fromoffice#)'><span class='fa fa-pencil-square-o' style='font-size:10pt;margin:1px;margin-top:-1px;margin-left:1px;margin-right:1px;'> </span>edit</div> " +
+        //            "<div class='k-button k-button-icontext' style='border-radius:50px;color:\\#ffffff;background-color:\\#DE5555;'   onclick='sup_Deletes(#=realignmentid#,#=toaccount#,#=Amount#,#=tooffice#,#=toprogram#,#=subaccount#)'   ><span class='fa fa-trash-o' style='font-size: 10pt;margin: 1px;margin-top:-1px;margin-left:1px;margin-right:1px;'> </span>del</div> "
+        //            ).HtmlAttributes(new { style = "vertical-align: top;" }).Width(158);
+        col.Bound(m => m.realignmentid).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                    .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">id</div></text>)
+                        .Hidden()
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Bound(m => m.fromprogram).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">program(from)</div></text>)
+                        .Hidden()
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Bound(m => m.fromaccount).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">account(from)</div></text>)
+                        .Hidden()
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Bound(m => m.toprogram).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">program(to)</div></text>)
+                        .Hidden()
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Bound(m => m.toaccount).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">account(to)</div></text>)
+                        .Hidden()
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Bound(m => m.subaccount).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">sub-account</div></text>)
+                        .Hidden()
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Bound(m => m.tooffice).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">office(to)</div></text>)
+                        .Hidden()
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Bound(m => m.fromoffice).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">office(from)</div></text>)
+                        .Hidden()
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+    })
+
+    .Sortable()
+    .Scrollable()
+    //    .Events(e => e.Change("WFPgrid"))
+    .HtmlAttributes(new { style = "height:450px;overflow-y:hidden;" })
+    .Pageable(pageable => pageable
+        .Refresh(true)
+        .ButtonCount(2))
+    .DataSource(d => d
+    .Ajax()
+    .Aggregates(a =>
+    {
+        a.Add(c => c.Amount).Sum();
+        a.Add(c => c.Amountfrom).Sum();
+    })
+    .PageSize(1000)
+    .Model(m => m.Id(i => i.supplementalbudget_id))
+    .Read(read => read.Action("Load_Realign_Req", "Release").Data("RealGridSubmitted")))
+    )
+
+</div>
+@*<div class="k-button k-button-icontext" style="float:left; bottom: 15px; right: 25px;width: 100px;background-color:cornflowerblue; color:white;border-radius:50px;margin-left:700px;margin-top:10px;" onclick="frmPreviewSubmitted()"><span class="fa fa-print"></span> Preview</div>*@
+<div class="k-button k-button-icontext" style="float:right; bottom: 15px; right: 25px;width: 100px;background-color:indianred; color:white;border-radius:50px;margin-right:50px;margin-top:10px;" onclick="frmRealignclose()"><span class="fa fa-close"></span> Close</div>
+<script>
+    function frmPreviewSubmitted() {
+        var program_id = $('#Program_realigned_to_null').val() == "" ? 0 : $('#Program_realigned_to_null').val()
+        var accountid = $('#account_list_realigned_to_null').val() == "" ? 0 : $('#account_list_realigned_to_null').val()
+        var yearof = $("#ddlYear").val()
+        var office = $('#office_realigned_to_null').data("kendoComboBox").text()
+        var officeid = $('#office_realigned_to_null').val()
+        var repHistory = 0//$('#repHistory').val()
+        $.ajax({
+            async: false,
+            dataType: 'html',
+            success: window.open("../Reports/ReportViewer.aspx?rid=39&programID=" + program_id + "&accountID=" + accountid + "&yearof=" + yearof + "&OfficeName=" + office + "&OfficeID=" + officeid + "&mode=2&repHistory=" + repHistory + "&source=1")
+        });
+    }
+</script>

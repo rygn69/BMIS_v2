@@ -1,0 +1,246 @@
+﻿
+<script>
+    
+    function getParam() {
+        return {
+            office:'@Session["office"]',
+            tyear: '@Session["tyear"]',
+            id:'@Session["id"]',
+            ooeid:'@Session["ooeid"]',
+            qtr:'@Session["qtr"]'
+        }
+    }
+  
+
+    function disapprovedfppt(trnno) {
+        //GET Value of the active cell
+        var gview = $("#grd_dffptapprove").data("kendoGrid");
+        var selectedItem = gview.dataItem(gview.select());
+    //    var remarks = selectedItem.remarks;
+        
+        //if (remarks == ""){
+        //    swal("Warning!", "Please enter remarks!", "warning");
+        //}
+        //else{
+            swal({
+                title: "W A R N I N G!",
+                text: "Disapprove this transaction?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                closeOnConfirm: false
+            }, function () {
+                var url = "@Url.Action("disapprovefppt", "Report")";
+                $.get(url, { trnno: trnno }, function (e) {
+                    if (e == "success") {
+                        swal("Success!", "Successfully disapproved!", "success");
+                        $("#grd_dffptapprove").data("kendoGrid").dataSource.read();
+                        $("#dffptconsol").data("kendoGrid").dataSource.read();
+                    } else {
+                        swal("Error!", e, "error");
+                        $("#grd_dffptapprove").data("kendoGrid").dataSource.read();
+                    }
+                });
+            });
+        //}
+    }
+    function frmclose() {
+        $("#dffptapproved").data("kendoWindow").close();
+    }
+    function onDataBound(e) {
+        $(".k-hierarchy-cell").hide();
+        $(".k-hierarchy-col").hide();
+        var grid = $("#grd_dffptapprove").data("kendoGrid")
+        var ds = grid.dataSource.view();
+        var rows = e.sender.tbody.children();
+
+        for (var i = 0; i < ds.length; i++) {
+            trnno = ds[i].trnno;
+            firstmon_release=ds[i].firstmonth_rel
+            secondmon_release=ds[i].secondmonth_rel
+            thirdmon_release=ds[i].thirdmonth_rel
+
+            var row = $(rows[i]);
+            if (@Session["id"] == 1 && (firstmon_release == 0 || secondmon_release == 0 || thirdmon_release == 0)) {
+                $('#deleteid' + trnno + '').css("display", "normal");
+            }
+            else {
+                $('#deleteid' + trnno + '').css("display", "none");
+                grid.hideColumn('deleteid' + trnno + '');
+            }
+        }
+    }
+    function searchSubmitConsol() {
+        var $filter = new Array();
+        $filter = [];
+
+        if ($('#searchSubmitConsol').val().length > 0) {
+            $filter.push({ field: "AccountName", operator: "contains", value: $('#searchSubmitConsol').val() }),
+            $filter.push({ field: "ooe", operator: "contains", value: $('#searchSubmitConsol').val() }),
+            $filter.push({ field: "Qtr", operator: "contains", value: $('#searchSubmitConsol').val() })
+        }
+
+        $('#grd_dffptapprove').data('kendoGrid').dataSource.filter({
+            logic: "or",
+            filters: $filter
+        });
+
+    }
+
+    $(function () {
+        $("#searchSubmitConsol").keypress(function (e) {
+            if (e.keyCode == 13) {
+                searchSubmitConsol();
+            }
+        });
+    });
+</script>
+<div id="searchAccountid" style="height: 30px; margin-top: 0px; float: right; margin-left: 200px;">
+    <input type="text" style="width:406px;border-collapse:collapse;margin:0px;border-style:solid;margin-left:0px;height:70%;outline:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search..." id="searchSubmitConsol" name="searchSubmitConsol">
+    <div class="k-button k-button-icontext" style="height:30px;width:40px;border-style:solid;" onclick="searchSubmitConsol()"><span class="mif-search"></span></div>
+</div>
+<div class="fa fa-re">
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.WFPSubmitted>()
+        .Name("grd_dffptapprove")
+        .HtmlAttributes(new { style = "height:460px;" })
+        .Scrollable()
+        .Columns(col =>
+        {
+        col.Template(@<text></text>)
+            .HeaderTemplate(@<text>Expense Class</text>)
+            .Width(60)
+            //.HtmlAttributes(new { style = "text-align:center;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .HtmlAttributes(new { style = "align:center;float:none;text-align:center; vertical-align: middle;" })
+          //  .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+            .ClientTemplate("<div>#=ooe# </div>");
+        col.Template(@<text></text>)
+       //col.Bound(m => m.AccountName)
+            .HeaderTemplate(@<text>Account</text>)
+            .Width(280)
+            .HtmlAttributes(new { style = "text-align:left;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=AccountName# </div>");
+        col.Template(@<text></text>)
+                    .HeaderTemplate(@<text>Qtr</text>)
+                    .Width(50)
+                    .HtmlAttributes(new { style = "text-align:center;height:30px" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                    .ClientTemplate("<div>#=Qtr# </div>");
+        col.Template(@<text></text>)
+                    .HeaderTemplate(@<text>1st Month</text>)
+                    .Width(100)
+                    .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                    .ClientTemplate("<div>#=kendo.toString(fistamount,'c2')# </div>");
+        col.Template(@<text></text>)
+                    .HeaderTemplate(@<text>2nd Month</text>)
+                    .Width(100)
+                    .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                    .ClientTemplate("<div>#=kendo.toString(secondamount,'c2')# </div>");
+        col.Template(@<text></text>)
+                    .HeaderTemplate(@<text>3rd Month</text>)
+                    .Width(100)
+                    .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                    .ClientTemplate("<div>#=kendo.toString(thirdamount,'c2')# </div>");
+        col.Template(@<text></text>)
+                    .HeaderTemplate(@<text>Transaction Date</text>)
+                    .Width(165)
+                    .HtmlAttributes(new { style = "text-align:left;" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                    .ClientTemplate("<div>#=datetimentered# </div>");
+   
+        col.Template(@<text></text>)
+                    .HeaderTemplate(@<text>1st Month <br />Release</text>)
+                    .Width(100)
+                    .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                    .ClientTemplate("<div>#=kendo.toString(firstmon_release,'c2')# </div>");
+                    
+        col.Template(@<text></text>)
+                    .HeaderTemplate(@<text>2nd Month <br />Release</text>)
+                    .Width(100)
+                    .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                    .ClientTemplate("<div>#=kendo.toString(secondmon_release,'c2')# </div>");
+                    
+        col.Template(@<text></text>)
+                    .HeaderTemplate(@<text>3rd Month <br />Release</text>)
+                    .Width(100)
+                    .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                    .ClientTemplate("<div>#=kendo.toString(thirdmon_release,'c2')# </div>");
+                    
+        @*col.Bound(m => m.remarks)
+                .HeaderTemplate(@<text>Remarks</text>)
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+               // .ClientTemplate("<div> id=remarksid </div>")
+                .Width(165);*@
+    // col.Command(command => command.Destroy()).Width(150);
+    col.Template(t => { })
+        .ClientTemplate(
+        "<div  class='k-button k-button-icontext'  id='deleteid#=trnno#' onclick='disapprovedfppt(#=trnno#)' style='border-radius:50px;width:110px;'><span class='fa fa-thumbs-o-down'  style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'></span>Disapprove</div></div>")
+        //.HtmlAttributes(new { style = "text-align:left;width:130px" })
+        .HeaderTemplate(@<text>Disapprove</text>)
+            .Width(133)
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" });
+
+        })
+            //.ToolBar(toolbar =>
+            //{
+            //    toolbar.Create();
+            //    toolbar.Save();
+            //})
+            .Editable(editable => editable.Mode(GridEditMode.InCell))
+            .Navigatable()
+            .Pageable(pageable => pageable
+            .Refresh(true)
+            .Enabled(true)
+            .ButtonCount(2))
+            .Selectable()
+            .AutoBind(false)
+            .Resizable(s => s.Columns(true))
+            //.Sortable(sortable => sortable
+            //.AllowUnsort(true)
+            //.SortMode(GridSortMode.MultipleColumn))
+            .Events(e => e.DataBound("onDataBound"))
+            .DataSource(dataSource => dataSource
+            .Ajax()
+            .Batch(true)
+            .Model(m => m.Id(i => i.trnno))
+            .ServerOperation(false)
+
+            //.Aggregates(a =>
+            //{
+            //    a.Add(c => c.Amount).Sum();
+            //})
+            .PageSize(10)
+            .Read(read => read.Action("GetDFPPTApprove", "Report").Data("getParam"))
+          //  .Update("Editing_Update", "Report")
+            )
+    )
+</div>
+<div style="margin-top:45px">
+    <div  class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 100px;float:right;background-color:indianred; color:white; margin-top: 20px; margin-right:80px;border-radius:50px;margin-top:-30px; margin-bottom:0px" onclick="frmclose()"><span class="fa fa-close"></span> Close</div>
+</div>
+<script>
+    $(document).ready(function(){
+        $("#grd_dffptapprove").data("kendoGrid").dataSource.read();
+    });
+
+    @*$(document).ready(function () {
+        if (@Session["userspecialaccess"].ToString() != "0")
+        {
+            document.getElementById("div_forapproval").style.display = "inline";
+        }
+        else
+        {
+            document.getElementById("div_forapproval").style.display = "none";
+            $("#div_close").css('margin-top','29px');
+        }
+    });*@
+
+</script>

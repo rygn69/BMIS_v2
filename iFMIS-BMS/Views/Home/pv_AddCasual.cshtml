@@ -1,0 +1,184 @@
+﻿
+<script>
+    function GetSelectedCasualRate() {
+        document.getElementById("lblDailyRate").innerHTML = "";
+        document.getElementById("lblSalary").innerHTML = "";
+        var url = "@Url.Action("GetSelectedCasualRate", "Maintenance")";
+        var CasualRateID = $("#ddlCasualStatus").val();
+        $.getJSON(url, { CasualRateID: CasualRateID }, function (result) {
+            $.each(result, function (i, field) {
+                if (i == 'Salary') {
+                    document.getElementById("lblDailyRate").innerHTML = field;
+                }
+                else if (i == 'strSalary') {
+                    document.getElementById("lblSalary").innerHTML = field;
+                }
+            });
+        });
+    }
+    function ReqClose() {
+        document.documentElement.style.overflow = 'auto';  // firefox, chrome
+        document.body.scroll = "yes";
+        $("#ProposeNewCasual").data("kendoWindow").close();
+    }
+    function getYearCasRate(){
+        return{
+            CRYear:$("#PlanYear").val()
+        }
+    }
+    function reqSave() {
+        var EmploymentStatus = $("#ddlCasualStatus").val();
+        var AppointmentDate = $("#dpAppointmentDateCasual").val();
+        var OfficeID = $("#ddlCasualoffice").val();;
+        var Quantity = $("#Quantity").val();
+        if ( EmploymentStatus == "" || AppointmentDate == "") {
+            swal({
+                title: "Notice!",
+                text: "Complete The Fields",
+                type: "info",
+                showCancelButton: false,
+                confirmButtonColor: "#1fa67a",
+                confirmButtonText: "OK!",
+                closeOnConfirm: true,
+            });
+        }
+        else {
+            if (@ViewBag.SeriesID == 0) {
+                var url = "@Url.Action("SaveVacantCasual", "Maintenance")";
+                $.post(url, { EmploymentStatus: EmploymentStatus, AppointmentDate: AppointmentDate, OfficeID: OfficeID,Quantity:Quantity,PlanYear:'@ViewBag.PlanYear' }, function (d) {
+                    if (d == 1) {
+                        swal({
+                            title: "Notice!",
+                            text: "Successfuly Saved",
+                            type: "success",
+                            showCancelButton: false,
+                            confirmButtonColor: "#1fa67a",
+                            confirmButtonText: "OK!",
+                            closeOnConfirm: true,
+                        });
+                        $("#grdCasualList").data("kendoGrid").dataSource.read();
+                        $("#ddlCasualStatus").data("kendoDropDownList").value(0);
+                        $("#dpAppointmentDateCasual").data("kendoDatePicker").value(new Date(new Date().getFullYear() + 1, 0, 1));
+                        document.getElementById("lblDailyRate").innerHTML = "";
+                        document.getElementById("lblSalary").innerHTML = "";
+                        $("#Quantity").prop("readonly", false);
+                        document.getElementById("Quantity").value = 1;
+                    }
+                })
+            }
+            else {
+                var url = "@Url.Action("UpdateCasualVacant", "Maintenance")";
+                $.post(url, {SeriesID:@ViewBag.SeriesID,AppointmentDate:AppointmentDate,CasualRateID:EmploymentStatus}, function (d) {
+                    if (d == 1) {
+                        swal({
+                            title: "Notice!",
+                            text: "Successfuly Updated",
+                            type: "success",
+                            showCancelButton: false,
+                            confirmButtonColor: "#1fa67a",
+                            confirmButtonText: "OK!",
+                            closeOnConfirm: true,
+                        });
+                        $("#grdCasualList").data("kendoGrid").dataSource.read();
+                        $("#ddlCasualStatus").data("kendoDropDownList").value(0);
+                        $("#dpAppointmentDateCasual").data("kendoDatePicker").value(new Date(new Date().getFullYear() + 1, 0, 1));
+                        document.getElementById("lblDailyRate").innerHTML = "";
+                        document.getElementById("lblSalary").innerHTML = "";
+                        $("#Quantity").prop("readonly", false);
+                        document.getElementById("Quantity").value = 1;
+                        CloseKendoWindow("ProposeNewCasual");
+                    }
+                })
+            }
+        }
+    }
+    function CheckIfMax(){
+        if(document.getElementById("Quantity").value < 1){
+            document.getElementById("Quantity").value = 1;
+        }
+    }
+    function onddlCasualStatusDataBound() {
+        if ($("#ddlCasualStatus").data("kendoDropDownList").value() != 0) {
+            GetSelectedCasualRate();
+        }
+    }
+</script>
+<label style="color:red">Note : * Salary is Computed 22 working days per month</label>
+@(Html.Kendo().ComboBox()
+                            .Name("ddlCasualoffice")
+                            .DataTextField("OfficeName")
+                            .DataValueField("OfficeID")
+                            .Placeholder("Select office...")
+                            .Filter("contains")
+                            .MinLength(1)
+                            .HtmlAttributes(new { @style = "width: 500px;" })
+                            //.Events(e => e.Change("fn_dprefresher"))
+                       .DataSource(source => source.Read(read => read.Action("GetOffice", "dpOffice")))
+)
+<label style="display:inline-block">
+    Casual Rate :<br />
+    @(Html.Kendo().DropDownList()
+                         .Name("ddlCasualStatus")
+                         .DataTextField("EmploymentStatus")
+                         .DataValueField("EmploymentStatusID")
+                         .MinLength(1)
+                         .OptionLabel("Select Rate")
+                         .HtmlAttributes(new { @style = "width: 242px;" })
+                         .DataSource(source => source.Read(read => read.Action("ddlCasualRate", "Dropdowns").Data("getYearCasRate")))
+                         .Events(e => e.Change("GetSelectedCasualRate").DataBound("onddlCasualStatusDataBound"))
+    )
+</label>
+<div style="display:inline-block; margin-left:10px">
+    <label> Quantity</label>
+    <input type="number" id="Quantity" style="width:50px" required value="1" min="1" onblur="CheckIfMax()" />
+</div>
+<br />
+<label style="display:inline-block">
+    Salary Effectivity Date :<br />
+    @(Html.Kendo().DatePicker()
+              .Name("dpAppointmentDateCasual")
+              .Start(CalendarView.Month)
+              .Depth(CalendarView.Month)
+              .Value(new DateTime(DateTime.Now.Year + 1, 1, 1))
+              .Min(new DateTime(DateTime.Now.Year + 1, 1, 1))
+              .Format("MM/dd/yyyy")
+              .HtmlAttributes(new { style = "width: 242px; height: 100%", type="text" })
+    )
+</label>
+<br />
+<label style="display:inline-block">
+    Daily Rate :<span id="lblDailyRate"></span>
+</label>
+<br />
+<label style="display:inline-block">
+    Monthly Salary :<span id="lblSalary"></span>
+</label>
+<br />
+<div style="float:right">
+    <div id="btnsave" class="k-button k-button-icontext" style="margin-bottom:5px;display:inline-block;width: 80px;clear:both; margin-top:5px;" onclick="reqSave()">Save</div>
+    <div id="btnCloseNewCasualSettings" class="k-button k-button-icontext" style="margin-bottom:5px;display:inline-block;width: 80px;clear:both; margin-top:5px;" onclick="ReqClose()">Close</div>
+</div>
+<script>
+    $(document).ready(function () {
+        setTimeout(function () {
+            if (@ViewBag.SeriesID == 0) {
+                if ('@Account.UserInfo.UserTypeDesc.ToString()' == 'Budget In-Charge') {
+                    $("#ddlCasualoffice").data("kendoComboBox").value(@Account.UserInfo.Department.ToString());
+                    $("#ddlCasualoffice").data("kendoComboBox").enable(false);
+                }
+                else {
+                    $("#ddlCasualoffice").data("kendoComboBox").value($("#ddlOffices").val());
+                    $("#ddlCasualoffice").data("kendoComboBox").enable();
+                }
+            }
+            else {
+                $("#ddlCasualoffice").data("kendoComboBox").value(@ViewBag.OfficeID);
+                $("#ddlCasualoffice").data("kendoComboBox").enable(false);
+                $("#ddlCasualStatus").data("kendoDropDownList").value(@ViewBag.CasualRateID);
+                $("#Quantity").prop('disabled', true);
+                $("#dpAppointmentDateCasual").data("kendoDatePicker").value('@ViewBag.EffectivityDate');
+            }
+
+        }, 500);
+    });
+</script>

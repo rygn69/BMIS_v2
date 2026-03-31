@@ -1,0 +1,160 @@
+﻿<div style="border: outset;border-width:1px;border-color:#038603; width: 870px; padding-left:0px;padding-right:0px;padding-top:0px;padding-bottom:7px;margin-top: 10px;">
+    <div style=" width: 0;height: 0; border-right: 5px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;margin-top: -1px; ">
+        <div style="width: 803px; margin-top:1px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 37px solid #1fa67a; ">
+
+            <div style="float: left; height:28px; margin-left:-59px; margin-top: 5px;">
+                <i class="fa fa-tasks fa-2x fg-white"> &nbsp;&nbsp;</i>
+            </div>          
+        </div>
+    </div>
+    <script type="text/javascript">
+
+    var BudgetYear = $("#propsYears").val();
+    var PastYear = BudgetYear - 2;
+    var CurrentYear = BudgetYear - 1;
+    document.getElementById("actualYearAppropriateBudgetPanel").innerHTML = PastYear;
+    document.getElementById("estimatesYearAppropriateBudgetPanel").innerHTML = CurrentYear;
+    document.getElementById("proposedYearAppropriateBudgetPanel").innerHTML = BudgetYear;
+        
+    </script>
+    <script>
+        var thisculture = kendo.culture();
+        thisculture.numberFormat.currency.symbol = '₱';
+
+        function newAccount() {
+            $(window).scrollTop(0);
+            var url = "@Url.Action("CreateNewAccounts", "Home")";
+            //ProgramID = e;
+            var pro_id = $("#Progss").val();
+            //alert(pro_id)
+            $.get(url, { pro_id: pro_id }, function (d) {
+                //alert(ProgramID);
+                $('#newAccounts').html(d);
+            })
+            $('#newAccounts').data('kendoWindow').title("Create New Accounts").center().open();
+        }
+
+        function SetGridParameters() {
+            var off_id = $("#offs").val();
+            var proYe = $("#propsYears").val();
+            return {
+                officeID: off_id,
+                propYear1: proYe
+            }
+        }
+
+        function onSaveChanges() {
+            @*var url = "@Url.Action("updateAccounts", "Annual")";*@
+            swal({
+                title: "Success!",
+                text: "Successfully Save",
+                type: "success",
+                showCancelButton: false,
+                confirmButtonColor: "#1fa67a",
+                confirmButtonText: "OK!",
+                closeOnConfirm: true,
+            }, function () {
+                $("#grOfficeAccounts").data("kendoGrid").dataSource.read();
+            });
+        }
+
+        function onGridEdit(arg) {
+            if (arg.container.find("input[name=PastProposalAmmount]").length > 0) {
+
+                $("#grOfficeAccounts").data("kendoGrid").closeCell(arg.container)
+            }
+        }
+        function onCancel(e) {
+            $('#editPorgram').data('kendoWindow').title("Edit").center().closeCell();
+            $("#grOfficeAccounts`").data("kendoGrid").closeCell(arg.container)
+        }
+
+    </script>
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.AccountsModel>()
+    .Name("grOfficeAccounts")
+    .Columns(col =>
+    {
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;">Accounts</div></text>)
+                        .Width(150)
+                        .HtmlAttributes(new { style = "text-align:left" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center" })
+                        .ClientTemplate("<div>#=AccountName# </div>").Width(220);
+
+
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;">Account Code</div></text>)
+                        .Width(80)
+                        .HtmlAttributes(new { style = "text-align:left" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center" })
+                        .ClientTemplate("<div>#=OOEName# </div>").Width(10);
+
+
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;">Past Year</div></text>)
+                        .Width(150)
+                        .HtmlAttributes(new { style = "text-align:left" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center" })
+                        .ClientTemplate("<div>#=PastProposalYear# </div>").Width(29).Hidden();
+
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Past Year <span id="actualYearAppropriateBudgetPanel"></span>  (Actual)</div></text>)
+                        .Width(60)
+                        .HtmlAttributes(new { style = "text-align:left" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center" })
+                        .ClientTemplate("<div>#=kendo.toString(PastProposalAmmount, 'c2')# </div>");
+
+        @*col.Bound(m => m.PastProposalAmmount).HtmlAttributes(new { style = "text-align:left;" }).Title("Past Amount approved")
+                    .HeaderHtmlAttributes(new { style = "text-align:center" }).Width(60);*@
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Current Year <span id="estimatesYearAppropriateBudgetPanel"></span>   (Estimates)</div></text>)
+                        .HtmlAttributes(new { style = "text-align:left" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center" })
+                        .ClientTemplate("<div>#=ProposalYear# </div>").Width(50);
+                        
+        col.Bound(m => m.ProposalAllotedAmount).HtmlAttributes(new { style = "text-align:left;" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Budget Year <span id="proposedYearAppropriateBudgetPanel"></span> (Proposed)</div></text>)
+                        .HeaderHtmlAttributes(new { style = "text-align:center" }).Width(90);
+
+
+    })
+              .ToolBar(toolbar =>
+                      {
+                          toolbar.Save();
+
+                      })
+               .Editable(editable => editable.Mode(GridEditMode.InCell))
+               .Pageable(page => page.Refresh(true)
+               .Enabled(true)
+               .ButtonCount(4)
+               .PreviousNext(true))
+               .Events(e => e.SaveChanges("onSaveChanges").Edit("onGridEdit").Cancel("onCancel"))
+               .Selectable()
+               .DataSource(d => d
+               .Ajax()
+               .Batch(true)
+               .PageSize(10)
+               .Model(m => m.Id(i => i.AccountID))
+               .Read(read => read.Action("grOfficeAccounts", "BudgetPreparation").Data("SetGridParameters"))
+               .Update("UpdateOfficeAccounts", "BudgetPreparation")))
+</div>
+
+@(Html.Kendo().Window()
+    .Name("newAccounts")
+    .Title("Create New Accounts")
+    .HtmlAttributes(new { id = "newAccounts" })
+    .Width(850)
+    .Height(510)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(false)
+    .AutoFocus(true)
+    .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        }).Actions(a => { a.Close(); }))

@@ -1,0 +1,429 @@
+﻿#ChangeProgramAccount
+
+<script>
+    function reqSave() {
+        var notifi = new $("#popupNotification").data("kendoNotification");
+        //notifi.hide();
+        var url = "@Url.Action("UpdateProgramAccount","Maintenance")";
+        var frmData = $('#formProgram').serialize();
+        $.post(url, frmData, function (d) {
+            if (d == "Success") {
+                $.Notify({
+                    caption: 'Success!',
+                    content: 'Program Accounts Updated!',
+                    icon: "<span class='mif-checkmark'></span>",
+                    type: 'success'
+                });
+                $('#webTitle').html("Add Accounts");
+                var url = "@Url.Action("pvChangeProgramAccount", "Maintenance")";
+                $.get(url, function (d) {
+                    $('#siteContent').html(d);
+                })
+            } else {
+                swal("Error!", "Please try again.", "error")
+            }
+        })
+    }
+</script>
+<div style="float: left;border:outset; border-width:1px;border-color:#038603; width: 745px; padding-left:7px;padding-right:7px;padding-top:7px;padding-bottom:7px;">
+    <h3 style="color:#000000;">Change Program Accounts</h3>
+    <label>From :</label>
+    <div style="margin-top:20px;">
+        <label>FMIS Office</label>
+        @(Html.Kendo().DropDownList()
+                //PoPOut design || Text Field Drop codes
+                                    .Name("office_id")
+                                    .DataTextField("office_name")
+                                    .OptionLabel("Select Office . .")
+                                    .DataValueField("office_id")
+                                    .SelectedIndex(0)
+                                            .HtmlAttributes(new { @style = "width: 80%;" })
+                //dropdown connector to EmployeeController
+                                                    .DataSource(source => { source.Read(read => { read.Action("ddlOffice", "Dropdowns"); }); })
+
+        )
+    </div>
+    <div style="margin-top:20px">
+        <label>FMIS Program</label>
+        <script>
+            function filterProgram() {
+                var OfficeDropdown = $("#office_id").val();
+                return {
+                    OfficeDropdown: OfficeDropdown
+                }
+            }
+        </script>
+        @(Html.Kendo().DropDownList()
+                //PoPOut design || Text Field Drop codes
+                                    .Name("program_id")
+                                    .DataTextField("program_name")
+                                    .OptionLabel("Select Program . .")
+                                            .DataValueField("program_id")
+                                            .HtmlAttributes(new { @style = "width: 80%;" })
+                //dropdown connector to EmployeeController
+                                                    .DataSource(source =>
+                                                    {
+                                                        source.Read(read =>
+                                                            {
+                                                                read.Action("ddlProgram", "Dropdowns")
+                                                                    .Data("filterProgram");
+                                                            })
+                                                            .ServerFiltering(true);
+                                                    })
+                                    .Enable(false)
+                                    .AutoBind(false)
+                                    .CascadeFrom("office_id")
+
+        )
+    </div>
+    <div style="margin-top:20px;">
+        <label>FMIS Account</label>
+        <script>
+            function filterProgram() {
+                return {
+                    AccountDropdown: $("#account_id").val()
+                }
+            }
+        </script>
+        <script>
+            function onSelect() {
+                $("#grAccount").data("kendoGrid").dataSource.read();
+                $("#grAccountNonActive").data("kendoGrid").dataSource.read();
+            }
+        </script>
+
+        @(Html.Kendo().ComboBox()
+                  .Name("ref_account_id")
+                  .DataTextField("account_desc")
+                  .DataValueField("ref_account_id")
+                  .Filter("contains")
+                  .MinLength(1)
+                  .Placeholder("Type Account Code...")
+                  .HtmlAttributes(new { @style = "width: 80%;" })
+                  .Events(e => { e.Change("onSelect"); })
+                  .DataSource(source =>
+                  {
+                      source.Read(read =>
+                      {
+                          read.Action("ddlAccount", "Dropdowns");
+
+                      })
+                      .ServerFiltering(false);
+                  })
+)
+</div>
+
+<hr />
+<script>
+    function SearchAccountName() {
+        var OfficeDropdown = $("#office_id").val();
+        var ProgramDropdown = $("#program_id").val();
+        var AccountDropdown = $("#ref_account_id").val();
+        return {
+            OfficeDropdown: OfficeDropdown,
+            ProgramDropdown: ProgramDropdown,
+            AccountDropdown: AccountDropdown
+        }
+    }
+    function onClick() {
+        var entityGrid = $("#grAccount").data("kendoGrid");
+        var selectedItem = entityGrid.dataItem(entityGrid.select())
+        //alert(selectedItem.office_id);
+        //alert(selectedItem.program_id);
+        //alert(selectedItem.ref_account_id);
+        document.getElementById("account_id").value = selectedItem.account_id;
+        $("#officeID").data("kendoDropDownList").value(selectedItem.office_id);
+        $("#programID").data("kendoDropDownList").value(selectedItem.program_id);
+        $("#ref_accountID").data("kendoComboBox").value(selectedItem.ref_account_id);
+    }
+    function deleteAccount(id) {
+        //var data = this.dataItem($(account.currentTarget).closest("tr"));
+        var url = "@Url.Action("DeleteAccount", "Maintenance")";
+        var account_ID = id;
+        swal({
+            title: "Are you sure?",
+            text: "You will not be able to recover this imaginary file!",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, delete it!",
+            closeOnConfirm: false
+        },
+        function () {
+            //swal("Deleted!", "Your imaginary file has been deleted.", "success");
+
+            $.get(url, { account_ID : id }, function (d) {
+                if (d == "Success") {
+                    swal("Success!", "Account has been Deleted!", "success");
+                    $("#grAccount").data("kendoGrid").dataSource.read();
+                    $("#grAccountNonActive").data("kendoGrid").dataSource.read();
+                    
+                } else {
+                    swal("Failed!", d, "error")
+                }
+
+            });
+        });
+    }
+    function restoreAccount(id) {
+        //var data = this.dataItem($(account.currentTarget).closest("tr"));
+        var url = "@Url.Action("RestoreAccount", "Maintenance")";
+        var account_ID = id;
+        swal({
+            title: "System Security Alert!",
+            text: "Are you sure you want to Restore this Account?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, Restore it!",
+            closeOnConfirm: false
+        },
+        function () {
+            //swal("Deleted!", "Your imaginary file has been deleted.", "success");
+
+            $.get(url, { account_ID : id }, function (d) {
+                if (d == "Success") {
+                    swal("Success!", "Account has been Restored!", "success");
+                    $("#grAccount").data("kendoGrid").dataSource.read();
+                    $("#grAccountNonActive").data("kendoGrid").dataSource.read();
+                } else {
+                    swal("Failed!", "An error has been occured!", "error")
+                }
+
+            });
+        });
+    }
+</script>
+    <style>
+        .btn-delete a {
+            color: #000000;
+            background-color: #ffffff;
+            border-style: solid;
+            border-color: #333333;
+            border-width:1px;
+            height: auto;
+            width: auto;
+            padding: 3px;
+            padding-left: 5px;
+            padding-right: 5px;
+            cursor:pointer;
+            margin:auto;
+        }
+
+            .btn-delete a:hover {
+                color: #ffffff;
+                background-color: #000000;
+                border-style: solid;
+                border-color: #333333;
+                height: auto;
+                width: auto;
+            }
+    </style>
+@(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Maintenance.account_code>()
+            .Name("grAccount")
+            .Columns(col =>
+            {
+                col.Bound(m => m.account_id).Title("Account ID").Hidden();
+                col.Bound(m => m.program_id).Title("Program ID").Hidden();
+                col.Bound(m => m.office_id).Title("Office ID").Hidden();
+                col.Bound(m => m.ref_account_id).Title("Ref Account ID").Hidden();
+                col.Bound(m => m.office_desc).Title("Office Name");
+                col.Bound(m => m.program_desc).Title("Program Name");
+                col.Bound(m => m.account_desc).Title("Account Name");
+                col.Template(t => { }).ClientTemplate(
+"<div class='btn-delete'> <a  title='Delete' onclick='deleteAccount(#=account_id#)'><span class='fa fa-trash' style='font-size: 12pt;'></span></a></div>"
+).HtmlAttributes(new { style = "margin-left:5px;" }).Width(40);
+            })
+            .ToolBar(t => t.Template(@<text>
+
+
+                <div style="float: left; width: 0; margin-top:-3px;margin-bottom:-100px;margin-left:-3px; height: 0; border-right: 0px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;">
+                    <div style="float: left; width: 0; margin-top:1px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 36px solid #038603; ">
+
+                        <div style="float: left; height:28px; margin-left:-59px; margin-top: 5px;">
+                            <i class="fa fa-tasks fa-2x fg-white"></i>
+                        </div>
+                        
+
+                    </div>
+                    <div style="width:200px;">
+                        <span style="font-size:24px;color:#ffffff;"> Active Accounts </span>
+                    </div>
+                    
+                </div>
+   
+                <div style="float: right; height:28px;margin-top:2px;">
+                    <link href="~/Content/metroui/css/docs.css" rel="stylesheet" />
+
+
+                </div>
+            </text>))
+                             .Pageable(page => page.Refresh(true)
+                             .Enabled(true)
+                             .ButtonCount(4)
+                             .PreviousNext(true)
+
+                             )
+                                .Selectable(selectable => selectable.Mode(GridSelectionMode.Single))
+                                .Events(e =>
+                                {
+                                    e.Change("onClick");
+                                })
+
+                                .DataSource(d => d
+                                .Ajax()
+                                .PageSize(10)
+
+
+                                .Model(m => m.Id(i => i.account_id))
+                                      .Read(read => read.Action("SearchProgramAccount", "Maintenance").Data("SearchAccountName"))
+                                )
+                               
+)
+    <div style="margin-top:20px;">
+    </div>
+        @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Maintenance.account_code>()
+            .Name("grAccountNonActive")
+            .Columns(col =>
+            {
+                col.Bound(m => m.account_id).Title("Account ID").Hidden();
+                col.Bound(m => m.program_id).Title("Program ID").Hidden();
+                col.Bound(m => m.office_id).Title("Office ID").Hidden();
+                col.Bound(m => m.ref_account_id).Title("Ref Account ID").Hidden();
+                col.Bound(m => m.office_desc).Title("Office Name");
+                col.Bound(m => m.program_desc).Title("Program Name");
+                col.Bound(m => m.account_desc).Title("Account Name");
+                col.Template(t => { }).ClientTemplate(
+"<div class='btn-delete'> <a  title='Restore' onclick='restoreAccount(#=account_id#)'><span class='fa fa-reply-all' style='font-size: 12pt;'></span></a></div>"
+).HtmlAttributes(new { style = "margin-left:5px;" }).Width(40);
+            })
+            .ToolBar(t => t.Template(@<text>
+
+
+                <div style="float: left; width: 0; margin-top:-3px;margin-bottom:-100px;margin-left:-3px; height: 0; border-right: 0px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;">
+                    <div style="float: left; width: 0; margin-top:1px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 36px solid #038603; ">
+
+                        <div style="float: left; height:28px; margin-left:-59px; margin-top: 5px;">
+                            <i class="fa fa-tasks fa-2x fg-white"></i>
+                        </div>
+                    </div>
+                    <div style="width:300px;">
+                        <span style="font-size:24px;color:#ffffff;margin-left:-40px;"> Non-Active Accounts </span>
+                    </div>
+
+                </div>
+
+                <div style="float: right; height:28px;margin-top:2px;">
+                    <link href="~/Content/metroui/css/docs.css" rel="stylesheet" />
+
+
+                </div>
+            </text>))
+                             .Pageable(page => page.Refresh(true)
+                             .Enabled(true)
+                             .ButtonCount(4)
+                             .PreviousNext(true)
+
+                             )
+                                .Selectable(selectable => selectable.Mode(GridSelectionMode.Single))
+                                .Events(e =>
+                                {
+                                    e.Change("onClick");
+                                })
+
+                                .DataSource(d => d
+                                .Ajax()
+                                .PageSize(10)
+
+
+                                .Model(m => m.Id(i => i.account_id))
+                                      .Read(read => read.Action("SearchProgramAccountNonActive", "Maintenance").Data("SearchAccountName"))
+                                )
+
+        )
+
+        <hr />
+        <label>Change To</label>
+        <form id="formProgram" method="post">
+            <div style="margin-top:20px;">
+                <label>FMIS Office</label>
+                <input type="text" id="account_id" name="account_id" value="" hidden="hidden" />
+                @(Html.Kendo().DropDownList()
+                        //PoPOut design || Text Field Drop codes
+                                    .Name("officeID")
+                                    .DataTextField("office_name")
+                                    .OptionLabel("Select Office . .")
+                                    .DataValueField("office_id")
+                                    .SelectedIndex(0)
+                                    .HtmlAttributes(new { @style = "width: 80%;" })
+                        //dropdown connector to EmployeeController
+                                    .DataSource(source => { source.Read(read => { read.Action("ddlOffice", "Dropdowns"); }); })
+
+                )
+            </div>
+
+            <div style="margin-top:20px">
+                <label>FMIS Program</label>
+                <script>
+                    function filterFromProgram() {
+                        var OfficeDropdown = $("#officeID").val();
+                        return {
+                            OfficeDropdown: OfficeDropdown
+                        }
+                    }
+                </script>
+                @(Html.Kendo().DropDownList()
+                        //PoPOut design || Text Field Drop codes
+                                    .Name("programID")
+                                    .DataTextField("program_name")
+                                    .OptionLabel("Select Program . .")
+                                            .DataValueField("program_id")
+                                            .HtmlAttributes(new { @style = "width: 80%;" })
+                        //dropdown connector to EmployeeController
+                                                    .DataSource(source =>
+                                                    {
+                                                        source.Read(read =>
+                                                            {
+                                                                read.Action("ddlProgram", "Dropdowns")
+                                                                    .Data("filterFromProgram");
+                                                            })
+                                                            .ServerFiltering(true);
+                                                    })
+                                    .Enable(true)
+                                    .AutoBind(false)
+                                    .CascadeFrom("officeID")
+
+                )
+            </div>
+            <div style="margin-top:20px;">
+                <label>FMIS Account</label>
+                <script>
+                    function filterProgram() {
+                        return {
+                            AccountDropdown: $("#accountID").val()
+                        }
+                    }
+                </script>
+                @(Html.Kendo().ComboBox()
+                          .Name("ref_accountID")
+                          .DataTextField("account_desc")
+                          .DataValueField("ref_account_id")
+                  .Filter("contains")
+                  .MinLength(1)
+                  .Placeholder("Type Account Code...")
+                  .HtmlAttributes(new { @style = "width: 80%;" })
+                  .DataSource(source =>
+                  {
+                      source.Read(read =>
+                      {
+                          read.Action("ddlAccount", "Dropdowns");
+
+                      })
+                      .ServerFiltering(false);
+                  })
+                )
+            </div>
+        </form>
+        <div class="k-button k-button-icontext" onclick="reqSave()" style="padding:5px;float:right;margin-top:10px">Update</div>
+    </div>
+

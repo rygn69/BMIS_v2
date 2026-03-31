@@ -1,0 +1,139 @@
+﻿@model iFMIS_BMS.BusinessLayer.Models.Maintenance.OrdinanceSectionModel
+
+<script>
+    function reqCloseNewSectionWindow() {
+        document.documentElement.style.overflow = 'auto';  // firefox, chrome
+        document.body.scroll = "yes";
+        $("#NewSectionWindow").data("kendoWindow").close();
+    }
+    function reqAddNewSection() {
+        var SectionDescription = $("#txtSectionDesc").val();
+        var SectionOrder = $("#txtSectionOrder").val();
+        var SectionName = $("#txtSectionName").val();
+        var neworder = 0;
+        if (@Model.SectionID == 0) {
+            var url = "@Url.Action("SaveSection", "Maintenance")";
+            $.post(url, { SectionDescription: SectionDescription, SectionOrder: SectionOrder, SectionName: SectionName }, function (d) {
+                if (d == 1) {
+                    swal({
+                        title: "Success!",
+                        text: "Section Succesffuly Added!",
+                        type: "success",
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    $("#grSectionList").data("kendoGrid").dataSource.read();
+                    $("#txtSectionDesc").data("kendoEditor").value("");
+                    document.getElementById("txtSectionOrder").value = Number(SectionOrder) + 1;
+                    document.getElementById("txtSectionName").value = "";
+                }
+                else {
+                    swal({
+                        title: "Something went wrong!",
+                        text: d,
+                        type: "error",
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                }
+            })
+        }
+        else {
+            var url = "@Url.Action("UpdateSection", "Maintenance")";
+            $.post(url, { SectionDescription: SectionDescription, SectionOrder: SectionOrder, SectionName: SectionName,SectionID: @Model.SectionID }, function (d) {
+                if (d == 1) {
+                    swal({
+                        title: "Success!",
+                        text: "Section Succesffuly Updated!",
+                        type: "success",
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    $("#grSectionList").data("kendoGrid").dataSource.read();
+                    document.documentElement.style.overflow = 'auto';  // firefox, chrome
+                    document.body.scroll = "yes";
+                    $("#NewSectionWindow").data("kendoWindow").close();
+                    $("#txtSectionDesc").data("kendoEditor").value("");
+                    document.getElementById("txtSectionOrder").value = Number(SectionOrder) + 1;
+                    document.getElementById("txtSectionName").value = "";
+                }
+                else {
+                    swal({
+                        title: "Something went wrong!",
+                        text: d,
+                        type: "error",
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                }
+            })
+        }
+    }
+    function DetectTabKey(e) {
+        if (e.keyCode == 9) {
+            var editor = $("#txtSectionDesc").data("kendoEditor");
+            editor.exec("inserthtml", { value: "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" });
+            e.preventDefault();
+        }
+    }
+</script>
+<style>
+    .k-btnIndent {
+    background-position: -288px 0;
+}
+</style>
+<div style="display:inline-block">
+    <label>Section Name <br /><input id="txtSectionName" value="@Model.SectionName" /></label>
+</div>
+<div style="display:inline-block">
+    <label>Section Order <br /><input type="number" id="txtSectionOrder" style="width:70px" min="1" value="@Model.SectionOrder" /></label>
+</div>
+
+<label>Section Description</label>@*<textarea id="txtSectionDesc" name="txtSectionDesc" style="height:100px"></textarea>*@
+@(Html.Kendo().Editor()
+      .Name("txtSectionDesc")
+      .HtmlAttributes(new { style = "width: 100%;height:100px",id="txtSectionDesc" })
+      .Tools(tools => tools
+          .Clear()
+          .JustifyCenter()
+          .JustifyLeft()
+          .JustifyFull()
+          .JustifyRight()
+          .Bold()
+          .Italic()
+          .Underline()
+          .CustomButton(cb => cb.Name("btnIndent").ToolTip("Indent").Exec(@<text>
+            function(e) {
+                var editor = $(this).data("kendoEditor");
+                editor.exec("inserthtml", { value: "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" });
+            }
+        </text>))
+          ).Value(@Model.SectionDescription).Events(e => e.KeyDown("DetectTabKey"))
+          
+)
+
+
+<div style="float:right; margin-top: 10px">
+    <div id="btnAddSection" style="display:inline-block" class="k-button k-button-icontext" onclick="reqAddNewSection()"> <i class="fa fa-save"></i> Add </div>
+    <div style="display:inline-block" class="k-button k-button-icontext" onclick="reqCloseNewSectionWindow()"> <i class="fa fa-times"></i> Close </div>
+</div>
+
+<style>
+    textarea {
+    resize: none;
+}  
+</style>
+
+<script>
+    $(document).ready(function () {
+        setTimeout(function () {
+            if (@Model.SectionID == 0) {
+                document.getElementById("btnAddSection").innerHTML = "<i class='fa fa-save'></i> Add";
+            }
+            else {
+                document.getElementById("btnAddSection").innerHTML = "<i class='fa fa-save'></i> Update";
+            }
+            document.getElementsByName("txtSectionDesc").innerHTML = "<i class='fa fa-save'></i>";
+        }, 500);
+    });
+</script>

@@ -1,0 +1,51 @@
+﻿<script>
+    function ResetColor() {
+        var url = "@Url.Action("gettemplatecolor", "Maintenance")";
+        $.get(url, function (e) {
+            $("#colorPicker").val(e);
+            $("#newtempid").val(e);
+        }).fail(function () {
+            console.error("Failed to fetch template color from API.");
+        });
+    }
+</script>
+
+<label>Template Color :</label>
+<input style="display:inline-block;height:30px;" type="color" oninput="pickcolor()" id="colorPicker">
+<button style="border-radius:50px;background-color:cornflowerblue;color:white;" onclick="updateColor()">Apply Color</button>
+<button style="border-radius:50px;width:90px;" onclick="ResetColor()">Reset</button>
+<label>Code : </label>
+<input type="text" disabled id="newtempid" style="width:100px;"/>
+
+<script>
+    $(document).ready(function () {
+        ResetColor()
+    })
+
+    function updateColor() {
+        var tempcolor =$("#colorPicker").val()
+        console.log(tempcolor)
+        swal({
+            title: "Set new template color?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes",
+            closeOnConfirm: false,
+            showLoaderOnConfirm: true
+        },
+          function () {
+              var url = "@Url.Action("changetemplatecolor", "Maintenance")";
+              $.get(url, { tempcolor: tempcolor }, function (e) {
+
+                  swal("Done", "New template color set successfully!", "success")
+              })
+          })
+    }
+
+    function pickcolor() {
+        $("#newtempid").val($("#colorPicker").val())
+    }
+
+
+</script>

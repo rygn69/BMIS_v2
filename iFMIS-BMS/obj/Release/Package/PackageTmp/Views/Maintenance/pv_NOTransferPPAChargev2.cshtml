@@ -1,0 +1,314 @@
+﻿
+
+<script>
+
+    function onData(){
+        return{
+            obrno: $("#obrno").val(),
+            status: $("#Current").val() == 1 ? 0:1
+        }
+    }
+
+    function SearchTrans() {
+        $("#NOTC").data("kendoGrid").dataSource.read();
+    }
+
+    $("#obrno").change(function () {
+        //sync();
+    }).keypress(function (e) {
+        if (e.keyCode == 13) {
+            SearchTrans();
+        }
+    });
+
+    function fnMainPPA() {
+        var officeid_temp= $("#officeid_temp").val()
+        return {
+            selaccountid: $("#selaccountid").val(),
+            accountid:$("#accountid").val(),
+            yearof: $("#yearof").val(),
+            status: $("#Current").val() == 1 ? 0 : 1,
+            officeid_temp: officeid_temp
+        }
+    }
+
+    var thisculture = kendo.culture();
+    thisculture.numberFormat.currency.symbol = '₱'; // Script For Changing The Currency Sign
+    function OnTabstripActivate() {
+        var SelectedTabIndex = $("#tabstrip").data("kendoTabStrip").select().index();
+        var OfficeID = $("#ddlAIPOffices").val();
+        //if (OfficeID != '') {
+        //    if (SelectedTabIndex == 0) {
+        //        $("#grdPPA").data("kendoGrid").dataSource.read();
+        //    }
+        //    else if (SelectedTabIndex == 1) {
+        //        $("#grdLBPForm4OtherData").data("kendoGrid").dataSource.read();
+        //    }
+        //}
+    }
+    function edittrans(trnno, officeid, accountid, obrno, yearof, Amount, SubAccountid, NonOfficeProgramID) {
+        $("#trnno").val(trnno)
+        $("#accountid").val(accountid)
+        $("#yearof").val(yearof)
+        $("#amountoriginal").val(Amount)
+        $("#NonOfficeProgramID").val(NonOfficeProgramID)
+        $("#officeid_temp").val(officeid)
+        if ((accountid == 336 || accountid == 334 || accountid == 342) && NonOfficeProgramID == 43) {
+            document.getElementById('translabelid').innerHTML = "Transfer to Office    :"
+            document.getElementById('translabelid').style = "float:left;margin-left: 16px;font-size:13px;margin-top:10px";
+            $("#selaccountid").val(1);
+            $("#office").data("kendoComboBox").dataSource.read()
+            $("#office").data("kendoComboBox").value(officeid)
+        }
+        else// if (SubAccountid != 0)
+        {
+            document.getElementById('translabelid').innerHTML = "Transfer to account   :";
+            document.getElementById('translabelid').style = "float:left;margin-left: 4px;font-size:13px;margin-top:10px";
+            $("#selaccountid").val(2);
+            $("#office").data("kendoComboBox").dataSource.read()
+            $("#office").data("kendoComboBox").value(SubAccountid)
+        }
+        //$("#office").data("kendoComboBox").dataSource.read()
+        fnOffice()
+    }
+    function fnOffice() {
+
+        var office = $("#office").val();
+        var url = "@Url.Action("GetNOSAOB","Maintenance")"
+        var status = $("#Current").val() == 1 ? 0 : 1
+        $.get(url, { office: office, accountid: $("#accountid").val(), ProposalYear: $("#yearof").val(), status: status }, function (d) {
+            $("#appropriation").val(MoneyFormat(d.Appropriation));
+            $("#obligation").val(MoneyFormat(d.ObligatedAmount));
+            $("#balance").val(MoneyFormat(d.BalanceAllotment));
+            $("#balancetemp").val(d.BalanceAllotment)
+        });
+    }
+</script>
+
+@*<h2><span class="fa fa-print"></span> PPA's Transfer of Charges</h2>*@
+
+@*<font size="3"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>Note:</strong> You can generate report with or without Office </font>*@
+<br />
+<div style="display:inline-block;margin-left:250px;margin-bottom:20px">
+    <input type="radio" id="Current" style="width:20px;" value=1 checked onclick="currentclick()"/>
+    <label style="display:inline-block" onclick="currentlabel()"> Current </label>
+    <input type="radio" id="Continuing" value=0 style="margin-left:30px;width:20px;" onclick="excessclick()"/>
+    <label style="display:inline-block" onclick="excesslabel()"> Continuing </label>
+</div>
+<div id="" style="display:inline-block;margin-left:250px">
+    <label style="margin-left:70px;font-size:13px;width:100px;margin-top:20px;">ObR No. :</label>
+
+    <div style="float:left;margin-top:-31px;margin-left:160px">
+        <input id="obrno" name="obrno" type="text" value="" placeholder="000-0000-00-00-0000" style="width:300px;height:100%;" onkeyup="SearchTrans()" class="form-control">
+    </div>
+</div>
+
+<div class="transition animated fadeInUp" style="margin-top:10px;">
+    @(Html.Kendo().Grid<iFMIS_BMS.Models.NonOfficeSubAccount>()
+        .Name("NOTC")
+        .Columns(columns =>
+        {
+            columns.Template(@<text></text>).Hidden().ClientTemplate("<div>#=trnno# </div>");
+            columns.Template(@<text></text>).Hidden().ClientTemplate("<div>#=officeid# </div>");
+            columns.Template(@<text></text>).Hidden().ClientTemplate("<div>#=accountid# </div>");
+    columns.Template(@<text></text>).Hidden().ClientTemplate("<div>#=yearof# </div>");
+            columns.Template(@<text></text>).Hidden().ClientTemplate("<div>#=SubAccountid# </div>");
+            columns.Template(@<text></text>).Hidden().ClientTemplate("<div>#=NonOfficeProgramID# </div>");
+            columns.Template(@<text></text>)
+                     .HeaderTemplate(@<text>Office</text>)
+                     .HtmlAttributes(new { style = "text-align:left" })
+                     .HeaderHtmlAttributes(new { style = "text-align:center", @class = "metro-header" })
+                     .Width(200)
+                     .ClientTemplate("<div>#=officename# </div>");
+            columns.Template(@<text></text>)
+                     .HeaderTemplate(@<text>Account</text>)
+                     .HtmlAttributes(new { style = "text-align:left" })
+                     .HeaderHtmlAttributes(new { style = "text-align:center", @class = "metro-header" })
+                     .Width(200)
+                     .ClientTemplate("<div>#=AccountName# </div>");
+            columns.Template(@<text></text>)
+                     .HeaderTemplate(@<text>ObR No.</text>)
+                     .HtmlAttributes(new { style = "text-align:left" })
+                     .HeaderHtmlAttributes(new { style = "text-align:center", @class = "metro-header" })
+                     .Width(150)
+                     .ClientTemplate("<div>#=obrno# </div>");
+            columns.Template(@<text></text>)
+                     .HeaderTemplate(@<text>Amount</text>)
+                     .HtmlAttributes(new { style = "text-align:right" })
+                     .HeaderHtmlAttributes(new { style = "text-align:center", @class = "metro-header" })
+                     .Width(100)
+                     .ClientTemplate("<div>#=kendo.toString(Amount, 'n2')# </div>");
+            columns.Template(t => { })
+                     .HeaderHtmlAttributes(new { style = "text-align:center", @class = "metro-header" })
+                     .ClientTemplate(
+               "<div class='btn-edit'>  <a  title='Edit Charges' onclick='edittrans(#=trnno#,#=officeid#,#=accountid#,\"#=obrno#\",#=yearof#,#=Amount#,#=SubAccountid#,#=NonOfficeProgramID#)'><span class='fa fa-edit' style ='font-size: 15pt;color:blue'></span></a></div>"
+               ).HtmlAttributes(new { style = "margin-left:5px;" }).Width(40);
+
+        })
+        .Sortable()
+        .Pageable(pageable => pageable.Refresh(true))
+        .Scrollable()
+        .HtmlAttributes(new { @class = "table-responsive", style = "height:350px; overflow-x:hidden;" })
+        .Selectable(selectable => selectable
+        .Mode(GridSelectionMode.Single)
+        .Type(GridSelectionType.Row))
+        //   .Events(events => events.Change("selectedrow"))
+        .DataSource(dataSource => dataSource
+            .Ajax()
+            .Model(model => model.Id(u => u.nonofficeid))
+            .PageSize(10)
+            .ServerOperation(false)
+            .Read(read => read.Action("GetNOTransaction", "Maintenance").Data("onData"))
+        )
+    )
+</div>
+
+<div style="float: left;margin-right:10px;margin-top:15px;">
+    <label id="translabelid" style="float:left;margin-left: 16px;font-size:13px;margin-top:10px">
+        Transfer to Office    :
+    </label>
+    <div style="float:left;margin-left:32px;width:500px">
+        @(Html.Kendo().ComboBox()
+                .Name("office")
+                .DataTextField("offname")
+                .DataValueField("OfficeID")
+                .AutoBind(true)
+                // .Placeholder("Select Office...")
+                .Filter("contains")
+                .MinLength(3)
+                .Events(e => e.Change("fnOffice"))
+                .SelectedIndex(-1)
+                .HtmlAttributes(new { style = "width:100%; height:100%", @class = "form-control autoselect" })
+                .DataSource(source =>
+                {
+                    source.Read(read =>
+                    {
+                        read.Action("GetOffice", "Report").Data("fnMainPPA");
+                    })
+                .ServerFiltering(false);
+                })
+        )
+    </div>
+</div>
+<div id="" style="margin-top: 65px;">
+    <label style="margin-left:36px;font-size:13px;width:100px;margin-top:20px;">Appropriation :</label>
+
+    <div style="float:left;margin-top:-31px;margin-left:160px">
+        <input id="appropriation" name="appropriation" type="text" style="width:300px;height:100%;color:#0103fc" readonly class="form-control">
+    </div>
+</div>
+<div id="" style="margin-top: 10px;">
+    <label style="margin-left:57px;font-size:13px;width:100px;margin-top:20px;">Obligation :</label>
+
+    <div style="float:left;margin-top:-31px;margin-left:160px">
+        <input id="obligation" name="obligation" type="text" style="width:300px;height:100%;color:#ff0000" readonly class="form-control">
+    </div>
+</div>
+<div id="" style="margin-top: 10px;">
+    <label style="margin-left:75px;font-size:13px;width:100px;margin-top:20px;">Balance :</label>
+
+    <div style="float:left;margin-top:-31px;margin-left:160px">
+        <input id="balance" name="balance" type="text" style="width:300px;height:100%;color:#43b835" readonly class="form-control">
+    </div>
+</div>
+<div style="float:left;margin-left:475px;width:300px;margin-top:30px;">
+    <div id="btnSave" class="k-button k-button-icontext" style="border-radius:50px; bottom: 15px;background-color:cornflowerblue;color:white; right: 15px;width: 90px;float:right; margin-right:200px; margin-bottom:0px" onclick="reqSave()"><span class="fa fa-save"></span> Save </div>
+    <div class="k-button k-button-icontext" style="border-radius:50px; bottom: 15px; right: 15px;width: 90px;float:right;margin-right:-190px; margin-bottom:0px" onclick="reqClear()"><span class="fa fa-eraser"></span> Clear </div>
+</div>
+<div style="display:none">
+    <input id="accountid" name="accountid" type="number" />
+    <input id="yearof" name="yearof" type="number" />
+    <input id="trnno" name="trnno" type="number" />
+    <input id="amountoriginal" name="amountoriginal" type="number" />
+    <input id="balancetemp" name="balancetemp" type="number" />
+    <input id="selaccountid" name="selaccountid" type="number" value="1" />
+    <input id="NonOfficeProgramID" name="NonOfficeProgramID" type="number" />
+    <input id="officeid_temp" type="number" value="0"/>
+
+</div>
+<script>
+    $(document).ready(function () {
+        //$("#btnSave").attr('disabled', 'disabled')
+       // document.getElementById("btnSave").disabled = true;
+        //  document.getElementById("btnSave").setAttribute('disabled', 'disabled');
+        OnTabstripActivate();
+    });
+    
+    function currentclick(){
+        if (document.getElementById("Current").checked) {
+            document.getElementById("Current").value = 1
+            document.getElementById("Continuing").checked = false
+            document.getElementById("Continuing").value = 0
+        }
+        SearchTrans()
+    }
+    function excessclick() {
+        if (document.getElementById("Continuing").checked) {
+            document.getElementById("Continuing").value = 1
+            document.getElementById("Current").checked = false
+            document.getElementById("Current").value = 0
+        }
+        SearchTrans()
+    }
+    function currentlabel() {
+        //if (document.getElementById("Current").checked) {
+            document.getElementById("Current").value = 1
+            document.getElementById("Current").checked = true
+            document.getElementById("Continuing").checked = false
+            document.getElementById("Continuing").value = 0
+        //}
+            SearchTrans()
+    }
+
+    function excesslabel() {
+        document.getElementById("Current").value = 0
+        document.getElementById("Current").checked = false
+        document.getElementById("Continuing").checked = true
+        document.getElementById("Continuing").value = 1
+        SearchTrans()
+    }
+    function reqSave() {
+        var amountoriginal = $("#amountoriginal").val()
+        var trnno = $("#trnno").val()
+        var balancetemp = $("#balancetemp").val()
+        var office = $("#office").val()
+        var obrno = $("#obrno").val()
+        var balancetemp2 = Number(balancetemp) - Number(amountoriginal)
+        var url = "@Url.Action("UpdateNOTransaction","Maintenance")"
+        var status = $("#Current").val() == 1 ? 0:1
+        
+        if (Number(balancetemp2) < 0) {
+            swal("","Sorry! There's no available balance.","warning")
+        } else {
+            swal({
+                title: "Confirmation!",
+                text: "Would you like to transfer the PPA?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                closeOnConfirm: false
+            }, function () {
+                $.get(url, { trnno: trnno, office: office, obrno: obrno, status: status }, function (d) {
+                    if (d == "success") {
+                        swal("", "Transfer of ppa is done.", "success")
+                        $("#NOTC").data('kendoGrid').dataSource.read();
+                        reqClear();
+                    }
+                    else {
+                        swal("",d,"error")
+                    }
+                })
+
+            });
+        }
+    }
+    function reqClear() {
+        $("#office").val("");
+        $("#appropriation").val(MoneyFormat(0.00));
+        $("#obligation").val(MoneyFormat(0.00));
+        $("#balance").val(MoneyFormat(0.00));
+        $("#amountemp").val("");
+        $("#officeid_temp").val(0);
+    }
+</script>

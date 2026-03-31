@@ -1,0 +1,277 @@
+﻿
+<script>
+    function getParam() {
+        return {
+            office:'@Session["office"]',
+            tyear: '@Session["tyear"]',
+            id: '@Session["id"]',
+            ooeid:'@Session["ooeid"]',
+            qtr:'@Session["qtr"]'
+        }
+    }
+    function returndffpt(trnno) {
+        swal({
+            title: "W A R N I N G!",
+            text: "Return this transaction?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes",
+            closeOnConfirm: false
+        }, function () {
+            var url = "@Url.Action("returndfppt", "Report")";
+            $.get(url, { trnno: trnno }, function (e) {
+                if (e == "success") {
+                    swal("Success!", "Successfully returned!", "success");
+                    $("#grd_dffptlist").data("kendoGrid").dataSource.read();
+                } else {
+                    swal("Error!", e, "error");
+                    $("#grd_dffptlist").data("kendoGrid").dataSource.read();
+                }
+            });
+        });
+    }
+    function frmclose() {
+        $("#dffptsubmitted").data("kendoWindow").close();
+    }
+    function onDataBound(e) {
+        $(".k-hierarchy-cell").hide();
+        $(".k-hierarchy-col").hide();
+        var grid = $("#grd_dffptlist").data("kendoGrid")
+        var ds = grid.dataSource.view();
+        var rows = e.sender.tbody.children();
+
+        for (var i = 0; i < ds.length; i++) {
+            trnno = ds[i].trnno;
+            firstmon_release=ds[i].firstmon_release
+            secondmon_release=ds[i].secondmon_release
+            thirdmon_release=ds[i].thirdmon_release
+
+            var row = $(rows[i]);
+            if ('@Session["id"]' == 0 && firstmon_release == 0 && secondmon_release == 0 && thirdmon_release == 0) {
+                $('#deleteid' + trnno + '').css("display", "normal");
+            }
+            else {
+                $('#deleteid' + trnno + '').css("display", "none");
+
+            }
+        }
+    }
+    function searchPrep() {
+        var $filter = new Array();
+        $filter = [];
+
+        if ($('#searchPrep').val().length > 0) {
+            $filter.push({ field: "AccountName", operator: "contains", value: $('#searchPrep').val() }),
+            $filter.push({ field: "ooe", operator: "contains", value: $('#searchPrep').val() }),
+            $filter.push({ field: "Qtr", operator: "contains", value: $('#searchPrep').val() })
+        }
+
+        $('#grd_dffptlist').data('kendoGrid').dataSource.filter({
+            logic: "or",
+            filters: $filter
+        });
+
+    }
+
+    $(function () {
+        $("#searchPrep").keypress(function (e) {
+            if (e.keyCode == 13) {
+                searchPrep();
+            }
+        });
+    });
+</script>
+<div id="searchAccountid" style="height: 30px; margin-top: 0px; float: right; margin-left: 200px;">
+    <input type="text" style="width:406px;border-collapse:collapse;margin:0px;border-style:solid;margin-left:0px;height:70%;outline:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search..." id="searchPrep" name="searchPrep">
+    <div class="k-button k-button-icontext" style="height:30px;width:40px;border-style:solid;" onclick="searchPrep()"><span class="mif-search"></span></div>
+</div>
+<div class="fa fa-re">
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.WFP>()
+        .Name("grd_dffptlist")
+        .HtmlAttributes(new { style = "height:450px;" })
+        .Scrollable()
+        .Columns(col =>
+        {
+        col.Template(@<text></text>)
+            .HeaderTemplate(@<text>Expense Class</text>)
+            .Width(60)
+            .HtmlAttributes(new { style = "text-align:center;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=ooe# </div>");
+        col.Template(@<text></text>)
+            .HeaderTemplate(@<text>Account</text>)
+            .Width(280)
+            .HtmlAttributes(new { style = "text-align:left;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=AccountName# </div>");
+        col.Template(@<text></text>)
+                    .HeaderTemplate(@<text>Qtr</text>)
+                    .Width(50)
+                    .HtmlAttributes(new { style = "text-align:center;height:30px" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                    .ClientTemplate("<div>#=Qtr# </div>");
+        col.Template(@<text></text>)
+                    .HeaderTemplate(@<text>1st Month</text>)
+                    .Width(100)
+                    .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                    .ClientTemplate("<div>#=kendo.toString(fistamount,'c2')# </div>");
+        col.Template(@<text></text>)
+                    .HeaderTemplate(@<text>2nd Month</text>)
+                    .Width(100)
+                    .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                    .ClientTemplate("<div>#=kendo.toString(secondamount,'c2')# </div>");
+        col.Template(@<text></text>)
+                    .HeaderTemplate(@<text>3rd Month</text>)
+                    .Width(100)
+                    .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                    .ClientTemplate("<div>#=kendo.toString(thirdamount,'c2')# </div>");
+        col.Template(@<text></text>)
+                    .HeaderTemplate(@<text>Date Prepared</text>)
+                    .Width(165)
+                    .HtmlAttributes(new { style = "text-align:left;" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                    .ClientTemplate("<div>#=datetimentered# </div>");
+         col.Template(@<text></text>)
+                    .HeaderTemplate(@<text>Date Submitted </text>)
+                    .Width(165)
+                    .HtmlAttributes(new { style = "text-align:left;" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                    .ClientTemplate("<div>#=submitdatetime# </div>");
+         col.Template(@<text></text>)
+                        .HeaderTemplate(@<text>Remarks </text>)
+                        .Width(165)
+                        .HtmlAttributes(new { style = "text-align:left;" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                        .ClientTemplate("<div>#=remarks# </div>");
+        col.Template(@<text></text>)
+                    .HeaderTemplate(@<text></text>)
+                    .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                    .ClientTemplate(
+                        "<div class='k-button k-button-icontext' id='deleteid#=trnno#' style='border-radius:50px;color:\\#ffffff;background-color:\\#DE5555;' onclick='deletedfpptprep(#=trnno#,#=accountid#)'><span class='fa fa-trash' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'> </span>Delete</div> ")
+                    .HtmlAttributes(new { style = "vertical-align: top;" })
+                    .Width(108);
+        col.Template(@<text></text>)
+                    .HeaderTemplate(@<text>1st release</text>)
+                    .ClientTemplate("<div>#=firstmon_release# </div>")
+                    .Hidden();
+         col.Template(@<text></text>)
+                    .HeaderTemplate(@<text>2nd release</text>)
+                    .ClientTemplate("<div>#=secondmon_release# </div>")
+                    .Hidden();
+         col.Template(@<text></text>)
+                    .HeaderTemplate(@<text>3rd release</text>)
+                    .ClientTemplate("<div>#=thirdmon_release# </div>")
+                    .Hidden();
+
+        })
+            //.Editable(editable => editable.Mode(GridEditMode.InCell))
+            .Pageable(pageable => pageable
+            .Refresh(true)
+            .ButtonCount(2))
+            .Selectable()
+            .Resizable(s => s.Columns(true))
+            .Sortable(sortable => sortable
+            .AllowUnsort(true)
+            .SortMode(GridSortMode.MultipleColumn))
+            
+            .Events(e => e.DataBound("onDataBound"))
+            .DataSource(dataSource => dataSource
+            .Ajax()
+            .Batch(true)
+            .Model(m => m.Id(i => i.trnno))
+            .ServerOperation(false)
+
+
+            //.Aggregates(a =>
+            //{
+            //    a.Add(c => c.Amount).Sum();
+            //})
+            .PageSize(10)
+            .Read(read => read.Action("GetDFPPTPlist", "Report").Data("getParam"))
+            )
+)
+</div>
+<div style="margin-top:45px">
+    @*<div id="btnSubmit" class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 100px;float:left; margin-top: -25px; margin-left:650px;border-radius:50px;background-color:cornflowerblue;color:white; margin-bottom:0px" onclick="reqSubmit()"><span class="fa fa-send-o"></span> Submit</div>*@
+    <div  class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 100px;float:right;background-color:indianred; color:white; margin-top: -25px; margin-right:125px;border-radius:50px; margin-bottom:0px" onclick="frmclose()"><span class="fa fa-close"></span> Close</div>
+</div>
+<script>
+    $(document).ready(function(){
+        $("#grd_dffptlist").data("kendoGrid").dataSource.read();
+
+        if ('@Session["id"]' == 0) {
+            document.getElementById("btnSubmit").style.display="normal"
+        }
+        else {
+            document.getElementById("btnSubmit").style.display = "none";
+        }
+    });
+
+    function reqSubmit(){
+        var office=$("#office").val();
+        var ooeid=$("#ooe_id").val()
+        var tyear=$("#ProposalYear").val();
+        var qtr=$("#quarter").val()
+      
+        if (ooeid == 0 || qtr == 0 ){
+            swal("Warning","Please select expense class or period!","warning")
+        }
+        else if( $("#appbal_temp").val() == 1){
+            swal("Warning", "Insufficient balance, please check the amount you've entered!", "warning")
+        }
+        else{
+            swal({
+                title: "Submit your DFPPT in the "+ $("#quarter").data("kendoDropDownList").text() +"?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                closeOnConfirm: false,
+                showLoaderOnConfirm: true
+            },
+            function () {
+                var url = "@Url.Action("submitdfppt", "Report")";
+                $.get(url, { office:office,ooeid:ooeid, tyear:tyear,qtr:qtr }, function(e){
+                    if (e =='success'){
+                        swal("Success", "DFPPT successfully submitted.", "success")
+                        $("#grd_dffptlist").data("kendoGrid").dataSource.read()
+                    }
+                    else{
+                        swal("Error",e,"error")
+                    }
+                })
+            })
+        }
+    }
+    function deletedfpptprep(trnno, accountid) {
+        var office = $("#office").val();
+        var transyear = $("#ProposalYear").val()
+        swal({
+            title: "Delete this transaction?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes",
+            closeOnConfirm: false,
+            showLoaderOnConfirm: true
+        },
+            function () {
+                var url = "@Url.Action("deletedfppt", "Report")";
+                $.get(url, { trnno: trnno, office: office, accountid: accountid, transyear: transyear }, function (e) {
+                    if (e =='success'){
+                        swal("Success", "Transaction successfully deleted.", "success")
+                        $("#grd_dffptlist").data("kendoGrid").dataSource.read()
+                        $("#WFPDetails").data("kendoGrid").dataSource.read()
+                    }
+                    else{
+                        swal("Error",e,"error")
+                    }
+                })
+            })
+    }
+
+</script>

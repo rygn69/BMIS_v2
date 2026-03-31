@@ -1,0 +1,136 @@
+﻿
+    
+<script>
+
+    office_id: '@Session["office_id"]'
+    year_of: '@Session["year_of"]'
+
+
+    function getPS() {
+
+        var url = "@Url.Action("GETPS", "Utility")";
+
+        $.post(url, { office_id: '@Session["office_id"]', year_of: '@Session["year_of"]' }, function (d) {
+            document.getElementById('ps').innerHTML = "PRESONAL SERVICES : " + d
+        });
+    }
+
+
+    function getMOOE() {
+
+        var url = "@Url.Action("GETMOOE", "Utility")";
+
+        $.post(url, { office_id: '@Session["office_id"]', year_of: '@Session["year_of"]' }, function (d) {
+            document.getElementById('mooe').innerHTML = "MOOE : " + d
+        });
+    }
+
+
+    function getCO() {
+
+        var url = "@Url.Action("GETCO", "Utility")";
+
+        $.post(url, { office_id: '@Session["office_id"]', year_of: '@Session["year_of"]' }, function (d) {
+            document.getElementById('co').innerHTML = "CAPITAL OUTLAY : " + d
+        });
+    }
+
+    function getOPIS() {
+
+        var url = "@Url.Action("GETOPIS", "Utility")";
+
+        $.post(url, { office_id: '@Session["office_id"]', year_of: '@Session["year_of"]' }, function (d) {
+            document.getElementById('OPIS').innerHTML =  d
+        });
+    }
+
+    function getOfficeID() {
+        ChangeTotalAmounts();
+        return {
+            office_id: '@Session["office_id"]',
+            year_of: '@Session["year_of"]'
+        }
+    }
+
+    function ChangeTotalAmounts() {
+        setTimeout(function () {
+            getPS();
+            getMOOE();
+            getCO();
+            getOPIS();
+        }, 1000);
+    }
+
+
+</script>
+
+
+<div style=" width: 0;height: 0; border-right: 5px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;margin-top: -1px;margin-bottom: 0px; ">
+    <div style="float: left; width: 895px; margin-top:1px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 36px solid #1fa67a; ">
+
+        <div style="float: left; height:28px; margin-left:-59px; margin-top: 5px;">
+            <i class="fa fa-tasks fa-2x fg-white">  &nbsp;&nbsp; </i>
+          
+        </div>
+      
+        <span id="OPIS" style="font-weight:600;margin-left: 50px; font-size: 20px;margin-bottom: 20px"></span>
+      
+    </div>
+
+</div>
+
+
+    
+<label>
+    <span id="ps" style="font-weight:600;margin-left: 50px; font-size: 20px;margin-bottom: 20px"></span>
+</label>
+<label>
+    <span id="mooe" style="font-weight:600;margin-left: 50px; font-size:20px;margin-bottom: 20px"></span>
+</label>
+<label>    
+    <span id="co" style="font-weight:600;margin-left: 50px; font-size:20px; margin-bottom: 20px"></span>
+</label>
+ 
+    <div>
+
+        @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.summary_model>()
+
+    .Name("Grid")
+    .Columns(columns =>
+    {
+        // columns.Bound(o => o.summary_id).Hidden();
+        columns.Bound(o => o.summary_group).Hidden().ClientGroupHeaderTemplate("#=value#");
+
+
+
+        columns.Bound(o => o.summary_desc).Width(90)
+            .HeaderTemplate(@<text>
+                <div style="font-weight:600;"></div></text>)
+                  .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size: 20px;" })
+                 .ClientGroupFooterTemplate("Total")
+                 .ClientFooterTemplate("Total Count: ");
+        columns.Bound(o => o.summary_count).Width(90)
+             .HeaderTemplate(@<text>
+                <div style="font-weight:600;">Qty</div></text>)
+                    .ClientGroupFooterTemplate("#=sum#")
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size: 20px;" })            
+                    .ClientFooterTemplate("#=sum#")
+                     .ClientTemplate("<div>#=kendo.toString(summary_count)# </div>");
+                    
+
+    })
+                .Pageable()
+                .Sortable()
+                .DataSource(dataSource => dataSource
+                    .Ajax()
+                            .Aggregates(aggregates =>
+                            {
+                                aggregates.Add(p => p.summary_count).Sum();
+
+                            })
+                    .Group(groups => groups.Add(p => p.summary_group))
+                    .Read(read => read.Action("getSummary", "Utility").Data("getOfficeID"))
+                )
+        )
+
+    </div>

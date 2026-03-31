@@ -1,0 +1,228 @@
+﻿@model iFMIS_BMS.BusinessLayer.Models.AccountsModel
+<script>
+    function DisableLetters(event) {
+        if ($.inArray(event.keyCode, [46, 8, 9, 27, 13, 110]) !== -1 ||
+            // Allow: Ctrl+A, Command+A
+           (event.keyCode == 65 && (event.ctrlKey === true || event.metaKey === true)) ||
+            // Allow: home, end, left, right, down, up
+           (event.keyCode >= 35 && event.keyCode <= 40)) {
+            // let it happen, don't do anything
+            return;
+        }
+        // Ensure that it is a number and stop the keypress
+        if ((event.shiftKey || (event.keyCode < 48 || event.keyCode > 57)) && (event.keyCode < 96 || event.keyCode > 105)) {
+            event.preventDefault();
+        }
+    }
+    function ShowSelectAccount() {
+        if (document.getElementById("cbBuildExistingAccount").checked == true) {
+            $('#ExistingAccountDiv').css("display", "inline-block");
+            $('#NewAccountDiv').css("display", "none");
+        }
+        else {
+            $('#ExistingAccountDiv').css("display", "none");
+            $('#NewAccountDiv').css("display", "inline-block");
+        }
+    }
+    function SearchExistingAccount() {
+        var SearchProgramData = $("#SearchExistingAccount").val();
+        var ProgramgGrid = $("#grdExistingAccountWindow").data("kendoGrid").dataSource;
+        ProgramgGrid.filter([
+            {
+                logic: "or",
+                filters: [{
+                    field: "AccountName",
+                    operator: "contains",
+                    value: SearchProgramData
+                }]
+            }
+        ]);
+    }
+    document.getElementById('SearchExistingAccount').onkeydown = function (event) {
+        if (event.keyCode == 13) {
+            SearchExistingAccount();
+        }
+    }
+    document.getElementById('SearchExistingAccount').onkeyup = function () {
+        if (($(this).val() == '' || $(this).val() == 'Search Account') && $(this).attr('type') != 'hidden') {
+            SearchExistingAccount()
+        }
+    }
+    function reqBuild() {
+        if (document.getElementById("cbBuildExistingAccount").checked == true) {
+            var grid = $("#grdExistingAccountWindow").data("kendoGrid");
+            var dataRows = grid.items();
+            var rowIndex = dataRows.index(grid.select());
+            var ds = grid.dataSource.view();
+            var AccountID = ds[rowIndex].AccountID;
+            swal({
+                title: "Are you sure?",
+                text: "This will Automatically Approve and Build This Account to this Office",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                closeOnConfirm: false
+            }, function () {
+                var url = "@Url.Action("BuildAndApproveExistingAccount", "Home")";
+                $.post(url, { Yearof: @Model.ProposalYear, OfficeID: @Model.SelectedOfficeID, ApprovedAmount: @Model.SlashAmount, ProposalID: @Model.ProposalID, ProgramID: @Model.ProgramID, OOEID: @Model.OOEID, AccountID:AccountID}, function (d) {
+                    if (d == 1) {
+                        swal({ title: "Notice!", text: "Successfully Approved", timer: 1000, showConfirmButton: false, type: "success" });
+                        $("#grd_BudgetApprovalBudget").data("kendoGrid").dataSource.read();
+                    }
+                    else {
+                        swal({ title: "Notice!", text: d, timer: 1000, showConfirmButton: false, type: "error" });
+                    }
+                });
+            });
+        }
+        else {
+            var AccountName = $("#txtAccountName").val();
+            var AccountCode = $("#txtAccountCode").val();
+            var ChildAccountCode = $("#txtChildAccountCode").val();
+            var ThirdLevelGroup = $("#ddlThirdLevelGroup").val();
+            var FundType = $("#ddlFundType").val();
+            swal({
+                title: "Are you sure?",
+                text: "This will Automatically Approve and Build This Account to this Office",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                closeOnConfirm: false
+            }, function () {
+                var url = "@Url.Action("BuildAndApproveAccount", "Home")";
+                $.post(url, { Yearof: @Model.ProposalYear, OfficeID: @Model.SelectedOfficeID, ApprovedAmount: @Model.SlashAmount, 
+                    ProposalID: @Model.ProposalID, ProgramID: @Model.ProgramID, OOEID: @Model.OOEID, 
+                    AccountName: AccountName, AccountCode:AccountCode,ChildAccountCode:ChildAccountCode,
+                    ThirdLevelGroup:ThirdLevelGroup,FundType:FundType}, function (d) {
+                    if (d == 1) {
+                        swal({ title: "Notice!", text: "Successfully Approved", timer: 1000, showConfirmButton: false, type: "success" });
+                        $("#grd_BudgetApprovalBudget").data("kendoGrid").dataSource.read();
+                    }
+                    else {
+                        swal({ title: "Notice!", text: d, timer: 1000, showConfirmButton: false, type: "error" });
+                    }
+                });
+            });
+
+        }
+    }
+
+</script>
+
+<div>
+<div style="display:inline-block;width:100%">
+    <input type="checkbox" id="cbBuildExistingAccount" class="k-checkbox" onclick="ShowSelectAccount()">
+    <label class="k-checkbox-label" for="cbBuildExistingAccount">Existing Account</label>
+</div>
+
+    <div id="NewAccountDiv">
+        <div style="display:inline-block;width:100%; margin-top: 10px">
+            <label>
+                Account Name : <br />
+                <input type="text" id="txtAccountName" class="k-textbox" placeholder="Account Name" style="width: 100%" value="@Model.AccountName">
+            </label>
+        </div>
+        <div style="width:48%;display:inline-block;margin-top: 10px">
+            <label>
+                Account Code : <br />
+                <input type="text" id="txtAccountCode" class="k-textbox" placeholder="Account Code" style="width: 100%" min="0" onkeydown="DisableLetters(event)">
+            </label>
+        </div>
+        <div style="width:48%;display:inline-block;margin-top: 10px; margin-left:15px">
+            <label>
+                Child Series Number : <br />
+                <input type="text" id="txtChildAccountCode" class="k-textbox" placeholder="Child Series Number" style="width: 100%">
+            </label>
+        </div>
+        <div style="display:inline-block;width:100%; margin-top: 10px">
+            <label>
+                Third Level Group : <br />
+                @(Html.Kendo().DropDownList()
+                            .Name("ddlThirdLevelGroup")
+                            .DataTextField("FundName")
+                            .DataValueField("FundName")
+                            .OptionLabel("Select Third Level Group...")
+                            .HtmlAttributes(new { @style = "width: 100%;" })
+                            .DataSource(source => source.Read(read => read.Action("ddlThirdLevelGroup", "Dropdowns")))
+                )
+            </label>
+        </div>
+        <div style="display:inline-block;width:100%; margin-top: 10px">
+            <label>
+                Fund Type : <br />
+                @(Html.Kendo().DropDownList()
+                            .Name("ddlFundType")
+                            .DataTextField("FundName")
+                            .DataValueField("FundName")
+                            .OptionLabel("Select Fund Type...")
+                            .HtmlAttributes(new { @style = "width: 100%;" })
+                            .DataSource(source => source.Read(read => read.Action("ddlFundType", "Dropdowns")))
+                )
+            </label>
+
+        </div>
+    </div>
+    <div id="ExistingAccountDiv" style="display:none; margin-top:5px">
+        @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.AccountsModel>()
+        .Name("grdExistingAccountWindow")
+        .Columns(columns =>
+        {
+            columns.Bound(c => c.AccountID).Hidden();
+            columns.Bound(c => c.AccountName).Title("Account Name").Width(200)
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+            columns.Bound(c => c.FundName).Title("Fund Type").Width(150)
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+            
+        })
+        .HtmlAttributes(new { style = "height: 280px; width:470px" })
+        .Scrollable(s => s.Enabled(true))
+        .Selectable()
+        .Pageable(p => p.ButtonCount(4).Refresh(true).PreviousNext(true))
+        .DataSource(dataSource => dataSource
+            .Ajax()
+            .ServerOperation(false)
+            .PageSize(5)
+            .Read(read => read.Action("getExistingAccounts", "Home"))
+        )
+        .ToolBar(toolbar =>
+        {
+            toolbar.Template(@<text>
+                <div style="float: right; height:28px;margin-top:2px;">
+                    <link href="~/Content/metroui/css/docs.css" rel="stylesheet" />
+                    <div style="background-color:white;border:solid;border-color:whitesmoke;border-width:thin;width:310px;height:30px;float:right;padding:0px;margin-top:-3px;" id="search">
+                        <input type="text" style="width:260px;border-collapse:collapse;border-color:white;margin:0px;margin-left:-10px;height:70%;outline:none;border-left-style:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search Account" id="SearchExistingAccount" name="SearchExistingAccount">
+                        <div class="k-button k-button-icontext" style="height:29px;width:40px;margin-top:0.6px;" onclick="SearchExistingAccount()"><span class="mif-search"></span></div>
+                    </div>
+
+                </div>
+            </text>);
+        })
+        )
+    </div>
+    <div style="display:inline-block; float: right">
+        <div id="btnUpdateEffectivity" class="k-button k-button-icontext" style="margin-bottom:5px;display:inline-block;width: 120px;clear:both; margin-top:5px;" onclick="reqBuild()">Build & Approve</div>
+        <div id="btnCloseWindowEffectivity" class="k-button k-button-icontext" style="margin-bottom:5px;display:inline-block;width: 80px;clear:both; margin-top:5px;" onclick="reqCloseBuildAndApproveWindow()">Close</div>
+    </div>
+</div>
+
+@(Html.Kendo().Window()
+    .Name("SelectAcountWindow")
+    .Title("Select Account")
+    .Width(500)
+    .Height(355)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(true)
+    .AutoFocus(true)
+    .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        }).Actions(a => { a.Close(); }))
+

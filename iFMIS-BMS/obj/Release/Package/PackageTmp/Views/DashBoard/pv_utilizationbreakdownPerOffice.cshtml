@@ -1,0 +1,77 @@
+﻿@model IEnumerable<iFMIS_BMS.BusinessLayer.Models.DashBoard.DashBoardModel>
+<script src="~/Scripts/BMS/Release/otherfunction.js"></script>
+<script>
+    function getBudgetYear() {
+        var ddlYear = $("#ddlYear").val() == "" ? CurrentYear() : $("#ddlYear").val()
+        var fundname='@Session["fundname"]'
+        var fundsource='@Session["fundsource"]'
+        return {
+            year: ddlYear,
+            status: '@Session["status"]',
+            fundname: fundname,
+            fundsource: fundsource
+        }
+    }
+</script>
+<div style="width:100%;height:95%;margin-top:10px;">
+    @(Html.Kendo().Chart(Model)
+            .Name("UtilizationPerOfficeChart")
+            //.Title(title => title
+            //      .Text("Appropriation")
+            //      .Position(ChartTitlSSePosition.Top))
+            .Legend(legend => legend
+                .Visible(true)
+                .Position(ChartLegendPosition.Top)
+            )
+            .Series(series =>
+            {
+                series.Pie(m => m.finamount, m => m.fundname).Labels(labels => labels
+                   .Template("#= category #: \n #=kendo.toString(value, 'c2')# (#= kendo.format('{0:P4}', percentage)#)")
+                   .Background("transparent")
+                   .Visible(true)
+                );
+            })
+            .Tooltip(tooltip => tooltip
+                .Visible(true)
+                .Format("{0:c2}")
+                .Template("#= category #: #= kendo.toString(value,'c2') #")
+            )
+             .HtmlAttributes(new { style = "height:90%" })
+            .DataSource(source => source.Read(read => read.Action("UtilizationDetailOffice", "Dashboard").Data("getBudgetYear")))
+
+    )
+    </div>
+    <div>
+        <label id="fundtotal" style="width:100%;"> </label>
+    </div>
+<script>
+    $(document).ready(function () {
+        var url = "@Url.Action("UtilizationPerOfficeSummary", "DashBoard")";
+        var ddlYear = $("#ddlYear").val() == "" ? CurrentYear() : $("#ddlYear").val()
+        var fundname = '@Session["fundname"]'
+        var status='@Session["status"]'
+        
+        $.post(url, { year: ddlYear, status: status, fundname: fundname }, function (e) {
+        
+            if ('@Session["status"]' == "Appropriation"){
+                document.getElementById('fundtotal').innerHTML = "&nbspTotal : ₱" + commaSeparateNumberRealignment(e)
+            }
+            else if ('@Session["status"]' == "Allotment"){
+                document.getElementById('fundtotal').innerHTML = "&nbspTotal : ₱" + commaSeparateNumberRealignment(e)
+            }
+            else if ('@Session["status"]' == "Pre-Obligation"){
+                document.getElementById('fundtotal').innerHTML = "&nbspTotal : ₱" + commaSeparateNumberRealignment(e)
+            }
+            else if ('@Session["status"]' == "Obligation"){
+                document.getElementById('fundtotal').innerHTML = "&nbspTotal : ₱" + commaSeparateNumberRealignment(e)
+            }
+            else if ('@Session["status"]' == "Disbursement"){
+                document.getElementById('fundtotal').innerHTML = "&nbspTotal : ₱" + commaSeparateNumberRealignment(e)
+            }
+            else if ('@Session["status"]' == "Utilization") {
+                document.getElementById('fundtotal').innerHTML = "&nbspTotal : ₱" + commaSeparateNumberRealignment(e)
+            }
+        })
+            @*document.getElementById('AppropriationBreakdown').title = '@Session["fundname"]'*@
+        })
+</script>

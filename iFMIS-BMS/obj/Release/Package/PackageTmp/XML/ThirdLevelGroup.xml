@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Table>
+  <ThirdLevelGroup>
+    <ThirdLevelID>1</ThirdLevelID>
+    <ThirdLevelDesc>Personal Services</ThirdLevelDesc>
+  </ThirdLevelGroup>
+  <ThirdLevelGroup>
+    <ThirdLevelID>2</ThirdLevelID>
+    <ThirdLevelDesc>Maintenance and Other Operating Expenses</ThirdLevelDesc>
+  </ThirdLevelGroup>
+  <ThirdLevelGroup>
+    <ThirdLevelID>3</ThirdLevelID>
+    <ThirdLevelDesc>Capital Outlay</ThirdLevelDesc>
+  </ThirdLevelGroup>
+</Table>

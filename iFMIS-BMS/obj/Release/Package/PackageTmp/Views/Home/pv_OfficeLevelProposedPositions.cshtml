@@ -1,0 +1,93 @@
+﻿<script>
+    function GetProposedPositionsGridParam() {
+        return {
+            Yearof: $("#ddlYear").val()
+        }
+    }
+    function OnGridDataBound(e) {
+        var rows = e.sender.tbody.children();
+
+        for (var j = 0; j < rows.length; j++) {
+            var row = $(rows[j]);
+            var dataItem = e.sender.dataItem(row);
+
+            if (dataItem.get("Status") == 'Approved') {
+                row.addClass("ChangeApprovedBackColor");
+            }
+            else if (dataItem.get("Status") == 'Removed') {
+                row.addClass("ChangeRemovedBackColor");
+            }
+        }
+    }
+    function ReqReloadData() {
+        $("#grdProposedPositions").data("kendoGrid").dataSource.read();
+    }
+</script>
+
+<div>
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.ProposedPositionsSummaryModel>()
+        .Name("grdProposedPositions")
+        .Columns(columns =>
+        {
+            columns.Bound(c => c.Status).Hidden();
+            columns.Bound(c => c.Position).Title("Position").Width(200)
+                .ClientGroupFooterTemplate("<div style='text-align:center;color:darkgreen;font-weight:8px'><label> No of Proposed : #=count#</label></div>")
+                .ClientFooterTemplate("<div style='text-align:center;color:darkgreen'><label> No of Proposed : #=count#</label></div>")
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+            columns.Bound(c => c.TotalProposed).Title("Amount Proposed").Width(120)
+                .ClientGroupFooterTemplate("<div style='text-align:right;color:darkgreen'><label>#=kendo.toString(sum,'c2')#</label></div>")
+                .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> #=kendo.toString(sum,'c2')#</label></div>")
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                .HtmlAttributes(new { style = "text-align:right;" });
+            ////hide --formula is not update - xXx - 6/11/2020
+            //columns.Bound(c => c.TotalApproved).Title("Amount Approved").Width(120)
+            //    .ClientGroupFooterTemplate("<div style='text-align:right;color:darkgreen'><label>#=kendo.toString(sum,'c2')#</label></div>")
+            //    .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> #=kendo.toString(sum,'c2')#</label></div>")
+            //    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+            //    .HtmlAttributes(new { style = "text-align:right;" });
+            ////hide --formula is not update - xXx - 6/11/2020
+        })
+        .HtmlAttributes(new { style = "height: 480px;" })
+        .Scrollable(s => s.Enabled(true))
+        .Selectable()
+        .Events(e => e.DataBound("OnGridDataBound"))
+        .DataSource(dataSource => dataSource
+            .Ajax()
+            .Read(read => read.Action("getProposedPositionsOfficeLevel", "Home").Data("GetProposedPositionsGridParam"))
+            .Batch(true)
+            .ServerOperation(false)
+            .Model(m => m.Id(i => i.SeriesID))
+            .Aggregates(g =>
+            {
+                g.Add(c => c.TotalApproved).Sum();
+                g.Add(c => c.TotalProposed).Sum();
+                g.Add(c => c.Position).Count();
+            })
+        )
+        .ToolBar(toolbar =>
+        {
+            toolbar.Template(@<text>
+                <div style="float: left; height:28px;margin-top:2px; width:80%;height:100%">
+                    
+                    <label style="float:left;color:white">
+                        <span style="float:left"> Legends :</span><br />
+                        <span class='fa fa-circle' style='color:#FFFF80;' id='circle-id'></span> <span> Removed</span>
+                        <span class='fa fa-circle' style='color:#80FF80;' id='circle-id'></span> <span> Approved</span>
+                    </label>
+                </div>
+                <div style="float: right; height:28px;margin-top:2px; width:17%;height:100%">
+                    <div id="btnReloadData" class="k-button k-button-icontext" style="margin-bottom:5px;display:inline-block;width: 80px;clear:both; margin-top:5px;" onclick="ReqReloadData()">Load Data</div>
+                </div>
+            </text>);
+        })
+    )
+</div>
+<style>
+    .ChangeRemovedBackColor {
+        background-color: #FFFF80;
+    }
+
+    .ChangeApprovedBackColor {
+        background-color: #80FF80;
+    }
+</style>

@@ -1,0 +1,154 @@
+﻿<script src="~/Scripts/BMS/Maintenance/ControlUtilities.js"></script>
+<script>
+    function FunctionCodeURL() {
+        return '@Url.Action("SearchFunctionCode", "BudgetControl")';
+    }
+    function SaveNonOfficeCodeURL() {
+        return '@Url.Action("SaveNonOfficeCode", "BudgetControl")';
+    }
+</script>
+<style>
+            textarea:focus, input:focus, input[type]:focus, .uneditable-input:focus {
+            border-color: rgba(0, 128, 0, 0.8);
+            box-shadow: 0 1px 1px rgba(0, 128, 0, 0.075) inset, 0 0 8px rgba(0, 128, 0, 0.6);
+            outline: 0 none;
+        }
+</style>
+<div style="border-color:gray;border-width:1px;border-style:solid;width:430px;margin-top:10px;float:left">
+    <div style="background-color:white;width:120px;margin-top:-15px;margin-left:15px;border-style:solid;border-color:black;border-width:1px;">
+        <span style="font-size:18px;font-weight:bold;margin-left:5px;">MODE : <span id="mode-status" style="color:green">NEW</span></span>
+    </div>
+    <div style="margin-top:15px;margin-left:10px;">
+        <div style="display:inline-block;">
+            <div style="display:inline-block;width:60px;">
+                <span>Office:</span>
+            </div>
+
+            <div style="display:inline-block;">
+                @(Html.Kendo().ComboBox()
+                                    .Name("Office")
+                                    .DataTextField("office_name")
+                                    .DataValueField("office_id")
+                                    .Placeholder("Search Office Name . .")
+                                    .Filter("contains")
+                                    .MinLength(3)
+                                    .Events(e => e.Change("SetPrograms"))
+                                    .HtmlAttributes(new { @style = "width: 300px;" })
+                                    .DataSource(source => source.Read(read => read.Action("ddlOffice", "Dropdowns")))
+                )
+            </div>
+        </div>
+    </div>
+    <div style="margin-top:15px;margin-left:10px;">
+        <div style="display:inline-block;">
+            <div style="display:inline-block;width:60px;">
+                <span>Program:</span>
+            </div>
+
+            <div style="display:inline-block;">
+                @(Html.Kendo().ComboBox()
+                                    .Name("Program")
+                                    .DataTextField("setProgramDesc")
+                                    .DataValueField("setProgramID")
+                                    .Placeholder("Search Office Name . .")
+                                    .Filter("contains")
+                                    .MinLength(3)
+                                    .Events(e => e.Change("SetAccount"))
+                                    .HtmlAttributes(new { @style = "width: 300px;" })
+                                    .DataSource(source => source.Read(read => read.Action("ddlgetPrograms", "Dropdowns").Data("ProgramParam")))
+                )
+            </div>
+        </div>
+    </div>
+    <div style="margin-top:15px;margin-left:10px;">
+        <div style="display:inline-block;">
+            <div style="display:inline-block;width:60px;">
+                <span>Account:</span>
+            </div>
+
+            <div style="display:inline-block;">
+                @(Html.Kendo().ComboBox()
+                                    .Name("Account")
+                                    .DataTextField("AccountName")
+                                    .DataValueField("AccountID")
+                                    .Placeholder("Search Office Name . .")
+                                    .Filter("contains")
+                                    .MinLength(3)
+                                    .Events(e => e.Change("SetMainPPA"))
+                                    .HtmlAttributes(new { @style = "width: 300px;" })
+                                    .DataSource(source => source.Read(read => read.Action("ddlProgramAccount", "Dropdowns").Data("AccountParam")))
+                )
+            </div>
+        </div>
+    </div>
+    <div style="margin-top:15px;margin-left:10px;">
+        <div style="display:inline-block;">
+            <div style="display:inline-block;width:60px;">
+                <span>Main PPA:</span>
+            </div>
+
+            <div style="display:inline-block;">
+                @(Html.Kendo().ComboBox()
+                                    .Name("MainPPA")
+                                    .DataTextField("PPADescription")
+                                    .DataValueField("RootPPA")
+                                    .Placeholder("Search Root PPA . .")
+                                    .Filter("contains")
+                                    .MinLength(3)
+                                    .Events(e => e.Change("SetPPA"))
+                                    .AutoBind(false)
+                                    .HtmlAttributes(new { @style = "width: 300px;" })
+                                    .DataSource(source => source.Read(read => read.Action("ddlMainPPA", "Dropdowns").Data("MainPPAParam")))
+                )
+            </div>
+        </div>
+    </div>
+    <div style="margin-top:15px;margin-left:10px;">
+        <div style="display:inline-block;">
+            <div style="display:inline-block;width:60px;">
+                <span>Root PPA:</span>
+            </div>
+
+            <div style="display:inline-block;">
+                @(Html.Kendo().ComboBox()
+                                    .Name("PPA")
+                                    .DataTextField("PPADescription")
+                                    .DataValueField("PPA")
+                                    .Placeholder("Search Office Name . .")
+                                    .Filter("contains")
+                                    .MinLength(3)
+                                    .Events(e => e.Change("SetFunctionCode"))
+                                    .AutoBind(false)
+                                    .HtmlAttributes(new { @style = "width: 300px;" })
+                                    .DataSource(source => source.Read(read => read.Action("ddlPPAs", "Dropdowns").Data("PPAsParam")))
+                )
+            </div>
+        </div>
+    </div>
+    <div style="margin-top:15px;margin-left:10px;">
+        <div style="display:inline-block;">
+            <div style="display:inline-block;width:100px;">
+                <span>Function Code:</span>
+            </div>
+            <div style="margin-left:0px;display:inline-block;">
+                <input type="number" style="width:260px" class="k-input" id="FunctionCodeNum" name="FunctionCodeNum" />
+            </div>
+        </div>
+    </div>
+    <div style="padding:15px;float:right;">
+        <div class="k-button" style="padding:5px;width:99px;" id="SaveNonOfficeCode" onclick="SaveNonOfficeCode()"><span class="fa fa-save"></span> SAVE</div>
+    </div>
+
+        <div style="margin:10px;">
+            <!--Just like the space between us-->
+        </div>
+    </div>
+
+<script>
+    $(document).ready(function () {
+        //$("#Office").data("kendoComboBox").value(43);
+        //$("#Office").data("kendoComboBox").enable(false);
+        //$("#MainPPA").data("kendoComboBox").enable(false);
+        //$("#PPA").data("kendoComboBox").enable(false);
+    });
+</script>

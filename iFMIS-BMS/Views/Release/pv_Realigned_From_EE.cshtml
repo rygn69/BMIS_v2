@@ -1,0 +1,1002 @@
+﻿
+<script>
+    function fn_History_from_EE() {
+        var url = "@Url.Action("Realignment_History", "Release")";
+
+
+        $.get(url, {}, function (d) {
+            $('#realign_historyEE').html(d);
+        })
+
+        $('#realign_historyEE').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Realigned From").center().open();
+        
+    }
+    function fn_closeRealigned_From_EE() {
+
+        $("#history_from_EE").data("kendoWindow").close();
+    }
+    function fn_save_edit_realign_From_EE() {
+
+        var url = "@Url.Action("Save_Realign_Edit", "Release")";
+
+
+        var year_ = $("#ddlYear").val();
+        var amount = $('#amount_torealign_FROM_EE').val()
+        var realignment_id = $('#for_ID_FROM_EE').val()
+        var amount_dum = $('#amount_torealign_FROM_EE_dum').val()
+        var amountAvailable = $('#available_amount_FROM_EE').val()
+        var tobe_avail = $('#total_toberealign_FROM_EE').val()
+
+        if (Number(amount) > Number(amount_dum)) {
+
+            var amount_Cya = Number(amount) - Number(amount_dum);
+            if (Number(amount_Cya) > Number(amountAvailable)) {
+                swal({
+                    title: "Oopps!",
+                    text: "You are not allowed to exceed amount",
+                    timer: 3000,
+                    type: "error",
+                    showConfirmButton: false
+                })
+
+            } else {
+
+                if (Number(tobe_avail) == 0) {
+                    if (Number(amount) < Number(amount_dum)) {
+
+                        swal({
+                            title: "Oopps!",
+                            text: "You are not allowed to exceed amount",
+                            timer: 3000,
+                            type: "error",
+                            showConfirmButton: false
+                        })
+
+
+                    } else {
+                        if (Number(amountAvailable) == 0) {
+
+                            if (Number(amount) > Number(amount_dum)) {
+
+                                swal({
+                                    title: "Oopps!",
+                                    text: "You are not allowed to exceed amount",
+                                    timer: 3000,
+                                    type: "error",
+                                    showConfirmButton: false
+                                })
+
+
+                            } else {
+
+                                if (Number(realignment_id) == 0) {
+                                    swal({
+                                        title: "Oopps!",
+                                        text: "Please Select an Item.",
+                                        timer: 2000,
+                                        type: "error",
+                                        showConfirmButton: false
+                                    })
+
+                                } else {
+
+                                    swal({
+                                        title: "Are you sure?",
+                                        text: "This item will be EDITED and SAVED!",
+                                        type: "info",
+                                        showCancelButton: true,
+                                        closeOnConfirm: false,
+                                        confirmButtonColor: "#1fa67a",
+                                        confirmButtonText: "Yes, Save It!",
+                                        showLoaderOnConfirm: true,
+                                    }, function () {
+                                        $.post(url, { year_: year_, amount: ConvertCommasToEmpty(amount), realignment_id: realignment_id, amount_dum: amount_dum }, function (e) {
+                                            if (e == "1") {
+                                                swal({
+                                                    title: "Success!",
+                                                    text: "Non-Office Account has been Removed.",
+                                                    timer: 2000,
+                                                    type: "success",
+                                                    showConfirmButton: false
+                                                })
+
+                                                document.getElementById("for_ID_FROM_EE").value = 0;
+                                                document.getElementById("amount_torealign_FROM_EE_dum").value = 0;
+                                                document.getElementById("amount_torealign_FROM_EE").value = 0;
+                                                represh_EE();
+                                                document.getElementById("amount_torealign_FROM_EE").disabled = true;
+                                                refmemem();
+                                                fn_refreshtext_null_EE();
+                                                $('#Realigned_From_Grid_EE').data('kendoGrid').dataSource.read();
+                                            } else {
+                                                swal({
+                                                    title: "Error!",
+                                                    text: "System Error! Please try again.",
+                                                    timer: 2000,
+                                                    type: "error",
+                                                    showConfirmButton: false
+                                                })
+                                            }
+
+                                        })
+                                    });
+
+                                }
+
+                            }
+
+                        }
+                        else {
+
+                            if (Number(realignment_id) == 0) {
+                                swal({
+                                    title: "Oopps!",
+                                    text: "Please Select an Item.",
+                                    timer: 2000,
+                                    type: "error",
+                                    showConfirmButton: false
+                                })
+
+                            } else {
+                                swal({
+                                    title: "Are you sure?",
+                                    text: "This item will be EDITED and SAVED!",
+                                    type: "info",
+                                    showCancelButton: true,
+                                    closeOnConfirm: false,
+                                    confirmButtonColor: "#1fa67a",
+                                    confirmButtonText: "Yes, Save It!",
+                                    showLoaderOnConfirm: true,
+                                }, function () {
+                                    $.post(url, { year_: year_, amount: ConvertCommasToEmpty(amount), realignment_id: realignment_id, amount_dum: amount_dum }, function (e) {
+                                        if (e == "1") {
+                                            swal({
+                                                title: "Success!",
+                                                text: "Non-Office Account has been Removed.",
+                                                timer: 2000,
+                                                type: "success",
+                                                showConfirmButton: false
+                                            })
+
+                                            document.getElementById("for_ID_FROM_EE").value = 0;
+                                            document.getElementById("amount_torealign_FROM_EE_dum").value = 0;
+                                            document.getElementById("amount_torealign_FROM_EE").value = 0;
+                                            represh_EE();
+                                            document.getElementById("amount_torealign_FROM_EE").disabled = true;
+                                            refmemem();
+                                            fn_refreshtext_null_EE();
+                                            $('#Realigned_From_Grid_EE').data('kendoGrid').dataSource.read();
+                                        } else {
+                                            swal({
+                                                title: "Error!",
+                                                text: "System Error! Please try again.",
+                                                timer: 2000,
+                                                type: "error",
+                                                showConfirmButton: false
+                                            })
+                                        }
+
+                                    })
+                                });
+
+                            }
+
+
+                        }
+                    }
+                }
+                else {
+                    if (Number(amountAvailable) == 0) {
+
+                        if (Number(amount) > Number(amount_dum)) {
+
+                            swal({
+                                title: "Oopps!",
+                                text: "You are not allowed to exceed amount",
+                                timer: 3000,
+                                type: "error",
+                                showConfirmButton: false
+                            })
+
+
+                        } else {
+
+                            if (Number(realignment_id) == 0) {
+                                swal({
+                                    title: "Oopps!",
+                                    text: "Please Select an Item.",
+                                    timer: 2000,
+                                    type: "error",
+                                    showConfirmButton: false
+                                })
+
+                            } else {
+
+                                swal({
+                                    title: "Are you sure?",
+                                    text: "This item will be EDITED and SAVED!",
+                                    type: "info",
+                                    showCancelButton: true,
+                                    closeOnConfirm: false,
+                                    confirmButtonColor: "#1fa67a",
+                                    confirmButtonText: "Yes, Save It!",
+                                    showLoaderOnConfirm: true,
+                                }, function () {
+                                    $.post(url, { year_: year_, amount: ConvertCommasToEmpty(amount), realignment_id: realignment_id, amount_dum: amount_dum }, function (e) {
+                                        if (e == "1") {
+                                            swal({
+                                                title: "Success!",
+                                                text: "Non-Office Account has been Removed.",
+                                                timer: 2000,
+                                                type: "success",
+                                                showConfirmButton: false
+                                            })
+
+                                            document.getElementById("for_ID_FROM_EE").value = 0;
+                                            document.getElementById("amount_torealign_FROM_EE_dum").value = 0;
+                                            document.getElementById("amount_torealign_FROM_EE").value = 0;
+                                            represh_EE();
+                                            document.getElementById("amount_torealign_FROM_EE").disabled = true;
+                                            refmemem();
+                                            fn_refreshtext_null_EE();
+                                            $('#Realigned_From_Grid_EE').data('kendoGrid').dataSource.read();
+                                        } else {
+                                            swal({
+                                                title: "Error!",
+                                                text: "System Error! Please try again.",
+                                                timer: 2000,
+                                                type: "error",
+                                                showConfirmButton: false
+                                            })
+                                        }
+
+                                    })
+                                });
+
+                            }
+
+                        }
+
+                    }
+                    else {
+
+                        if (Number(realignment_id) == 0) {
+                            swal({
+                                title: "Oopps!",
+                                text: "Please Select an Item.",
+                                timer: 2000,
+                                type: "error",
+                                showConfirmButton: false
+                            })
+
+                        } else {
+
+                            swal({
+                                title: "Are you sure?",
+                                text: "This item will be EDITED and SAVED!",
+                                type: "info",
+                                showCancelButton: true,
+                                closeOnConfirm: false,
+                                confirmButtonColor: "#1fa67a",
+                                confirmButtonText: "Yes, Save It!",
+                                showLoaderOnConfirm: true,
+                            }, function () {
+                                $.post(url, { year_: year_, amount: ConvertCommasToEmpty(amount), realignment_id: realignment_id, amount_dum: amount_dum }, function (e) {
+                                    if (e == "1") {
+                                        swal({
+                                            title: "Success!",
+                                            text: "Non-Office Account has been Removed.",
+                                            timer: 2000,
+                                            type: "success",
+                                            showConfirmButton: false
+                                        })
+
+                                        document.getElementById("for_ID_FROM_EE").value = 0;
+                                        document.getElementById("amount_torealign_FROM_EE_dum").value = 0;
+                                        document.getElementById("amount_torealign_FROM_EE").value = 0;
+                                        represh_EE();
+                                        document.getElementById("amount_torealign_FROM_EE").disabled = true;
+                                        refmemem();
+                                        fn_refreshtext_null_EE();
+                                        $('#Realigned_From_Grid_EE').data('kendoGrid').dataSource.read();
+                                    } else {
+                                        swal({
+                                            title: "Error!",
+                                            text: "System Error! Please try again.",
+                                            timer: 2000,
+                                            type: "error",
+                                            showConfirmButton: false
+                                        })
+                                    }
+
+                                })
+                            });
+
+                        }
+
+
+                    }
+
+                }
+
+
+            }
+        } else {
+
+            var amount_Cya = Number(amount_dum) - Number(amount);
+            // alert(Number(amount_Cya) +'<'+ Number(tobe_avail))
+            if (Number(amount_Cya) > Number(tobe_avail)) {
+                swal({
+                    title: "Oopps!",
+                    text: "You are not allowed to exceed amount",
+                    timer: 3000,
+                    type: "error",
+                    showConfirmButton: false
+                })
+
+            } else {
+
+
+                if (Number(tobe_avail) == 0) {
+                    if (Number(amount) < Number(amount_dum)) {
+
+                        swal({
+                            title: "Oopps!",
+                            text: "You are not allowed to exceed amount",
+                            timer: 3000,
+                            type: "error",
+                            showConfirmButton: false
+                        })
+
+
+                    } else {
+                        if (Number(amountAvailable) == 0) {
+
+                            if (Number(amount) > Number(amount_dum)) {
+
+                                swal({
+                                    title: "Oopps!",
+                                    text: "You are not allowed to exceed amount",
+                                    timer: 3000,
+                                    type: "error",
+                                    showConfirmButton: false
+                                })
+
+
+                            } else {
+
+                                if (Number(realignment_id) == 0) {
+                                    swal({
+                                        title: "Oopps!",
+                                        text: "Please Select an Item.",
+                                        timer: 2000,
+                                        type: "error",
+                                        showConfirmButton: false
+                                    })
+
+                                } else {
+
+                                    swal({
+                                        title: "Are you sure?",
+                                        text: "This item will be EDITED and SAVED!",
+                                        type: "info",
+                                        showCancelButton: true,
+                                        closeOnConfirm: false,
+                                        confirmButtonColor: "#1fa67a",
+                                        confirmButtonText: "Yes, Save It!",
+                                        showLoaderOnConfirm: true,
+                                    }, function () {
+                                        $.post(url, { year_: year_, amount: ConvertCommasToEmpty(amount), realignment_id: realignment_id, amount_dum: amount_dum }, function (e) {
+                                            if (e == "1") {
+                                                swal({
+                                                    title: "Success!",
+                                                    text: "Non-Office Account has been Removed.",
+                                                    timer: 2000,
+                                                    type: "success",
+                                                    showConfirmButton: false
+                                                })
+
+                                                document.getElementById("for_ID_FROM_EE").value = 0;
+                                                document.getElementById("amount_torealign_FROM_EE_dum").value = 0;
+                                                document.getElementById("amount_torealign_FROM_EE").value = 0;
+                                                represh_EE();
+                                                document.getElementById("amount_torealign_FROM_EE").disabled = true;
+                                                refmemem();
+                                                fn_refreshtext_null_EE();
+                                                $('#Realigned_From_Grid_EE').data('kendoGrid').dataSource.read();
+                                            } else {
+                                                swal({
+                                                    title: "Error!",
+                                                    text: "System Error! Please try again.",
+                                                    timer: 2000,
+                                                    type: "error",
+                                                    showConfirmButton: false
+                                                })
+                                            }
+
+                                        })
+                                    });
+
+                                }
+
+                            }
+
+                        }
+                        else {
+
+                            if (Number(realignment_id) == 0) {
+                                swal({
+                                    title: "Oopps!",
+                                    text: "Please Select an Item.",
+                                    timer: 2000,
+                                    type: "error",
+                                    showConfirmButton: false
+                                })
+
+                            } else {
+
+                                swal({
+                                    title: "Are you sure?",
+                                    text: "This item will be EDITED and SAVED!",
+                                    type: "info",
+                                    showCancelButton: true,
+                                    closeOnConfirm: false,
+                                    confirmButtonColor: "#1fa67a",
+                                    confirmButtonText: "Yes, Save It!",
+                                    showLoaderOnConfirm: true,
+                                }, function () {
+                                    $.post(url, { year_: year_, amount: ConvertCommasToEmpty(amount), realignment_id: realignment_id, amount_dum: amount_dum }, function (e) {
+                                        if (e == "1") {
+                                            swal({
+                                                title: "Success!",
+                                                text: "Non-Office Account has been Removed.",
+                                                timer: 2000,
+                                                type: "success",
+                                                showConfirmButton: false
+                                            })
+
+                                            document.getElementById("for_ID_FROM_EE").value = 0;
+                                            document.getElementById("amount_torealign_FROM_EE_dum").value = 0;
+                                            document.getElementById("amount_torealign_FROM_EE").value = 0;
+                                            represh_EE();
+                                            document.getElementById("amount_torealign_FROM_EE").disabled = true;
+                                            refmemem();
+                                            fn_refreshtext_null_EE();
+                                            $('#Realigned_From_Grid_EE').data('kendoGrid').dataSource.read();
+                                        } else {
+                                            swal({
+                                                title: "Error!",
+                                                text: "System Error! Please try again.",
+                                                timer: 2000,
+                                                type: "error",
+                                                showConfirmButton: false
+                                            })
+                                        }
+
+                                    })
+                                });
+
+                            }
+
+
+                        }
+                    }
+                }
+                else {
+                    if (Number(amountAvailable) == 0) {
+
+                        if (Number(amount) > Number(amount_dum)) {
+
+                            swal({
+                                title: "Oopps!",
+                                text: "You are not allowed to exceed amount",
+                                timer: 3000,
+                                type: "error",
+                                showConfirmButton: false
+                            })
+
+
+                        } else {
+
+                            if (Number(realignment_id) == 0) {
+                                swal({
+                                    title: "Oopps!",
+                                    text: "Please Select an Item.",
+                                    timer: 2000,
+                                    type: "error",
+                                    showConfirmButton: false
+                                })
+
+                            } else {
+
+                                swal({
+                                    title: "Are you sure?",
+                                    text: "This item will be EDITED and SAVED!",
+                                    type: "info",
+                                    showCancelButton: true,
+                                    closeOnConfirm: false,
+                                    confirmButtonColor: "#1fa67a",
+                                    confirmButtonText: "Yes, Save It!",
+                                    showLoaderOnConfirm: true,
+                                }, function () {
+                                    $.post(url, { year_: year_, amount: ConvertCommasToEmpty(amount), realignment_id: realignment_id, amount_dum: amount_dum }, function (e) {
+                                        if (e == "1") {
+                                            swal({
+                                                title: "Success!",
+                                                text: "Non-Office Account has been Removed.",
+                                                timer: 2000,
+                                                type: "success",
+                                                showConfirmButton: false
+                                            })
+
+                                            document.getElementById("for_ID_FROM_EE").value = 0;
+                                            document.getElementById("amount_torealign_FROM_EE_dum").value = 0;
+                                            document.getElementById("amount_torealign_FROM_EE").value = 0;
+                                            represh_EE();
+                                            document.getElementById("amount_torealign_FROM_EE").disabled = true;
+                                            refmemem();
+                                            fn_refreshtext_null_EE();
+                                            $('#Realigned_From_Grid_EE').data('kendoGrid').dataSource.read();
+                                        } else {
+                                            swal({
+                                                title: "Error!",
+                                                text: "System Error! Please try again.",
+                                                timer: 2000,
+                                                type: "error",
+                                                showConfirmButton: false
+                                            })
+                                        }
+
+                                    })
+                                });
+
+                            }
+
+                        }
+
+                    }
+                    else {
+
+                        if (Number(realignment_id) == 0) {
+                            swal({
+                                title: "Oopps!",
+                                text: "Please Select an Item.",
+                                timer: 2000,
+                                type: "error",
+                                showConfirmButton: false
+                            })
+
+                        } else {
+
+                            swal({
+                                title: "Are you sure?",
+                                text: "This item will be EDITED and SAVED!",
+                                type: "info",
+                                showCancelButton: true,
+                                closeOnConfirm: false,
+                                confirmButtonColor: "#1fa67a",
+                                confirmButtonText: "Yes, Save It!",
+                                showLoaderOnConfirm: true,
+                            }, function () {
+                                $.post(url, { year_: year_, amount: ConvertCommasToEmpty(amount), realignment_id: realignment_id, amount_dum: amount_dum }, function (e) {
+                                    if (e == "1") {
+                                        swal({
+                                            title: "Success!",
+                                            text: "Non-Office Account has been Removed.",
+                                            timer: 2000,
+                                            type: "success",
+                                            showConfirmButton: false
+                                        })
+
+                                        document.getElementById("for_ID_FROM_EE").value = 0;
+                                        document.getElementById("amount_torealign_FROM_EE_dum").value = 0;
+                                        document.getElementById("amount_torealign_FROM_EE").value = 0;
+                                        represh_EE();
+                                        document.getElementById("amount_torealign_FROM_EE").disabled = true;
+                                        refmemem();
+                                        fn_refreshtext_null_EE();
+                                        $('#Realigned_From_Grid_EE').data('kendoGrid').dataSource.read();
+                                    } else {
+                                        swal({
+                                            title: "Error!",
+                                            text: "System Error! Please try again.",
+                                            timer: 2000,
+                                            type: "error",
+                                            showConfirmButton: false
+                                        })
+                                    }
+
+                                })
+                            });
+
+                        }
+
+
+                    }
+
+                }
+
+
+            }
+        }
+
+    }
+
+
+    setTimeout(function () {
+
+        var lru = "@Url.Action("thatass","Release")";
+
+        var year_ = $("#ddlYear").val();
+        $.post(lru, { year_: year_ }, function (e) {
+            document.getElementById("total_toberealign_FROM_EE").value = commaSeparateNumberRealignmentEE(e);
+
+        })
+    }, 500);
+
+
+    setTimeout(function () {
+        document.getElementById("available_amount_FROM_EE").value = 0;
+        var classtype = $("#classtype").val();
+
+
+        var url = "@Url.Action("datass", "Release")";
+
+
+        var office_id = $('#office_realigned_to_EE').val()
+        var program_id = $('#Program_realigned_to_EE').val()
+        var ooe_id = $('#ooe_id_realigned_to_EE').val()
+        var account_id = $('#account_list_realigned_to_EE').val()
+        var year_ = $("#ddlYear").val();
+
+        $.post(url, { office_id: office_id, program_id: program_id, ooe_id: ooe_id, account_id: account_id, year_: year_ }, function (d) {
+            document.getElementById("for_ID_FROM_EE").value = 0;
+            document.getElementById("amount_torealign_FROM_EE_dum").value = 0;
+            document.getElementById("amount_torealign_FROM_EE").value = 0;
+            document.getElementById("available_amount_FROM_EE").value = commaSeparateNumberRealignmentEE(d);
+
+        })
+
+    }, 500);
+
+
+    function refmemem() {
+        setTimeout(function () {
+
+            var lru = "@Url.Action("thatass","Release")";
+
+            var year_ = $("#ddlYear").val();
+            $.post(lru, { year_: year_ }, function (e) {
+                document.getElementById("total_toberealign_FROM_EE").value = commaSeparateNumberRealignmentEE(e);
+
+            })
+        }, 500);
+
+
+        setTimeout(function () {
+            document.getElementById("available_amount_FROM_EE").value = 0;
+            var classtype = $("#classtype").val();
+
+
+            var url = "@Url.Action("datass", "Release")";
+
+
+            var office_id = $('#office_realigned_to_EE').val()
+            var program_id = $('#Program_realigned_to_EE').val()
+            var ooe_id = $('#ooe_id_realigned_to_EE').val()
+            var account_id = $('#account_list_realigned_to_EE').val()
+            var year_ = $("#ddlYear").val();
+
+            $.post(url, { office_id: office_id, program_id: program_id, ooe_id: ooe_id, account_id: account_id, year_: year_ }, function (d) {
+
+                document.getElementById("available_amount_FROM_EE").value = commaSeparateNumberRealignmentEE(d);
+                document.getElementById("amount_torealign_FROM_EE").disabled = true;
+            })
+
+        }, 500);
+
+
+    }
+
+
+
+
+    function edit_realignment_FROM_EE(realignment_id) {
+        var url = "@Url.Action("Edit_RealignV2", "Release")";
+
+        $.get(url, { realignment_id: realignment_id }, function (d) {
+            document.getElementById("amount_torealign_FROM_EE").disabled = false;
+            document.getElementById("amount_torealign_FROM_EE").value = d.Amount_EDIT;
+            document.getElementById("amount_torealign_FROM_EE_dum").value = d.Amount_EDIT;
+            document.getElementById("for_ID_FROM_EE").value = d.realignment_id_EDIT;
+
+
+        })
+
+    }
+    function delete_realignment_FROM_EE(realignment_id) {
+        edit_realignment_FROM_EE(realignment_id);
+        document.getElementById("amount_torealign_FROM_EE").disabled = true;
+        setTimeout(function () {
+
+            var dummy = $('#amount_torealign_FROM_EE_dum').val()
+            var amount_tobe = $('#total_toberealign_FROM_EE').val()
+
+
+            var url = "@Url.Action("delete_Realaign", "Release")";
+            var year_ = $("#ddlYear").val();
+
+
+            if (Number(dummy) > Number(amount_tobe)) {
+                swal({
+                    title: "Oopps!",
+                    text: "You Can't Delete this Item",
+                    timer: 2000,
+                    type: "error",
+                    showConfirmButton: false
+                })
+            } else {
+
+
+
+                swal({
+                    title: "Are you sure?",
+                    text: "This item will be removed!",
+                    type: "info",
+                    showCancelButton: true,
+                    closeOnConfirm: false,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Yes, Remove It!",
+                    showLoaderOnConfirm: true,
+                }, function () {
+
+
+                    $.get(url, { realignment_id: realignment_id, year_: year_ }, function (e) {
+                        if (e == "1") {
+                            swal({
+                                title: "Success!",
+                                text: "Non-Office Account has been Removed.",
+                                timer: 2000,
+                                type: "success",
+                                showConfirmButton: false
+                            })
+
+                            document.getElementById("for_ID_FROM_EE").value = 0;
+                            document.getElementById("amount_torealign_FROM_EE_dum").value = 0;
+                            document.getElementById("amount_torealign_FROM_EE").value = 0;
+                            represh_EE();
+                            document.getElementById("amount_torealign_FROM_EE").disabled = true;
+                            refmemem();
+                            fn_refreshtext_null_EE();
+                            $('#Realigned_From_Grid_EE').data('kendoGrid').dataSource.read();
+                        } else {
+                            swal({
+                                title: "Error!",
+                                text: "System Error! Please try again.",
+                                timer: 2000,
+                                type: "error",
+                                showConfirmButton: false
+                            })
+                        }
+
+
+                    })
+                });
+            }
+        }, 500);
+    }
+
+    function readFrom_EE() {
+        var classtype = $("#classtype").val();
+
+        var office_id = $('#office_realigned_to_EE').val()
+        var program_id = $('#Program_realigned_to_EE').val()
+        var ooe_id = $('#ooe_id_realigned_to_EE').val()
+        var account_id = $('#account_list_realigned_to_EE').val()
+        var year_ = $("#ddlYear").val();
+
+        return {
+            office_id: office_id,
+            program_id: program_id,
+            ooe_id: ooe_id,
+            account_id: account_id,
+            year_: year_
+        }
+
+
+    }
+
+    function refresh_grid_EE(e) {
+        if (e.errors) {
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "\n";
+                    });
+                }
+            });
+            alert(message);
+        }
+        $("#Realigned_From_Grid_EE").data("kendoGrid").dataSource.read();
+    }
+    setTimeout(function () {
+
+        $("#Realigned_From_Grid_EE").data("kendoGrid").dataSource.read();
+
+    }, 1000);
+
+    function From_Grid_Refresh() {
+
+        setTimeout(function () {
+
+            $("#Realigned_From_Grid_EE").data("kendoGrid").dataSource.read();
+
+        }, 500);
+    }
+
+     setTimeout(function () {
+        var url = "@Url.Action("get_AccountName_realignment", "Release")";
+
+         var program_id = $('#Program_realigned_to_EE').val()
+         var account_id = $('#account_list_realigned_to_EE').val()
+         var year_ = $("#ddlYear").val();
+
+        $.post(url, { program_id: program_id,  account_id: account_id, year_: year_ }, function (e) {
+            document.getElementById("account_name").textContent = e;
+
+        })
+
+    }, 500);
+
+</script>
+
+<div style="border: outset;clear:both;border-width:1px;border-color:#1fa67a; width: 749px; padding-left:0px;padding-right:0px;padding-top:0px;padding-bottom:7px;margin-top: 0px;">
+    <div style=" width: 0;height: 0; border-right: 5px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;margin-top: -1px; ">
+        <div style="float: left; width: 683px; margin-top:1px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 36px solid #1fa67a; ">
+            <div style="float: left; height:28px; margin-left:-59px; margin-top: 5px;">
+                <i class="fa fa-tasks fa-2x fg-white"></i>
+
+            </div>
+            <div style='color:white;font-size: 20px;font-weight: bold;margin-top: 1px;' id="account_name"></div>
+
+        </div>
+    </div>
+
+
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Monthly_Realignment_Model>
+        ()
+        .Name("Realigned_From_Grid_EE")
+        .Scrollable()
+        .Columns(col =>
+        {
+
+            col.Bound(m => m.realignment_id).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                            .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Date Time Entered</div></text>)
+                        .Width(95)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+          
+            col.Bound(m => m.Amount)
+                            .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                            .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Amount</div></text>)
+                        .Width(70)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div>#=kendo.toString(Amount,'c2')# </div>")
+                        .ClientFooterTemplate("<div style='text-align:center;color:darkgreen'><label> </label><label> #=kendo.toString(sum, 'c2')#</label></div>");
+
+            col.Bound(m => m.user_name).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                            .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Realigned By</div></text>)
+                        .Width(130)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientFooterTemplate("<div style='text-align:center;color:darkgreen'><label> </label><label> Total Amount </label></div>");
+
+
+            col.Bound(m => m.YearOf).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                            .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Year</div></text>)
+                        .Width(30)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+
+
+
+
+            col.Template(t => { }).ClientTemplate(
+
+            "<div class='k-button k-button-icontext' style='border-radius:50px;color:\\#ffffff;background-color:\\#1FA67A;' onclick='edit_realignment_FROM_EE(#=realignment_id#)'><span class='fa fa-pencil-square-o' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'> </span>edit</div> " +
+            "<div class='k-button k-button-icontext' style='border-radius:50px;color:\\#ffffff;background-color:\\#DE5555;' onclick='delete_realignment_FROM_EE(#=realignment_id#)'><span class='fa fa-trash-o' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'> </span>del</div> "
+            ).HtmlAttributes(new { style = "vertical-align: top;" }).Width(100);
+        })
+
+                .Sortable()
+                .Scrollable()
+                .Selectable()
+                .HtmlAttributes(new { style = "height:290px;" })
+                .DataSource(d => d
+                .Ajax()
+                .Aggregates(a =>
+                    {
+                       a.Add(c => c.Amount).Sum();
+                    })                
+                .PageSize(1000)
+                .Model(m => m.Id(i => i.realignment_id))
+                .Read(read => read.Action("Realign_From", "Release").Data("readFrom_EE")))
+    )
+
+
+        <div style="float: left;margin-right:0px;margin-top:60px;">
+
+            <div style=" float:left;margin-left:-40px;margin-top:-36px;">
+                <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                    Available <br /> &nbsp; Amount
+                </label>
+
+            </div>
+
+            <div style="float: left;margin-left:0px;margin-top:-30px;">
+                : <input type="text" style="width:130px" name="available_amount_FROM_EE" id="available_amount_FROM_EE" onkeyup="commaSeparateNumberversion2('available_amount_FROM_EE')" disabled>
+            </div>
+
+
+            <div style="float: left;margin-left:155px;margin-top:-38px;">
+                <label style="margin-left: 0px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                    Amount to <br /> &nbsp; Realign
+                </label>
+            </div>
+            <div></div>
+            <div style="float: left;margin-left:0px;margin-top:-30px;">
+                : <input type="text" style="width:130px" name="amount_torealign_FROM_EE" id="amount_torealign_FROM_EE" onkeyup="commaSeparateNumberversion2('amount_torealign_FROM_EE')" onfocus="this.select();" disabled>
+            </div>
+            <div style="float: left;margin-left:0px;margin-top:-50px;">
+                <input type="text" style="width:130px" name="amount_torealign_FROM_EE_dum" id="amount_torealign_FROM_EE_dum" disabled hidden>
+            </div>
+
+
+
+
+
+            <div style="float: left;margin-left:350px;margin-top:-42px;">
+                <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                    Total Amount <br />to be Realign
+                </label>
+            </div>
+            <div style="float: left;margin-left:590px;margin-top:-37px;">
+                :  <input type="text" style="width:130px" name="total_toberealign_FROM_EE" id="total_toberealign_FROM_EE" onkeyup="commaSeparateNumberversion2('total_toberealign_FROM_EE')" disabled>
+            </div>
+            <div style="float: left;margin-left:630px;margin-top:-37px;">
+                <input type="text" style="width:100px" name="for_ID_FROM_EE" id="for_ID_FROM_EE" disabled hidden>
+            </div>
+
+        </div>
+        <div style="float:left;margin-top:26px;margin-left:370px">
+        <div class="k-button k-button-icontext" style=" border-radius: 50px; color: #ffffff; background-color: #808080;" onclick="fn_History_from_EE()"><span class='fa fa-history' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'></span> Realign History</div>
+         </div>
+        <div style="float:left;margin-top:-29px;margin-left:530px">
+            <div class="k-button k-button-icontext" style=" bottom: 15px; right: 220px;width: 80px; border-radius:50px;color:#ffffff;background-color:#1FA67A;" onclick="fn_save_edit_realign_From_EE()"><span class='fa fa-plus-circle' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'></span> Save</div>
+        </div>
+        <div style="float:left;margin-top:-29px;margin-left:617px">
+            <div class="k-button k-button-icontext" style=" bottom: 15px; right: 220px;width: 80px; border-radius:50px;color:#ffffff;background-color:#DE5555;" onclick="fn_closeRealigned_From_EE()"><span class='fa fa-times' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'></span> Close</div>
+        </div>
+
+</div>
+
+@(Html.Kendo().Window()
+        .Name("realign_historyEE")
+        .Title("New Entry")
+        .Width(1030)
+        .Height(600)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+
+        })
+                .Actions(a => { a.Close(); })
+)

@@ -1,0 +1,203 @@
+﻿    <style>
+    .dialog-overlay {
+        background-color: #000000;
+        opacity: 0.4;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        min-height: 100%;
+        min-width: 100%;
+        z-index: 1049;
+    }
+
+    .dialog {
+        position: fixed;
+        display: block;
+        width: 500px;
+        height: 300px;
+        float: left;
+        background-color: #ffffff;
+        color: #1d1d1d;
+        z-index: 1050;
+        box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3);
+    }
+
+        .dialog .dialog-close-button {
+            position: absolute;
+            height: 1.5rem;
+            width: 1.5rem;
+            min-height: 1.5rem;
+            text-align: center;
+            vertical-align: middle;
+            font-size: 1rem;
+            font-weight: normal;
+            padding: .125rem 0 .625rem 0;
+            z-index: 3;
+            outline: none;
+            cursor: pointer;
+            background-color: #ffffff;
+            color: #777777;
+            top: .25rem;
+            right: .25rem;
+        }
+
+            .dialog .dialog-close-button:hover {
+                background-color: #cde6f7;
+                color: #2a8dd4;
+            }
+
+                .dialog .dialog-close-button:hover:after {
+                    border-color: #2a8dd4;
+                }
+
+            .dialog .dialog-close-button:active {
+                background-color: #92c0e0;
+                color: #ffffff;
+            }
+
+            .dialog .dialog-close-button:after {
+                border-color: #777777;
+                content: '\D7';
+                line-height: 1;
+            }
+</style>
+<div data-role="dialog" data-overlay="true" data-close-button="true" data-width="350px" data-height="150px" id="dialog" class="dialog">
+    <div>
+        <h2 style="text-shadow:none;padding-left:20px;padding-top:30px;">Please wait. . . <i class="fa fa-refresh fa-spin fa-3x" style="font-size:30px;"></i> </h2>
+    </div>
+</div>
+<script>
+    var thisculture = kendo.culture();
+    thisculture.numberFormat.currency.symbol = '₱';
+    function showDialog(id) {
+        var dialog = $(id).data('dialog');
+        dialog.open();
+    }
+    function reqSave(id) {
+        var officeID = $("#office_id").val();
+        var url = "@Url.Action("CopyPPMPCurrentData", "Maintenance")";
+        var dialog = $(id).data('dialog');
+        dialog.open();
+        $.post(url, {officeID: officeID}, function(e){
+           
+            if(e == "success"){
+                dialog.close();
+                swal("Success", d, "success")
+            }else{
+                dialog.close();
+                swal("Error", "Something went wrong!", "error")
+            }
+            
+        });
+    }
+
+</script>
+<br />
+<h2>Year of Transaction : <span id="Year"></span></h2>
+
+<label style="margin-top:5px;">Copy your PPMP Current Data to your MOOE Program</label>
+<div style="margin-top:20px;">
+    <label>FMIS Office</label>
+    @(Html.Kendo().ComboBox()
+                                    .Name("office_id")
+                                    .DataTextField("office_name")
+                                    .Filter("contains")
+                                    .MinLength(2)
+                                    .Placeholder("Select Office . .")
+                                    .DataValueField("office_id")
+                                    .HtmlAttributes(new { @style = "width: 80%;" })
+                                    .DataSource(source => { source.Read(read => { read.Action("ddlOffice", "Dropdowns"); }); })
+
+    )
+</div>
+<script>
+    function LoadPrograms() {
+        $("#ddlProgram").data("kendoDropDownList").dataSource.read();
+    }
+    function ProgramData() {
+        var proyy = $("#ddlBudgetYear").val();
+        var off_id = $("#office_id").val();
+        return {
+            propYear: proyy,
+            office_ID: off_id,
+        }
+    }
+</script>
+<div style="display:inline-block;">
+
+    <label>
+        Program : 
+    </label>
+    @(Html.Kendo().DropDownList()
+                            .Name("ddlProgram")
+                            .DataTextField("ProgramDescription")
+                            .DataValueField("ProgramID")
+                            .OptionLabel("Select Program...")
+                            .HtmlAttributes(new { @style = "width: 385px;" })
+                            .Events(e => e.Open("LoadPrograms"))
+                            .DataSource(source => source.Read(read => read.Action("GetPrograms2", "dpPrograms").Data("ProgramData")))
+    )
+</div>
+<div style="margin-top:20px">
+    <div class="k-button k-state-active" style="padding:10px;" onclick="reqSave('#dialog')"><i class="fa fa-plus"></i> Copy PPMP Data</div>
+
+</div>
+    <script>
+        $(document).ready(function () {
+
+            $("#office_id").data("kendoComboBox").value(@Account.UserInfo.Department);
+            $("#office_id").data("kendoComboBox").enable(false);
+            var d = new Date();
+            var YearDate = d.getFullYear() + 1;
+            document.getElementById("Year").innerHTML = YearDate;
+        });
+
+        function PPMP_dataParam() {
+            var year = 2017;
+            var officeid = 72;
+            var programid = 4;
+            var accountid = 969;
+            return {
+                year: 2017,
+                officeid: 72,
+                programid: 4,
+                accountid: 969
+            }
+        }
+    </script>
+
+<div style="margin-top:20px;">
+    <label style="color:#ff0000;"><b>Raw Data :</b></label>
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.ppmp>()
+    .Name("grPPMP")
+    .Columns(col =>
+    {
+        col.Bound(m => m.itemname).Title("Item Name");
+        col.Bound(m => m.unit).Title("Unit");
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;">Unit Cost</div></text>)
+                        .ClientTemplate("<div>#=kendo.toString(unitcost, 'c2')# </div>");
+        //col.Bound(m => m.unitcost).Title("Unit Cost");
+        col.Bound(m => m.qty1).Title("Qty1");
+        col.Bound(m => m.qty2).Title("Qty2");
+        col.Bound(m => m.qty3).Title("Qty3");
+        col.Bound(m => m.qty4).Title("Qty4");
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;">Amount</div></text>)
+                        .ClientTemplate("<div>#=kendo.toString(amount, 'c2')# </div>");
+        //col.Bound(m => m.amount).Title("Amount");
+    })
+                .Pageable(page => page.Refresh(true)
+                .Enabled(true)
+                .ButtonCount(4)
+                .PreviousNext(true))
+                .Selectable(selectable => selectable.Mode(GridSelectionMode.Single))
+                .DataSource(d => d
+                .Ajax()
+                .PageSize(10)
+                .Model(m => m.Id(i => i.itemname))
+                .Read(read => read.Action("PPMP_DataTable", "PPMP").Data("PPMP_dataParam")))
+)
+</div>

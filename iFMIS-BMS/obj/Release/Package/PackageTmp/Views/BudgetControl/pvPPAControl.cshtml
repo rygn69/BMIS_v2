@@ -1,0 +1,698 @@
+﻿<script>
+    function trnnoURL() {
+        return '@Url.Action("SearchTrnnoID", "BudgetControl")';
+    }
+    function SearchOBRURL() {
+        return '@Url.Action("SearchOBR", "BudgetControl")';
+    }
+    function DBYearUrl() {
+        return '@Url.Action("CheckDBYear", "BudgetControl")';
+    }
+    function CheckIfExistUrl() {
+        return '@Url.Action("CheckIfExisit", "BudgetControl")';
+    }
+    function ChangeOBRURL() {
+        return '@Url.Action("ChangeOBR", "BudgetControl")';
+    }
+    function setPPAOBRURL() {
+        return '@Url.Action("SetPPAOBR", "BudgetControl")';
+    }
+    function setAllotmentURL() {
+        return '@Url.Action("SetAllotment", "BudgetControl")';
+    }
+    function setPPAAllotmentURL() {
+        return '@Url.Action("SetAllotment", "BudgetControl")';
+    }
+    function setObligationURL() {
+        return '@Url.Action("SetObligate", "BudgetControl")';
+    }
+    function getPPAObligationURL() {
+        return '@Url.Action("RootPPAObligate", "BudgetControl")';
+    }
+    function AddPPAControlURL() {
+        return '@Url.Action("AddPPAControl", "BudgetControl")';
+    }
+    function SavePPAControlURL() {
+        return '@Url.Action("SavePPAControl", "BudgetControl")';
+    }
+    function UpdatePPAControlURL() {
+        return '@Url.Action("UpdatePPAControl", "BudgetControl")';
+    }
+    function setPPAReleaseURL() {
+        return '@Url.Action("SetPPARelease", "BudgetControl")';
+    }
+    function setPPAObligationURL() {
+        return '@Url.Action("SetPPAObligation", "BudgetControl")';
+    }
+    function getPPAReleaseURL() {
+        return '@Url.Action("getPPARelease", "BudgetControl")';
+    }
+    function getPPAObligateURL() {
+        return '@Url.Action("getPPAObligate", "BudgetControl")';
+    }
+    function CancelPPAControlURL() {
+        // return
+    }
+    function CheckIfCanceledURL() {
+        return '@Url.Action("CheckIfCanceled", "BudgetControl")';
+    }
+    function DeletePPAURL() {
+        return '@Url.Action("DeletePPAItem", "BudgetControl")';
+    }
+    function PPAReturnURL() {
+        return '@Url.Action("PPAReturn", "BudgetControl")';
+    }
+    function PPACancelURL() {
+        return '@Url.Action("PPACancel", "BudgetControl")';
+    }
+    function TypeID() {
+        return @Account.UserInfo.UserTypeID;
+    }
+    function getOfficeID() {
+        return '@Account.UserInfo.Department';
+    }
+    function SetTempOBRURL() {
+        return '@Url.Action("SetPrefixTemp20OBR", "BudgetControl")';
+    }
+
+    function OBRNo20FromTempOBRURL() {
+        return '@Url.Action("OBRNo20FromTempOBR", "BudgetControl")';
+    }
+    function VerifyOfficeRefURL() {
+        return '@Url.Action("VerifyOfficeRef", "BudgetControl")';
+    }
+    function AirMarkURL() {
+        return '@Url.Action("SearchAirMark", "BudgetControl")';
+    }
+    function PPAAirMarkURL() {
+        return '@Url.Action("PPAAirMark", "BudgetControl")';
+    }
+    function CheckIfAirMarkURL() {
+        return '@Url.Action("CheckIfAirMark", "BudgetControl")';
+    }
+    function TransactionURL() {
+        return '@Url.Action("GenerateTransaction", "BudgetControl")';
+    }
+    function PPAComputationURL() {
+        return '@Url.Action("PPAComputation", "BudgetControl")';
+    }
+    function CheckIFOBRExistInAirMarkURL() {
+        return '@Url.Action("CheckIFOBRExistInAirMark", "BudgetControl")';
+    }
+    function SearchPPATransaction() {
+        return '@Url.Action("SearchTransno", "BudgetControl")';
+    }
+</script>
+<script src="~/Scripts/BMS/BudgetControl/PPAControl.js"></script>
+<style>
+    input[type="radio"] {
+        width: auto;
+    }
+
+    textarea {
+        resize: none;
+    }
+            textarea:focus, input:focus, input[type]:focus, .uneditable-input:focus {
+            border-color: rgba(0, 128, 0, 0.8);
+            box-shadow: 0 1px 1px rgba(0, 128, 0, 0.075) inset, 0 0 8px rgba(0, 128, 0, 0.6);
+            outline: 0 none;
+        }
+</style>
+<form id="PPACurrentControl">
+    <div style="border-color:gray;border-width:1px;border-style:solid;width:435px;margin-top:10px;float:left">
+        <div style="background-color:white;width:120px;margin-top:-15px;margin-left:15px;"><span style="font-size:18px;margin-left:5px;">General Info</span></div>
+        <div style="padding:10px;">
+
+            <div style="">
+                <div style="width:110px;border-style:solid;border-color:black;border-width:1px;padding:5px;display:inline-block">
+                    <span style="font-size:18px;font-weight:bold">MODE : <span id="mode-status" style="color:green">NEW</span></span>
+                </div>
+
+                <div style="margin-left:-1px;display:inline-block">
+                    <div style="width:400px;margin-left:60px">
+                        <label style="display:none;color:red" id="labelnoteppa"> This transaction for C.Y. 2021 is closed"</label>
+                    </div> 
+                    
+                    <div class="k-button" style="padding:5px;width:93px;margin-top:-10px;" id="PPAAdd" onclick="PPAAdd()"><span class="fa fa-plus"></span> ADD</div>
+                    <div class="k-button" style="padding:5px;width:93px;margin-top:-10px;" id="PPASave" onclick="PPASave()"><span class="fa fa-save"></span> SAVE</div>
+                    <div class="k-button" style="padding:5px;width:93px;margin-top:-10px;display:none" id="PPAUpdate" onclick="PPAUpdate()"><span class="fa fa-upload"></span> UPDATE</div>
+                    <div class="k-button" style="padding:5px;width:93px;margin-top:-10px;display:none" id="PPAReturn" onclick="PPAReturn()"><span class="fa fa-undo"></span> RETURN</div>
+                    <div class="k-button" style="padding:5px;width:93px;margin-top:-10px;display:none" id="PPACancel" onclick="PPACancel()"><span class="fa fa-ban"></span> CANCEL</div>
+                    <div class="k-button" style="padding:5px;width:93px;margin-top:-10px" id="PPAClear" onclick="ClearForm(3)"><span class="fa fa-times"></span> CLEAR</div>
+                </div>
+            </div>
+
+
+            <div style="width:440px;margin-top:5px;">
+                <input type="text" id="ModeIndicator" name="ModeIndicator" value="0" style="display:none;" />
+
+                <div style="width:120px;display:inline-block;">
+                    <span style="">QR No. :</span>
+                </div>
+                <div style="display:inline-block">
+                    <input class="k-input" type="text" style="background-color:#405b43;color:whitesmoke;font-size:large;text-align:center;width:288px" id="cttsppa" name="cttsppa" autocomplete="off" value="" />
+                </div>
+
+                <div style="width:120px;display:inline-block;"><span style="">Transaction No. :</span>
+                </div>
+                 <div style="display:inline-block;margin-top:5px;">
+                    <input class="k-input" type="text" id="TransactionNo" name="TransactionNo" style="width:288px" autocomplete="off" value="" />
+                    <input class="k-input" id="PPAOBRNo" name="PPAOBRNo" style="width:308px;display:none" value="0" />
+                </div>
+                <input type="text" style="display:none;" id="grtrnnoID" name="grtrnnoID" />
+                <input type="text" style="display:none;" id="ReturnID" name="ReturnID" />
+            </div>
+            <div style="width:440px;margin-top:5px;">
+                <div style="width:120px;display:inline-block;"><span style="">Transaction Type :</span></div> <div style="display:inline-block">
+                    @(Html.Kendo().DropDownList()
+                                    .Name("PPATransactionType")
+                                    .DataTextField("TransTypeName")
+                                    .DataValueField("TransTypeID")
+                                    .OptionLabel("Search Transaction Type . .")
+                                    .HtmlAttributes(new { @style = "width: 290px;" })
+                                    .DataSource(source => source.Read(read => read.Action("ddlTransactionType", "Dropdowns")))
+                    )
+                </div>
+            </div>
+            <div style="width:440px;margin-top:5px;">
+                <div style="width:120px;display:inline-block;"><span style="">Mode of Expenses :</span></div> <div style="display:inline-block">
+                    @(Html.Kendo().DropDownList()
+                                    .Name("PPAModeOfExpense")
+                                    .DataTextField("ModeOfExpenseName")
+                                    .DataValueField("ModeOfExpenseID")
+                                    .OptionLabel("Search Mode of Expense . .")
+                                    .HtmlAttributes(new { @style = "width: 290px;" })
+                                    .DataSource(source => source.Read(read => read.Action("ddlModeOfExpense", "Dropdowns").Data("PPATransactionType")).ServerFiltering(true))
+                                    .Enable(false)
+                                    .AutoBind(false)
+                                    .CascadeFrom("PPATransactionType")
+
+                    )
+                </div>
+            </div>
+            <div style="width:440px;margin-top:5px;">
+                <div style="width:120px;display:inline-block;"><span style="">Office :</span></div> <div style="display:inline-block">
+
+                    @(Html.Kendo().ComboBox()
+                                    .Name("PPAOffice")
+                                    .DataTextField("office_name")
+                                    .DataValueField("office_id")
+                                    .Placeholder("Search Office Name . .")
+                                    .Filter("contains")
+                                    .MinLength(3)
+                                    //.SelectedIndex(32)
+                                    .Events(e => e.Change("refreshProgram"))
+                                    .HtmlAttributes(new { @style = "width: 290px;" })
+                                    .DataSource(source => source.Read(read => read.Action("ddlOffice20", "Dropdowns")))
+                    )
+                    <input type="text" id="OfficeID" name="OfficeID" style="display:none;">
+                </div>
+            </div>
+            <div style="width:440px;margin-top:5px;">
+                <div style="width:120px;display:inline-block;"><span style="">Fund Type :</span></div> <div style="display:inline-block">
+                    @(Html.Kendo().ComboBox()
+                                    .Name("PPAFundType")
+                                    .DataTextField("FundTypeName")
+                                    .DataValueField("FundTypeID")
+                                    .SelectedIndex(0)
+                                    .Placeholder("Search Fund . .")
+                                    .Filter("contains")
+                                    .MinLength(3)
+                                    .SelectedIndex(3)
+                                    .HtmlAttributes(new { @style = "width: 290px;" })
+                                    .DataSource(source => source.Read(read => read.Action("ddlFundTypeControl", "Dropdowns")))
+                    )
+                    <input type="text" id="FundTypeValue" name="FundTypeValue" style="display:none;" />
+                </div>
+            </div>
+            <div style="width:440px;margin-top:5px;">
+                <div style="width:120px;display:inline-block;"><span style="">Program :</span></div> <div style="display:inline-block">
+                    @(Html.Kendo().ComboBox()
+                                    .Name("PPAProgram")
+                                    .DataTextField("setProgramDesc")
+                                    .DataValueField("setProgramID")
+                                    .Placeholder("Search Program . .")
+                                    .Filter("contains")
+                                    .MinLength(3)
+                            //      .SelectedIndex(6)
+                                  .Events(e => e.Change("refreshExpenditure"))
+                                    .HtmlAttributes(new { @style = "width: 290px;" })
+                                    .DataSource(source => source.Read(read => read.Action("ddlgetPrograms", "Dropdowns").Data("PPAProgram")))
+                    )
+                </div>
+            </div>
+            <div style="width:440px;margin-top:5px; display:none">
+                <div style="width:120px;display:inline-block;"></div>
+                <div style="display:inline-block">
+                    <span><input type="radio" id="ObjectExpenditure" name="ModePayment" value="2" checked > By Object of Expenditure </span>
+                </div>
+            </div>
+            <div style="width:440px;margin-top:5px;">
+                <div style="width:120px;display:inline-block;"><span style="" id="ooename">Obj of Expenditure:</span></div> <div style="display:inline-block">
+                    @(Html.Kendo().ComboBox()
+                                    .Name("PPAObjOfExpenditure")
+                                    .DataTextField("AccountName")
+                                    .DataValueField("AccountID")
+                                    .Placeholder("Search . .")
+                                    .Filter("contains")
+                                    .MinLength(3)
+                            //   .Events(e => e.Change("checkEnabled"))
+                                    .HtmlAttributes(new { @style = "width: 290px;" })
+                                    .DataSource(source => source.Read(read => read.Action("ddlAccounts", "Dropdowns").Data("AccountParam")))
+                    )
+                </div>
+            </div>
+            <div style="width:440px;margin-top:5px;">
+                <div style="width:120px;display:inline-block;"><span style="">Main PPA:</span></div> <div style="display:inline-block">
+                    @(Html.Kendo().ComboBox()
+                                    .Name("RootPPA")
+                                    .DataTextField("PPADescription")
+                                    .DataValueField("RootPPA")
+                                    .Placeholder("Search Root PPA . .")
+                                    .Filter("contains")
+                                    .MinLength(3)
+                                    .AutoBind(true)
+                                    .Events(e => e.Change("ChangePPAsetter"))
+                                    .HtmlAttributes(new { @style = "width: 290px; " })
+                                    .DataSource(source => source.Read(read => read.Action("ddlMainPPA", "Dropdowns").Data("MainPPAParam")))
+                    )
+                </div>
+            </div>
+            <div style="width:440px;margin-top:5px;">
+                <div style="width:120px;display:inline-block;"><span style="">PPA:</span></div> <div style="display:inline-block">
+                    @(Html.Kendo().ComboBox()
+                                    .Name("PPA")
+                                    .DataTextField("PPADescription")
+                                    .DataValueField("PPA")
+                                    .Placeholder("Search PPA . .")
+                                    .Filter("contains")
+                                    .MinLength(3)
+                                    .HtmlAttributes(new { @style = "width: 290px;" })
+                                    .Events(e => e.Change("ComputePPA"))
+                                    .DataSource(source => source.Read(read => read.Action("ddlPPAs", "Dropdowns").Data("PPAParam")).ServerFiltering(true))
+                                    .Enable(false)
+                                    .AutoBind(false)
+                                    .CascadeFrom("RootPPA")
+                    )
+                </div>
+            </div>
+            <div style="width:440px;margin-top:5px;">
+                <div style="width:120px;display:inline-block;"><span style="">Expense Class:</span></div> <div style="display:inline-block">
+                    @(Html.Kendo().ComboBox()
+                                    .Name("PPAOOE")
+                                    .DataTextField("ooe_name")
+                                    .DataValueField("ooe_id")
+                                    .Placeholder("Search OOE . .")
+                                    .Filter("contains")
+                                    .MinLength(3)
+                                    .SelectedIndex(2)
+                                    //.Events(e => e.Change("setPPAID"))
+                                    .HtmlAttributes(new { @style = "width: 290px;" })
+                                    .DataSource(source => source.Read(read => read.Action("ddlOOE", "Dropdowns")))
+                    )
+                    <input type="text" style="display:none" id="OOEText" name="OOEText" />
+                </div>
+            </div>
+            <div style="width:440px;margin-top:-20px;">
+                <div style="width:120px;float:left;margin-top:25px"><span style="">Expense Description:</span></div> <div style="float:left;margin-top:28px;margin-left:4px;margin-bottom:33px;">
+                     <textarea id="PPADescription" name="PPADescription" style="width:280px;"></textarea>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div style="border-color:gray;border-width:1px;border-style:solid;width:775px;margin-top:10px;float:left;margin-left:5px;padding:5px;">
+        <div style="float:left;">
+
+
+            @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.BudgetControlModel>()
+                    .HtmlAttributes(new { style = "width:775px;height:220px;" })
+    .Name("grPPAName")
+    .Scrollable()
+    .Columns(col =>
+    {
+        col.Bound(m => m.grPPAAccountName).Title("PPA Name").Width(270).ClientFooterTemplate("Total :");
+        col.Bound(m => m.grPPAClaim).Title("Amount").Width(100).ClientTemplate("<div> #=kendo.toString(grPPAClaim, 'c2')# </div>")
+            .ClientFooterTemplate("<div> <span style='text-align:right;color:black;'> #=kendo.toString(sum, 'c2') # </span> </div>");
+        col.Template(t => { }).ClientTemplate(
+            "# if (grPPAAcctChecker == 1) { #" +
+            "<div class='k-button k-state-disabled'>DELETE</div>" +
+            "# } else if(grAcctChecker == 0 ){ #" +
+            "<div class='k-button' onclick='(DeletePPA(#=grSubsidyID# , #=grPPAID#, #=grPPAClaim# ))'> DELETE </div>" +
+            "# } #"
+            ).HtmlAttributes(new { style = "margin-left:5px;" }).Width(100);
+        col.Bound(m => m.grPPADescription).Width(250).Hidden();
+        col.Bound(m => m.grPPAModeOfExpense).Width(250).Hidden();
+        col.Bound(m => m.grPPATransactionType).Width(250).Hidden();
+        col.Bound(m => m.grPPAOOE).Width(250).Hidden();
+        col.Bound(m => m.grPPA).Width(250).Hidden();
+        col.Bound(m => m.grRootPPA).Width(250).Hidden();
+        col.Bound(m => m.grPPATotalClaim).Width(250).Hidden();
+        col.Bound(m => m.grPPAAcctChecker).Width(250).Hidden();
+        col.Bound(m => m.grPPAID).Width(250).Hidden();
+        col.Bound(m => m.grSubsidyID).Width(250).Hidden();
+        col.Bound(m => m.grRemarks).Width(250).Hidden();
+    })
+        .Pageable(page => page.Refresh(true)
+        .Enabled(true)
+        .ButtonCount(4)
+        .PreviousNext(true)
+        )
+            .Selectable(selectable => selectable.Mode(GridSelectionMode.Single))
+        .Events(e => e.Change("GridClick"))
+        .AutoBind(false)
+            .DataSource(d => d
+            .Ajax()
+            .Aggregates(aggregates =>
+                {
+                    aggregates.Add(p => p.grPPAClaim).Sum();
+                })
+            .PageSize(10)
+            .Model(m => m.Id(i => i.grOBRNo))
+            .Read(read => read.Action("PPACurrentObligated", "BudgetControl").Data("PPANameParam"))
+            )
+            )
+        </div>
+        @*<div style="float:left;">
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.BudgetControlModel>()
+    .HtmlAttributes(new { style = "width:385px;height:220px;display:none" })
+    .Name("grAccountName")
+    .Scrollable()
+    .Columns(col =>
+    {
+        col.Bound(m => m.grPPAAccountName).Title("Account Name").Width(270).ClientFooterTemplate("Total :");
+        col.Bound(m => m.grPPAClaim).Title("Amount").Width(100).ClientTemplate("<div> #=kendo.toString(grPPAClaim, 'c2')# </div>")
+            .ClientFooterTemplate("<div> <span style='text-align:right;color:black;'> #=kendo.toString(sum, 'c2') # </span> </div>");
+    })
+                                            .AutoBind(false)
+                                            .Pageable(page => page.Refresh(true)
+                                            .Enabled(true)
+                                            .ButtonCount(4)
+                                            .PreviousNext(true)
+                                            )
+                    //                           .Selectable(selectable => selectable.Mode(GridSelectionMode.Single))
+                    // .Events(e => e.Change("GridClick"))
+                                               .DataSource(d => d
+                                               .Ajax()
+                                               .Aggregates(aggregates =>
+                                                    {
+                                                        aggregates.Add(p => p.grPPAClaim).Sum();
+                                                    })
+                                               .PageSize(10)
+                                               .Model(m => m.Id(i => i.grOBRNo))
+                                               .Read(read => read.Action("PPAAccountName", "BudgetControl").Data("AccountNameParam"))
+                                               )
+            )
+        </div>*@
+
+    </div>
+
+    <div style="border-color:gray;border-width:1px;border-style:solid;width:350px;margin-top:35px;float:left;margin-left:5px">
+        <div style="background-color:white;width:180px;margin-top:-15px;margin-left:15px;"><span style="font-size:18px;margin-left:5px;">Total Appropriation</span></div>
+        <div style="padding:10px;">
+            <div style="width:340px"> 
+                <div id="PPAobrlabelid" style="width:120px;display:inline-block;"><span style="">OBR No. :</span></div>
+                 <div ID="PPATransOBRNoid"style="display: inline;margin-left:62.5px">
+                    <input class="k-input" id="PPATransOBRNo" name="PPATransOBRNo" style="width:200px;font-weight:700;text-align:right;font-size:18px;" readonly="readonly" />
+                </div>
+
+                <div id="PPAFuntionCodelabelid" style="width:120px;display:inline-block;"><span style="">Function Code :</span></div>
+                 <div id="PPAFuntionCodeid" style="display: inline;margin-left:26px">
+                    <input class="k-input" id="PPAFuntionCode" name="PPAFuntionCode" style="width:200px;font-weight:700;text-align:center;font-size:18px;" readonly="readonly" />
+                </div>
+            </div>
+            <div style="width:340px;margin-top:5px;">
+                <div style="float:left;width:120px;margin-top:5px"><span style="font-size:10px;">Total Allotment released for this account as of the date:</span></div> <div style="float:left;margin-top:-45px;margin-left:123.5px;">
+                    <input class="k-input" id="AcctRelease" name="AcctRelease" style="width:200px;text-align:right;font-weight:700;color:#4061ff;" readonly="readonly" />
+                </div>
+            </div>
+            <div style="float:left;width:340px;margin-top:-10px;">
+                <div style="width:120px;margin-top:15px;"><span style="font-size:10px;">Less: Total obligation incurred </span></div> 
+                <div style="margin-left:123.5px;margin-top:-30px">
+                     <input class="k-input" id="AcctObligation" name="AcctObligation" style="width:200px;text-align:right;font-weight:700;color:#ff0000" readonly="readonly" />
+                </div>
+            </div>
+            <div style="float:left;width:340px;margin-top:10px;">
+                <div style="width:120px;display:inline-block;"><span style="font-size:10px;">Allotment released for this PPA:</span></div> <div style="margin-top:-28px;margin-left:123.5px">
+                     <input class="k-input" id="PPARelease" name="PPARelease" style="width:200px;text-align:right;font-weight:700;color:#4061ff" readonly="readonly" />
+                </div>
+            </div>
+            <div style="float:left;width:340px;margin-top:15px;">
+                <div style="width:120px;display:inline-block;"><span style="font-size:12px;">Obligation incurred for this PPA:</span></div> <div style="float:left;margin-left:123.5px;margin-top:-30px;margin-bottom:13px">
+                     <input class="k-input" id="PPAObligate" name="PPAObligate" style="width:200px;text-align:right;font-weight:700;color:#ff0000" readonly="readonly" />
+                </div>
+            </div>
+            @*<div style="width:340px;margin-top:5px;">
+                <div style="width:120px;display:inline-block;"><span style="">Less: This claim</span></div> <div style="display:inline-block">
+                    <input class="k-input" id="Claim" name="Claim" style="width:200px;text-align:right;font-weight:700;" readonly="readonly" value="0" />
+
+                </div>
+            </div>
+            <div style="width:340px;margin-top:5px;margin-bottom:10px;">
+                <div style="width:120px;display:inline-block;"><span style="">Balance of Allotment</span></div> <div style="display:inline-block">
+                    <input class="k-input" id="BalanceAllotment" name="BalanceAllotment" style="width:200px;text-align:right;font-weight:700;" readonly="readonly" />
+                </div>
+            </div>*@
+        </div>
+
+    </div>
+    <div style="border-color:gray;border-width:1px;border-style:solid;width:420px;margin-top:35px;float:left;margin-left:5px;padding:5px;">
+        <div style="background-color:white;width:180px;margin-top:-20px;margin-left:15px;"><span style="font-size:18px;margin-left:5px;">Amount Obligated</span></div>
+        <div style="width:400px;margin-top:5px;display:none">
+            <div style="width:120px;display:inline-block;"><span style="">Account Charged :</span></div> <div style="display:inline-block">
+                @(Html.Kendo().ComboBox()
+                                    .Name("PPAAccountCharged")
+                                    .DataTextField("AccountName")
+                                    .DataValueField("AccountID")
+                                    .Placeholder("Search . .")
+                                    .Filter("contains")
+                                    .MinLength(3)
+                            //   .Events(e => e.Change("checkEnabled"))
+                                    .HtmlAttributes(new { @style = "width: 275px;" })
+                                    .DataSource(source => source.Read(read => read.Action("ddlAccounts", "Dropdowns").Data("AccountParam")))
+                )
+            </div>
+        </div>
+        <div style="width:400px;margin-top:5px;display:none">
+            <div style="width:120px;display:inline-block;"><span style="">Actual Account :</span></div> <div style="display:inline-block">
+                @(Html.Kendo().ComboBox()
+                                    .Name("PPAActualAccount")
+                                    .DataTextField("AccountName")
+                                    .DataValueField("AccountID")
+                                    .Placeholder("Search . .")
+                                    .Filter("contains")
+                                    .MinLength(3)
+                            //   .Events(e => e.Change("checkEnabled"))
+                                    .HtmlAttributes(new { @style = "width: 275px;" })
+                                    .DataSource(source => source.Read(read => read.Action("ddlAccounts", "Dropdowns").Data("AccountParam")))
+                )
+            </div>
+        </div>
+        <div style="width:400px;margin-top:10px;">
+            <div style="width:120px;display:inline-block;"><span style="font-size:12px" id="AccntLabel">Balance for this PPA:</span></div> <div style="display:inline-block">
+                <input class="k-input" id="PPAvailable" name="PPAvailable" style="width:272px;text-align:right;font-weight:700;color:green;" readonly />
+            </div>
+        </div>
+        <div style="width:400px;margin-top:10px;">
+            <div style="width:120px;display:inline-block;"><span style="">Less: Amount :</span></div> <div style="display:inline-block">
+                <input type="number" class="k-input" id="AmountInputed" name="AmountInputed" style="width:272px;text-align:right;font-weight:700;"min="0" value="0" onkeyup="sync()" />
+            </div>
+        </div>
+        <div style="width:400px;margin-top:10px;">
+            <div style="width:120px;display:inline-block;"><span style="">Balance Allotment :</span></div> <div style="display:inline-block">
+                 <input class="k-input" id="PPABalanceAllotment" name="PPABalanceAllotment" style="width:272px;background-color:#ededed;text-align:right;font-weight:700;" readonly />
+            </div>
+        </div>
+        <div style="width:400px;margin-top:10px">
+            <div style="width:120px;display:inline-block;"><span style="">Total Claim :</span></div> <div style="display:inline-block">
+                <input class="k-input" id="Claim" name="Claim" style="width:272px;background-color:#ededed;text-align:right;font-weight:700;" readonly />
+            </div>
+        </div>
+        <div style="width:400px;margin-top:10px;">
+            <div style="width:120px;display:inline-block;">
+                <span style="">Remarks</span>
+            </div>
+            <div style="display:inline-block;margin-bottom:33px">
+                <textarea id="Remarks" name="Remarks" style="width:262px;height:39px;"></textarea>
+            </div>
+        </div>
+        <div style="width:400px;margin-top:5px;display:none">
+            <div style="width:120px;display:inline-block;"><span style="font-size:12px">Current Available Allotment :</span></div> <div style="display:inline-block">
+                <input class="k-input" id="CurrentAllotment" name="CurrentAllotment" style="width:272px;background-color:#ededed;text-align:right;font-weight:700;" readonly />
+            </div>
+        </div>
+    </div>
+
+    <div style="display:none">
+        <input class="k-input" id="OBRNoCenter" name="OBRNoCenter" style="width:200px;font-weight:700;text-align:right;color:#00ff21;display:none" />
+        <input type="number" id="SelectedAccount" name="SelectedAccount" />
+        <input class="k-input" id="ObligateValue" name="ObligateValue" style="width:200px;text-align:right;font-weight:700;color:#ff0000;display:none" />
+        <input class="k-input" id="AllotedAmountValue" name="AllotedAmountValue" style="width:200px;text-align:right;font-weight:700;color:#4061ff;display:none" />
+        <input type="text" id="ObligateParamValue" name="ObligateParamValue" style="display:none;" />
+        <input type="text" id="DiffObliandAllocatedValue" name="DiffObliandAllocatedValue" style="display:none">
+        <input type="text" id="ClaimValue" name="ClaimValue" value="0" style="display:none;">
+        <input type="number" id="BalanceAllotmentValue" name="BalanceAllotmentValue" style="display:none">
+        <input type="text" style="display:none;" id="ActualAmountValue" name="ActualAmountValue" />
+        <input class="k-input" id="AccntChargeValue" name="AccntChargeValue" style="width:272px;display:none" />
+        
+        <input type="number" id="BalanceAllotmentAppointmentValue" name="BalanceAllotmentAppointmentValue" style="display:none" />
+        <input type="number" id="CurrentAllotmentValue" name="CurrentAllotmentValue" style="display:none" />
+        <input type="number" id="CurrentAllotmentBalance" name="CurrentAllotmentBalance" style="display:none" />
+        <input type="text" id="CheckRefNo" name="CheckRefNo" style="display:none" value="0" />
+
+        <!--New Added for PPA-->
+        <input type="number" id="_AllotedAmount" name="_AllotedAmount" />
+        <input type="number" id="_Obligate" name="_Obligate" />
+        <input type="number" id="_PPAObligate" name="_PPAObligate" />
+        <input type="number" id="_DiffAllotment" name="_DiffAllotment" />
+        <input type="number" id="_PPAvailable" name="_PPAvailable" />
+        <input type="number" id="_PPABalanceAllotment" name="_PPABalanceAllotment" />
+        <input type="number" id="_BalanceAllotment" name="_BalanceAllotment" />
+        <input type="number" id="_Claim" name="_Claim" value="0"/>
+        <input type="number" id="_PPARelease" name="_PPARelease" />
+        <input type="number" id="_Amount" name="_Amount" value="0" />
+        <input type="number" id="_AcctChecker" name="_AcctChecker" />
+        <input type="number" id="_SubsidyID" name="_SubsidyID" />
+        <input type="number" id="_PPAID" name="_PPAID" />
+        <input type="number" id="_ChangePPAChecker" name="_ChangePPAChecker" />
+        <input type="number" id="_PPAAllotment" name="_PPAAllotment" />
+        <input type="number" id="_PPAObligation" name="_PPAObligation" />
+        <input type="number" id="_PPADifference" name="_PPADifference" />
+        <input type="number" id="_RefIdentifier" name="_RefIdentifier" />
+        <input type="number" id="_onGridClickIdentifier" name="_onGridClickIdentifier" />
+        <input type="text" id="UserTransactionID" name="UserTransactionID" />
+        <input type="number" id="_AcctRelease" name="_AcctRelease" />
+        <input type="number" id="_AcctObligation" name="_AcctObligation" />
+        <input type="number" id="_AcctDifference" name="_AcctDifference" />
+        <input type="number" id="yearendtransppa" name="yearendtrans" value="0" />
+        <input type="number" id="fcode_temp" name="fcode_temp" value="0" />
+    </div>
+</form>
+<script>
+
+    $(document).ready(function () {
+        //(function ($) {
+        //    $.fn.currencyFormat = function () {
+        //        this.each(function (i) {
+        //            $(this).change(function (e) {
+        //                if (isNaN(parseFloat(this.value))) return;
+        //                this.value = parseFloat(this.value).toFixed(2);
+        //            });
+        //        });
+        //        return this; //for chaining
+        //    }
+        //})(jQuery);
+
+        //$(function () {
+        //    $('.currency').currencyFormat();
+        //});
+
+        CheckStatus();
+        Transaction();
+
+        if("@Model.OBRValue" != "0"){
+            @*var str = "@Model.OBRValue";
+            var OBREntry = "";
+            if(str.length == 5){
+                OBREntry = ZeroPrefixFormat(@Model.OBRValue, 5);
+                console.log("OBREntry: ".OBREntry);
+                $("#OBRNoEntry").val("@Model.OBRValue");
+            }else{ *@
+                $("#TransactionNo").val("@Model.OBRValue");
+            //}
+
+        }
+
+      //  $("#PPAOffice").data("kendoComboBox").enable(false);
+        setTimeout(function () {
+            var Year = $("#Years").val();
+            if (Year < 2021) {
+                $("#PPAOffice").data("kendoComboBox").dataSource.read();
+                $("#PPAOffice").data("kendoComboBox").value(43);
+                $("#PPAProgram").data("kendoComboBox").dataSource.read();
+                $("#PPAProgram").data("kendoComboBox").value(55);
+               // $("#PPAProgram").data("kendoComboBox").enable(false);
+
+                $("#PPAObjOfExpenditure").data("kendoComboBox").dataSource.read();
+                $("#PPAObjOfExpenditure").data("kendoComboBox").value(2861);
+             //   $("#PPAObjOfExpenditure").data("kendoComboBox").enable(false);
+
+                $("#PPAAccountCharged").data("kendoComboBox").dataSource.read();
+                $("#PPAAccountCharged").data("kendoComboBox").value(2861);
+                $("#PPAAccountCharged").data("kendoComboBox").enable(true);
+
+                $("#PPAActualAccount").data("kendoComboBox").dataSource.read();
+                $("#PPAActualAccount").data("kendoComboBox").value(2861);
+            }
+            else {
+
+
+                $("#PPAOffice").data("kendoComboBox").dataSource.read();
+                //$("#PPAOffice").data("kendoComboBox").value(1);
+                //$("#PPAProgram").data("kendoComboBox").dataSource.read();
+                //$("#PPAProgram").data("kendoComboBox").value(217);
+               // $("#PPAProgram").data("kendoComboBox").enable(false);
+
+                //$("#PPAObjOfExpenditure").data("kendoComboBox").dataSource.read();
+                //$("#PPAObjOfExpenditure").data("kendoComboBox").value(2861);
+               // $("#PPAObjOfExpenditure").data("kendoComboBox").enable(false);
+
+                $("#PPAAccountCharged").data("kendoComboBox").dataSource.read();
+                $("#PPAAccountCharged").data("kendoComboBox").value(2861);
+                $("#PPAAccountCharged").data("kendoComboBox").enable(true);
+
+                $("#PPAActualAccount").data("kendoComboBox").dataSource.read();
+                $("#PPAActualAccount").data("kendoComboBox").value(2861);
+                //$("#PPAActualAccount").data("kendoComboBox").enable(false);
+            }
+            $("#TransactionNo").focus()
+        }, 500);
+
+        var url="@Url.Action("getCAFOAmode", "Excess")"
+        $.get(url,function (e) {
+                if (e == 1) {
+                    document.getElementById("PPAobrlabelid").style.display = "none"
+                    document.getElementById("PPATransOBRNoid").style.display = "none"
+                    document.getElementById("PPAFuntionCodelabelid").style.display = "inline"
+                    document.getElementById("PPAFuntionCodeid").style.display = "inline"
+                }
+                else {
+                    document.getElementById("PPAobrlabelid").style.display = "inline"
+                    document.getElementById("PPATransOBRNoid").style.display = "inline"
+                    document.getElementById("PPAFuntionCodelabelid").style.display = "none"
+                    document.getElementById("PPAFuntionCodeid").style.display = "none"
+                }
+        })
+
+        var url="@Url.Action("transyearend", "BudgetControl")"
+        $.get(url,{year: $("#Years").val()},function (e) {
+            $("#yearendtransppa").val(e)
+            if (e == 0) {
+                    
+                 document.getElementById("PPAAdd").style.display="none"
+                 document.getElementById("PPASave").style.display="none"
+                 document.getElementById("PPAUpdate").style.display="none"
+                 document.getElementById("PPAReturn").style.display="none"
+                 document.getElementById("PPACancel").style.display = "none"
+                 document.getElementById("PPAClear").style.display = "none"
+                document.getElementById("labelnoteppa").style.display = "inline"
+                document.getElementById("labelnoteppa").innerHTML = "The financial transaction for C.Y. " + $("#Years").val() + " was closed!"
+            }
+        })
+        //setTimeout(function () {
+            //$("#PPAObjOfExpenditure").data("kendoComboBox").dataSource.read();
+            //$("#PPAObjOfExpenditure").data("kendoComboBox").value(2861);
+            //$("#PPAObjOfExpenditure").data("kendoComboBox").enable(false);
+
+            //$("#PPAAccountCharged").data("kendoComboBox").dataSource.read();
+            //$("#PPAAccountCharged").data("kendoComboBox").value(2861);
+            //$("#PPAAccountCharged").data("kendoComboBox").enable(true);
+
+            //$("#PPAActualAccount").data("kendoComboBox").dataSource.read();
+            //$("#PPAActualAccount").data("kendoComboBox").value(2861);
+            ////$("#PPAActualAccount").data("kendoComboBox").enable(false);
+
+        //}, 500);
+    });
+
+</script>

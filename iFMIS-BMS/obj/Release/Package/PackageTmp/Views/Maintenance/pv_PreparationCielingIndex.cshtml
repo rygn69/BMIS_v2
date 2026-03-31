@@ -1,0 +1,32 @@
+﻿<script>
+    function OnTabstripActivate() {
+        var SelectedTabIndex = $("#tabstrip").data("kendoTabStrip").select().index();
+        //var OfficeID = $("#ddlOffices").val();
+        //if (OfficeID != '') {
+            if (SelectedTabIndex == 0) {
+                $("#grOfficeCielingGF").data("kendoGrid").dataSource.read();
+            }
+            else {
+                $("#grOfficeCielingEE").data("kendoGrid").dataSource.read();
+            }
+        //}
+    }
+</script>
+<div style="width : 100%; margin-top: 0px;border-style: solid; border-color: #1fa67a">
+    <div style="width:100%;height : 25px ; background-color:#1fa67a; color: white">
+        <label class="fa fa-line-chart fa-lg" style="margin-left: 5px; display:inline-block">  Office Budget Proposal Ceiling</label>
+    </div>
+    @(Html.Kendo().TabStrip()
+          .Name("tabstrip")
+          .Navigatable(false)
+          .Animation(animation =>
+              animation.Open(effect =>
+              effect.Fade(FadeDirection.In)))
+              .Events(e => e.Activate("OnTabstripActivate"))
+          .Items(tabstrip =>
+          {
+              tabstrip.Add().Text("General Fund").Selected(true).LoadContentFrom("pv_CeilingGFTab", "Maintenance");
+              tabstrip.Add().Text("Economic Enterprise").LoadContentFrom("pv_CeilingEETab", "Maintenance");
+          })
+    )
+</div>

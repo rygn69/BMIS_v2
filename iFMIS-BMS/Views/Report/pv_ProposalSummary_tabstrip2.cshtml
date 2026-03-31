@@ -1,0 +1,44 @@
+﻿<script>
+    function fn_refresher(e) {
+
+        var tabStrip = $("#grid_tabstrip2").data("kendoTabStrip");
+        var selectedIndex = tabStrip.select().index();
+
+        // Set parameter values based on the selected tab
+        var parameterValue = $("#proyear").val();//selectedIndex === 0 ? "value1" : "value2";
+
+        // Update the content URL based on the selected tab and parameter value
+        var contentUrl = selectedIndex === 0 ?
+            "proposalperoffice?param=" + parameterValue :
+            "proposalperitem?param=" + parameterValue;
+
+        // Load the content with the updated URL
+        $.get(contentUrl, function (data) {
+            var contentElement = $(tabStrip.contentElement(selectedIndex));
+            contentElement.html(data); // Insert the returned content into the tab
+        });
+    }
+</script>
+<div class="demo-section k-content">
+    @(Html.Kendo().TabStrip()
+          .Name("grid_tabstrip2")
+          .Navigatable(false)
+          .Animation(animation =>
+              animation.Open(effect =>
+              effect.Fade(FadeDirection.In)))
+          .Items(tabstrip =>
+          {
+              tabstrip.Add().Text("Per Office").Selected(true).LoadContentFrom("proposalperoffice", "Report");
+              tabstrip.Add().Text("Per Item").LoadContentFrom("proposalperitem", "Report");
+          })
+          .Events(e => e.Activate("fn_refresher"))
+
+    )
+</div>
+
+<script>
+    $(document).ready(function () {
+        @*alert(@Session["officeid"])*@
+    });
+</script>
+

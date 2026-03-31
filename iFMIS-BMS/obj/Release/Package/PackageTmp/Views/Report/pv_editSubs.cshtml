@@ -1,0 +1,151 @@
+﻿
+@model iFMIS_BMS.BusinessLayer.Models.LBPOne_Sub2Model
+
+
+<script>
+
+    function GetFundID() {
+        return {
+            Type_ID: '@Session["Type_ID"]',
+            Year_Of: '@Session["Year_Of"]'
+        }
+    }
+
+
+    function reqSaveEdt() {
+        var notifi = new $("#popupNotification").data("kendoNotification");
+
+        var url = "@Url.Action("UpdateSub", "Report")";
+
+        //var Sub1_Desc_ID = $('#dllSubs').val()
+        //var Sub1_Desc = $("#dllSubs").data("kendoComboBox").text();
+        //var Sub2_Desc_ID = $('#dllSubs2').val()
+        //var Sub2_Desc = $("#dllSubs2").data("kendoComboBox").text();
+        var Sub2_ID = $('#Sub2_ID').val()
+        var Sub1_Desc = $('#Sub1_Desc').val()
+        var Sub2_Desc = $('#Sub2_Desc').val()
+        var Past_year = $('#Past_year').val()
+        var Current_year = $('#Current_year').val()
+        var Budget_year = $('#Budget_year').val()
+
+
+
+        $.post(url, { Sub2_ID: Sub2_ID, Sub1_Desc: Sub1_Desc, Sub2_Desc: Sub2_Desc, Past_year: Past_year, Current_year: Current_year, Budget_year: Budget_year, Type_ID: '@Session["Type_ID"]', Year_Of: '@Session["Year_Of"]' }, function (e) {
+                if (e == "1") {
+                    swal({
+                        title: "Success!",
+                        text: "Successfuly Updated.",
+                        timer: 2000,
+                        type: "success",
+                        showConfirmButton: false
+                    })
+                    $('#newAccounts').data('kendoWindow').close();
+                    //$('#Typegrid').data('kendoGrid').dataSource.read();
+                    $('#grid_' + '@Session["TypeID"]').data('kendoGrid').dataSource.read();
+                } else {
+                    swal({
+                        title: "Error!",
+                        text: "System Error! Please try again.",
+                        timer: 2000,
+                        type: "error",
+                        showConfirmButton: false
+                    })
+                }
+
+
+        });
+
+        @*$.post(url, { Sub1_Desc_ID: Sub1_Desc_ID, Sub1_Desc: Sub1_Desc, Sub2_Desc_ID: Sub2_Desc_ID, Sub2_Desc: Sub2_Desc, Past_year: Past_year, Current_year: Current_year, Budget_year: Budget_year, Type_ID: '@Session["Type_ID"]', Year_Of: '@Session["Year_Of"]' }, function (d) {*@
+
+            $('#newAccounts').data('kendoWindow').close();
+
+        //})
+    }
+
+    function reqAddSub2() {
+        $("#ComboSub").css("visibility", "visible")
+        $("#addSub").css("visibility", "hidden")
+    }
+</script>
+<div style="border: outset;border-width:1px;border-color:#038603; width: 580px; padding-left:0px;padding-right:0px;padding-top:0px;padding-bottom:0px;margin-top: 10px;">
+    <div style=" width: 0;height: 0; border-right: 5px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;margin-top: -1px; ">
+        <div style="width: 513px; margin-top:1px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 37px solid #1fa67a; ">
+
+            <div style="float: left; height:28px; margin-left:-59px; margin-top: 5px;">
+                <i class="fa fa-edit fa-2x fg-white"></i>
+            </div>
+
+        </div>
+    </div>
+
+
+
+
+
+
+    <div style="float:inherit; margin-left:50px; margin-top:30px; margin-bottom:50px">
+        @*<label></label>
+        Something : <div style="margin-left:100px;margin-top:-20px">
+            @(Html.Kendo().ComboBoxFor(m => m.Sub1_Desc)
+                        .Name("dllSubs")
+                        .DataTextField("Sub1_Desc")
+                        .DataValueField("Sub1_Desc_ID")
+                        .Placeholder("Select or Add Revenue...")
+                        .HtmlAttributes(new { @style = "width: 380px;" })
+                        .DataSource(source => source.Read(read => read.Action("SubCombo", "Report"))
+
+
+    ))
+        </div>
+        <label></label><label></label>
+        <label></label><label></label>
+        <label></label><label></label>
+        <div style="margin-left:100px;margin-top:0px;visibility:hidden" id="addSub"><div class="k-button" onclick="reqAddSub2()">Add Sub</div></div>
+        <div style="margin-left:0px;margin-top:-20px;visibility:visible" id="ComboSub">
+            Sub : <div style="margin-left:100px;margin-top:-20px">
+                                                                                    @(Html.Kendo().ComboBox()
+                                                                                            .Name("dllSubs2")
+                                                                                            .DataTextField("Sub2_Desc")
+                                                                                            .DataValueField("Sub2_Desc_ID")
+                                                                                            .Placeholder("Select or Add Revenue...")
+                                                                                            .HtmlAttributes(new { @style = "width: 380px;" })
+                                                                                            .DataSource(source => source.Read(read => read.Action("SubCombo2", "Report"))
+
+
+                                                                        ))
+            </div>
+        </div>*@
+        @Html.HiddenFor(m => m.Sub2_ID)
+        <label></label><label></label>
+        <label></label><label></label>
+        <label></label><label></label>
+        Type of Fund :  <div style="margin-left:100px;margin-top:-20px"><input type="text" class="k-textbox" style="width: 380px;" id="Sub1_Desc" name="Sub1_Desc" value="@Model.Sub1_Desc" readonly /></div>
+        <label></label><label></label>
+        <label></label><label></label>
+        <label></label><label></label>
+        Sub :  <div style="margin-left:100px;margin-top:-20px"><input type="text" class="k-textbox" style="width: 380px;" id="Sub2_Desc" name="Sub2_Desc" value="@Model.Sub2_Desc" /></div>
+        <label></label><label></label>
+        <label></label><label></label>
+        <label></label><label></label>
+        Past Year :  <div style="margin-left:100px;margin-top:-20px"><input type="text" class="k-textbox" style="width: 380px;" id="Past_year" name="Past_year" value="@Model.Year1_Amount" /></div>
+        <label></label><label></label>
+        <label></label><label></label>
+        <label></label><label></label>
+        Current Year :  <div style="margin-left:100px;margin-top:-20px"><input type="text" class="k-textbox" style="width: 380px;" id="Current_year" name="Current_year" value="@Model.Year2_Amount"/></div>
+        <label></label><label></label>
+        <label></label><label></label>
+        <label></label><label></label>
+        Budget Year :  <div style="margin-left:100px;margin-top:-20px"><input type="text" class="k-textbox" style="width: 380px;" id="Budget_year" name="Budget_year" value="@Model.Year3_Amount" /></div>
+        <label></label><label></label>
+        <label></label><label></label>
+        <label></label><label></label>
+    </div>
+    <div class="k-button k-button-icontext" style="position: absolute; bottom: 15px; right: 20px;width: 80px;" onclick="reqSaveEdt()">Save</div>
+
+
+
+
+
+
+</div>
+

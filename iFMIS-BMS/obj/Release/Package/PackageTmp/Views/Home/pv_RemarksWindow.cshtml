@@ -1,0 +1,69 @@
+﻿<script>
+    function onShow(e) {
+        var element = e.element.parent(),
+            eWidth = element.width(),
+            eHeight = element.height(),
+            wWidth = $(window).width(),
+            wHeight = $(window).height(),
+            newTop, newLeft;
+
+        newLeft = Math.floor(wWidth - (eWidth + 5));
+        newTop = 5;
+
+        e.element.parent().css({ top: newTop, left: newLeft });
+    }
+</script>
+
+<script>
+    function CloseWindow()
+    {
+        document.documentElement.style.overflow = 'auto';  // firefox, chrome
+        document.body.scroll = "yes";
+        $("#RemarksWindow").data("kendoWindow").close();
+    }
+    function SaveRemark() {
+
+        var url = "@Url.Action("DeclineProposal", "Home")";
+        var idsToSend = [];
+        var grid = $("#grd_BudgetApprovalBudget").data("kendoGrid")
+        var ds = grid.dataSource.view();
+        var Remark = document.getElementById("taRemark").value;
+        if (Remark == '') {
+            swal("Something Went Wrong!", "Remark is required!", "error");
+        }
+        else {
+            for (var i = 0; i < ds.length; i++) {
+                var row = grid.table.find("tr[data-uid='" + ds[i].uid + "']");
+                var checkbox = $(row).find(".checkbox");
+                if (checkbox.is(":checked")) {
+                    idsToSend.push(ds[i].ProposalID);
+                }
+            }
+            $.post(url, { ProposalIDList: idsToSend, Remarks: Remark }, function (d) {
+                if (d == "1") {
+                    swal({ title: "Success!", text: "Selected Accounts Declined!", timer: 1000, showConfirmButton: false, type: "success" });
+                    document.documentElement.style.overflow = 'auto';  // firefox, chrome
+                    document.body.scroll = "yes";
+                    $('#RemarksWindow').data('kendoWindow').close();
+                    $("#grd_BudgetApprovalBudget").data("kendoGrid").dataSource.read();
+                } else {
+                    swal("Something Went Wrong!", d, "error");
+                }
+            })
+        }
+    }
+
+</script>
+
+<div>
+    <div style="margin-left:5px">
+        <label style="color:red; font-size:12px; margin-bottom: 10px">* Note :This remark will be applied to all selected accounts</label>
+        <label>Remarks</label>
+    </div>
+    <div style="width:300px; margin-left: 5px" class="input-control textarea" data-role="input">
+        <textarea style="height:115px" id="taRemark" name="taRemark"></textarea>
+    </div>
+</div>
+
+<div class="k-button k-button-icontext" style="position: absolute; bottom: 15px; right: 10px;width: 80px;" onclick="SaveRemark()">OK</div>
+<div class="k-button k-button-icontext" style="position: absolute; bottom: 15px; right: 95px;width: 80px;" onclick="CloseWindow()">Cancel</div>

@@ -1,0 +1,75 @@
+﻿<script>
+    function getParamRep() {
+        return {
+            year: $("#tyear").val()
+        }
+    }
+    function rtpsupple(docid) {
+       
+        //success: window.open("https://pgas.ph/dgsign/blank/getPDF_digital_only?pdfData=application/pdf&FormID=" + docid + "")
+        success: window.open(" https://pgas.ph/dgsign/blank/keuitughhjugjugah?doc_id=" + docid + "")
+        //}
+    }
+</script>
+<div style="display:inline-block;width:100%;height:550px; margin: 10px 0 20px 0px;">
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.WFPrepare>()
+        .Name("sb3dgsign_grid")
+        .HtmlAttributes(new { style = "" })
+        .Columns(col =>
+        {
+        col.Template(@<text></text>)
+                                @*.Hidden()*@
+        .HeaderTemplate(@<text>No.</text>)
+        .Width(35)
+        .HtmlAttributes(new { style = "text-align:center;vertical-align:top" })
+        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:11px;color:beige;" })
+        .ClientTemplate("<div>#=trnno# </div>");
+
+   
+    col.Template(@<text></text>)
+        .HeaderTemplate(@<text>Office</text>)
+        .Width(55)
+        .HtmlAttributes(new { style = "text-align:center;vertical-align:top" })
+        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:11px;color:beige;" })
+        .ClientTemplate("<div>#=office# </div>");
+
+    col.Template(@<text></text>)
+        .HeaderTemplate(@<text>Control No.</text>)
+         .Width(55)
+        .HtmlAttributes(new { style = "text-align:center;vertical-align:top" })
+        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:11px;color:beige;" })
+        .ClientTemplate("<div>#=wfpno# </div>");
+
+    col.Template(@<text></text>)
+        .HeaderTemplate(@<text></text>)
+        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:10px;color:beige;" })
+        .ClientTemplate(
+            "<div style='cursor:pointer' onclick='rtpsupple(#=docid#)'><span class='fa fa-print' title='Click to preview ARO!' style='font-size: 16px;margin-top: -1px;margin-left: 1px;margin-right:1px;width:25px;text-align:center;cursor:pointer;'></span>SB3</div> ")
+        .HtmlAttributes(new { style = "vertical-align: middle;text-align:center;vertical-align:top" })
+        .Width(55);
+
+        })
+            .Resizable(e => e.Columns(true))
+            .Pageable(pageable => pageable
+            .Refresh(true)
+            .ButtonCount(5))
+            .Scrollable()
+            .HtmlAttributes(new { @class = "table-responsive", style = "height:500px;overflow-y:hidden;" })
+            .Selectable()
+            //   .Events(e => e.DataBound("onDataBound").Change("WFPgrid"))
+            .DataSource(dataSource => dataSource
+            .Ajax()
+            .Batch(true)
+            .Model(m => m.Id(i => i.wfpid))
+            .ServerOperation(false)
+
+            .Aggregates(a =>
+            {
+                a.Add(c => c.amount).Sum();
+            })
+            .PageSize(1000)
+            .Read(read => read.Action("getsb3grid_report", "Report").Data("getParamRep"))
+            )
+)
+
+    </div>

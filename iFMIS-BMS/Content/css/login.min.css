@@ -1,0 +1,192 @@
+﻿body {
+ background: url("images/bg49.gif") #b0acac repeat;
+ font-size:13px;
+}    
+
+@font-face {  
+  font-family: FontBondCondensed ;  
+  src: url(../Include/Fonts/OpenSans-CondBold.ttf) format("truetype");  
+}
+@font-face {  
+  font-family: FontLightCondensed ;  
+  src: url(../Include/Fonts/OpenSans-CondLight.ttf) format("truetype");  
+}
+
+#log-wrapper {
+        height:380px;
+       
+        width:400px;
+        margin:auto auto;
+        
+       
+        font-family:'Segoe UI';
+        border:4px solid #fff;
+         -webkit-box-shadow:  0px 0px 2px 0px rgba(128, 128, 128, 0.3);
+         box-shadow: 0px 0px 2px 0px rgba(128, 128, 128, 0.3); 
+        
+
+       
+
+    }
+       #log-wrapper .l-headers {
+            width:400px;
+            height:105px;
+        }
+     .pgas-logo {
+        background:url("pgas-logo.png") no-repeat;
+        height:96px;
+        width:96px;
+        margin:5px 0 0 3px;
+        position:absolute;
+    }
+
+     .intranet-logo {
+        /*background:url("Content/logo1.png") no-repeat;*/
+        height:50px;
+        width:285px;
+        margin:0 0 0 90px;
+        position:absolute;
+        padding:10px  0 0 10px ;
+        font-size-adjust:0.49;
+        
+        /*border:1px solid #808080;*/
+    }
+        .intranet-logo .tophead {
+            font-size:14px;
+            text-align:right;
+            font-weight:300;
+            text-shadow:1px 1px 2px #898888;
+            font-size-adjust:0.49;
+            padding-top:0px;
+            margin-top:-5px;
+            
+        }
+        .intranet-logo .topTitle {
+            margin-top:-2px;
+            font-size:23px;
+            text-align:right;
+            text-shadow:1px 1px 2px #898888;
+        }
+         /*.intranet-logo .subTitle {
+            margin-top:-5px;
+            font-size:11px;
+            text-align:right;
+            text-shadow:1px 1px 2px #898888;
+        }*/
+     .strip {
+        position:absolute;
+        height:20px;
+        width:196px;
+        margin:65px 0 0 167px;
+        background-color: #C437D3;
+        padding:2px 15px 2px 25px;
+        line-height:110%;
+        text-align:right;
+        color:#fff;
+        text-shadow:1px 1px 2px #7e7d7d;
+        border:3px solid #fff;
+        border-right:none;
+        font-size:15px;
+        /*border-radius: 8px 0px 0px 8px;*/
+        -webkit-box-shadow:  0px 0px 1px 1px rgba(125, 125, 125, 0.2);
+         box-shadow:  0px 0px 1px 1px rgba(125, 125, 125, 0.2); 
+        z-index:200;
+        
+    }
+        #log-wrapper .l-fields {
+            color:#fff;
+            font-weight:500;
+            /*background:#0e6ac4 repeat;*/
+            width:400px;
+            min-height:200px;
+            height:auto;
+            /*position:absolute;*/
+            -webkit-box-shadow: inset 0px 0px 1px 1px rgba(125, 125, 125, 0.2);
+             box-shadow: inset 0px 0px 1px 1px rgba(125, 125, 125, 0.2); 
+             /*background-color: rgb(127, 197, 248);*/
+            background: #c437d3; /* Old browsers */
+            background: -moz-linear-gradient(top,  #c437d3 0%, #9702a7 100%); /* FF3.6+ */
+            background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#c437d3), color-stop(100%,#9702a7)); /* Chrome,Safari4+ */
+            background: -webkit-linear-gradient(top,  #c437d3 0%,#9702a7 100%); /* Chrome10+,Safari5.1+ */
+            background: -o-linear-gradient(top,  #c437d3 0%,#9702a7 100%); /* Opera 11.10+ */
+            background: -ms-linear-gradient(top,  #c437d3 0%,#9702a7 100%); /* IE10+ */
+            background: linear-gradient(to bottom,  #c437d3 0%,#9702a7 100%); /* W3C */
+            filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#c437d3', endColorstr='#9702a7',GradientType=0 ); /* IE6-9 */
+
+
+
+
+        }
+
+        #log-wrapper .l-fields .panel {
+            width:99%;
+            height:155px;
+            /*border:1px solid #b0acac;*/
+            margin:auto;
+            padding-top:15px;
+        }
+        #log-wrapper .l-fields .panel .criteria{
+            width:120px;
+            height:25px;
+            /*border:1px solid #b0acac;*/
+            padding:7px 0px 5px 25px;
+            float:left;
+        }
+        #log-wrapper .l-fields .panel .field{
+            width:auto;
+            height:25px;
+            /*border:1px solid #b0acac;*/
+            padding:7px 5px 5px 5px;
+            float:left;
+        }
+
+    #log-wrapper .l-footer {
+        color:#7a7a7a;
+        /*width:388px;*/
+        height:auto;
+        font-size:10px;
+        text-align:center;
+        padding:10px 10px 8px 0;
+        /*border:solid 1px #808080;*/
+        border-top:none;
+        -webkit-box-shadow: inset 0px 0px 1px 1px rgba(125, 125, 125, 0.3);
+             box-shadow: inset 0px 0px 1px 1px rgba(125, 125, 125, 0.3); 
+    }
+
+
+.icon-sprite1 {
+    background-image: url("images/smallicon-sprite1.png");
+    background-repeat: no-repeat;
+    background-size: auto auto;
+   
+}
+.icon-sprite3 {
+    background-image: url("images/1eGg7s9j1fo.png");
+    background-repeat: no-repeat;
+    background-size: auto auto;
+  
+}
+
+.north-tip {
+   background-position: -38px -125px;
+    
+   margin-left:-17px;
+   margin-top:16px;
+}
+.icon-size {
+    height: 16px;
+    width: 15px;
+}
+
+.a-position
+{
+    position:absolute;
+}
+
+.rfloat {
+    float:right;
+}
+
+.lfloat {
+    float:left;
+}

@@ -1,0 +1,1332 @@
+﻿
+@model IEnumerable<iFMIS_BMS.BusinessLayer.Models.WFP>
+
+<style>
+    .dialog-overlay {
+        background-color: #000000;
+        opacity: 0.4;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        min-height: 100%;
+        min-width: 100%;
+        z-index: 99999;
+    }
+</style>
+<script>
+        function CheckAll(e) {
+            $("#dffptconsol tbody input:checkbox").prop("checked", e.checked);
+        }
+
+        function btnApprove() {
+            if ($('#SpanOnApproveProgress').css("display") == 'none') {
+                $('#SpanOnApproveProgress').css("display", "auto");
+                $('#spanthumbsup').css("display", "none");
+                var url = "@Url.Action("ApproveDFPPT", "Report")";
+                var idsToSend = [];
+                var AmountsToSend = [];
+                var BudgetToSend = [];
+                var grid = $("#dffptconsol").data("kendoGrid")
+                var ds = grid.dataSource.view();
+
+                for (var i = 0; i < ds.length; i++) {
+                    var row = grid.table.find("tr[data-uid='" + ds[i].uid + "']");
+                    var checkbox = $(row).find(".checkbox");
+                    if (checkbox.is(":checked")) {
+                        idsToSend.push(ds[i].transno); //loops
+                    }
+                }
+                if (idsToSend == "") {
+                    swal({ title: "Error!", text: "Please mark as check at least one account!", timer: 2500, showConfirmButton: false, type: "error" });
+                    $('#SpanOnApproveProgress').css("display", "none");
+                    $('#spanthumbsup').css("display", "auto");    
+                } else {
+                    $.post(url, { transno: idsToSend}, function (d) {
+                        if (d == 1) {
+                            swal({ title: "Success!", text: "Selected accounts has been approved!", timer: 1000, showConfirmButton: false, type: "success" });
+                            $("#dffptconsol").data("kendoGrid").dataSource.read();
+                            $('#SpanOnApproveProgress').css("display", "none");
+                            $('#spanthumbsup').css("display", "auto");
+                        }
+                        else {
+                            swal("Something Went Wrong!", d, "error");
+                            $('#SpanOnApproveProgress').css("display", "none");
+                            $('#spanthumbsup').css("display", "auto");
+                        }
+                    })
+                }
+            }
+        }
+    function onDataBound(e) {
+        $(".k-hierarchy-cell").hide();
+        $(".k-hierarchy-col").hide();
+        var grid = $("#dffptconsol").data("kendoGrid")
+        var ds = grid.dataSource.view();
+        var rows = e.sender.tbody.children();
+        var trnno = 0;
+        var approvetag = 0;
+
+        for (var i = 0; i < ds.length; i++) {
+            trnno = ds[i].transno;
+            approvetag = ds[i].approve;
+
+            var row = $(rows[i]);
+            if (approvetag != 0) {
+            $('#check' + trnno + '').css("display", "none");
+            }
+            else {
+                $('#check' + trnno + '').css("display", "normal");
+            }
+            //if (comtag == 1) {
+            //    row.addClass("ChangeBackColor");
+            //}
+            //else if (comtag == 2) {
+            //    row.addClass("ChangeApprovedColor");
+            //    $('#deleteid' + release_float_id + '').css("display", "none");
+            //}
+            //else {
+            //    $('#viewdetailid' + release_float_id + '').css("display", "none");
+            //}
+        }
+    }
+        function coma_sepa(val) {
+            val = val.toString().replace(/,/g, ''); //remove existing commas first
+
+            var valSplit = val.split('.'); //then separate decimals
+            while (/(\d+)(\d{3})/.test(valSplit[0].toString())) {
+                valSplit[0] = valSplit[0].toString().replace(/(\d+)(\d{3})/, '$1' + ',' + '$2');
+            }
+
+            if (valSplit.length == 2) { //if there were decimals
+                val = valSplit[0] + "." + valSplit[1]; //add decimals back
+            } else {
+                val = valSplit[0];
+            }
+
+            return val;
+        }
+
+        function covert_empty(str) {
+            str = str.toString().replace(/,/g, "");
+            parseInt(str, 20);
+            return str;
+        }
+        function fnooeid() {
+            setTimeout(function () {
+                $("#dffptconsol").data("kendoGrid").dataSource.read();
+
+                //if ($("#ooe_id").val()==1)
+                //{
+                //    $("#firstmonFin").prop('disabled', true);
+                //    $("#secondmonFin").prop('disabled', true);
+                //    $("#thirdmonFin").prop('disabled', true);
+                //}
+                //else{
+                //    $("#firstmonFin").prop('disabled', false);
+                //    $("#secondmonFin").prop('disabled', false);
+                //    $("#thirdmonFin").prop('disabled', false);
+                //}
+            }, 500);
+
+        }
+        function fnyear() {
+            setTimeout(function () {
+                $("#dffptconsol").data("kendoGrid").dataSource.read();
+                //$("#repHistory").val("");
+                //$("#repHistory").data("kendoComboBox").dataSource.read();
+                $("#office").data("kendoComboBox").dataSource.read();
+            }, 500);
+        }
+        function fnquarter() {
+            setTimeout(function () {
+                $("#dffptconsol").data("kendoGrid").dataSource.read();
+                //$("#repHistory").val("");
+                //$("#repHistory").data("kendoComboBox").dataSource.read();
+                clearentry()
+            }, 500);
+        }
+        function getParam(){
+            return {
+                office: $("#office").val(),
+                ooeid: $("#ooe_id").val(),
+                propyear: $("#TYear").val(),
+                qtr: $("#quarter").val()
+            }
+        }
+
+
+        var thisculture = kendo.culture();
+        thisculture.numberFormat.currency.symbol = '₱'; // Script For Changing The Currency Sign
+
+        function comma_sepa(val) {
+
+            val = val.toString().replace(/,/g, ''); //remove existing commas first
+
+            var valSplit = val.split('.'); //then separate decimals
+            while (/(\d+)(\d{3})/.test(valSplit[0].toString())) {
+                valSplit[0] = valSplit[0].toString().replace(/(\d+)(\d{3})/, '$1' + ',' + '$2');
+            }
+
+            if (valSplit.length == 2) { //if there were decimals
+                val = valSplit[0] + "." + valSplit[1]; //add decimals back
+            } else {
+                val = valSplit[0];
+            }
+
+            return val;
+        }
+
+        function searchaccountsubmit() {
+            var $filter = new Array();
+            $filter = [];
+
+            if ($('#searchaccountsubmit').val().length > 0) {
+                $filter.push({ field: "objectexpenditure", operator: "contains", value: $('#searchaccountsubmit').val() });
+            }
+
+            $('#dffptconsol').data('kendoGrid').dataSource.filter({
+                logic: "or",
+                filters: $filter
+            });
+
+        }
+
+        $(function () {
+            $("#searchaccountsubmit").keypress(function (e) {
+                if (e.keyCode == 13) {
+                    searchaccountsubmit();
+                }
+            });
+        });
+        function  sync(){
+            var tallocation= $("#totalalloc").val();
+            var app = $("#appropriationNet").val()
+
+            if ($("#fmonthrel").val() == 0) {
+                firstmonFin = covert_empty($("#firstmonFin").val())
+            }
+            else {
+                firstmonFin =0
+            }
+
+            if ($("#smonthrel").val() == 0) {
+                secondmonFin = covert_empty($("#secondmonFin").val())
+            }
+            else {
+                secondmonFin=0
+            }
+            if ($("#tmonthrel").val() == 0) {
+                thirdmonFin = covert_empty($("#thirdmonFin").val())
+            }
+            else {
+                thirdmonFin=0   
+            }
+
+            var sumallocation = parseFloat(Number(firstmonFin) + Number(secondmonFin) + Number(thirdmonFin)).toFixed(2)
+            var balapp = parseFloat(Number(app) - (Number(tallocation) + Number(sumallocation))).toFixed(2)
+            $("#appbal_temp").val(0)
+            if ( balapp < 0 ){
+                swal("Warning", "Insufficient balance, please check the amount you've entered!", "warning")
+                $("#firstmonFin").val(MoneyFormatWithDecimal($("#firstmonFin_temp").val()))
+                $("#secondmonFin").val(MoneyFormatWithDecimal($("#secondmonFin_temp").val()))
+                $("#thirdmonFin").val(MoneyFormatWithDecimal($("#thirdmonFin_temp").val()))
+                $("#appbal_temp").val(1)
+            }
+        }
+        
+</script>
+
+<h2 style="font-size:18px;font-weight:bold"><span class="fa fa-file-archive"></span> Detailed Financial and Physical Performance Target (Approval) </h2>
+
+@*<font size="3"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>Note:</strong> You can generate report with or without Office </font>*@
+<br />
+
+<div style="float: left;margin-right:10px;margin-top:2px;">
+    <label style="float:left;margin-left: 108px;">
+        Office    :
+    </label>
+</div>
+<div style="float:left;margin-left:4px;width:500px">
+    @(Html.Kendo().ComboBox()
+            .Name("office")
+            .DataTextField("offname")
+            .DataValueField("OfficeID")
+            .AutoBind(true)
+            .Placeholder("Select Office...")
+            .Filter("contains")
+            .MinLength(3)
+           // .Events(e => e.Select("fnOffice"))
+            .SelectedIndex(0)
+            .HtmlAttributes(new { style = "width:100%; height:100%", @class = "form-control autoselect" })
+            .DataSource(source =>
+            {
+                source.Read(read =>
+                {
+                    read.Action("GetOfficeWFPSubmit", "Report").Data("getyear");
+                })
+            .ServerFiltering(false);
+            })
+    )
+</div>
+
+
+<div style="float: left;margin-right:10px;margin-top:10px;">
+    <label style="float:left;margin-left: 50px;">
+        Expense Class    :
+    </label>
+</div>
+<div style="float:left;margin-left:4px;width:500px;margin-top:10px;">
+    @(Html.Kendo().ComboBox()
+                .Name("ooe_id")
+                .DataTextField("OOEName")
+                .DataValueField("OOEID")
+                .AutoBind(true)
+                .Placeholder("Select expense class...")
+                .Filter("contains")
+                .MinLength(3)
+                .Events(e => e.Select("fnooeid"))
+                .SelectedIndex(-1)
+                .HtmlAttributes(new { style = "width:100%; height:100%", @class = "form-control autoselect" })
+                .DataSource(source =>
+                {
+                    source.Read(read =>
+                    {
+                        read.Action("dp_OOE", "Dropdowns");
+                    })
+                    .ServerFiltering(false);
+                })
+    )
+</div>
+
+
+<div style="float: left;margin-right:10px;margin-top:10px;">
+    <label style="float:left;margin-left: 120px;">
+        Year    :
+    </label>
+</div>
+<div style="float:left;margin-left:4.5px;width:100px;margin-top:10px;">
+    @(Html.Kendo().ComboBox()
+                .Name("TYear")
+                .DataTextField("ProposalYear")
+                .DataValueField("ProposalYear")
+                .SelectedIndex(0)
+                .Events(e => e.Select("fnyear"))
+                .HtmlAttributes(new { style = "width:100%; height:100%", @class = "form-control autoselect" })
+
+                .DataSource(source => source.Read(read => read.Action("GetWFPYear", "PYear")))
+    )
+
+</div>
+
+<div style="float: left;margin-right:10px;margin-top:13px;">
+    <label style="float:left;margin-left: 50px;">
+        Period    :
+    </label>
+</div>
+<div style="float:left;margin-left:26px;width:150px;margin-top:10px;">
+    @(Html.Kendo().DropDownList()
+                .Name("quarter")
+                .DataTextField("Text")
+                .DataValueField("Value")
+                //.Events(e => e.Change("change"))
+                .Events(e => e.Select("fnquarter"))
+                .BindTo(new List<SelectListItem>() {
+                    new SelectListItem() {
+                        Text = "1st Quarter",
+                        Value = "1"
+                    },
+                    new SelectListItem() {
+                        Text = "2nd Quarter",
+                        Value = "2"
+                    },
+                    new SelectListItem() {
+                        Text = "3rd Quarter",
+                        Value = "3"
+                    },
+                    new SelectListItem() {
+                        Text = "4th Quarter",
+                        Value = "4"
+                    }
+                })
+                .Value(@ViewBag.MonthVaue)
+                .HtmlAttributes(new { style = "width:100%; height:100%", @class = "form-control autoselect" })
+                .SelectedIndex(0)
+    )
+</div>
+
+<div style="float:left;margin-top:60px;margin-right:525px;">
+    <div class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 120px;float:left;border-style:solid;border-width:1px; margin-top: 20px; margin-left:0px;margin-top:-30px; margin-bottom:0px" title="Click to view list of submitted dfppt!" onclick="vwsubmitdfppt()"><span class="fa fa-send"></span> Submitted</div>
+    <div class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 120px;float:left;border-style:solid;border-width:1px; margin-top: 20px; margin-left:120px;margin-top:-30px; margin-bottom:0px" title="Click to view list of approved dfppt!" onclick="vwapprovedfppt()"><span class="fa fa-thumbs-o-up"></span> Approved</div>
+    <div class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 128px;float:left;border-style:solid;border-width:1px; margin-top: 20px; margin-left:240px;margin-top:-30px; margin-bottom:0px" title="Click to view release history!" onclick="vwrelease()"><span class="fa fa-history"></span> Release History</div>
+</div>
+<div id="searchAccountid" style="height: 30px; margin-top: -32px; float: right; margin-left: 200px;">
+    <input type="text" style="width:306px;border-collapse:collapse;margin:0px;border-style:solid;margin-left:0px;height:70%;outline:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search account..." id="searchaccountsubmit" name="searchaccountsubmit">
+    <div class="k-button k-button-icontext" style="height:30px;width:40px;border-style:solid;" onclick="searchaccountsubmit()"><span class="mif-search"></span></div>
+</div>
+<div style="width:100%;float:left;margin-top:0px;">
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.WFPSubmitted>()
+        .Name("dffptconsol")
+        .HtmlAttributes(new { style = "height:450px;" })
+        .Scrollable()
+        .Columns(col =>
+        {
+        col.Template(@<text></text>)
+                @*.Hidden()*@
+            .HeaderTemplate(@<text>No.</text>)
+            .Width(40)
+            .HtmlAttributes(new { style = "text-align:center;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            @*.HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal"})*@
+            .ClientTemplate("<div>#=trnno# </div>");
+    //id = 'deleteid#=release_id#'
+        col.Template(@<text></text>)
+            .ClientTemplate("<input id='check#=transno#' type='checkbox'  class='checkbox'/>")
+            .Title("<input onclick=CheckAll(this) type='checkbox'  class='checkbox'/> <span style='text - align:center; vertical - align:middle; height: 30px; background - color:#ff6a00;font-size:14px;color:beige;font-weight:100;'>Approve</span> ")
+            .Width(105)
+            //  .HeaderTemplate(@<text>For Review</text>)
+            .HtmlAttributes(new { style = "text-align:center;height:30px" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" });
+        col.Template(@<text></text>)
+            .HeaderTemplate(@<text>Account</text>)
+            .Width(280)
+            .HtmlAttributes(new { style = "text-align:left;" })
+            //.HeaderH  tmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;", @class = "metro-header" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=objectexpenditure# </div>");
+
+        col.Template(@<text></text>)
+                    .HeaderTemplate(@<text>Appropriation</text>)
+                    .Width(150)
+                    .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                    .ClientTemplate("<div>#=kendo.toString(Appropriation,'c2')# </div>");
+        col.Template(@<text></text>)
+                    .HeaderTemplate(@<text>Appropriation Net</text>)
+                    .Hidden()
+                    .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                    .ClientTemplate("<div>#=kendo.toString(AppropriationNet,'c2')# </div>");
+        col.Template(@<text></text>)
+                    .HeaderTemplate(@<text>Reserve</text>)
+                    .Width(150)
+                    .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                    .ClientTemplate("<div>#=kendo.toString(Reserved,'c2')# </div>");
+        col.Template(@<text></text>)
+                    .HeaderTemplate(@<text>Net Program</text>)
+                    .Hidden()
+                    .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                    .ClientTemplate("<div>#=kendo.toString(Netprogram,'c2')# </div>");
+        col.Template(@<text></text>)
+                    .HeaderTemplate(@<text>1st Month</text>)
+                    .Width(150)
+                    .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                    .ClientTemplate("<div>#=kendo.toString(Firstmonth,'c2')# </div>");
+        col.Template(@<text></text>)
+                    .HeaderTemplate(@<text>2nd Month</text>)
+                    .Width(150)
+                    .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                    .ClientTemplate("<div>#=kendo.toString(Secondmonth,'c2')# </div>");
+        col.Template(@<text></text>)
+                    .HeaderTemplate(@<text>3rd Month</text>)
+                        .Width(150)
+                        .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                        .ClientTemplate("<div>#=kendo.toString(Thirdmonth,'c2')# </div>");
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text>Performance Indicator</text>)
+                        .Width(280)
+                        .HtmlAttributes(new { style = "text-align:left;" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                        .ClientTemplate("<div>#=MFO# </div>");
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text>Physical Target1</text>)
+                        .Width(280)
+                        .HtmlAttributes(new { style = "text-align:left;" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                        .ClientTemplate("<div>#=PTFirstmonth# </div>");
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text>Physical Target2</text>)
+                        .Width(280)
+                        .HtmlAttributes(new { style = "text-align:left;" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                        .ClientTemplate("<div>#=PTSecondmonth# </div>");
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text>Physical Target3</text>)
+                        .Width(280)
+                        .HtmlAttributes(new { style = "text-align:left;" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                        .ClientTemplate("<div>#=PTThirdmonth# </div>");
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text></text>)
+                        .Width(0)
+                        .HtmlAttributes(new { style = "text-align:left;" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                        .ClientTemplate("<div>#=officeid# </div>");
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text></text>)
+                      .Width(0)
+                        .HtmlAttributes(new { style = "text-align:left;" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                        .ClientTemplate("<div>#=programid# </div>");
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text></text>)
+                       .Width(0)
+                        .HtmlAttributes(new { style = "text-align:left;" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                        .ClientTemplate("<div>#=accountid# </div>");
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text></text>)
+                        .Hidden()
+                        .HtmlAttributes(new { style = "text-align:left;" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                        .ClientTemplate("<div>#=officemfo# </div>");
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text></text>)
+                        .Hidden()
+                        .HtmlAttributes(new { style = "text-align:left;" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                        .ClientTemplate("<div>#=qtr# </div>");
+        col.Template(@<text></text>)
+                    .HeaderTemplate(@<text>first month rel</text>)
+                    .Hidden()
+                    .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                    .ClientTemplate("<div>#=kendo.toString(firstmonth_rel,'c2')# </div>");
+        col.Template(@<text></text>)
+                    .HeaderTemplate(@<text>second month rel</text>)
+                    .Hidden()
+                    .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                    .ClientTemplate("<div>#=kendo.toString(secondmonth_rel,'c2')# </div>");
+        col.Template(@<text></text>)
+                    .HeaderTemplate(@<text>third month rel</text>)
+                    .Hidden()
+                    .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                    .ClientTemplate("<div>#=kendo.toString(thirdmonth_rel,'c2')# </div>");
+         col.Bound(c => c.transno)
+                    .HeaderTemplate(@<text>transaction no.</text>)
+                    .Hidden()
+                    .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                    .ClientTemplate("<div>#=transno#</div>");
+         col.Bound(c => c.approve)
+                    .HeaderTemplate(@<text>approve tag</text>)
+                    .Hidden()
+                    .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" });
+                    //.ClientTemplate("<div>#=transno#</div>");
+
+
+        })
+        .ToolBar(toolbar =>
+        {
+            toolbar.Custom().Text("<span id='spanthumbsup' class='fa fa-thumbs-o-up'> </span><span id='SpanOnApproveProgress' style='display:none' class='fa fa-spinner fa-spin'></span> Approve Checked Accounts").Name("btnApprove").Url("javascript:void(0)").HtmlAttributes(new { onclick = "btnApprove()" });
+            // toolbar.Save();
+        })
+            .Editable(editable => editable.Mode(GridEditMode.InCell))
+            .Pageable(pageable => pageable
+            .Refresh(true)
+            .ButtonCount(2))
+            .Selectable()
+            .Resizable(s => s.Columns(true))
+            .Events(e => e.Change("WFPgridsubmit").DataBound("onDataBound"))
+            .DataSource(dataSource => dataSource
+            .Ajax()
+            .Batch(true)
+            .Model(m => m.Id(i => i.trnno))
+            .ServerOperation(false)
+
+
+            //.Aggregates(a =>
+            //{
+            //    a.Add(c => c.Amount).Sum();
+            //})
+            .PageSize(1000)
+            .Read(read => read.Action("GetDfpptSubmitted", "Report").Data("getParam"))
+            .Update("UpdateProposedAccount", "Home"))
+            )
+    
+</div>
+
+<div style="width:765px;float:left;">
+    <div style="float: left;margin-right:10px;margin-top:10px;">
+        <label style="float:left;margin-left: 100px;">
+            Account    :
+        </label>
+    </div>
+    <div style="display:inline-block;margin-left:-4px;margin-top:10px;background-color:#17c3d5;height:30px;">
+        <span style="font-size:16px;font-weight:bold;vertical-align:middle;color:beige;margin-left:5px;margin-right:5px" id="selectaccountname"></span>
+    </div>
+</div>
+
+
+<div style="width:750px;float:left;margin-top:15px;">
+    <div style="float: left;margin-right:10px;margin-top:10px;">
+        <label style="float:left;margin-left: 124px;">
+            MFO    :
+        </label>
+    </div>
+    <div style="display:inline-block;margin-left:-2.5px">
+        <textarea id="mfoid2" name="mfoid2" value="" style="width:400px;"></textarea>
+    </div>
+</div>
+
+<div style="width:750px;float:left;margin-top:15px;">
+    <div style="float: left;margin-right:10px;margin-top:0px;">
+        <label style="float:left;margin-left: -2px;">
+            Performance Indicator    :
+        </label>
+    </div>
+    <div style="float:left;margin-left:-3px;width:457px;,margin-top:-10px">
+        <textarea id="mfoid" name="mfoid" value="" style="width:400px;"></textarea>
+    </div>
+</div>
+
+<div style="border-color:gray;border-width:1px;border-style:solid;width:757px;margin-top:20px;float:left">
+    <div style="background-color:#ff6a00;width:150px;margin-top:-15px;margin-left:10px;"><span style="font-size:15px;margin-left:5px;color:beige;font-style:italic">Financial Allocation</span></div>
+    <div style="width:400px;margin-top:5px;">
+        <div style="float: left;margin-left:-26px;margin-top:15px;">
+            <label style="float:left;margin-left: 50px;">
+                Net Appropriation    :
+            </label>
+        </div>
+        <div style="display:inline-block;margin-top:10px;margin-left:7.5px">
+            <input class="k-input" id="appropriation_orig" name="appropriation_orig" type="text" disabled style="width:150px;color:cornflowerblue;font-size:large;font-weight:bold" />
+        </div>
+    </div>
+    <div style="width:700px;margin-top:2px;margin-left:-2px;">
+        <div style="float: left;margin-right:-18px;margin-top:15px;">
+            <label style="float:left;margin-left: 46px;">
+                Total Allocation    :
+            </label>
+        </div>
+        <div style="display:inline-block;margin-top:10px;margin-left:25.5px">
+            <input class="k-input" id="totallocation" name="totallocation" type="text" disabled style="width:150px;color:green;font-size:large;font-weight:bold" />
+        </div>
+        <div style="float:right;margin-right:100px;margin-top:17px;">
+            <label>
+                Balance    :
+            </label>
+            <div style="float:right;margin-top:-30px;margin-left:70px">
+                <input class="k-input" id="appbal" name="appbal" type="text" disabled style="width:150px;color:indianred;font-size:large;font-weight:bold" />
+            </div>
+        </div>
+
+    </div>
+    <div style="border-color:gray;border-width:1px;border-style:dashed;width:757px;margin-top:10px;float:left"></div>
+    <div style="width:575px;margin-top:2px;">
+        <div style="float: left;margin-right:10px;margin-top:15px;">
+            <label style="float:left;margin-left: 72px;">
+                First Month    :
+            </label>
+        </div>
+        <div style="display:inline-block;margin-top:10px;margin-left:-1.5px">
+            <input class="k-input" id="firstmonFin" name="firstmonFin" type="text" onkeyup="sync()" style="width:150px;font-size:large" />
+            <div class="k-button k-button-icontext" style="background-color:indianred;border-radius:7px;" title="Click to add denomination!" onclick="addbreakdown(1)"><span class="fa fa-plus" style="color:white"></span></div>
+            <div class="k-button k-button-icontext" style="background-color:cornflowerblue;border-radius:7px;" title="Click to view the PPMP details!" onclick="vwppmplist(1)"><span class="fa fa-list" style="color:white"></span></div>
+            <input type="checkbox" style="zoom:1.2" title="Check the box to release this period!" id="firstmon_check" onclick="firstmon_check()" value="0" />
+            <div class="k-button k-button-icontext" id="setreleased_first" style="background-color:#097118;border-radius:7px;" title="Click to set as released amount!" onclick="linktorelease(1)"><span class="fa fa-thumbs-up" style="color:white"> Set as Released</span></div>
+        </div>
+    </div>
+
+    <div style="width:575px;margin-top:2px;">
+        <div style="float: left;margin-right:10px;margin-top:15px;">
+            <label style="float:left;margin-left: 48px;">
+                Second Month    :
+            </label>
+        </div>
+        <div style="display:inline-block;margin-top:10px;margin-left:0px">
+            <input class="k-input" id="secondmonFin" name="secondmonFin" type="text" onkeyup="sync()" style="width:150px;font-size:large" />
+            <div class="k-button k-button-icontext" style="background-color:indianred;border-radius:7px;" title="Click to add denomination!" onclick="addbreakdown(2)"><span class="fa fa-plus" style="color:white"></span></div>
+            <div class="k-button k-button-icontext" style="background-color:cornflowerblue;border-radius:7px;" title="Click to view the PPMP details!" onclick="vwppmplist(2)"><span class="fa fa-list" style="color:white"></span></div>
+            <input type="checkbox" style="zoom:1.2" title="Check the box to release this period!" id="secondmon_check" onclick="secondmon_check()" value="0" />
+            <div class="k-button k-button-icontext" id="setreleased_second" style="background-color:#097118;border-radius:7px;" title="Click to set as released amount!" onclick="linktorelease(2)"><span class="fa fa-thumbs-up" style="color:white"> Set as Released</span></div>
+        </div>
+    </div>
+
+    <div style="width:575px;margin-top:2px;margin-bottom:10px;">
+        <div style="float: left;margin-right:10px;margin-top:15px;">
+            <label style="float:left;margin-left: 63.5px;">
+                Third Month    :
+            </label>
+        </div>
+        <div style="display:inline-block;margin-top:10px;margin-left:0px">
+            <input class="k-input" id="thirdmonFin" name="thirdmonFin" type="text" onkeyup="sync()" style="width:150px;font-size:large" />
+            <div class="k-button k-button-icontext" style="background-color:indianred;border-radius:7px;" title="Click to add denomination!" onclick="addbreakdown(3)"><span class="fa fa-plus" style="color:white"></span></div>
+            <div class="k-button k-button-icontext" style="background-color:cornflowerblue;border-radius:7px;" title="Click to view the PPMP details!" onclick="vwppmplist(3)"><span class="fa fa-list" style="color:white"></span></div>
+            <input type="checkbox" style="zoom:1.2" title="Check the box to release this period!" id="thirdmon_check" onclick="thirdmon_check()" value="0" />
+            <div class="k-button k-button-icontext" id="setreleased_third" style="background-color:#097118;border-radius:7px;" title="Click to set as released amount!" onclick="linktorelease(3)"><span class="fa fa-thumbs-up" style="color:white"> Set as Released</span></div>
+        </div>
+    </div>
+    <div>
+    <div style="width:705px;margin-top:18px">
+        <label style="float:left;margin-left: 113.5px;">
+            Batch    :
+        </label>
+        </div>
+        <div style="float:right;margin-right:506px;margin-top:-5px;margin-bottom:10px">
+            <input class="k-input" id="batchno" name="batchno" type="number" min="1" value="1" style="width:75px;font-size:medium;text-align:center" />
+        </div>
+        <div style="float:right;margin-right:-450px;width:100px;margin-top:5px;margin-bottom:0px">
+            <div  class="k-button k-button-icontext" style="border-radius:50px;background-color:cornflowerblue;color:white;width:110px;" onclick="releasedfppt()"><span class="fa fa-thumbs-up"></span> Release</div>
+        </div>
+    </div>
+    <div style="display:inline-block;margin-left:10px">
+        <label>
+         <span style="font-size:14px;">   NOTE : </span><span style="font-size:11px;background-color:indianred;color:white"> Field(s) colored with red is/are the released amount! </span>
+        </label>
+    </div>
+</div>
+<div style="border-color:gray;border-width:1px;border-style:solid;width:757px;margin-top:20px;float:left">
+    <div style="background-color:#ff6a00;width:120px;margin-top:-15px;margin-left:10px;"><span style="font-size:15px;margin-left:5px;color:beige;font-style:italic">Physical Target</span></div>
+    <div style="width:600px;margin-top:5px;">
+        <div style="float: left;margin-right:10px;margin-top:15px;">
+            <label style="float:left;margin-left: 70px;">
+                First Month    :
+            </label>
+        </div>
+        <div style="display:inline-block;margin-top:10px;margin-left:0px">
+            <input class="k-input" id="firstmon" name="firstmon" type="text" style="width:400px;" />
+        </div>
+    </div>
+
+    <div style="width:600px;margin-top:2px;">
+        <div style="float: left;margin-right:10px;margin-top:11px;">
+            <label style="float:left;margin-left: 47px;">
+                Second Month    :
+            </label>
+        </div>
+        <div style="display:inline-block;margin-top:10px;margin-left:0px">
+            <input class="k-input" id="secondmon" name="secondmon" type="text" style="width:400px;" />
+        </div>
+    </div>
+
+    <div style="width:600px;margin-top:2px;margin-bottom:15px;">
+        <div style="float: left;margin-right:10px;margin-top:10px;">
+            <label style="float:left;margin-left: 63px;">
+                Third Month    :
+            </label>
+        </div>
+        <div style="display:inline-block;margin-top:10px;margin-left:0px">
+            <input class="k-input" id="thirdmon" name="thirdmon" type="text" style="width:400px;" />
+        </div>
+    </div>
+</div>
+<div style="float:right;margin-right:187px;width:100px;margin-top:15px;margin-bottom:0px;">
+    <div class="k-button k-button-icontext" style="border-radius:50px;width:85px;" onclick="clearentry()"><span class="fa fa-eraser"></span> Clear</div>
+</div>
+<div style="display:none">
+    <input type="text" id="officeid" name="officeid" value="0" style="display:none;">
+    <input type="text" id="programid" name="programid" value="0" style="display:none;">
+    <input type="text" id="accountid" name="accountid" value="0" style="display:none;">
+    <input type="number" id="firstmonFin_temp" name="firstmonFin_temp" value="0" style="display:none;">
+    <input type="number" id="secondmonFin_temp" name="secondmonFin_temp" value="0" style="display:none;">
+    <input type="number" id="thirdmonFin_temp" name="thirdmonFin_temp" value="0" style="display:none;">
+    <input type="number" id="totalalloc" name="totalalloc" value="0" style="display:none;">
+    <input type="number" id="appropriation" name="appropriation" value="0" style="display:none;">
+    <input type="number" id="appropriationNet" name="appropriationNet" value="0" style="display:none;">
+    <input type="number" id="qtr" name="qtr" value="0" style="display:none;">
+    <input type="number" id="fmonthrel" name="fmonthrel" value="0" style="display:none;">
+    <input type="number" id="smonthrel" name="smonthrel" value="0" style="display:none;">
+    <input type="number" id="tmonthrel" name="tmonthrel" value="0" style="display:none;">
+    <input type="number" id="appbal_temp" name="appbal_temp" value="0" style="display:none;">
+    <input type="number" id="trnno" name="trnno" value="0" style="display:none;">
+    <input type="number" id="approvetag" name="approvetag" value="0" style="display:none;">
+    <input type="number" id="maintrnno" name="maintrnno" value="0" style="display:none;">
+    <input type="number" id="selmonth" name="selmonth" value="0" style="display:none;">
+</div>
+
+
+
+<script>
+
+        function releasedfppt() {
+            var firstmon_check= $("#firstmon_check").val()
+            var secondmon_check=$("#secondmon_check").val()
+            var thirdmon_check = $("#thirdmon_check").val()
+            var firstmonFin = covert_empty($("#firstmonFin").val())
+            var secondmonFin = covert_empty($("#secondmonFin").val())
+            var thirdmonFin =covert_empty( $("#thirdmonFin").val())
+            var qtr = $("#qtr").val()
+            var officeid=$("#officeid").val()
+            var programid=$("#programid").val()
+            var accountid= $("#accountid").val()
+            var TYear = $("#TYear").val()
+            var batchno = $("#batchno").val()
+            var trnno = $("#trnno").val()
+            var selmonth = $("#selmonth").val()
+
+            var url = "@Url.Action("Releasedfppt", "Report")";
+
+            sync()
+            if (firstmon_check == 0 && secondmon_check == 0 && thirdmon_check == 0) {
+                swal("Warning","Please check the checkbox beside the amount!","warning")
+            }
+            else if (document.getElementById("selectaccountname").innerHTML == "") {
+                swal("Warning", "Please select an account first!", "warning")
+            }
+            else if ($("#appbal_temp").val() == 1) {
+                swal("Warning", "Insufficient balance, please check the amount you've entered!", "warning")
+            }
+            else if ($("#selmonth").val() == 0) {
+                swal("Warning", "There is nothing to release!", "warning")
+            }
+            else {
+                swal({
+                    title: "Release amount?",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Release",
+                    closeOnConfirm: false,
+                    showLoaderOnConfirm: true
+                },
+                function (isConfirm) {
+
+                    if (isConfirm) {
+                      //  swal("Success", "Transaction has been released!", "success");
+                        $.get(url, { officeid: officeid, programid: programid, accountid: accountid, firstmon_check: firstmon_check, secondmon_check: secondmon_check, thirdmon_check: thirdmon_check, firstmonFin: firstmonFin, secondmonFin: secondmonFin, thirdmonFin: thirdmonFin, qtr: qtr, TYear: TYear, batchno: batchno, trnno: trnno }, function (e) {
+
+                            if (e == "Success") {
+
+                                swal("Success", "Transaction has been released!", "success");
+                                fnquarter()
+                            } else {
+                                swal("Error", e, "error");
+                            }
+                        });
+
+                    }
+                });
+            }
+        }
+        function firstmon_check() {
+            if (document.getElementById("firstmon_check").checked) {
+                document.getElementById("firstmon_check").value = 1
+                if ($("#quarter").val() == 1) {
+                    $("#selmonth").val(1)
+                }
+                else if ($("#quarter").val() == 2) {
+                    $("#selmonth").val(4)
+                }
+                else if ($("#quarter").val() == 3) {
+                    $("#selmonth").val(7)
+                }
+                else {
+                    $("#selmonth").val(10)
+                }
+                getbatchno()
+            } else {
+                document.getElementById("firstmon_check").value = 0
+                $("#selmonth").val(0)
+            }
+            sync()
+        }
+        function secondmon_check() {
+            if (document.getElementById("secondmon_check").checked) {
+                document.getElementById("secondmon_check").value = 1
+                if ($("#quarter").val() == 1) {
+                    $("#selmonth").val(2)
+                }
+                else if ($("#quarter").val() == 2) {
+                    $("#selmonth").val(5)
+                }
+                else if ($("#quarter").val() == 3) {
+                    $("#selmonth").val(8)
+                }
+                else {
+                    $("#selmonth").val(11)
+                }
+                getbatchno()
+            } else {
+                document.getElementById("secondmon_check").value = 0
+                $("#selmonth").val(0)
+            }
+            sync()
+        }
+        function thirdmon_check() {
+            if (document.getElementById("thirdmon_check").checked) {
+                document.getElementById("thirdmon_check").value = 1
+                if ($("#quarter").val() == 1) {
+                    $("#selmonth").val(3)
+                }
+                else if ($("#quarter").val() == 2) {
+                    $("#selmonth").val(6)
+                }
+                else if ($("#quarter").val() == 3) {
+                    $("#selmonth").val(9)
+                }
+                else {
+                    $("#selmonth").val(12)
+                }
+                getbatchno()
+            } else {
+                document.getElementById("thirdmon_check").value = 0
+                $("#selmonth").val(0)
+            }
+            sync()
+        }
+        //$(document).read(function (){
+        //    $("#dffptconsol").data("kendoGrid").dataSource.read();
+        //})
+
+        function getyear() {
+            return {
+                tyear: $("#TYear").val()
+            }
+        }
+        function WFPgridsubmit() {
+
+            var entityGrid = $("#dffptconsol").data("kendoGrid");
+            var selectedItem = entityGrid.dataItem(entityGrid.select());
+
+            $("#fmonthrel").val(selectedItem.firstmonth_rel)
+            $("#smonthrel").val(selectedItem.secondmonth_rel)
+            $("#tmonthrel").val(selectedItem.thirdmonth_rel)
+
+            $("#mfoid").val(selectedItem.MFO);
+            $("#firstmon").val(selectedItem.PTFirstmonth);
+            $("#secondmon").val(selectedItem.PTSecondmonth);
+            $("#thirdmon").val(selectedItem.PTThirdmonth);
+            $("#officeid").val(selectedItem.officeid);
+            $("#programid").val(selectedItem.programid);
+            $("#accountid").val(selectedItem.accountid);
+            $("#mfoid2").val(selectedItem.officemfo);
+            $("#trnno").val(selectedItem.transno);
+            $("#approvetag").val(selectedItem.approve)
+            $("#maintrnno").val(selectedItem.transno);
+
+            if ($("#fmonthrel").val() == 0) {
+                $("#firstmonFin").val(MoneyFormatWithDecimal(selectedItem.Firstmonth));
+                $("#firstmonFin").css('background-color', 'white')
+                $("#firstmonFin").css('color', 'black')
+                if ($("#approvetag").val() == 1) {
+                    $("#firstmon_check").show();
+                    $("#setreleased_first").show();
+                }
+                else {
+                    $("#firstmon_check").hide();
+                    $("#setreleased_first").hide();
+                }
+            }
+            else {
+                $("#firstmonFin").val(MoneyFormatWithDecimal(selectedItem.firstmonth_rel));
+                $("#firstmonFin").css('background-color', 'indianred')
+                $("#firstmonFin").css('color', 'white')
+                $("#firstmon_check").hide();
+                $("#setreleased_first").hide();
+            }
+            if ($("#smonthrel").val() == 0) {
+                $("#secondmonFin").val(MoneyFormatWithDecimal(selectedItem.Secondmonth));
+                $("#secondmonFin").css('background-color', 'white')
+                $("#secondmonFin").css('color', 'black')
+                if ($("#approvetag").val() == 1) {
+                    $("#secondmon_check").show();
+                    $("#setreleased_second").show();
+                }
+                else {
+                    $("#secondmon_check").hide();
+                    $("#setreleased_second").hide();
+                }
+            }
+            else {
+                $("#secondmonFin").val(MoneyFormatWithDecimal(selectedItem.secondmonth_rel));
+                $("#secondmonFin").css('background-color', 'indianred')
+                $("#secondmonFin").css('color', 'white')
+                $("#secondmon_check").hide();
+                $("#setreleased_second").hide();
+            }
+            if ($("#tmonthrel").val() == 0) {
+                $("#thirdmonFin").val(MoneyFormatWithDecimal(selectedItem.Thirdmonth));
+                $("#thirdmonFin").css('background-color', 'white')
+                $("#thirdmonFin").css('color', 'black')
+                if ($("#approvetag").val() == 1) {
+                    $("#thirdmon_check").show();
+                    $("#setreleased_third").show();
+                }
+                else {
+                    $("#thirdmon_check").hide();
+                    $("#setreleased_third").hide();
+                }
+            }
+            else {
+                $("#thirdmonFin").val(MoneyFormatWithDecimal(selectedItem.thirdmonth_rel));
+                $("#thirdmonFin").css('background-color', 'indianred')
+                $("#thirdmonFin").css('color', 'white')
+                $("#thirdmon_check").hide();
+                $("#setreleased_third").hide();
+            }
+
+            $("#appropriation").val(selectedItem.AppropriationNet);
+            $("#appropriation_orig").val(MoneyFormatWithDecimal(selectedItem.AppropriationNet));
+            $("#firstmonFin_temp").val(selectedItem.Firstmonth);
+            $("#secondmonFin_temp").val(selectedItem.Secondmonth);
+            $("#thirdmonFin_temp").val(selectedItem.Thirdmonth);
+            $("#appropriationNet").val(selectedItem.AppropriationNet);
+            $("#qtr").val(selectedItem.qtr)
+
+             
+            document.getElementById("selectaccountname").innerHTML=selectedItem.objectexpenditure
+
+            var qtr=$("#quarter").val();
+
+            var url = "@Url.Action("totalallocation", "Report")";
+
+            $.get(url, { programid: selectedItem.programid, accountid: selectedItem.accountid, transyear: $("#TYear").val(), qtr: qtr, trnno: selectedItem.transno,selmon:0 }, function (e) {
+                $("#totalalloc").val(e.TotaldenoAmount)
+                $("#totallocation").val(MoneyFormatWithDecimal(e.TotaldenoAmount));
+                var appbal = parseFloat(Number(selectedItem.AppropriationNet) - Number(e.TotaldenoAmount)).toFixed(2)
+                $("#appbal").val(MoneyFormatWithDecimal(appbal));
+            })
+        }
+        function clearentry(){
+            $("input[type=number]").val("");
+            $("#firstmon").val("")
+            $("#secondmon").val("")
+            $("#thirdmon").val("")
+            $("#appropriation").val(0)
+            $("#appropriation_orig").val("0.00")
+            $("#totallocation").val("0.00")
+            $("#appbal").val("0.00")
+            $("#firstmonFin").val("0.00")
+            $("#secondmonFin").val("0.00")
+            $("#thirdmonFin").val("0.00")
+            $("#mfoid#ExcessDescription").val("");
+            $("#mfoid").val("");
+            $("#mfoid2").val("");
+            document.getElementById("selectaccountname").innerHTML = "";
+            $("input[type=checkbox]").prop("checked", false)
+            $("input[type=checkbox]").val(0)
+            $("#firstmon_check").show()
+            $("#secondmon_check").show()
+            $("#thirdmon_check").show()
+
+            $("#firstmonFin").css('background-color', 'white')
+            $("#firstmonFin").css('color', 'black')
+            $("#secondmonFin").css('background-color', 'white')
+            $("#secondmonFin").css('color', 'black')
+            $("#thirdmonFin").css('background-color', 'white')
+            $("#thirdmonFin").css('color', 'black')
+
+            $("#appbal_temp").val(0)
+            $("#batchno").val(1)
+        }
+
+        function Close() {
+            //$('#GeneralFund_Grid').data('kendoGrid').dataSource.read();
+            //acc_availble_mount();
+        }
+        function vwrelease() {
+
+            $(window).scrollTop(0);
+            var url = "@Url.Action("dfpptrelease", "Release")";
+            var office = $("#office").val();
+            var ooeid=$("#ooe_id").val()
+            var tyear = $("#TYear").val();
+            var qtr=$("#quarter").val()
+
+            $.get(url,
+                {
+                    office: office,
+                    tyear: tyear,
+                    ooeid: ooeid,
+                    qtr: qtr
+                },function (d) {
+                $('#vwrelease_wndow').html(d);
+            })
+
+            $('#vwrelease_wndow').data('kendoWindow').title("<i class='fa fa-navicon'> Release</i>").center().open();
+        }
+        function vwsubmitdfppt(){
+
+            $(window).scrollTop(0);
+            var url = "@Url.Action("dfpptlistPerOffice", "Report")";
+            var office=$("#office").val();
+            var ooeid=$("#ooe_id").val()
+            var tyear = $("#TYear").val();
+            var qtr=$("#quarter").val()
+
+            $.get(url,
+                {
+                    office: office,
+                    tyear: tyear,
+                    id: 1,
+                    ooeid:ooeid,
+                    qtr: qtr
+                },
+            function (d) {
+                $('#dffptsubmittedPerOffice').html(d);
+            })
+
+            $('#dffptsubmittedPerOffice').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Submitted").center().open();
+        }
+
+    function vwapprovedfppt() {
+
+        $(window).scrollTop(0);
+        var url = "@Url.Action("dfpptapprove", "Report")";
+        var office=$("#office").val();
+        var ooeid=$("#ooe_id").val()
+        var tyear = $("#TYear").val();
+        var qtr=$("#quarter").val()
+
+        $.get(url,
+            {
+                office: office,
+                tyear: tyear,
+                id: 1,
+                ooeid:ooeid,
+                qtr: qtr
+            },
+        function (d) {
+            $('#dffptapproved').html(d);
+        })
+
+        $('#dffptapproved').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Approved").center().open();
+    }
+    function vwppmplist(id){
+        $(window).scrollTop(0);
+        var url = "@Url.Action("getppmpdetailsconsol", "Report")";
+        var office=$("#office").val();
+        var ooeid=$("#ooe_id").val()
+        var tyear = $("#TYear").val();
+        var qtr=$("#quarter").val()
+        var accountid= $("#accountid").val();
+        $.get(url,
+            {
+                office: office,
+                tyear: tyear,
+                id: id,
+                ooeid:ooeid,
+                qtr: qtr,
+                accountid:accountid
+            },
+        function (d) {
+            $('#ppmpdetailsconsol').html(d);
+        })
+
+        $('#ppmpdetailsconsol').data('kendoWindow').title("<i class='fa fa-navicon'> </i> PPMP denomination").center().open();
+    }
+    function addbreakdown(id){
+        $(window).scrollTop($(window).height - $(window).width + 100)
+
+        var url = "@Url.Action("addofficebreakdown_consol", "Report")";
+        var office=$("#office").val();
+        var ooeid=$("#ooe_id").val()
+        var tyear = $("#TYear").val();
+        var qtr=$("#quarter").val()
+        var programid=$("#programid").val();
+        var accountid= $("#accountid").val();
+        var maintrnno=$("#maintrnno").val();
+        $.get(url,
+            {
+                office: office,
+                tyear: tyear,
+                id: id,
+                ooeid:ooeid,
+                qtr: qtr,
+                programid:programid,
+                accountid:accountid,
+                maintrnno:maintrnno
+            },
+        function (d) {
+            $('#addbrekdownform_consol').html(d);
+        })
+
+        $('#addbrekdownform_consol').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Denomination").center().open();
+    }
+    function linktorelease(id) {
+        var firstmonFin = covert_empty($("#firstmonFin").val())
+        var secondmonFin = covert_empty($("#secondmonFin").val())
+        var thirdmonFin = covert_empty($("#thirdmonFin").val())
+        var qtr = $("#qtr").val()
+        var officeid = $("#officeid").val()
+        var programid = $("#programid").val()
+        var accountid = $("#accountid").val()
+        var TYear = $("#TYear").val()
+        var trnno = $("#trnno").val()
+
+        var url = "@Url.Action("setReleasedfppt", "Report")";
+        swal({
+            title: "Set release amount?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes",
+            closeOnConfirm: false,
+            showLoaderOnConfirm: true
+        },
+                function (isConfirm) {
+
+                    if (isConfirm) {
+                        $.get(url, { officeid: officeid, programid: programid, accountid: accountid, firstmonFin: firstmonFin, secondmonFin: secondmonFin, thirdmonFin: thirdmonFin, qtr: qtr, TYear: TYear, trnno: trnno, id: id }, function (e) {
+                            if (e == "Success") {
+                                swal("Success", "Amount has been set to released!", "success");
+                                fnquarter()
+                            } else {
+                                swal("Error", e, "error");
+                            }
+                        });
+
+                    }
+                });
+    }
+    function Close() {
+    }
+
+    function getbatchno() {
+        var url = "@Url.Action("numeric_des", "Release")";
+
+        var office_id = $("#office").val();
+        var program_id = $("#programid").val();
+        var account_id = $("#accountid").val();
+        var year_ = $("#TYear").val();
+        var selmonth = $("#selmonth").val();
+
+        if (account_id == null || account_id == 0 || account_id == "" || account_id == ''
+            || program_id == null || program_id == 0 || program_id == "" || program_id == ''
+            ) {
+            $.get(url, { office_id: office_id, program_id: 0, account_id: 0, year_: year_, month_: selmonth }, function (d) {
+
+                if (d == null || d == 0 || d == "" || d == '') {
+                    $("#batchno").val(1);
+                }
+                else {
+                    $("#batchno").val(d);
+                }
+            })
+        } else {
+            $.get(url, { office_id: office_id, program_id: program_id, account_id: account_id, year_: year_, month_: selmonth }, function (d) {
+                if (d == null || d == 0 || d == "" || d == '') {
+                    $("#batchno").val(1);
+                }
+                else {
+                    $("#batchno").val(d);
+                }
+            })
+        }
+    }
+</script>
+
+@(Html.Kendo().Window()
+        .Name("vwrelease_wndow")
+        //.Title("")
+        .Width(1010)
+        .Height(552)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+          .Events(e => e.Close("Close"))
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+        .Actions(a => { a.Close(); })
+)
+@(Html.Kendo().Window()
+        .Name("dffptsubmittedPerOffice")
+        //.Title("")
+        .Width(1200)
+        .Height(572)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+          .Events(e => e.Close("Close"))
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+                .Actions(a => { a.Close(); })
+)
+@(Html.Kendo().Window()
+        .Name("dffptapproved")
+        //.Title("")
+        .Width(1200)
+        .Height(580)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+          .Events(e => e.Close("Close"))
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+                .Actions(a => { a.Close(); })
+)
+@(Html.Kendo().Window()
+        .Name("ppmpdetailsconsol")
+        //.Title("")
+        .Width(900)
+        .Height(552)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+          .Events(e => e.Close("Close"))
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+                .Actions(a => { a.Close(); })
+)
+@(Html.Kendo().Window()
+        .Name("addbrekdownform_consol")
+        //.Title("")
+        .Width(1000)
+        .Height(720)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+          .Events(e => e.Close("Close"))
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+                .Actions(a => { a.Close(); })
+)
+<style>
+    .pageContent {
+        border: 1px solid #dadada;
+        padding: 5px;
+        margin-top: 7px;
+        height: 1425px;
+        background-color: #fff;
+        padding: 10px;
+    }
+</style>

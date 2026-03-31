@@ -1,0 +1,312 @@
+﻿@model iFMIS_BMS.BusinessLayer.Models.PMISUserModel
+
+@{
+    ViewBag.Title = "Users";
+}
+
+<script>
+    @*$(document).ready(function () {
+        var eid = $('#ddlEmployees').val();
+        var url = "@Url.Action("ddlUserType", "User")";
+
+        //$.post(url, { eid: eid }, function (d) {
+        //    $("#ddlUserType").data("kendoDropDownList").value(d);
+
+        //})
+
+    })*@
+    function getUserPar() {
+        return {
+            User_ID: '@Session["User_ID"]',
+            eid: '@Session["eid"]'
+        }
+    }
+    function reqSave(e) {
+            var Mode = document.getElementById("btnupdate").innerHTML;
+            var url = "@Url.Action("SaveUser", "User")";
+            var UserTypeID = $('#ddlUserType').val()
+            var eid = $('#ddlEmployees').val()      
+            var OfficeID = $("#ddlOffices").data("kendoComboBox").value()   
+            var MenuIDs = [];
+            var grid = $("#grdMenuList").data("kendoGrid")
+            var ds = grid.dataSource.view();
+            for (var i = 0; i < ds.length; i++) {
+                var row = grid.table.find("tr[data-uid='" + ds[i].uid + "']");
+                var checkbox = $(row).find(".checkbox");
+                if (checkbox.is(":checked")) {
+                    MenuIDs.push(11018);//for Dashbord Menu incase malimtan sa user ug check
+                    MenuIDs.push(ds[i].MenuID);
+                    MenuIDs.push(ds[i].MenuParent);
+                }
+            }
+            if (UserTypeID == null || eid == null || OfficeID == null || MenuIDs == "" || UserTypeID == "" || eid == "" || OfficeID == "") {
+                swal({ title: "Error!", text: "Please Select Office, Menu and User Type!", timer: 1000, showConfirmButton: false, type: "error" });
+            } else {
+
+                $.post(url, { UserTypeID: UserTypeID, eid: eid, OfficeID: OfficeID, MenuIDs: MenuIDs, Mode: Mode }, function (d) {
+                    if (d == 1) {
+                        swal({ title: "Success!", text: "Successfuly Added!", timer: 1000, showConfirmButton: false, type: "success" });
+                        $('#NewOfficeWindow').data('kendoWindow').close();
+                        $('#OfficeGrid').data('kendoGrid').dataSource.read();
+                    }
+                    else if(d == 2) {
+                        //swal({ title: "Success!", text: "Successfuly Updated!", timer: 1000, showConfirmButton: false, type: "success" });
+                        swal({ title: "Success!", text: "This function is under construction!", timer: 1000, showConfirmButton: false, type: "success" });
+                        $('#NewOfficeWindow').data('kendoWindow').close();
+                        $('#OfficeGrid').data('kendoGrid').dataSource.read();
+                    }
+                    else {
+                        swal({ title: "Error!", text: d, timer: 1000, showConfirmButton: false, type: "error" });
+                        $('#NewOfficeWindow').data('kendoWindow').close();
+                        $('#OfficeGrid').data('kendoGrid').dataSource.read();
+                    }
+                    
+                })
+            }
+    }
+
+    function loadRoles(e) {
+        $("#grdMenuList tbody input:checkbox").prop("checked", false);
+        var grid = $("#grdMenuList").data("kendoGrid")
+        var ds = grid.dataSource.data();
+        var UserTypeID = $('#ddlUserType').val()
+        var url = "@Url.Action("GetUserTypeMenu", "User")";
+        $.post(url, { UserTypeID: UserTypeID }, function (d) {
+            var i = 0
+            for ( i; i <= (d.length - 1) ; i++) {
+                var x = 0;
+                for (x; x < (ds.length) ; x++) {
+                    var row = grid.table.find("tr[data-uid='" + ds[x].uid + "']");
+                    var checkbox = $(row).find(".checkbox");
+                    if (ds[x].MenuID == d[i]) {
+                        checkbox.prop("checked", true);
+                    }
+
+                }
+                var x = 0;
+            }
+        })
+    }
+
+    function readEmp() {
+        var eid = $('#ddlEmployees').val()
+
+        return {
+            eid: eid
+
+        }
+    }
+    function CheckAll(e) {
+        $("#grdMenuList tbody input:checkbox").prop("checked", e.checked);
+    }
+    function OnCheckBoxClick(e) {
+        var grid = $("#grdMenuList").data("kendoGrid")
+        var ds = grid.dataSource.data();
+        var datasourceItemCount = grid.dataSource.total()
+        var isCheckAll = "";
+        for (var i = 0; i < datasourceItemCount; i++) {
+            var row = grid.table.find("tr[data-uid='" + ds[i].uid + "']");
+            var checkbox = $(row).find(".checkbox");
+            if (checkbox.is(":checked")) {
+                isCheckAll = "yes"
+            }
+        }
+        for (var i = 0; i < datasourceItemCount; i++) {
+            var row = grid.table.find("tr[data-uid='" + ds[i].uid + "']");
+            var checkbox = $(row).find(".checkbox");
+            if (checkbox.is(":checked")) {
+
+            }
+            else {
+                isCheckAll = "no"
+            }
+        }
+        if (isCheckAll == "yes") {
+            $("#grdMenuList thead input:checkbox").prop("checked", true);
+        }
+        else {
+            $("#grdMenuList thead input:checkbox").prop("checked", false);
+        }
+
+    }
+    function GetUserMenus() {
+        var eid = $('#ddlEmployees').val()
+        var UserTypeID = $('#ddlUserType').val()
+        var OfficeID = $("#ddlOffices").data("kendoComboBox").value()
+        var url = "@Url.Action("GetUserMenu", "User")";
+        var url2 = "@Url.Action("GetUserTypeMenu", "User")";
+        var grid = $("#grdMenuList").data("kendoGrid")
+        var ds = grid.dataSource.data();
+        if (eid != "" && UserTypeID != "" && OfficeID != "") {
+            $("#grdMenuList tbody input:checkbox").prop("checked", false);
+            $.post(url, { eid: eid, OfficeID: OfficeID, UserTypeID: UserTypeID }, function (d) {
+                if (d.length == 0) {
+                    document.getElementById("btnupdate").innerHTML = "Add"
+                    $('#ddlUserType').data("kendoDropDownList").enable();
+                    $.post(url2, { UserTypeID: UserTypeID }, function (d) {
+                        var i = 0
+                        for (i; i <= (d.length - 1) ; i++) {
+                            var x = 0;
+                            for (x; x < (ds.length) ; x++) {
+                                var row = grid.table.find("tr[data-uid='" + ds[x].uid + "']");
+                                var checkbox = $(row).find(".checkbox");
+                                if (ds[x].MenuID == d[i]) {
+                                    checkbox.prop("checked", true);
+                                }
+
+                            }
+                            var x = 0;
+                        }
+                    })
+                }
+                else {
+                    document.getElementById("btnupdate").innerHTML = "Update"
+                    $('#ddlUserType').data("kendoDropDownList").enable(false);
+                    $("#grdMenuList tbody input:checkbox").prop("checked", false);
+                    var i = 0
+                    for (i; i <= (d.length - 1) ; i++) {
+                        var x = 0;
+                        for (x; x < (ds.length) ; x++) {
+                            var row = grid.table.find("tr[data-uid='" + ds[x].uid + "']");
+                            var checkbox = $(row).find(".checkbox");
+                            if (ds[x].MenuID == d[i]) {
+                                checkbox.prop("checked", true);
+                            }
+
+                        }
+                        var x = 0;
+                    }
+                }
+            })
+        }
+        else {
+            $("#grdMenuList tbody input:checkbox").prop("checked", false);
+            var grid = $("#grdMenuList").data("kendoGrid")
+            var ds = grid.dataSource.data();
+            var UserTypeID = $('#ddlUserType').val()
+            var url = "@Url.Action("GetUserTypeMenu", "User")";
+            $.post(url, { UserTypeID: UserTypeID }, function (d) {
+                var i = 0
+                for ( i; i <= (d.length - 1) ; i++) {
+                    var x = 0;
+                    for (x; x < (ds.length) ; x++) {
+                        var row = grid.table.find("tr[data-uid='" + ds[x].uid + "']");
+                        var checkbox = $(row).find(".checkbox");
+                        if (ds[x].MenuID == d[i]) {
+                            checkbox.prop("checked", true);
+                        }
+
+                    }
+                    var x = 0;
+                }
+            })
+        }
+    }
+    function onDataBound(e) {
+        $(".k-hierarchy-cell").hide();
+        $(".k-hierarchy-col").hide();
+        var grid = $("#grdMenuList").data("kendoGrid")
+        var ds = grid.dataSource.view();
+        var rows = e.sender.tbody.children();
+        var access = 0;
+        for (var i = 0; i < ds.length; i++) {
+            access = ds[i].access;
+            MenuID = ds[i].MenuID;
+            var row = $(rows[i]);
+            if (access != 0) {
+                //row.addClass("ChangeBackColorRPerson");
+                $('#check' + MenuID + '').attr("checked", true);
+            }
+            else {
+                $('#check' + MenuID + '').attr("checked", false);
+            }
+        }
+    }
+</script>
+
+<h2>Add/Update Users</h2>
+
+<div>
+
+    <label style="margin-left: 0px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px; display : inline-block">
+        User Type : @(Html.Kendo().DropDownList()
+                        .Name("ddlUserType")
+                        .DataTextField("UserTypeDesc")
+                        .DataValueField("UserTypeID")
+                        .OptionLabel("Select User Type...")
+                        .HtmlAttributes(new { @style = "width: 490px;" })
+                        .DataSource(source => source.Read(read => read.Action("ddlUserType", "User")))
+                        //.Events(e => { e.Change("loadRoles"); })
+                        .Events(e => e.Change("GetUserMenus"))
+                        
+        )
+
+    </label>
+
+</div>
+
+<label style="margin-left: 0px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px; display : inline-block">Office : </label>
+<label style="margin-left: 24px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px; display : inline-block">
+    @(Html.Kendo().ComboBox()
+                         .Name("ddlOffices")
+                         .DataTextField("OfficeName")
+                         .DataValueField("OfficeID")
+                         .Filter("contains")
+                         .MinLength(1)
+                         .Placeholder("Select Employee's Office...")
+                         .HtmlAttributes(new { @style = "width: 490px;" })
+                         .DataSource(source => source.Read(read => read.Action("ddlOffice", "User").Data("readEmp")))
+                         .Events(e => e.Change("GetUserMenus"))
+    )
+
+</label>
+
+<div style="width : 100%; margin-top: 20px;border-style: solid; border-color: #1fa67a">
+
+    <div style="width:100%;height : 25px ; background-color:#1fa67a; color: white">
+        <label class="fa fa-user-plus fa-lg" style="margin-left: 5px; display:inline-block">  User Menu</label>
+    </div>
+        @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.MenuModel>()
+        .Name("grdMenuList")
+        .Columns(columns =>
+        {
+
+            columns.Template(@<text></text>)
+                        .ClientTemplate(
+                            "<input id='check#=MenuID#' onclick=OnCheckBoxClick(this) type='checkbox' class='checkbox'/>"
+                        )
+                        .Title("<input onclick=CheckAll(this) type='checkbox'   class='checkbox'/>")
+                        .Width(20)
+                        .HtmlAttributes(new { @onclick = "click", style = "align:center;float:none;text-align:center; vertical-align: middle;" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+            columns.Bound(c => c.MenuID).Hidden();
+            columns.Bound(c => c.MenuParent).Hidden();
+            columns.Bound(c => c.MenuName).Title("Menu Name").Width(200);
+            columns.Bound(c => c.access).Hidden();
+        })
+        .HtmlAttributes(new { style = "height: 270px;" })
+        .Scrollable(s => s.Enabled(true))
+        .Selectable()
+        .Events(e => e.DataBound("onDataBound"))
+        .DataSource(dataSource => dataSource
+        .Ajax()
+        .Batch(true)
+        .ServerOperation(true)
+        .AutoSync(true)
+        .Read(read => read.Action("getMenuList", "Maintenance").Data("getUserPar"))
+        )
+)
+</div>
+
+
+<div style="float:right">
+    <div id="btnupdate" class="k-button k-button-icontext" style="display:inline-block;bottom: 15px; right: 20px;border-radius:50px;width: 80px;clear:both; margin-top: 10px" onclick="reqSave()">Add</div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#ddlOffices").data("kendoComboBox").value('@Session["officeid"]')
+        $("#ddlUserType").data("kendoDropDownList").value(@Session["UserTypeID"]);
+        
+    })
+</script>

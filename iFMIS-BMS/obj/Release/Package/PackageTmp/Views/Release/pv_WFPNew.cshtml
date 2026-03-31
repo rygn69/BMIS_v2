@@ -1,0 +1,3676 @@
+﻿@model IEnumerable<iFMIS_BMS.BusinessLayer.Models.WFP>
+    
+<script>
+    var thisculture = kendo.culture();
+    var fpay_tag=0;
+    thisculture.numberFormat.currency.symbol = '';
+    function fnoffice() {
+        return {
+            officeid:$("#office").val(),//@Account.UserInfo.Department,
+            fundid : $("#gfid").val() == 1 ? 0 : 1
+        }
+
+    }
+    function fnbrgy() {
+        return {
+            muncode: $("#municipal").val()
+        }
+    }
+    function CheckAllPrep(e) {
+        $("#grid_responsible_person tbody input:checkbox").prop("checked", e.checked);
+    }
+
+    function covert_empty(str) {
+        str = str.toString().replace(/,/g, "");
+        parseInt(str, 20);
+        return str;
+    }
+    function fnooe() {
+        return {
+            officeid:$("#office").val(),
+            tyear: $("#wfpyear").val()
+        }
+    }
+    function fnOffice_sel() {
+        var fundid=$("#gfid").val() == 1 ? 0 : 1
+        var mode_trans= $("#gf_currentid").val()
+        var officeid=$("#office").val()
+
+        if (fundid == 0 && mode_trans == 1){ //gf and current
+            $("#ooe").data("kendoComboBox").value("")
+            $("#ooe").data("kendoComboBox").dataSource.read();
+            $("#repHistory").data("kendoComboBox").dataSource.read();
+            $("#projectaip").data("kendoDropDownList").dataSource.read();
+        }
+        else{ //excess and trust fund
+          
+            $("#account").data("kendoComboBox").value("")
+            $("#account").data("kendoComboBox").dataSource.read()
+        }
+
+        var url = "@Url.Action("getfpaytag", "Report")";
+        $.get(url,{officeid:officeid},function(e){
+            if (e == 1 && fundid ==1){
+                fpay_tag=1;
+                $("#fpay_tmp").val(1)
+                $("#paymentfor_div").show();
+            }
+            else{
+                fpay_tag=0;
+                $("#fpay_tmp").val(0)
+                $("#paymentfor_div").hide();
+            }
+        })
+       
+    }
+    function fnaccount() {
+        return {
+            programid: $("#ooe").val(),
+            tyear: $("#wfpyear").val(),
+            selname: $("#ooe").data("kendoComboBox").text(),
+            ooeid: $("#ooeclass").val(),
+            fundid : $("#gfid").val() == 1 ? 0 : 1,
+            officeid:$("#office").val(),
+            mode: $("#gf_currentid").val()
+        }
+    }
+    function fnooe_sel() {
+
+        $("#ooeclass").data("kendoDropDownList").value("")
+        $("#ooeclass").data("kendoDropDownList").dataSource.read()
+        $("#account").data("kendoComboBox").value("")
+        $("#account").data("kendoComboBox").dataSource.read()
+        loadpritem()
+
+    }
+    function fnactivity() {
+        return {
+            officeid: $("#office").val(),
+            tyear: $("#wfpyear").val(),
+            mode_trans: $("#gf_currentid").val(),
+            accountid:$("#account").val(),
+            fundid : $("#gfid").val() == 1 ? 0 : 1
+
+        }
+    }
+    function fngroupactivity() {
+        var  mode_trans = $("#gf_currentid").val() == 1 ? 0 : 1
+        return {
+            year: $("#wfpyear").val(),
+            program : $("#ooe").val(),
+            account : $("#account").val(),
+            excessid: mode_trans,
+            tempradid : 0
+        }
+    }
+
+    function sync() {
+        var m1 = $("#jan").val()
+        var m2 = $("#feb").val()
+        var m3 = $("#mar").val()
+        var m4 = $("#apr").val()
+        var m5 = $("#may").val()
+        var m6 = $("#jun").val()
+        var m7 = $("#jul").val()
+        var m8 = $("#aug").val()
+        var m9 = $("#sep").val()
+        var m10 = $("#oct").val()
+        var m11 = $("#nov").val()
+        var m12 = $("#dec").val()
+        var ooeid = $("#ooeclass").val()
+        var qtytotal_orig = $("#qtytotal_temp").val() == "" ? 0 : $("#qtytotal_temp").val()
+        var unit= $("#unit").val().toString().toUpperCase()
+        var totqty = parseFloat(Number(m1) + Number(m2) + Number(m3) + Number(m4) + Number(m5) + Number(m6) + Number(m7) + Number(m8) + Number(m9) + Number(m10) + Number(m11) + Number(m12)).toFixed(2)
+        var qty_bal = parseFloat(Number(qtytotal_orig) - Number(totqty)).toFixed(2)
+
+        //if (qty_bal < 0 && ooeid != 1) {
+        //    swal("", "Sorry! Total quantity must not be greater than the approved AIP.", "warning")
+        //    WFPgrid()
+        //}
+        //else {
+        //add filter on 2/27/2023 - start
+        //if ((unit == "LUMPSUM" || unit == "LOT") && totqty > 5){
+        //     $("#jan").val(0)
+        //    $("#feb").val(0)
+        //    $("#mar").val(0)
+        //    $("#apr").val(0)
+        //    $("#may").val(0)
+        //    $("#jun").val(0)
+        //    $("#jul").val(0)
+        //    $("#aug").val(0)
+        //    $("#sep").val(0)
+        //    $("#oct").val(0)
+        //    $("#nov").val(0)
+        //    $("#dec").val(0)
+        //    $("#totqty").val(0)
+        //    $("#nodays").val(1)
+        //    $("#totamount").val(0.00)
+        //    swal("Warning","Please be informed, that there are maximum of four (4) quantities allowed of the unit lumpsum/lot. ","warning")
+        //}
+        //add filter on 2/27/2023 - end
+        //else{
+            $("#totqty").val(totqty)
+            sync2()
+        //}
+    }
+    function sync2() {
+
+        var totalqty = $("#totqty").val()
+        var amount = $("#amount").val()
+        var days = $("#nodays").val()
+        var appbal = $("#balance_temp").val()
+        var amountTemp=$("#amountTemp").val()
+        var mode=$("#mode").val()
+        var totamount = parseFloat(Number(totalqty) * Number(amount) * Number(days)).toFixed(2)
+
+        var appbal2 = parseFloat((Number(appbal) + Number(amountTemp))).toFixed(2)
+        if (mode == 0) {
+            //if (Number(appbal) - Number(totamount) < 0) {
+            //    swal("Warning", "Insufficient balance! Please check your entry.", "warning")
+            //    $("#amount").val(0)
+            //    $("#nodays").val(1)
+            //    $("#totqty").val(0)
+            //    //sync()
+            //}
+            //else {
+                $("#totamount").val(totamount)
+            //}
+        }
+        else {
+            //if (Number(appbal2) - Number(totamount) < 0) {
+            //    swal("Warning", "Insufficient balance! Please check your entry.", "warning")
+            //    $("#amount").val(0)
+            //    $("#nodays").val(1)
+            //    $("#totqty").val(0)
+            //    //sync()
+            //}
+            //else {
+                $("#totamount").val(totamount)
+            //}
+        }
+
+        if ($("#groupactivity").val() != 0) {
+            sync3()
+        }
+
+    }
+
+    function sync3() {
+
+        var amount = $("#totamount").val();
+        var amountTemp = $("#amountTemp").val() == "" ? 0 : $("#amountTemp").val();
+        var appBal = 0;
+        var nonofficeidtemp = $("#nonofficeid_temp").val()
+        var MotherAccountTemp = $("#MotherAccount").val()
+
+        var MotherAccount = groupactivity == 0 ? nonofficeidtemp : $("#groupactivity").val();
+        var ProposalYear = $("#wfpyear").val();
+        var nonofficeidparentTemp = $("#nonofficeidparent_temp").val();
+
+
+        var url2 = "@Url.Action("getParticularBalance", "Maintenance")";
+        var noidparentTemp = 0;
+
+        $.get(url2, { MotherAccount: MotherAccount, ProposalYear: ProposalYear }, function (e) {
+
+            if (MotherAccountTemp != 0) { //Sub-account
+
+                if (MotherAccount != nonofficeidparentTemp) {
+                    noidparentTemp = amountTemp;
+                } else {
+                    noidparentTemp = 0;
+                }
+
+                appBal = parseFloat(Number(e)).toFixed(2) - Number(noidparentTemp) - parseFloat(Number(amount)).toFixed(2)
+
+                appBal = Number(appBal) + Number(amountTemp)
+                $("#mainAccountUsed").val(1)
+
+            }
+            else {//main account
+
+                appBal = Number(amountTemp) - Number(e)
+                appBal = Number(amount) - Number(appBal)
+
+                $("#mainAccountUsed").val(0)
+            }
+            $("#appBalTemp").val(appBal)
+
+            //if ($("#appBalTemp").val() < 0) {
+            //    swal("", "Amount must NOT be greater than appropriation balance!", "warning");
+            //    $("#amount").val(0)
+            //    $("#totamount").val(0)
+            //}
+        });
+    }
+
+    $(function () {
+        $("#jan").keyup(function (e) {
+            //sync();
+        });
+    });
+
+    function getparalocatin() {
+        return {
+            office: $("#office").val(),
+            account: $("#account").val(),
+            year: $("#wfpyear").val()
+        }
+    }
+    function deletewfp(id){
+        var year= $("#wfpyear").val()
+        var fundid = $("#gfid").val() == 1 ? 0 : 1;
+        var mode_trans= $("#gf_currentid").val()
+        swal({
+            title: "Delete ITEM?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes",
+            closeOnConfirm: false,
+            showLoaderOnConfirm: true
+        },
+            function () {
+                var url = "@Url.Action("deletewfp", "Report")";
+                $.get(url, { id: id,year:year,fundid:fundid,mode_trans:mode_trans }, function (e) {
+                    if (e =='success'){
+                        swal("Success", "Item has been deleted.", "success")
+                        $("#WFPPrepareGrid").data("kendoGrid").dataSource.read()
+                        reqClearPartial()
+                    }
+                    else{
+                        swal("Error",e,"error")
+                    }
+                })
+            })
+    }
+    function transferitem(id){
+        var year= $("#wfpyear").val()
+        var fundid = $("#gfid").val() == 1 ? 0 : 1;
+        var officeid  = $("#office").val()
+        var programid = $("#ooe").val()
+        var accountid = $("#account").val()
+
+        if (accountid == 336 || accountid == 869 || accountid == 59787){
+            swal({
+                title: "Return the ITEM?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                closeOnConfirm: false,
+                showLoaderOnConfirm: true
+            },
+                function () {
+                    var url = "@Url.Action("retunwfp", "Report")";
+                    $.get(url, { id: id,year:year,officeid:officeid,programid:programid,accountid:accountid}, function (e) {
+                        if (e =='success'){
+                            swal("Success", "Item has been returned successfully.", "success")
+                            $("#WFPPrepareGrid").data("kendoGrid").dataSource.read()
+                        }
+                        else{
+                            swal("Error",e,"error")
+                        }
+                    })
+                })
+        }
+        else{
+            swal("Warning","This functionality can be accessed exclusively by Office Supplies account only.","warning")
+        }
+    }
+    function deleteloc(id) {
+        swal({
+            title: "Delete location?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes",
+            closeOnConfirm: false,
+            showLoaderOnConfirm: true
+        },
+            function () {
+                var url = "@Url.Action("deletelocation", "Report")";
+                $.get(url, { id: id }, function (e) {
+                    if (e =='success'){
+                        swal("Success", "Location has been deleted.", "success")
+                        $("#wfplocation").data("kendoGrid").dataSource.read()
+                    }
+                    else{
+                        swal("Error",e,"error")
+                    }
+                })
+            })
+    }
+    function btnSubmit(id) {
+
+        var officeid  = $("#office").val()
+        var programid = $("#ooe").val()
+        var accountid = $("#account").val()
+        var year = $("#wfpyear").val()
+        var balapp= covert_empty($("#appbalance").val());
+        var grid = $("#WFPPrepareGrid").data("kendoGrid")
+        var ds = grid.dataSource.view();
+        var idsToSend = [];
+        var selitemsubmit =0;
+        var url = "@Url.Action("submitwfp", "Report")";
+        var url2= "@Url.Action("submitwfpitem", "Report")";
+        var urlsub= "@Url.Action("submitwfpsubppa", "Report")";
+        var fundid = $("#gfid").val() == 1 ? 0 : 1
+        var subppabal=covert_empty($("#BalAppropriation").val());
+        var subppaid=$("#groupactivity").val()
+        var fundid = $("#gfid").val() == 1 ? 0 : 1;
+        var mode_trans = $("#gf_currentid").val()
+        var supplemetalapp = $("#supplemetalapp").val()
+
+        for (var i = 0; i < ds.length; i++) {
+            var row = grid.table.find("tr[data-uid='" + ds[i].uid + "']");
+            var checkbox = $(row).find(".checkbox");
+            if (checkbox.is(":checked")) {
+                idsToSend.push(ds[i].wfpid); //loops
+                selitemsubmit=1;
+            }
+        }
+        if ((officeid == 0 || programid ==0 || accountid ==0) && fundid==0 && mode_trans == 1) {
+            swal("","Please select office, program and account respectively from the dropdown list!","info")
+        }
+        else if ((officeid == 0 || accountid ==0) && fundid != 0) {
+            swal("","Please select office and account respectively from the dropdown list!","info")
+        }
+        else if ((officeid == 0 || accountid ==0) && mode_trans == 0) {
+            swal("","Please select office and account respectively from the dropdown list!","info")
+        }
+        //else if (Number(balapp) < 0 && accountid != 70109){ //whole of nation approach
+        else if (Number(balapp) < 0 && id != 2){ //whole of nation approach
+            swal("Warning","Insufficient balance, please check the appropriation details!","warning")
+        }
+        else if (id == 2 && Number(subppabal) < 0){ //sub-ppa
+            swal("Warning","Insufficient balance, please check the sub-ppa appropriation balance!","warning")
+        }
+        else if (id ==2 && subppaid == 0){ //sub-ppa
+            swal("","Please select sub-ppa from the group under!","info")
+        }
+        else if ((officeid == 1 || officeid == 63) && (programid == 218 ||  programid==249) && @Account.UserInfo.eid !=314203 && @Account.UserInfo.eid !=365263 && @Account.UserInfo.eid !=365565 && @Account.UserInfo.eid !=365206 && @Account.UserInfo.eid != 303923 && @Account.UserInfo.eid != 2417 && @Account.UserInfo.eid != 1604 && @Account.UserInfo.eid != 3110  && @Account.UserInfo.eid != 2799){
+            swal("Warning","Sorry, you're not allowed to submit the 5% reserve! Please contact the fund administrator.","warning")
+        }
+        //else if (year == 2024){
+        //    swal("","The submission for WFP in 2024 has not yet become accessible!","info")
+        //}
+        else {
+
+            swal({
+                title: "Submit WFP?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                closeOnConfirm: false,
+                showLoaderOnConfirm: true
+            },
+                function () {
+                    if (id != 2){
+                        if (selitemsubmit == 1 ){
+                            $.post(url2, {transno: idsToSend, officeid:officeid, programid: programid, accountid: accountid, year:year,fundid:fundid,mode_trans:mode_trans,supplemetalapp:supplemetalapp }, function (d) {
+                                if (d == 'success') {
+                                    swal("Success", "Selected item has been submitted.", "success")
+                                    $("#WFPPrepareGrid").data("kendoGrid").dataSource.read();
+                                }
+                                else {
+                                    swal("Warning!", d, "warning")
+                                    //swal({ title: "Warning!", text: "Please tick the checkbox first!", timer: 2500, showConfirmButton: false, type: "warning" });
+                                }
+                            })
+                        }
+                        else{
+                            $.post(url, { officeid: officeid, programid: programid, accountid: accountid, year: year, id: id,fundid:fundid,mode_trans:mode_trans,supplemetalapp:supplemetalapp }, function (d) {
+                                if (d == 'success') {
+                                    swal("Success", "WFP has been submitted.", "success")
+                                    $("#WFPPrepareGrid").data("kendoGrid").dataSource.read();
+                                    reqClearPartial()
+                                }
+                                else {
+                                    swal("Warning!", d, "warning")
+                                }
+                            })
+                        }
+                    }
+                    else{ //submit per sub-ppa
+                        $.post(urlsub, { officeid: officeid, programid: programid, accountid: accountid, year: year, subppaid:subppaid }, function (d) {
+                            if (d == 'success') {
+                                swal("Success", "WFP has been submitted.", "success")
+                                $("#WFPPrepareGrid").data("kendoGrid").dataSource.read();
+                                reqClearPartial()
+                            }
+                            else {
+                                swal("Warning!", d, "warning")
+                            }
+                        })
+                    }
+                })
+        }
+
+    }
+    function btnpreview_selectitem() {
+        $('#SpanOnApproveProgress').css("display", "auto");
+        $('#spanthumbsup').css("display", "none");
+        var url = "@Url.Action("WFPDFPPTreportemp", "Report")";
+        var idsToSend = [];
+        var grid = $("#WFPPrepareGrid").data("kendoGrid")
+        var ds = grid.dataSource.view();
+        var officeid = $("#office").val();
+        var officename = $("#office").data("kendoComboBox").text()
+        var yearof = $("#wfpyear").val();
+        var repHistory = $("#repHistory").val();
+        var prepby = $("#prepby").val();
+        var prepwfp = 0//$("#prepwfp").val() == 1 ? 1: 0;
+        var submitwfp = 2;//$("#submitwfp").val() == 1? 2:0;
+        var approvewfp = 0;//$("#approvewfp").val() == 1 ? 3 : 0;
+        var printstatus = Number(prepwfp) + Number(submitwfp) + Number(approvewfp)
+        var projectaip = 0//$("#projectaip").val()
+        var fundsource = $("#fundsource").data("kendoDropDownList").text()
+        var accountid = $("#account").val();
+        var accountname = $("#account").data("kendoComboBox").text()
+        var municipal = $("#municipal").data("kendoDropDownList").text()
+        var barangay = $("#barangay").data("kendoDropDownList").text()
+        var ooeclass = $("#ooeclass").data("kendoDropDownList").text()
+
+        for (var i = 0; i < ds.length; i++) {
+            var row = grid.table.find("tr[data-uid='" + ds[i].uid + "']");
+            var checkbox = $(row).find(".checkbox");
+            if (checkbox.is(":checked")) {
+                idsToSend.push(ds[i].wfpid); //loops
+            }
+        }
+
+        if (idsToSend == "") {
+            swal({ title: "Error!", text: "Please tick the box first!", timer: 2500, showConfirmButton: false, type: "error" });
+            $('#SpanOnApproveProgress').css("display", "none");
+            $('#spanthumbsup').css("display", "auto");
+        } else {
+            $.post(url, { transno: idsToSend }, function (d) {
+                if (d == 1) {
+                    $.ajax({
+                        async: false,
+                        dataType: 'html',
+                        //success: window.open("../Reports/ReportViewer.aspx?rid=31&officeid=" + officeid + "&ooeid=" + ooeid + "&yearof=" + yearof + "&qtr=" + qtr + "&mpoffice=" + mpoffice + "&empname=" + empname + "&empid=" + empid + "&repHistory=" + repHistory + "&prepdfppt=1&approvedfppt=1&accountidlist=1")
+                        success: window.open("../Reports/ReportViewer.aspx?rid=37&OfficeID=" + officeid + "&year=" + yearof + "&OfficeName=" + officename + "&prepby=" + prepby + "&fundsource=1&ProjectName=&funddescription=&repHistory=" + repHistory + "&printstatus=1&projectaip=" + projectaip + "&fundsourcename=" + fundsource + "&accountID=" + accountid + "&accountname=" + accountname + "&municipal=" + municipal + "&barangay=" + barangay + "&ooeclass=" + ooeclass + "&accountidlist=1")
+
+                    });
+                }
+            })
+        }
+
+    }
+    function btnppmpdelete() {
+        $('#SpanOnApproveProgress').css("display", "auto");
+        $('#spanthumbsup').css("display", "none");
+        var url = "@Url.Action("DeleteWFPItem", "Report")";
+        var fundid = $("#gfid").val() == 1 ? 0 : 1
+        var mode_trans= $("#gf_currentid").val()
+        var idsToSend = [];
+
+        var grid = $("#WFPPrepareGrid").data("kendoGrid")
+        var ds = grid.dataSource.view();
+        var yearof = $("#wfpyear").val()
+        var programid = $("#ooe").val()
+        var accountid = $("#account").val()
+
+        for (var i = 0; i < ds.length; i++) {
+            var row = grid.table.find("tr[data-uid='" + ds[i].uid + "']");
+            var checkbox = $(row).find(".checkbox");
+            if (checkbox.is(":checked")) {
+                idsToSend.push(ds[i].wfpid); //loops
+            }
+        }
+        if (idsToSend == "") {
+            swal({ title: "Warning!", text: "Please tick the box first!", timer: 2500, showConfirmButton: false, type: "warning" });
+            $('#SpanOnApproveProgress').css("display", "none");
+            $('#spanthumbsup').css("display", "auto");
+        }
+        else {
+            swal({
+                title: "Delete selected items?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                closeOnConfirm: false,
+                showLoaderOnConfirm: true
+            },
+               function () {
+                   $.post(url, { transno: idsToSend, yearof: yearof, programid: programid, accountid: accountid,fundid:fundid,mode_trans:mode_trans }, function (d) {
+                       if (d == 1) {
+                           swal({ title: "Success!", text: "Selected items has been deleted!", timer: 1000, showConfirmButton: false, type: "success" });
+                           $("#WFPPrepareGrid").data("kendoGrid").dataSource.read();
+                           $('#SpanOnApproveProgress').css("display", "none");
+                           $('#spanthumbsup').css("display", "auto");
+                       }
+                       else {
+                           swal("Something Went Wrong!", d, "error");
+                           $('#SpanOnApproveProgress').css("display", "none");
+                           $('#spanthumbsup').css("display", "auto");
+                       }
+                   })
+               })
+        }
+    }
+
+    function btndetails() {
+        var grid = $('#WFPPrepareGrid').data('kendoGrid');
+        if (document.getElementById("btndetails_id").text == " Show Details") {
+            $("#btndetails_id").html("<span class='fa fa-regular-eye'></span> Hide Details");
+            grid.showColumn('account_parent');
+            grid.showColumn('activityname');
+            grid.showColumn('completiondate');
+            grid.showColumn('remarks');
+            grid.showColumn('prepareuser')
+        }
+        else {
+            $("#btndetails_id").html("<span class='fa fa-regular-eye'></span> Show Details");
+            grid.hideColumn('account_parent');
+            grid.hideColumn('activityname');
+            grid.hideColumn('completiondate');
+            grid.hideColumn('remarks');
+            grid.hideColumn('prepareuser')
+        }
+    }
+
+    function btnsupplemental(){
+        var grid = $('#WFPPrepareGrid').data('kendoGrid');
+        if (document.getElementById("btnsupplemental_id").text == " Show Supplemental") {
+            $("#btnsupplemental_id").html("<span class='fa fa-regular-eye'></span> Show All Items");
+            $("#showsupplemental").val(1)
+        }
+        else {
+            $("#btnsupplemental_id").html("<span class='fa fa-regular-eye'></span> Show Supplemental");
+            $("#showsupplemental").val(0)
+        }
+        grid.dataSource.read()
+    }
+
+    function btnppmpitem() {
+        var officeid = $("#office").val() == "" ? 0 : $("#office").val()
+        var programid = $("#ooe").val() == "" ? 0 : $("#ooe").val()
+        var accountid = $("#account").val() == "" ? 0 : $("#account").val()
+        var tyear = $("#wfpyear").val()
+        var fundid = $("#gfid").val() == 1 ? 0 : 1
+        var mode_trans= $("#gf_currentid").val()
+        var ooeclass=$("#ooeclass").val()
+
+        var url = "@Url.Action("wfpadditem", "Report")";
+        if ((officeid == 0 || programid == 0 || accountid == 0 || tyear == 0) && fundid == 0 && mode_trans == 1) {
+            swal("", "Please select office, program, and account from the dropdown list above!", "info");
+        }
+        else if((officeid == 0 || accountid == 0) && fundid == 1){ //trust fund
+            swal("", "Please select office and account from the dropdown list above!", "info");
+        }
+        else if((officeid == 0 || accountid == 0) && mode_trans == 0){ //excess
+            swal("", "Please select office and account from the dropdown list above!", "info");
+        }
+        //else if(tyear >= 2025 && fundid == 0 ){
+        //    swal("Warning", "Adding items for the year "+tyear+" is not permitted!", "warning");
+        //}
+        else {
+
+            $.get(url,
+                {
+                    office: officeid,
+                    program: programid,
+                    account: accountid,
+                    tyear: tyear,
+                    fundid:fundid,
+                    mode_trans:mode_trans,
+                    ooeclass:ooeclass
+                },
+            function (d) {
+                $('#wfpadditem').html(d);
+            })
+            $('#wfpadditem').data('kendoWindow').title("<i class='fa fa-navicon'> </i> ADD PROCUREMENT ITEM").center().open();
+        }
+    }
+    function closewfpsubmit() {
+        $("#WFPPrepareGrid").data("kendoGrid").dataSource.read();
+    }
+
+    function closewfpapproved() {
+        $("#WFPPrepareGrid").data("kendoGrid").dataSource.read();
+    }
+
+    function closewfpapproved_lce() {
+        $("#WFPGridApproved_lce").data("kendoGrid").dataSource.read();
+    }
+
+    function fnReportHistory() {
+        return {
+            officeid: $("#office").val(),
+            yearof: $("#wfpyear").val()
+
+        }
+    }
+    function fnincludeppa() {
+        if (document.getElementById("includeppa").checked)
+        {
+            document.getElementById("includeppa").value=1
+        }
+        else {
+            document.getElementById("includeppa").value = 0
+        }
+    }
+    function fnincludeppalbl() {
+        if (document.getElementById("includeppa").checked) {
+            document.getElementById("includeppa").checked = false
+            document.getElementById("includeppa").value = 0
+        }
+        else {
+            document.getElementById("includeppa").checked = true
+            document.getElementById("includeppa").value = 1
+        }
+    }
+    function onDataBound(e) {
+        $(".k-hierarchy-cell").hide();
+        $(".k-hierarchy-col").hide();
+        var grid = $("#WFPPrepareGrid").data("kendoGrid")
+        var ds = grid.dataSource.view();
+        var rows = e.sender.tbody.children();
+        var isPPMP = 0;
+        var isSubppa=0;
+        var isupplemental=0;
+        var withad =0;
+        for (var i = 0; i < ds.length; i++) {
+            isPPMP = ds[i].isPPMP;
+            isSubppa=ds[i].subppaid
+            trnno = ds[i].wfpid;
+            pullitem = ds[i].pullitem;
+            isupplemental=ds[i].isupplemental;
+            withad= ds[i].withad;
+            var row = $(rows[i]);
+            if (isPPMP == 1 && isSubppa ==0 && pullitem ==0 && isupplemental==0 //&& withad ==0
+                ) {
+                row.addClass("ChangeBackColor");
+             //   $('#deleteid' + trnno + '').css("display", "none");
+            }
+            else if(isPPMP == 1 && isSubppa !=0  && pullitem ==0 && isupplemental ==0  //&& withad ==0
+                ){
+                row.addClass("ChangeSubppaColor");
+            }
+            else if (isPPMP == 0 && isSubppa !=0  && pullitem ==0 && isupplemental==0  //&& withad ==0
+                ) {
+                row.addClass("ChangeNotPPMPSubppaColor");
+                $(this).css('color', 'white');
+            }
+            else if (pullitem == 1 && isupplemental==0  //&& withad ==0
+                ){
+                row.addClass("ChangePullitemColor");
+                $(this).css('color', 'white');
+            }
+            else if (isupplemental == 1 && isPPMP == 1){
+                row.addClass("changesupplemental");
+
+            }
+            else if (isupplemental == 1 && isPPMP == 0){
+                //row.addClass("changesupplementalnotppmp");
+                row.addClass("changesBackColorWithADPPMP");
+
+            }
+            //else if (withad == 1 && isPPMP==0){
+            //    row.addClass("changesBackColorWithAD");
+
+            //}
+            //else if (withad == 1 && isPPMP==1){
+            //    row.addClass("changesBackColorWithADPPMP");
+
+            //}
+        }
+    }
+    function searchAccount() {
+        var $filter = new Array();
+        $filter = [];
+
+        var SelectedTabIndex = $("#tabstrip").data("kendoTabStrip").select().index();
+      
+        if (SelectedTabIndex == 0) {
+            if ($('#SearchData').val().length > 0) {
+                $filter.push({ field: "activityname", operator: "contains", value: $('#SearchData').val() }),
+                $filter.push({ field: "specificactivity", operator: "contains", value: $('#SearchData').val() }),
+                $filter.push({ field: "particular", operator: "contains", value: $('#SearchData').val() }),
+                $filter.push({ field: "unit", operator: "contains", value: $('#SearchData').val() }),
+                $filter.push({ field: "prepareuser", operator: "contains", value: $('#SearchData').val() }),
+                $filter.push({ field: "pullitem_desc", operator: "contains", value: $('#SearchData').val() }),
+                $filter.push({ field: "subppaname", operator: "contains", value: $('#SearchData').val() });
+            }
+
+            $('#WFPPrepareGrid').data('kendoGrid').dataSource.filter({
+                logic: "or",
+                filters: $filter
+            });
+        }
+        else if (SelectedTabIndex == 1) {
+            if ($('#SearchData').val().length > 0) {
+                $filter.push({ field: "specificactivity", operator: "contains", value: $('#SearchData').val() }),
+                $filter.push({ field: "particular", operator: "contains", value: $('#SearchData').val() });
+            }
+            $('#WFPCancel').data('kendoGrid').dataSource.filter({
+                logic: "or",
+                filters: $filter
+            });
+        }
+
+
+        
+
+    }
+
+    $(function () {
+        $("#SearchData").keypress(function (e) {
+            if (e.keyCode == 13) {
+                searchAccount();
+            }
+        });
+    });
+    function fnMainaccount() {
+
+        $("#MainAppropriationid").show();
+        $("#SubAppropriationid").show();
+        $("#BalAppropriationid").show();
+        var accountid = $("#account").val() == "" ? 0 : $("#account").val()
+        var MotherAccount = $("#groupactivity").val();
+        var ProposalYear = $("#wfpyear").val();
+        var mode_trans= $("#gf_currentid").val() == 1 ? 0: 1
+
+        if (mode_trans== 0){
+            if (accountid == 2861){
+                var url = "@Url.Action("SubAccountSAAB_WFP20", "Maintenance")";
+                $.get(url, { MotherAccount: MotherAccount, ProposalYear: ProposalYear }, function (d) {
+                    $("#MainAppropriation").val(MoneyFormat(d.Appropriation));
+                    $("#SubAppropriation").val(MoneyFormat(d.AllotedAmount));
+                    $("#BalAppropriation").val(MoneyFormat(d.BalanceAllotment));
+                })}
+            else{
+                var url = "@Url.Action("SubAccountSAAB_WFP", "Maintenance")";
+                $.get(url, { MotherAccount: MotherAccount, ProposalYear: ProposalYear }, function (d) {
+                    $("#MainAppropriation").val(MoneyFormat(d.Appropriation));
+                    $("#SubAppropriation").val(MoneyFormat(d.AllotedAmount));
+                    $("#BalAppropriation").val(MoneyFormat(d.BalanceAllotment));
+                })
+            }
+        }
+        else{
+            var url = "@Url.Action("SubAccountSAAB_WFPexcess", "Maintenance")";
+            $.get(url, { MotherAccount: MotherAccount, ProposalYear: ProposalYear }, function (d) {
+                $("#MainAppropriation").val(MoneyFormat(d.Appropriation));
+                $("#SubAppropriation").val(MoneyFormat(d.AllotedAmount));
+                $("#BalAppropriation").val(MoneyFormat(d.BalanceAllotment));
+            })
+        }
+        sync3();
+
+    }
+    function fnbarangay() {
+        $("#barangay").data("kendoDropDownList").dataSource.read()
+    }
+
+    function parwfprepare() {
+        return {
+            year: $("#wfpyear").val()
+        }
+    }
+    function fnprogram() {
+        return {
+            selname:$("#ooe").data("kendoComboBox").text()
+        }
+    }
+    function WFPgrid_click() {
+        var entityGrid = $("#wfprepared").data("kendoGrid");
+        var selItem = entityGrid.dataItem(entityGrid.select());
+
+        $("#office").data("kendoComboBox").value(selItem.officeid)
+        fnOffice_sel()
+
+        $("#ooe").data("kendoComboBox").value(selItem.programid)
+
+        $("#ooeclass").data("kendoDropDownList").value(selItem.ooeid)
+        fnooe_sel()
+
+        $("#account").data("kendoComboBox").value(selItem.accountid)
+        fnaccount_sel()
+    }
+    function fnooeid_sel() {
+        if ($("#ooeclass").data("kendoDropDownList").text() == "PS") {
+            $("#amount").attr("readonly", false)
+        }
+        else {
+            $("#amount").attr("readonly", true)
+        }
+
+        $("#account").data("kendoComboBox").value("")
+        $("#account").data("kendoComboBox").dataSource.read()
+        $("#amount").val(0)
+
+    }
+    function deleteprepaccount(programid,accountid,yearof) { //return wfp per account
+        var gview = $("#wfpconsol").data("kendoGrid");
+        var selectedItem = gview.dataItem(gview.select());
+        var remark = selectedItem.remarks == '' ? '' : selectedItem.remarks;
+
+        //if (remark == "" || remark.length == 0){
+        //    swal("Warning!", "Please enter remarks!", "warning");
+        //}
+        //else {
+
+            swal({
+                title: "W A R N I N G!",
+                text: "This will delete all the prepared items under this particular account. Do you want to proceed?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                closeOnConfirm: false
+            }, function () {
+                var url = "@Url.Action("deletewfpaccount", "Report")";
+                $.get(url, { programid: programid, accountid: accountid, yearof: yearof, remark: remark }, function (e) {
+                    if (e == "success") {
+                        swal("Success!", "Account has been deleted!", "success");
+                        $("#wfprepared").data("kendoGrid").dataSource.read();
+                    } else {
+                        swal("Error!", e, "error");
+                        $("#wfprepared").data("kendoGrid").dataSource.read();
+                    }
+                });
+            });
+        //}
+    }
+    function Check_click(cb, officeid) {
+        var officeid_drp = $("#office").val()
+        var programid = $("#ooe").val()
+        var accountid = $("#account").val()
+        var activity = $("#activity").val() == "" ? 0 : $("#activity").val()
+        var tyear = $("#wfpyear").val()
+        var url = "@Url.Action("res_office_sel", "Report")";
+        var resid= $("#responoffice").val() == 1 ? 1 : 0
+        var cbValue = cb.checked;
+        var trulse = cbValue == true ? 1 : 0
+        //cb.value = cbValue;
+        //var thisRow = $("#grid_responsible_person").data("kendoGrid").dataItem(cb.closest("tr"));
+        //thisRow.Checked = cbValue;
+
+        if (officeid_drp != 0 && accountid != 0 ) {
+            $.post(url, { officeid_drp: officeid_drp, programid: programid, accountid: accountid, officeid_sel: officeid, tyear: tyear, trulse: trulse, resid: resid,activity:activity }, function (d) {
+                $("#grid_responsible_person").data("kendoGrid").dataSource.read()
+            })
+        }
+        else if (officeid_drp == 0 || accountid == 0 && cbValue == true) {
+            swal("", "Please select an office, program and account respectively!", "info")
+            $("#grid_responsible_person").data("kendoGrid").dataSource.read();
+        }
+    }
+    function onDataBoundResperson(e) {
+        $(".k-hierarchy-cell").hide();
+        $(".k-hierarchy-col").hide();
+        var grid = $("#grid_responsible_person").data("kendoGrid")
+        var ds = grid.dataSource.view();
+        var rows = e.sender.tbody.children();
+        var actioncode = 0;
+        var officeid = 0;
+        for (var i = 0; i < ds.length; i++) {
+            actioncode = ds[i].actioncode;
+            officeid = ds[i].officeid;
+            var row = $(rows[i]);
+            if (actioncode == 1) {
+                row.addClass("ChangeBackColorRPerson");
+                $('#check' + officeid + '').attr("checked",true);
+            }
+            else {
+                $('#check' + officeid + '').attr("checked", false);
+            }
+        }
+    }
+    function getresofficepar() {
+
+        return {
+            office: $("#office").val(),
+            account: $("#account").val(),
+            year: $("#wfpyear").val(),
+            resid: $("#responoffice").val() == 1? 1 : 0
+        }
+    }
+
+    //function nospaces(t){
+    //    if(t.value.match(/\s/g)){
+    //        t.value=t.value.replace(/\s/g,'');
+    //    }
+    //}
+    function wfpstatus_review() {
+        $(window).scrollTop(0);
+        var url = "@Url.Action("wfpstatus_review", "Report")";
+        var office = $("#office").val();
+        var program = $("#ooe").val()
+        var account = $("#account").val()
+        var tyear = $("#wfpyear").val();
+        var fundid = $("#gfid").val() == 1 ? 0 : 1
+        var mode_trans= $("#gf_currentid").val()
+        $.get(url,
+            {
+                office: $("#office").val(),
+                program: program,
+                account: account,
+                tyear: tyear,
+                fundid:fundid,
+                mode_trans: mode_trans
+            },
+        function (d) {
+            $('#wfpstatus_review').html(d);
+        })
+
+        $('#wfpstatus_review').data('kendoWindow').title("<i class='fa fa-navicon'> </i> WFP Status").center().open();
+    }
+    function closewfpstatus_review() {
+        $("#WFPPrepareGrid").data("kendoGrid").dataSource.read();
+    }
+    function CheckAll_Prep(e) {
+        $("#WFPPrepareGrid tbody input:checkbox").prop("checked", e.checked);
+    }
+    function applied80per_click(){
+        var account = $("#account").val()
+        if (account == 336 || account == 869 || account == 59787)
+        {
+            if (document.getElementById("applied80per").checked){
+                $("#applied80per").val(1)
+            }
+            else{
+                $("#applied80per").val(0)
+            }
+            fnaccount_sel()
+        }
+        else{
+            swal("Warning","This functionality can be accessed exclusively by Office Supplies account only.","warning")
+            $("#applied80per").prop("checked",false)
+            $("#applied80per").val(0)
+        }
+    }
+    function filter80per_click(){
+        var account = $("#account").val()
+        if (account == 336 || account == 869 || account == 59787)
+        {
+            if (document.getElementById("filter80per").checked){
+                $("#filter80per").val(1)
+                $('#SearchData').val("pullitem")
+            }
+            else{
+                $("#filter80per").val(0)
+                $('#SearchData').val("")
+            }
+            searchAccount()
+        }
+        else{
+            swal("Warning","This functionality can be accessed exclusively by Office Supplies account only.","warning")
+            $("#filter80per").prop("checked",false)
+            $("#filter80per").val(0)
+        }
+    }
+
+    function applied80per_lbl(){
+        var account = $("#account").val()
+        if (account == 336 || account == 869 || account == 59787)
+        {
+            if (document.getElementById("applied80per").checked){
+                $("#applied80per").prop("checked",false)
+                $("#applied80per").val(0)
+            }
+            else{
+                $("#applied80per").prop("checked",true)
+                $("#applied80per").val(1)
+            }
+            fnaccount_sel()
+        }
+        else{
+            swal("Warning","This functionality can be accessed exclusively by Office Supplies account only.","warning")
+            $("#applied80per").prop("checked",false)
+            $("#applied80per").val(0)
+        }
+    }
+    function filter_lbl(){
+        var account = $("#account").val()
+        if (account == 336 || account == 869 || account == 59787)
+        {
+            if (document.getElementById("filter80per").checked){
+                $("#filter80per").prop("checked",false)
+                $("#filter80per").val(0)
+                $('#SearchData').val("")
+            }
+            else{
+                $("#filter80per").prop("checked",true)
+                $("#filter80per").val(1)
+                $('#SearchData').val("pullitem")
+            }
+            searchAccount()
+        }
+        else{
+            swal("Warning","This functionality can be accessed exclusively by Office Supplies account only.","warning")
+            $("#filter80per").prop("checked",false)
+            $("#filter80per").val(0)
+        }
+    }
+    function wfpsummary_click(){
+        if (document.getElementById("wfpsummaryid").checked){
+            $("#wfpsummaryid").val(1)
+        }
+        else{
+            $("#wfpsummaryid").val(0)
+        }
+        //$("#account").data("kendoComboBox").dataSource.read()
+        $("#WFPPrepareGrid").data("kendoGrid").dataSource.read()
+
+    }
+</script>
+
+<h2 style="font-size:18px;font-weight:bold"><span class="fa fa-tasks"></span> Work and Financial Plan (Preparation)</h2>
+<div style="display:inline-block;border-style:solid;border-width:1px;text-align:center;width:747px;background-color:lightgray;border-color:lightgray">
+    <div id="div_gfid" style="display:none">
+        <input type="radio" id="gfid" checked value="1" onclick="gfid_click()" style="width:25px;zoom:1.2"/>
+        <label style="display:inline-block;font-size:13px;" onclick="gflblid_click()">General Fund</label>
+    </div>
+    <div style="display:inline-block;margin-left:10px;">
+        <input type="radio" id="tfid" value="0" onclick="tfid_click()" style="width:25px;zoom:1.2"/>
+        <label style="display:inline-block;font-size:13px;" onclick="tflblid_click()">Trust Fund</label>
+    </div>
+</div>
+@*@if (Account.UserInfo.eid == 5580)
+{*@
+<div id="gftransid" style="display:inline-block;border-style:solid;border-width:1px;text-align:center;width:747px;border-color:lightgray">
+    <div style="float:left;background-color:#54625E;width:100%;text-align:left;border-top-color:chocolate;border-top-style:solid;border-width:1px;color:white"><span style="margin-left:5px;"><b>MODE</b></span></div>
+    <br />
+    <div style="display:inline-block;margin-right:175px;">
+        <input type="radio" id="gf_currentid" checked value="1" onclick="gf_current_id_click()" style="width:25px;zoom:1.2" />
+        <label style="display:inline-block;font-size:13px;" onclick="gf_current_lblid_click()">Current</label>
+        @*@if (Account.UserInfo.eid == 5580)
+        {*@
+        <input type="radio" id="gf_excessid" value="0" onclick="gf_excess_id_click()" style="width:25px;zoom:1.2;margin-left:10px" />
+        <label style="display:inline-block;font-size:13px;" onclick="gf_excess_lblid_click()">Continuing</label>
+        @*}*@
+    </div>
+</div>
+@*}*@
+
+<div id="headerid" style="margin-top:5px;display:normal">
+    
+    <label  style="display:inline-block;margin-left:10px;margin-top:10px;">
+        Year <span style="color:red">*</span>
+    </label>
+    <br />
+    <div style="margin-left:10px;width:100px;margin-top:0px">
+        @(Html.Kendo().ComboBox()
+                .Name("wfpyear")
+                .DataTextField("ProposalYear")
+                .DataValueField("ProposalYear")
+                .SelectedIndex(0)
+              //  .Events(e => e.Select("fnyear"))
+                .HtmlAttributes(new { style = "width:100%; height:100%", @class = "form-control autoselect" })
+
+                .DataSource(source => source.Read(read => read.Action("WFPYears", "PYear")))
+        )
+
+    </div>
+    
+    <label  style="display:inline-block;margin-left:10px;margin-top:10px;">
+        Office <span style="color:red">*</span>
+    </label>
+    <div style="margin-left:10px;width:500px;">
+        @(Html.Kendo().ComboBox()
+            .Name("office")
+            .DataTextField("offname")
+            .DataValueField("OfficeID")
+            .AutoBind(true)
+            .Placeholder("Select Office...")
+            .Filter("contains")
+            .MinLength(3)
+            .Events(e => e.Change("fnOffice_sel"))
+     //       .SelectedIndex(0)
+            .HtmlAttributes(new { style = "width:100%; height:100%", @class = "form-control autoselect" })
+            .DataSource(source =>
+            {
+                source.Read(read =>
+                {
+                    read.Action("GetOfficeWFP", "Report").Data("fnoffice");
+                })
+            .ServerFiltering(false);
+            })
+        )
+        <div style="float:left;margin-top:-29px;margin-left:500px">
+            <div class="k-button k-button-icontext" style="width:125px;color:indianred" title="Click to view returned WFP!" onclick="WFPstatus()"><span style="zoom:1.2;color:indianred" class="fa fa-rotate-left"></span> Returned WFP</div>
+        </div>
+        <div style="float:left;margin-top:-29px;margin-left:626px">
+            <div class="k-button k-button-icontext" style="width:30px;height:29px;" title="Click to view reviewed WFP!" onclick="WFPstatus_reviewonly()"><span style="zoom:1.2;" class="fa fa-list-alt"></span></div>
+        </div>
+        @*<div id="btnppmp" class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 200px;float:right; margin-top: 20px; margin-right:-155px;margin-top:-0px;background-color:cornflowerblue;border-radius:50px;color:white; margin-bottom:0px;width:150px;" onclick="reqPPMP('#dialog')">
+            <span class="fa fa-download"></span> Download PPMP
+        </div>*@
+        <label style="display:inline-block;margin-left:0px;margin-top:10px;">
+            Program <span id="program_reqid" style="color:red">*</span>
+        </label>
+        <div id="optionprogram" style="margin-left:0px;width:500px;">
+            @(Html.Kendo().ComboBox()
+            .Name("ooe")
+            .DataTextField("OOE")
+            .DataValueField("ProgramID")
+            .AutoBind(true)
+          //  .Placeholder("Select Office...")
+            .Filter("contains")
+            .MinLength(3)
+            .Events(e => e.Change("fnooe_sel"))
+            .SelectedIndex(-1)
+            .HtmlAttributes(new { style = "width:100%; height:100%", @class = "form-control autoselect" })
+            .DataSource(source =>
+            {
+                source.Read(read =>
+                {
+                    read.Action("GetOOEWFP", "Report").Data("fnooe");
+                })
+            .ServerFiltering(false);
+            })
+            )
+        </div>
+
+        <div id="optionprogram_excess" style="display:none">
+            <div style="margin-left:0px;width:500px;margin-top:0px;">
+                <div style="margin-left:0px;">
+                    <textarea id="programexcess" placeholder="Enter Program" style="width:487.5px;height:20px;"></textarea>
+                </div>
+            </div>
+        </div>
+        <div style="float:left;margin-top:-61px;margin-left:520px;width:300px;">
+            <label style="display:inline-block;margin-left:0px;margin-top:10px;">
+                Expense Class <span id="ooe_reqid" style="color:red">*</span>
+            </label>
+            <div style="margin-left:0px;width:100px;">
+                @(Html.Kendo().DropDownList()
+            .Name("ooeclass")
+            .DataTextField("ooename")
+            .DataValueField("ooeid")
+            .HtmlAttributes(new { style = "width:100%; height:100%;text-align:center", @class = "form-control autoselect" })
+            .DataSource(source =>
+            {
+                source.Read(read =>
+                {
+                    read.Action("GetWFPooe", "Report").Data("fnprogram");
+                })
+            .ServerFiltering(false);
+            })
+            .Events(e => e.Change("fnooeid_sel"))
+                )
+            </div>
+        </div>
+        <label style="display:inline-block;margin-left:0px;margin-top:10px;">
+            Account <span style="color:red">*</span>
+        </label>
+        <div style="margin-left:0px;width:500px;">
+            @(Html.Kendo().ComboBox()
+            .Name("account")
+            .DataTextField("AccountName")
+            .DataValueField("AccountID")
+            .AutoBind(true)
+            .Placeholder("Select account...")
+            .Filter("contains")
+            .MinLength(3)
+            .Events(e => e.Change("fnaccount_sel"))
+            .SelectedIndex(-1)
+            .HtmlAttributes(new { style = "width:100%; height:100%", @class = "form-control autoselect" })
+            .DataSource(source =>
+            {
+                source.Read(read =>
+                {
+                    read.Action("GetaccountWFP", "Report").Data("fnaccount");
+                })
+            .ServerFiltering(false);
+            })
+            )
+            <div style="display:inline-block">
+                <input type="checkbox" value="0" id="wfpsummaryid" onclick="wfpsummary_click()" style="zoom:1.2" />
+                <label style="display:inline-block;font-size:12px">View Revision</label>
+            </div>
+        </div>
+       
+    </div>
+</div>
+<div>
+    <div style="background-color:lightgray;margin-left:10px;text-align:left;margin-top:10px;height:30px;vertical-align:middle;width:747px">
+        <label style="margin-left:10px;float:left;margin-top:5px;">
+            Appropriation Details
+        </label>
+        <div style="display:inline-block;margin-left:150px;margin-top:5px;">
+            <input style="zoom:1.2"  type="checkbox" id="supplemetalapp" onclick="supplemetalapp()" value="0" />
+            <span style="font-size:14px;margin-left:2px;cursor:pointer;color:green" onclick="lblsupplemetalapp()"><b><u> Supplemental</u></b></span>
+        </div>
+    </div>
+    <div style="border-style:solid;height:75px;border-width:1px;margin-left:10px;width:745px;border-color:lightgray">
+        <div style="display:inline-block;margin-left:5px">
+            <label style="display:inline-block;margin-left:10px;margin-top:10px;">
+                Appropriation
+            </label>
+            <div style="margin-left:10px;">
+                <input id="appropriation_whole" type="text" min="0" value="0.00" readonly style="width:115px;color:#050afc" />
+            </div>
+        </div>
+        <div style="display:inline-block;margin-left:3px">
+            <label style="display:inline-block;margin-left:10px;margin-top:10px;">
+                Reserve (10%)
+            </label>
+            <input type="checkbox" id="reserveincludeid" value="1" onclick="reserve_click()" style="zoom:1.2" title="Tick the box to set as reserved!" />
+            <div style="margin-left:10px;">
+                <input id="reserve" type="text" min="0" value="0.00" readonly style="width:115px;color:#ff0000" />
+            </div>
+        </div>
+        <div style="display:inline-block;margin-left:3px">
+            <label style="display:inline-block;margin-left:10px;margin-top:10px;">
+                Appropriation (Net)
+            </label>
+            <div style="margin-left:10px;">
+                <input id="appropriation" type="text" min="0" value="0.00" readonly style="width:115px" />
+            </div>
+        </div>
+        <div style="display:inline-block;margin-left:-10px">
+            <label style="display:inline-block;margin-left:10px;margin-top:10px;">
+               Total Amount (AIP)
+            </label>
+            <div style="margin-left:10px;">
+                <input id="allotment" type="text" min="0" value="0.00" readonly style="width:115px;color:#ff0000" />
+            </div>
+        </div>
+        <div style="display:inline-block;margin-left:-10px">
+            <label style="display:inline-block;margin-left:10px;margin-top:10px;">
+                Balance
+            </label>
+            <div style="margin-left:10px;">
+                <input id="appbalance" type="text" min="0" value="0.00" readonly style="width:115px;color:green" />
+            </div>
+        </div>
+    </div>
+</div>
+@*<div style="float:left;margin-top:55px">
+    <div class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 95px;float:right;background-color:cornflowerblue;color:white;border-style:solid;border-width:1px; margin-top: 20px; margin-right:80px;margin-top:-30px; margin-bottom:0px" title="" onclick="btnppmpitem()"><span class="fa fa-plus"></span> ADD Item</div>
+</div>*@
+<div style="float:left;margin-top:45px;margin-left:0px;">
+    <div class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 85px;float:right;border-style:solid;border-width:1px; margin-top: 20px; margin-right:80px;margin-top:-30px; margin-bottom:0px;font-size:11px;" title="Click to view submitted WFP!" onclick="vwSubmitted()"><span class="fa fa-send"></span> Submitted</div>
+</div>
+<div style="float:left;margin-top:45px;margin-left:-82px;">
+    <div class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 85px;float:right;border-style:solid;border-width:1px; margin-top: 20px; margin-right:80px;margin-top:-30px; margin-bottom:0px;font-size:11px;" title="Click to view reviewed WFP!" onclick="vwApproved()"><span class="fa fa-book"></span> Reviewed</div>
+</div>
+<div style="float:left;margin-top:45px;margin-left:-82px;">
+    <div class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 85px;float:right;border-style:solid;border-width:1px; margin-top: 20px; margin-right:80px;margin-top:-30px; margin-bottom:0px;font-size:11px;" title="Click to view approved WFP!" onclick="vwApproved_lce()"><span class="fa fa-thumbs-o-up"></span> Approved</div>
+</div>
+<div style="float:left;margin-top:45px;margin-left:-82px;">
+    <div class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 85px;float:right;border-style:solid;border-width:1px; margin-top: 20px; margin-right:80px;margin-top:-30px; margin-bottom:0px;font-size:11px;" title="Click to open WFP status!" onclick="wfpstatus_review()"><span class="fa fa-list-alt"></span> Status</div>
+</div>
+<div style="float:left;margin-top:12px;margin-left:-55px;zoom:1.2">
+    <input type="checkbox" id="applied80per" title="Tick the box to allocate WFP funds to only 80% of the appropriation." onclick="applied80per_click()" value="0"/>
+    <label style="font-size:11px;display:inline-block;" title="Tick the box to allocate WFP funds to only 80% of the appropriation." onclick="applied80per_lbl()">WFP (80%)</label>
+</div>
+
+<div style="float:left;margin-top:12px;margin-left:10px;zoom:1.2">
+    <input type="checkbox" id="filter80per" title="Tick the box to filter WFP funds with 80% of the appropriation." onclick="filter80per_click()" value="0" />
+    <label style="font-size:11px;display:inline-block;" title="Tick the box to filter WFP funds with 80% of the appropriation." onclick="filter_lbl()">Filter WFP</label>
+</div>
+
+<div id="searchAccountid" style="height: 33px; margin-top: 15px; float: right;">
+    <input type="text" style="width:172px;border-collapse:collapse;margin:0px;border-style:solid;margin-left:0px;height:60%;outline:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search..." id="SearchData" name="SearchData">
+    <div class="k-button k-button-icontext" style="height:30px;width:40px;border-style:solid;" onclick="searchAccount()"><span class="mif-search"></span></div>
+</div>
+
+<div style="display:inline-block;width:100%;margin-top:-5px">
+    @(Html.Kendo().TabStrip()
+          .Name("tabstrip")
+          .Navigatable(false)
+          .Animation(animation =>
+              animation.Open(effect =>
+              effect.Fade(FadeDirection.In)))
+          .Items(tabstrip =>
+          {
+              tabstrip.Add().Text("Prepared").Selected(true).LoadContentFrom("pv_WFPDetail", "Report");
+              tabstrip.Add().Text("Cancelled").LoadContentFrom("pv_WFPCancel", "Report");
+          })
+          .Events(e => e.Activate("fn_refresher"))
+
+    )
+</div>
+<style>
+    .k-grid-header .k-header {
+        height: 20px;
+        padding: 0;
+    }
+
+    .k-grid tbody tr {
+        line-height: 14px;
+    }
+
+    .k-grid tbody td {
+        padding: 0;
+    }
+</style>
+
+<div style="background-color:#54625E;margin-top:-5px;padding-top:5px;padding-bottom:5px">
+    <span style="font-weight:bold;color:white;margin-left:5px">LEGEND: </span> <span style="color:yellow;margin-right:10px"> YELLOW: PPMP</span><span style="color:white">/</span> <span style="color:cyan;margin-right:10px"> CYAN: PPMP w/ SUB-PPA</span><span style="color:white">/</span> <span style="color:lightgreen;margin-right:10px"> LIGHT GREEN: Not PPMP w/ SUB-PPA</span><span style="color:white">/</span><span style="color:#CCCCCC;margin-right:10px"> LIGHT GRAY: WFP (80%)</span>
+    <span style="color:white;margin-right:10px">/ WHITE: Not PPMP</span><span style="color:orange;margin-right:10px">/ ORANGE: SUPPLEMENTAL (PROCUREMENT)</span><span style="color:beige;margin-right:10px">/ BEIGE: SUPPLEMENTAL (NON-PROCUREMENT)</span>@*<span style="color:lightblue;margin-right:10px">/ LIGHT BLUE: Not PPMP w/ ACTIVITY DESIGN</span> <span style="color:beige;margin-right:10px">/ BEIGE: PPMP w/ ACTIVITY DESIGN</span>*@
+</div>
+@*blueviolet*@
+
+<div>
+    <div id="optionfieldsid_current">
+        <label style="display:inline-block;margin-left:10px;margin-top:10px;">
+            Activity <span id="activity_reqid" style="color:red">*</span>
+        </label>
+        <div style="margin-left:10px;width:500px;margin-top:0px;">
+            @(Html.Kendo().ComboBox()
+            .Name("activity")
+            .DataTextField("initiative")
+            .DataValueField("initiative_id")
+            .AutoBind(true)
+            .Placeholder("Select activity...")
+            .Filter("contains")
+            .MinLength(3)
+            .Events(e => e.Change("fnOffice_activity"))
+            .SelectedIndex(0)
+            .HtmlAttributes(new { style = "width:100%; height:100%", @class = "form-control autoselect" })
+            .DataSource(source =>
+            {
+                source.Read(read =>
+                {
+                    read.Action("GetOfficeActivity", "Report").Data("fnactivity");
+                })
+            .ServerFiltering(false);
+            })
+            )
+        </div>
+    </div>
+    <div id="optionfieldsid_excess" style="display:none">
+        <label style="display:inline-block;margin-left:10px;margin-top:10px;">
+            Project Title <span id="" style="color:red">*</span>
+        </label>
+        <div style="margin-left:10px;width:500px;margin-top:0px;">
+            <div style="margin-left:0px;">
+                <textarea id="projectid" placeholder="Enter Project" style="width:487.5px;height:20px;"></textarea>
+            </div>
+        </div>
+    </div>
+
+    <div style="float:left;margin-top:-30px;margin-left:510px">
+        <div class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 30px;background-color:cornflowerblue;color:white; margin-bottom:0px" onclick="reqprintwfp()"><span class="fa fa-print"></span></div>
+    </div>
+
+    <div style="float:left;margin-left:552px;margin-top:-53px">
+        <div style="display:inline-block">
+            <label>
+                Start <span id="datefromid" style="color:red">*</span>
+            </label>
+            <input id="datepicker_activityfrom" title="datepicker" style="width: 100.5px; float: left; margin-left: 0px;" />
+        </div>
+        <div style="display:inline-block">
+            <label>
+                End <span id="datetoid" style="color:red">*</span>
+            </label>
+            <input id="datepicker_activityto" title="datepicker" style="width: 100.5px; float: left; margin-left: 0px;" />
+        </div>
+    </div>
+
+    <div style="display:inline-block;">
+        <div style="border-style:solid;border-width:1px;width:752.7px;border-color:darkgray;margin-left:10px;margin-top:10px;margin-bottom:0px;height:160px;">
+            <label style="display:inline-block;border-style:solid;border-width:1px;border-color:darkgray;background-color:lightgray;width:100%;height:30px;vertical-align:middle">
+                <span style="margin-left:6px;float:left;margin-top:5px;font-size:16px;">Sub-PPA</span> <span style="color:red"> *</span>
+            </label>
+            <br />
+            <label style="display:inline-block;margin-left:100px;margin-top:0px;">
+                @*Group Under*@
+                <div style="float:right;margin-top:0px;margin-left:243px">
+                    @*<div  class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 30px; margin-top: 10px; margin-left:15px;background-color:cornflowerblue;color:white; margin-bottom:0px" title="Please click to access the form for creating the sub-PPA." onclick="reqbuildsub()"><span ></span> <b>...</b></div>*@
+                    @*<a href="https://pgas.ph/ifmis_bms/Maintenance/NonOfficeSub" target="_blank" style="color:red;font-size:12px;" title="Please click the button to access the form for creating the sub-PPA."><b><i><u> Build Sub-PPA</u></i> </b></a>*@
+                </div>
+            </label>
+            <div style="margin-left:10px;width:487px;margin-top:-10px;">
+                @(Html.Kendo().ComboBox()
+            .Name("groupactivity")
+            .DataTextField("accountname")
+            .DataValueField("accountnameid")
+            .AutoBind(true)
+            .Placeholder("Select sub-ppa...")
+            .Filter("contains")
+            .MinLength(3)
+            .Events(e => e.Change("fnMainaccount"))
+            .SelectedIndex(0)
+            .HtmlAttributes(new { style = "width:100%; height:100%", @class = "form-control autoselect" })
+            .DataSource(source =>
+            {
+                source.Read(read =>
+                {
+                    read.Action("GetNOAccountWFP", "Report").Data("fngroupactivity");
+                })
+            .ServerFiltering(false);
+            })
+                )
+               
+            </div>
+            <div style="float:right;margin-right:175px;margin-top:-30px">
+                <div class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 80px;background-color:cornflowerblue;color:white; margin-bottom:0px" onclick="btnSubmit(2)"><span class="fa fa-send-o"></span> Submit</div>
+            </div>
+            <div style="display:inline-block" id="div_subppaid">
+                <div style="display:inline-block">
+                    <label style="display:inline-block;margin-left:10px;margin-top:10px;">
+                        Appropriation
+                    </label> <br />
+                    <input id="MainAppropriation" name="MainAppropriation" type="text" value="0.00" readonly style="width:139px;height:100%;color:#050afc;margin-left:10px" class="form-control">
+                </div>
+                <div style="display:inline-block">
+                    <label style="display:inline-block;margin-left:10px;margin-top:10px;">
+                        Total Amount (less)
+                    </label> <br />
+                    <input id="SubAppropriation" name="SubAppropriation" type="text" value="0.00" readonly style="width:139px;height:100%;color:#ff0000;margin-left:10px" class="form-control">
+                </div>
+                <div style="display:inline-block">
+                    <label style="display:inline-block;margin-left:10px;margin-top:10px;">
+                        Balance
+                    </label> <br />
+                    <input id="BalAppropriation" name="BalAppropriation" type="text" value="0.00" readonly style="width:139px;height:100%;color:green;margin-left:10px" class="form-control">
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <label style="display:inline-block;margin-left:10px;margin-top:10px;">
+        Project Component & Specific Activity <span style="color:red">*</span>
+    </label>
+    <div style="display:inline-block;margin-left:10px;width:500px;margin-top:0px;">
+        <div style="margin-left:0px;">
+            <textarea id="specificactivity" placeholder="Enter Specific Activity" style="width:487.5px"></textarea>
+        </div>
+        
+    </div>
+    <div  style="float:right;margin-right:230px;margin-top:15px">
+        <input type="checkbox" id="includeppa" style="zoom:1.2" value="0" onclick="fnincludeppa()"/>
+    </div>
+    <div  style="float:right;margin-right:160px;margin-top:-36px">
+        <label style="font-size:12px" id="lblforsubppaid" onclick="fnincludeppalbl()"> For Sub-PPA</label>
+    </div>
+    
+    <br />  
+    <label style="display:inline-block;margin-left:10px;margin-top:10px;">
+        Item Name <span style="color:red">*</span>
+    </label>
+    <div style="margin-left:10px;">
+        <textarea id="itemname"  placeholder="Enter Item Name" style="width:487.5px"></textarea>
+        
+    </div>
+    <div style="float:left;margin-left:515px;margin-top:-75px">
+        <label style="display:inline-block;margin-left:10px;">
+            Implementing Office
+        </label>
+        <div style="margin-left:10px;">
+            @(Html.Kendo().ComboBox()
+            .Name("propoffice")
+            .DataTextField("offname")
+            .DataValueField("OfficeID")
+            .AutoBind(true)
+            .Placeholder("Select office...")
+            .Filter("contains")
+            .MinLength(3)
+            .SelectedIndex(-1)
+            .HtmlAttributes(new { style = "width:100%; height:100%", @class = "form-control autoselect" })
+            .DataSource(source =>
+            {
+                source.Read(read =>
+                {
+                    read.Action("GetProOffice", "Report");
+                })
+            .ServerFiltering(false);
+            })
+            )
+        </div>
+        @if (Account.UserInfo.eid == 5580)
+        {
+        <div class="k-button k-button-icontext" style="color:red;float:right;margin-top:-30px;margin-right:-32px" title="Click to link ITEMS!" onclick="linkitem_eps()"><span style="zoom:1" class="fa fa-link"></span></div>
+        }
+    </div>
+    <label style="display:inline-block;margin-left:10px;margin-top:10px;">
+        Description
+    </label>
+    <div style="margin-left:10px;">
+        <textarea id="description" placeholder="Enter Description" style="width:487.5px;height:25px"></textarea>
+    </div>
+    <div style="float:left;margin-left:515px;margin-top:-66px">
+        <label style="display:inline-block;margin-left:10px;margin-top:10px;">
+            Unit <span style="color:red">*</span>
+        </label>
+        <div style="margin-left:10px;">
+            <input id="unit" readonly type="text" style="width:100px" />
+        </div>
+    </div>
+    <div id="paymentfor_div" style="display:none">
+        <div style="display:inline-block;margin-top:5px;">
+            <label style="display:inline-block;margin-left:10px;margin-top:5px;">
+                Supplier (<span style="color:red">Debt Payment</span>)
+            </label>
+            <div style="margin-left:10px;width:498.5px">
+            @(Html.Kendo().ComboBox()
+            .Name("fpaysupplier")
+            .DataTextField("name")
+            .DataValueField("supplierid")
+            .AutoBind(true)
+            .Placeholder("Select supplier...")
+            .Filter("contains")
+            .MinLength(3)
+            .SelectedIndex(-1)
+            .HtmlAttributes(new { style = "width:100%; height:100%", @class = "form-control autoselect" })
+            .DataSource(source =>
+            {
+                source.Read(read =>
+                {
+                    read.Action("GetSupplier", "Report");
+                })
+            .ServerFiltering(false);
+            })
+                )
+            </div>
+        </div>
+    </div>
+    <label style="display:none; float:left;margin-left:250px;margin-top:-50px;">
+        Weight(%) <span style="color:red">*</span>
+    </label>
+    <div style="display:none;float:left;margin-left:250px;margin-top:-28px">
+        <input id="weight" type="text" style="width:100px" />
+    </div>
+</div>
+<div>
+    <div style="background-color:#ffd800;color:black;margin-left:10px;text-align:left;margin-top:10px;height:30px;vertical-align:middle;width:752.7px">
+        <label style="margin-left:10px;float:left;margin-top:5px;">
+            Monthly Quantity/ Amount
+        </label>
+    </div>
+    <div style="border-style:solid;height:135px;border-width:1px;margin-left:10px;width:750px;border-color:#ffd800">
+        <div style="display:inline-block;margin-left:-3px">
+            <label style="display:inline-block;margin-left:10px;margin-top:10px;">
+                January <span style="color:red">*</span>
+            </label>
+            <div style="margin-left:10px;">
+                <input id="jan" type="number" min="0" value="0" onkeyup="sync()" onclick="sync()" style="width:100px" />
+            </div>
+        </div>
+        <div style="display:inline-block;margin-left:0px">
+            <label style="display:inline-block;margin-left:10px;margin-top:10px;">
+                February <span style="color:red">*</span>
+            </label>
+            <div style="margin-left:10px;">
+                <input id="feb" type="number" min="0" value="0" onkeyup="sync()" onclick="sync()"  style="width:100px" />
+            </div>
+        </div>
+        <div style="display:inline-block;margin-left:0">
+            <label style="display:inline-block;margin-left:10px;margin-top:10px;">
+                March <span style="color:red">*</span>
+            </label>
+            <div style="margin-left:10px;">
+                <input id="mar" type="number" min="0" value="0" onkeyup="sync()" onclick="sync()"  style="width:100px" />
+            </div>
+        </div>
+        <div style="display:inline-block;margin-left:0px">
+            <label style="display:inline-block;margin-left:10px;margin-top:10px;">
+                April <span style="color:red">*</span>
+            </label>
+            <div style="margin-left:10px;">
+                <input id="apr" type="number" min="0" value="0" onkeyup="sync()" onclick="sync()"  style="width:100px" />
+            </div>
+        </div>
+        <div style="display:inline-block;margin-left:0px">
+            <label style="display:inline-block;margin-left:10px;margin-top:10px;">
+                May <span style="color:red">*</span>
+            </label>
+            <div style="margin-left:10px;">
+                <input id="may" type="number" min="0" value="0" onkeyup="sync()" onclick="sync()"  style="width:100px" />
+            </div>
+        </div>
+        <div style="display:inline-block;margin-left:0px">
+            <label style="display:inline-block;margin-left:10px;margin-top:10px;">
+                June <span style="color:red">*</span>
+            </label>
+            <div style="margin-left:10px;">
+                <input id="jun" type="number" min="0" value="0" onkeyup="sync()" onclick="sync()"  style="width:100px" />
+            </div>
+        </div>
+        <br />
+        <div style="display:inline-block;margin-left:-3px">
+            <label style="display:inline-block;margin-left:10px;margin-top:10px;">
+                July <span style="color:red">*</span>
+            </label>
+            <div style="margin-left:10px;">
+                <input id="jul" type="number" min="0" value="0" onkeyup="sync()" onclick="sync()"  style="width:100px" />
+            </div>
+        </div>
+        <div style="display:inline-block;margin-left:0px">
+            <label style="display:inline-block;margin-left:10px;margin-top:10px;">
+                August <span style="color:red">*</span>
+            </label>
+            <div style="margin-left:10px;">
+                <input id="aug" type="number" min="0" value="0" onkeyup="sync()" onclick="sync()"  style="width:100px" />
+            </div>
+        </div>
+        <div style="display:inline-block;margin-left:0px">
+            <label style="display:inline-block;margin-left:10px;margin-top:10px;">
+                September <span style="color:red">*</span>
+            </label>
+            <div style="margin-left:10px;">
+                <input id="sep" type="number" min="0" value="0" onkeyup="sync()" onclick="sync()"  style="width:100px" />
+            </div>
+        </div>
+        <div style="display:inline-block;margin-left:0px">
+            <label style="display:inline-block;margin-left:10px;margin-top:10px;">
+                October <span style="color:red">*</span>
+            </label>
+            <div style="margin-left:10px;">
+                <input id="oct" type="number" min="0" value="0" onkeyup="sync()" onclick="sync()"  style="width:100px" />
+            </div>
+        </div>
+        <div style="display:inline-block;margin-left:0px">
+            <label style="display:inline-block;margin-left:10px;margin-top:10px;">
+                November <span style="color:red">*</span>
+            </label>
+            <div style="margin-left:10px;">
+                <input id="nov" type="number" min="0" value="0" onkeyup="sync()" onclick="sync()"  style="width:100px" />
+            </div>
+        </div>
+        <div style="display:inline-block;margin-left:0px">
+            <label style="display:inline-block;margin-left:10px;margin-top:10px;">
+                December <span style="color:red">*</span>
+            </label>
+            <div style="margin-left:10px;">
+                <input id="dec" type="number" min="0" value="0" onkeyup="sync()" onclick="sync()"  style="width:100px" />
+            </div>
+        </div>
+    </div>
+</div>
+<div style="display:inline-block">
+    <div style="display:inline-block;margin-left:5px">
+        <label style="display:inline-block;margin-left:10px;margin-top:10px;">
+            Total Quantity
+        </label>
+        <div style="margin-left:10px;">
+            <input id="totqty" type="text" min="0" value="0" readonly style="width:100px" />
+        </div>
+    </div>
+    <div style="display:inline-block;margin-left:5px">
+        <label style="display:inline-block;margin-left:10px;margin-top:10px;">
+            Amount <span style="color:red">*</span>
+        </label>
+        <div style="margin-left:10px;">
+            <input id="amount" type="number" min="0" readonly value="0.00" onkeyup="sync2()"  onclick="sync2()" style="width:100px" />
+        </div>
+    </div>
+    <div style="display:inline-block; margin-left:5px">
+        <label style="display:inline-block;margin-left:10px;margin-top:10px;">
+            No. of Month/Days <span style="color:red"></span>
+        </label>
+        <div style="margin-left:10px;">
+            @*<input id="nodays" type="number" min="1" value="1" onkeyup="sync2()" readonly  onclick="sync2()" style="width:100px" />*@
+            <input id="nodays" type="number" min="1" value="1" style="width:100px" />
+        </div>
+    </div>
+    <div style="display:inline-block;margin-left:5px">
+        <label style="display:inline-block;margin-left:10px;margin-top:10px;">
+            Total Amount
+        </label>
+        <div style="margin-left:10px;">
+            <input id="totamount" type="text" min="0" value="0.00" readonly style="width:100px" />
+        </div>
+    </div>
+</div>
+<div style="display:inline-block;">
+    <div style="background-color:indianred;color:white;margin-left:10px;text-align:left;margin-top:10px;height:30px;vertical-align:middle;width:497.5px">
+        <label style="margin-left:10px;float:left;margin-top:5px;">
+            Output Indicator/ Responsible Person 
+        </label>
+    </div>
+    <div style="border-style:solid;height:335px;border-width:1px;margin-left:10px;width:495px;border-color:indianred">
+        <div style="display:inline-block;margin-left:5px">
+            <label style="display:none;margin-left:10px;margin-top:10px;">
+                Physical Target
+            </label>
+            <div style="margin-left:10px;display:none">
+                <input id="ptarget" type="text" style="width:450px;height:25px" />
+            </div>
+            <label style="display:inline-block;margin-left:10px;margin-top:10px;">
+                Output Indicator <span style="color:red">*</span>
+            </label>
+            <div style="margin-left:10px;">
+                @*<input id="indicator" type="text" style="width:450px;height:25px" />*@
+                <textarea id="indicator" type="text" style="width:450px;height:50px" ></textarea>
+            </div>
+            <label style="display:inline-block;margin-left:10px;margin-top:10px;">
+                Responsible ( <input type="radio" checked value="1" style="width:10px;zoom:1.2" id="responoffice" onclick="responoffice()"/><span style="width:30px"> Office</span>/ <input type="radio" style="width:10px;zoom:1.2" id="responperson" onclick="responperson()"> Person )
+            </label>
+            <div style="margin-left:10px;" >
+                @*<input id="resperson" type="text" style="width:450px;height:25px" />*@
+                @(Html.Kendo().ComboBox()
+                .Name("resperson")
+                .DataTextField("EmpNameFull")
+                .DataValueField("eid")
+                .SelectedIndex(-1)
+                .Filter("contains")
+                .MinLength(3)
+                //.SelectedIndex(-1)
+                .HtmlAttributes(new { style = "width:462px; height:100%;visible=false" , @class = "form-control autoselect" })
+                .DataSource(source => source.Read(read => read.Action("GetEmployeePerOffice", "Report")))
+                )
+
+            @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.WFPrepare>()
+                .Name("grid_responsible_person")
+                .HtmlAttributes(new { style = "" })
+                .Scrollable()
+                .Columns(col =>
+                {
+                    col.Template(@<text></text>)
+                .Hidden()
+                .HeaderTemplate(@<text>Office ID</text>)
+                .Hidden()
+                .HtmlAttributes(new { style = "text-align:center;" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:15px;background-color:#ff6a00;font-size:10px;color:beige;" })
+                @*.HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal"})*@
+                .ClientTemplate("<div>#=officeid# </div>");
+
+                    @*col.Template(@<text></text>)*@
+            col.Bound(c=>c.officeabbr)
+                .HeaderTemplate(@<text>Office</text>)
+                .Width(50)
+                .HtmlAttributes(new { style = "text-align:center;font-size:12px" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:15px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                .ClientTemplate("<div>#=officeabbr# </div>");
+
+                    col.Template(@<text></text>)
+                .Hidden()
+                .HeaderTemplate(@<text>Actioncode</text>)
+                .Hidden()
+                .HtmlAttributes(new { style = "text-align:center;" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:15px;background-color:#ff6a00;font-size:10px;color:beige;" })
+                @*.HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal"})*@
+                .ClientTemplate("<div>#=actioncode# </div>");
+
+                    col.Template(@<text></text>)
+                .ClientTemplate("<input id='check#=officeid#' onclick=Check_click(this,#=officeid#) title='Tick the box to add as responsible office/person!' style='zoom:1.2' type='checkbox'  class='checkbox'/>")
+                .Title("<input type='checkbox' checked  class='checkbox' readonly  style='zoom:1.5'/> <span style='text - align:center; vertical - align:middle; height: 30px; background - color:#ff6a00;font-size:14px;color:beige;font-weight:100;'></span> ")
+                .Width(30)
+                //  .HeaderTemplate(@<text>For Review</text>)#=officeid#
+                .HtmlAttributes(new { style = "text-align:center;height:30px" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" });
+                })
+                //.Editable(editable => editable.Mode(GridEditMode.InCell))
+                .Resizable(e => e.Columns(true))
+                .Pageable(pageable => pageable
+                .Refresh(true)
+                .ButtonCount(5))
+                .HtmlAttributes(new { @class = "table-responsive", style = "height:200px;width:459px" })
+                .Selectable()
+                .Events(e => e.DataBound("onDataBoundResperson"))
+                .DataSource(dataSource => dataSource
+                .Ajax()
+                .Batch(true)
+                .Model(m => m.Id(i => i.locationid))
+                .ServerOperation(false)
+                .PageSize(50)
+                .Read(read => read.Action("GetReponsibleOffice", "Report").Data("getresofficepar"))
+                )
+            )
+            </div>
+        </div>
+    </div>
+</div>
+<br />
+<div style="border-color:gray;border-width:1px;border-style:solid;width:650px;margin-top:8px;float:left;margin-left:10px">
+    <div style="background-color:lightgray;border-color:lightgray;margin-left:0px;text-align:left;margin-top:0px;height:30px;vertical-align:middle;width:650px;margin-bottom:5px">
+        <label style="margin-left:10px;float:left;margin-top:5px;">
+            Physical Target
+        </label>
+    </div>
+    <div style="display:inline-block;margin-left:10px;margin-bottom:5px;">
+            <label style="display:inline-block">
+                First Quarter <span style="color:red;font-weight:bold">*</span>
+            </label>
+        <br />
+        <div style="display:inline-block;margin-left:-1px">
+            <textarea class="k-input" id="1qtr" name="1qtr" type="text" style="width:150px;"> </textarea>
+        </div>
+    </div>
+    <div style="display:inline-block;margin-left:5px">
+        
+            <label style="display:inline-block">
+                Second Quarter <span style="color:red;font-weight:bold">*</span>
+            </label>
+        <br />
+        <div style="display:inline-block;margin-left:-1px">
+            <textarea class="k-input" id="2qtr" name="2qtr" type="text" style="width:150px;"> </textarea>
+        </div>
+    </div>
+    <div style="display:inline-block;margin-left:5px">
+            <label style="display:inline-block">
+                Third Quarter <span style="color:red;font-weight:bold">*</span>
+            </label>
+        <br />
+        <div style="display:inline-block;margin-left:-1px">
+            <textarea class="k-input" id="3qtr" name="3qtr" type="text" style="width:150px;"></textarea>
+        </div>
+    </div>
+    <div style="display:inline-block;margin-left:5px">
+            <label style="display:inline-block">
+                Fourth Quarter <span style="color:red;font-weight:bold">*</span>
+            </label>
+        <br />
+        <div style="display:inline-block;margin-left:-1px">
+            <textarea class="k-input" id="4qtr" name="4qtr" type="text" style="width:150px;"></textarea>
+        </div>
+    </div>
+</div>
+
+<br />
+<div style="display:inline-block;margin-left:10px;margin-top:5px;">
+    <label style="display:inline-block">
+        Date of Completion
+    </label>
+    <br />
+    <div style="display:inline-block">
+        <input id="datepicker" title="datepicker" style="width: 140.5px; float: left; margin-left: 0px;" />
+    </div>
+</div>
+<div id="borderid" onclick="borderid()" style="border-style:solid;border-width:1px;border-color:cornflowerblue;background-color:cornflowerblue;margin-top:10px;cursor:pointer;">
+    <label style="display:inline-block;font-size:14px;padding:5px 5px 5px 5px"> Report</label>
+    <span id="anglehidedownid" style="float:right;margin-right:5px;display:none;padding:5px 5px 5px 5px;"  class="fa fa-angle-down"></span>
+    <span id="anglehideupid" style="float:right;margin-right:5px;font-size:16px;font-weight:bolder;padding:5px 5px 5px 5px;" class="fa fa-angle-up"></span>
+</div>
+<div id="reportid" style="display:inline-block;margin-left:10px;height:275px;margin-top:2px;">
+    <div style="display:inline-block;height:65px;">
+        <label style="display:inline-block;margin-left:10px;margin-top:10px;">
+            Source of Fund <span style="color:red">*</span>
+        </label>
+        <div style="margin-left:10px;">
+            @(Html.Kendo().DropDownList()
+            .Name("fundsource")
+            .DataTextField("FundName")
+            .DataValueField("FundCode")
+            .Filter("contains")
+            .MinLength(3)
+            .SelectedIndex(-1)
+            .HtmlAttributes(new { style = "width:478px; height:100%", @class = "form-control autoselect" })
+            .DataSource(source => source.Read(read => read.Action("GetFundsource", "Report")))
+            )
+        </div>
+    </div>
+    <div style="display:none;height:65px;">
+        <label style="display:inline-block;margin-left:10px;margin-top:10px;">
+            Project <span style="color:red">*</span>
+        </label>
+        <div style="margin-left:10px;">
+            @(Html.Kendo().DropDownList()
+            .Name("projectaip")
+            .DataTextField("project")
+            .DataValueField("project_id")
+            .Filter("contains")
+            .MinLength(3)
+            .SelectedIndex(-1)
+            .HtmlAttributes(new { style = "width:478px; height:100%", @class = "form-control autoselect" })
+            .DataSource(source => source.Read(read => read.Action("GetOfficeProject", "Report").Data("fnooe")))
+            )
+        </div>
+    </div>
+    <div id="" style="border-style:dotted;border-width:1px;display:inline-block;margin-left:10px;margin-top:2px;width:490px;">
+        <label style="display:inline-block;border-style:solid;border-width:1px;border-color:darkgray;background-color:lightgray;width:488px;">
+           <span style="font-size:16px;padding:5px 5px 5px 5px;">Location</span>
+        </label>
+        <br />
+        <div style="display:inline-block;margin-top:5px;margin-bottom:0px">
+            <input type="radio" id="pgas_loc" style="float:left;width:10px;zoom:1.3;margin-left:10px;margin-bottom:5px;" value="1" checked onclick="pgas_loc()"/>
+            <span style="float:left;margin-top:-2px;margin-left:5px">Within PGAS</span>
+            <input type="radio" id="other_loc" style="float:left;width:10px;zoom:1.3;margin-left:10px;margin-bottom:5px;" value="0" onclick="other_loc()" />
+            <span style="float:left;margin-top:-2px;margin-left:5px">Other (Please specify)</span>
+        </div>
+        <div id="otherlocationid" style="display:none;">
+            <div style="display:inline-block;">
+                @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.WFPrepare>()
+            .Name("wfplocation")
+            .HtmlAttributes(new { style = "" })
+            .Scrollable()
+            .Columns(col =>
+            {
+                col.Template(@<text></text>)
+            .Hidden()
+            .HeaderTemplate(@<text>No.</text>)
+            .Hidden()
+            .HtmlAttributes(new { style = "text-align:center;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:10px;color:beige;" })
+            @*.HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal"})*@
+            .ClientTemplate("<div>#=locationid# </div>");
+
+                col.Template(@<text></text>)
+            .HeaderTemplate(@<text>Municipality</text>)
+            .Width(100)
+            .HtmlAttributes(new { style = "text-align:left;;font-size:12px" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=municipal# </div>");
+                col.Template(@<text></text>)
+            .HeaderTemplate(@<text>Municipality id</text>)
+            .Width(0)
+            .Hidden()
+            .HtmlAttributes(new { style = "text-align:left;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=municipalid# </div>");
+                col.Template(@<text></text>)
+            .HeaderTemplate(@<text>Barangay</text>)
+            .Width(100)
+            .HtmlAttributes(new { style = "text-align:left;;font-size:12px" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=barangay# </div>");
+                col.Template(@<text></text>)
+            .HeaderTemplate(@<text>brgy id</text>)
+            .Width(0)
+            .Hidden()
+            .HtmlAttributes(new { style = "text-align:left;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:10px;color:beige;" })
+            .ClientTemplate("<div>#=barangayid# </div>");
+                col.Template(@<text></text>)
+            .HeaderTemplate(@<text></text>)
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:10px;color:beige;" })
+            .ClientTemplate(
+                "<div id='deleteid#=wfpid#' style='' onclick='deleteloc(#=locationid#)'><span class='fa fa-trash' title='Click to delete location!' style='font-size: 16px;margin: 1px;margin-top: -1px;margin-left: 2px;margin-right:2px;width:25px;color:red;text-align:center;cursor:pointer;'> </span></div> ")
+            .HtmlAttributes(new { style = "vertical-align: top;text-align:center" })
+            .Width(15);
+            })
+            //.Editable(editable => editable.Mode(GridEditMode.InCell))
+            .Resizable(e => e.Columns(true))
+            .Pageable(pageable => pageable
+            .Refresh(true)
+            .ButtonCount(5))
+            .HtmlAttributes(new { @class = "table-responsive", style = "height:150px;width:488px" })
+            .Selectable()
+            //.Events(e => e.Change("locgrid"))
+            .DataSource(dataSource => dataSource
+            .Ajax()
+            .Batch(true)
+            .Model(m => m.Id(i => i.locationid))
+            .ServerOperation(false)
+            .PageSize(50)
+            .Read(read => read.Action("GetWFPLocation", "Report").Data("getparalocatin"))
+            )
+                )
+            </div>
+            <br />
+            <div style="display:inline-block;height:65px;">
+                <label style="display:inline-block;margin-left:10px;margin-top:10px;">
+                    City/Municipality
+                </label>
+                <div style="margin-left:10px;">
+                    @(Html.Kendo().DropDownList()
+            .Name("municipal")
+            .DataTextField("Municipality")
+            .DataValueField("citymunCode")
+            .Filter("contains")
+            .MinLength(3)
+            .Events(e => e.Change("fnbarangay"))
+            .SelectedIndex(-1)
+            .HtmlAttributes(new { style = "width:478px; height:100%", @class = "form-control autoselect" })
+            .DataSource(source => source.Read(read => read.Action("GetMunicipality", "Report")))
+                    )
+
+                </div>
+            </div>
+            <div style="display:inline-block;height:65px;">
+                <label style="display:inline-block;margin-left:10px;margin-top:5px;">
+                    Barangay
+                </label>
+                <div style="margin-left:10px;">
+                    @(Html.Kendo().DropDownList()
+            .Name("barangay")
+            .DataTextField("brgyDesc")
+            .DataValueField("brgyCode")
+            .Filter("contains")
+            .MinLength(3)
+            .SelectedIndex(-1)
+            .HtmlAttributes(new { style = "width:478px; height:100%", @class = "form-control autoselect" })
+            .DataSource(source => source.Read(read => read.Action("GetBarangay", "Report").Data("fnbrgy")))
+                    )
+                </div>
+            </div>
+            <br />
+            <div style="display:inline-block;">
+                <div id="btnadd" class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 65px;float:left; margin-top: 0px; margin-left:10px;border-radius:50px;background-color:cornflowerblue;color:white; margin-bottom:0px" onclick="addlocation()"><span style="zoom:1.2" class="fa fa-plus-circle"></span> Add</div>
+                @*<div style="float:right;margin-right:230px;margin-top:15px">
+                    <input type="checkbox" id="includeppa" style="zoom:1.2" value="0" onclick="fnincludeppa()" />
+                </div>
+                <div style="float:right;margin-right:160px;margin-top:-36px">
+                    <label style="font-size:12px" onclick="fnincludeppalbl()"> Apply To All</label>
+                </div>*@
+            </div>
+        </div>
+    </div>
+    <div style="display:inline-block;height:65px;">
+        <label style="display:inline-block;margin-left:10px;margin-top:10px;">
+            Prepared by @*<span style="color:red">*</span>*@
+        </label>
+        <div style="margin-left:10px;">
+            @(Html.Kendo().ComboBox()
+        .Name("prepby")
+        .DataTextField("EmpNameFull")
+        .DataValueField("eid")
+        .SelectedIndex(-1)
+        .Filter("contains")
+        .MinLength(3)
+        .SelectedIndex(-1)
+        .HtmlAttributes(new { style = "width:478px; height:100%", @class = "form-control autoselect" })
+
+        .DataSource(source => source.Read(read => read.Action("GetEmployeePerOffice", "Report")))
+            )
+        </div>
+    </div>
+    <br />
+    <div style="display:inline-block;height:65px;">
+        <label style="margin-left:10px;margin-top:10px;">
+            Report History
+        </label>
+        <div style="margin-left:10px;">
+            @(Html.Kendo().ComboBox()
+            .Name("repHistory")
+            .DataTextField("datetimentered")
+            .DataValueField("wfp_id")
+            .SelectedIndex(-1)
+            .Filter("contains")
+            .MinLength(3)
+            .HtmlAttributes(new { style = "width:200px; height:100%" })
+            .DataSource(source => source.Read(read => read.Action("GetWFPReportHistory", "Report").Data("fnReportHistory")))
+            )
+        </div>
+    </div>
+</div>
+<br />
+<div id="previewid" style="margin-top:-20px;">
+    <div style="float:left;margin-left:103px;width:500px;margin-top:10px;width:225px">
+        <input style="width:10px;zoom:1.5" type="radio" checked="checked" id="prepwfp" onclick="prepdfppt(1)" value="1" />
+        <label style="display:inline-block" onclick="prepdfpptlabel(1)"> Print Prepared WFP</label>
+    </div>
+    <div style="float:left;margin-left:320px;width:500px;margin-top:-24px;width:225px">
+        <input style="width:10px;zoom:1.5" type="radio" id="submitwfp" onclick="prepdfppt(2)" value="0" />
+        <label style="display:inline-block" onclick="prepdfpptlabel(2)"> Print Submitted WFP</label>
+    </div>
+    <div style="float:left;margin-left:540px;width:500px;margin-top:-25px;width:225px">
+        <input style="width:10px;zoom:1.5" type="radio" id="approvewfp" onclick="prepdfppt(3)" value="0" />
+        <label style="display:inline-block" onclick="prepdfpptlabel(3)"> Print Reviewed WFP</label>
+    </div>
+</div>
+    <div style="display:inline-block;margin-left:10px;width:740px;margin-top:15px;margin-bottom:15px;background-color:#bdbcbc;height:50px">
+        <div id="btnClear" class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 100px;margin-left:175px;float:left; margin-top: 10px; border-radius:50px;margin-bottom:0px" onclick="reqClear()"><span class=""></span> Clear</div>
+        <div id="btnSave" class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 100px;float:left; margin-top: 10px; margin-left:15px;border-radius:50px;background-color:cornflowerblue;color:white; margin-bottom:0px" onclick="reqSave()"><span class="fa fa-save"></span> Save</div>
+        <div id="btnPrint" class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 100px;float:right; margin-top:10px; margin-right:235px;border-radius:50px;margin-bottom:0px" onclick="reqPrint()"><span class="fa fa-search"></span> Preview</div>
+    </div>
+    <div style="display:none">
+        <input type="number" value="0" id="wfpid"/>
+        <input type="number" value="0" id="nonofficeid_temp" />
+        <input type="number" value="0" id="subppaid_temp" />
+        
+        <input type="number"value="0" id="isPPMPTag"/>
+        <input type="text" value="" id="fund" />
+        <input type="number" value="0" id="kpmid" />
+        <input type="number" value="0" id="fundreqid" />
+        <input type="number" value="0" id="breakdownid" />
+        <input type="number" value="1" id="reporthide"/>
+        <input type="number" value="0" id="reserveflag"/>
+        <input type="number" value="0" id="qtytotal_temp" />
+        <input type="number" value="0" id="epa_lockid"/>
+        <input type="number" value="0" id="showsupplemental"/>
+        <input type="number" value="0" id="fpay_tmp" />
+    </div>
+
+<script>
+    $(document).ready(function () {
+        $("#municipal").data("kendoDropDownList").value("");
+        //   $("#barangay").data("kendoDropDownList").dataSource.read();
+        document.getElementById("reportid").style = "display:none"
+        document.getElementById("anglehideupid").style = 'display:none'
+        document.getElementById("anglehidedownid").style = 'float:right;margin-right:5px;display:normal;font-weight:bolder;font-size:16px;padding:5px 5px 5px 5px;'
+        $("#reporthide").val(0)
+        //$("#wfprepared").data("kendoGrid").dataSource.read()
+        $("#ooeclass").data("kendoDropDownList").value("")
+
+        $("#datepicker").kendoDatePicker();
+        $("#datepicker").val(new Date().toLocaleDateString());
+
+        $("#datepicker_activityfrom").kendoDatePicker();
+        $("#datepicker_activityfrom").val(new Date().toLocaleDateString());
+
+        $("#datepicker_activityto").kendoDatePicker();
+        $("#datepicker_activityto").val("");
+
+        $("#grid_responsible_person").data("kendoGrid").dataSource.read();
+        $("#resperson").closest(".k-widget").hide();
+        $("#includeppa").hide()
+        $("#lblforsubppaid").hide()
+
+        $("#optionfieldsid_current").show()
+        $("#optionfieldsid_excess").hide()
+        $("#showsupplemental").val(0)
+
+        //$("#datepicker").kendoDatePicker();
+
+        //$("#datepicker_activityfrom").on("click", function () {
+        //    // Your function code here
+        //    alert("DatePicker clicked!");
+        //});
+
+        
+        //$("#datepicker_activityfrom").kendoDatePicker({
+        //    // Attach the open event handler
+        //    open: function () {
+        //        // Your function code here
+        //        alert("DatePicker clicked!");
+        //    }
+        //});
+
+        var url = "@Url.Action("getusertf", "Report")";
+        $.get(url,function(e){
+            if (e == 1){
+                $("#div_gfid").hide();
+                document.getElementById("div_gfid").style="display:none"
+                tflblid_click()
+            }
+            else{
+                $("#div_gfid").show();
+                document.getElementById("div_gfid").style="display:inline-block"
+            }
+        })
+
+    });
+
+    function fn_refresher(e) {
+        var SelectedTabIndex = $("#tabstrip").data("kendoTabStrip").select().index();
+      
+        if (SelectedTabIndex == 0) {
+            $("#WFPPrepareGrid").data("kendoGrid").dataSource.read();
+        }
+        else if (SelectedTabIndex == 1) {
+            $("#WFPCancel").data("kendoGrid").dataSource.read();
+        }
+
+    }
+
+    function reqbuildsub(){
+        success: window.open("https://pgas.ph/ifmis_bms/Maintenance/NonOfficeSub")
+    }
+    //$("#checkDateButton").click(function() {
+    //    var datePicker = $("#datepicker").data("kendoDatePicker");
+    //    var selectedDate = datePicker.value();
+
+    //    if (selectedDate) {
+
+
+        
+    //        alert("Selected Date: " + selectedDate);
+    //    } else {
+    //        alert("No date selected.");
+    //    }
+    //});
+
+    function supplemetalapp(){
+        if (document.getElementById("supplemetalapp").checked){
+            $("#supplemetalapp").val(1)
+        }
+        else{
+            $("#supplemetalapp").val(0)
+        }
+        fnaccount_sel()
+    }
+    function lblsupplemetalapp(){
+        if (document.getElementById("supplemetalapp").checked){
+            $("#supplemetalapp").prop("checked",false)
+            $("#supplemetalapp").val(0)
+        }
+        else{
+            $("#supplemetalapp").prop("checked",true)
+            $("#supplemetalapp").val(1)
+        }
+        fnaccount_sel()
+    }
+    function gfid_click(){
+        document.getElementById("gfid").value="1"
+        document.getElementById("tfid").value="0"
+        $("#tfid").prop("checked",false)
+        $("#office").data("kendoComboBox").value("")
+        $("#ooe").data("kendoComboBox").value("")
+        $("#ooeclass").data("kendoDropDownList").value("")
+        $("#account").data("kendoComboBox").value("")
+        $("#office").data("kendoComboBox").dataSource.read()
+        //$("#program_reqid").show()
+        $("#ooe_reqid").show()
+        $("#activity_reqid").show()
+        $("#includeppa").hide()
+        $("#lblforsubppaid").hide()
+        $("#gftransid").show()
+    }
+    function tfid_click(){
+        document.getElementById("gfid").value="0"
+        document.getElementById("tfid").value="1"
+        $("#gfid").prop("checked",false)
+        $("#office").data("kendoComboBox").value("")
+        $("#ooe").data("kendoComboBox").value("")
+        $("#ooeclass").data("kendoDropDownList").value("")
+        $("#account").data("kendoComboBox").value("")
+        $("#office").data("kendoComboBox").dataSource.read()
+        //$("#program_reqid").hide()
+        $("#ooe_reqid").hide()
+        //$("#activity_reqid").hide()
+        $("#includeppa").hide()
+        $("#lblforsubppaid").hide()
+        $("#gftransid").hide()
+    }
+
+    function gflblid_click(){
+        gfid_click()
+        $("#gfid").prop("checked",true)
+        $("#WFPPrepareGrid").data("kendoGrid").dataSource.read()
+    }
+    function tflblid_click(){
+        tfid_click()
+        $("#tfid").prop("checked",true)
+        $("#WFPPrepareGrid").data("kendoGrid").dataSource.read()
+    }
+
+    function gf_current_id_click(){
+        document.getElementById("gf_currentid").value="1";
+        document.getElementById("gf_excessid").value="0";
+        $("#gf_excessid").prop("checked",false)
+        fnOffice_sel()
+        $("#ooe").data("kendoComboBox").value("")
+        $("#account").data("kendoComboBox").value("")
+        $("#program_reqid").show()
+        $("#ooe_reqid").show()
+        $("#activity_reqid").show()
+        $("#includeppa").hide()
+        $("#lblforsubppaid").hide()
+        $("#optionfieldsid_current").show()
+        $("#optionfieldsid_excess").hide()
+        $("#datefromid").show()
+        $("#datetoid").show()
+        $("#optionprogram").show()
+        $("#optionprogram_excess").hide()
+    }
+    function gf_excess_id_click(){
+           
+        document.getElementById("gf_currentid").value = "0";
+        document.getElementById("gf_excessid").value = "1";
+        $("#gf_currentid").prop("checked", false)
+        fnOffice_sel()
+        $("#ooe").data("kendoComboBox").value("")
+        $("#account").data("kendoComboBox").value("")
+        $("#program_reqid").hide()
+        $("#ooe_reqid").hide()
+        //$("#activity_reqid").hide()
+        $("#includeppa").hide()
+        $("#lblforsubppaid").hide()
+        $("#optionfieldsid_excess").show()
+        //$("#optionfieldsid_current").hide()
+        $("#datefromid").hide()
+        $("#datetoid").hide()
+        $("#optionprogram").hide()
+        $("#optionprogram_excess").show()
+    }
+    function gf_current_lblid_click(){
+        gf_current_id_click()
+        $("#gf_currentid").prop("checked",true)
+       
+    }
+    function gf_excess_lblid_click(){
+        gf_excess_id_click()
+        $("#gf_excessid").prop("checked",true)
+    }
+    function loadpritem(){
+        var url = "@Url.Action("downloadpritems", "Report")";
+        var office = $("#office").val();
+        var program = $("#ooe").val()
+        var account = $("#account").val()
+        var tyear = $("#wfpyear").val();
+        $.post(url,
+            {
+                office: $("#office").val(),
+                program: program,
+                account: account,
+                tyear: tyear
+            }, function (e) {})
+    }
+    function reqprintwfp(){
+        var activityid= $("#activity").val();
+        if (activityid == 0 || activityid.length <3){
+            swal("Warning","Please select an activity!","warning")
+        }
+        else{
+            var officeid = $("#office").val();
+            var officename = $("#office").data("kendoComboBox").text()
+            var programID = $("#ooe").val();
+            var yearof = $("#wfpyear").val();
+            var repHistory = $("#repHistory").val();
+            var prepby = $("#prepby").val();
+            var prepwfp= $("#prepwfp").val() == 1 ? 1: 0;
+            var submitwfp = $("#submitwfp").val() == 1? 2:0;
+            var approvewfp = $("#approvewfp").val() == 1 ? 3 : 0;
+            var printstatus = Number(prepwfp) + Number(submitwfp) + Number(approvewfp)
+            var projectaip = 0//$("#projectaip").val()
+            var fundsource = $("#fundsource").data("kendoDropDownList").text()
+            var accountid = $("#account").val();
+            var accountname = $("#account").data("kendoComboBox").text()
+            var municipal = $("#municipal").data("kendoDropDownList").text()
+            var barangay = $("#barangay").data("kendoDropDownList").text()
+            var ooeclass = $("#ooeclass").data("kendoDropDownList").text()
+            var pgas_loc = $("#pgas_loc").val() == 1 ? 1 : 0;
+            var reportpdf = $("#repHistory").data("kendoComboBox").text() + '.pdf';
+            var fundid = $("#gfid").val() == 1 ? 0 : 1
+            //if ((prepby == "" || prepby == "0" || prepby.length == 0) && repHistory.length == 0) {
+            //    swal("Warning", "Please select prepared by from the dropdown list!", "warning")
+            //}
+            //else if (projectaip == 0) {
+            //    swal("Warning", "Please select project in the dropdown list!", "warning")
+            //}
+            if ((accountid == 0 || accountid.length > 6) && repHistory == 0) {
+                swal("Warning", "Please select an account from the dropdown list!", "warning")
+            }
+                //else if (repHistory != 0) {
+                //    swal("", "Report history is not yet available as of this time.", "info")
+                //}
+            else {
+                if (repHistory == 0) {
+                    $.ajax({
+                        async: false,
+                        dataType: 'html',
+                        success: window.open("../Reports/ReportViewer.aspx?rid=37&OfficeID=" + officeid + "&year=" + yearof + "&OfficeName=" + officename + "&prepby=" + prepby + "&fundsource=1&ProjectName=&funddescription=&repHistory=" + repHistory + "&printstatus=" + printstatus + "&projectaip=" + projectaip + "&fundsourcename=" + fundsource + "&accountID=" + accountid + "&accountname=" + accountname + "&municipal=" + municipal + "&barangay=" + barangay + "&ooeclass=" + ooeclass + "&pgas_loc=" + pgas_loc + "&programID=" + programID + "&activityid="+activityid+"&fundid="+fundid+"")
+
+                    });
+                    $("#repHistory").data("kendoComboBox").dataSource.read();
+                }
+                else {
+
+                    var url = "@Url.Action("getdocid", "Report")";
+                    $.get(url, { docname: reportpdf }, function (e) {
+                        $.ajax({
+                            async: false,
+                            dataType: 'html',
+                            //success: window.open("https://pgas.ph/bmsattachment/" + reportpdf)
+                            success: window.open("https://pgas.ph/dgsign/blank/getPDF_View?pdfData=application/pdf&FormID="+ e )
+
+                        });
+                    })
+                }
+            }
+        }
+    }
+    function responoffice() {
+        var grid = $("#grid_responsible_person").data("kendoGrid");
+        $("#responoffice").val(1)
+        $("#responperson").val(0)
+        $("#responoffice").prop("checked", true)
+        $("#responperson").prop("checked", false)
+        $("#grid_responsible_person").data("kendoGrid").dataSource.read()
+        $("#grid_responsible_person th[data-field=officeabbr]").html("Office")
+
+    }
+
+    function responperson() {
+        var grid = $("#grid_responsible_person").data("kendoGrid");
+        $("#responoffice").val(0)
+        $("#responperson").val(1)
+        $("#responperson").prop("checked", true)
+        $("#responoffice").prop("checked", false)
+        $("#grid_responsible_person").data("kendoGrid").dataSource.read()
+        $("#grid_responsible_person th[data-field=officeabbr]").html("Person")
+    }
+    function fnaccount_sel() {
+        var officeid = $("#office").val()
+        var programid = $("#ooe").val()
+        var accountid = $("#account").val()
+        var tyear= $("#wfpyear").val()
+        var fundid = $("#gfid").val() == 1 ? 0 : 1;
+        var mode_trans= $("#gf_currentid").val()
+        var applied80per=$("#applied80per").val()
+        var supplemetal = $("#supplemetalapp").val()
+        var ooeid= $("#ooe").val()
+
+        $("#groupactivity").data("kendoComboBox").value("")
+        var url = "@Url.Action("getwfpappropriation", "Report")";
+        $.get(url, { officeid: officeid, programid: programid, accountid: accountid, tyear: tyear,fundid:fundid,mode_trans:mode_trans,applied80per:applied80per,supplemetal:supplemetal}, function (e) {
+            reqClearPartial()
+            $("#appropriation").val(MoneyFormat(e.AppropriationNet))
+            $("#allotment").val(MoneyFormat(e.allotment))
+            $("#appbalance").val(MoneyFormat(e.balance))
+            $("#appropriation_temp").val(e.AppropriationNet)
+            $("#allotment_temp").val(e.allotment)
+            $("#balance_temp").val(e.balance)
+            $("#activity").data("kendoComboBox").value("")
+            $("#activity").data("kendoComboBox").dataSource.read()
+            $("#WFPPrepareGrid").data("kendoGrid").dataSource.read()
+            $("#groupactivity").data("kendoComboBox").dataSource.read()
+            $("#wfplocation").data("kendoGrid").dataSource.read();
+            $("#grid_responsible_person").data("kendoGrid").dataSource.read();
+            $("#appropriation_whole").val(MoneyFormat(e.appropriation_whole))
+            $("#reserve").val(MoneyFormat(e.reserve))
+            $("#reserveflag").val(e.reserveflag);
+            
+            //if (e.procurement == 1 && tyear >= 2024 && accountid != 358  && accountid !=891  && accountid !=69996  && accountid !=70039  && accountid !=70106 && accountid != 36179){ //unli printing is excluded
+            //    $("#oct").attr("readonly", true)
+            //    $("#nov").attr("readonly", true)
+            //    $("#dec").attr("readonly", true)
+            //}
+            //else{
+            //    $("#oct").attr("readonly", false)
+            //    $("#nov").attr("readonly", false)SS
+            //    $("#dec").attr("readonly", false)
+            //}
+
+            var appnet = parseFloat(Number(e.AppropriationNet) / 12).toFixed(2)
+            var totappnet = parseFloat(appnet * 12).toFixed(2)
+
+            if (e.reserveflag == 1 || e.reserve != 0 ) 
+                {
+                $('#reserveincludeid').prop('checked', true);
+                $('#reserveincludeid').val(1)
+            }
+            else {
+                $('#reserveincludeid').prop('checked', false);
+                $('#reserveincludeid').val(0)
+            }
+            if ($("#ooeclass").val() == 1) {
+                $("#amount").val(1)
+                $("#jan").val(appnet)
+                $("#feb").val(appnet)
+                $("#mar").val(appnet)
+                $("#apr").val(appnet)
+                $("#may").val(appnet)
+                $("#jun").val(appnet)
+                $("#jul").val(appnet)
+                $("#aug").val(appnet)
+                $("#sep").val(appnet)
+                $("#oct").val(appnet)
+                $("#nov").val(appnet)
+                $("#dec").val(appnet)
+                $("#totqty").val(totappnet)
+                sync()
+            }
+            else {
+                $("#amount").val(0)
+                $("#jan").val(0)
+                $("#feb").val(0)
+                $("#mar").val(0)
+                $("#apr").val(0)
+                $("#may").val(0)
+                $("#jun").val(0)
+                $("#jul").val(0)
+                $("#aug").val(0)
+                $("#sep").val(0)
+                $("#oct").val(0)
+                $("#nov").val(0)
+                $("#dec").val(0)
+                $("#totqty").val(0)
+            }
+
+            //if (accountid == 336 || accountid == 869){
+            //    $("#jan").attr("readonly", true)
+            //    $("#feb").attr("readonly", true)
+            //    $("#mar").attr("readonly", true)
+            //    $("#apr").attr("readonly", true)
+            //    $("#may").attr("readonly", true)
+            //}
+            //else{
+            //    $("#jan").attr("readonly", false)
+            //    $("#feb").attr("readonly", false)
+            //    $("#mar").attr("readonly", false)
+            //    $("#apr").attr("readonly", false)
+            //    $("#may").attr("readonly", false)
+            //}
+
+            $("#itemname").attr("readonly", false)
+            $("#amount").attr("readonly", false)
+            $("#unit").attr("readonly", false)
+
+            if (accountid != 336 && accountid != 869 && accountid != 59787){
+                $("#applied80per").prop("checked",false)
+                $("#applied80per").val(0)
+                $("#filter80per").prop("checked",false)
+                $("#filter80per").val(0)
+            }
+        });
+    }
+    function reserve_click() {
+        var officeid = $("#office").val()
+        var programid = $("#ooe").val()
+        var accountid = $("#account").val()
+        var yearof = $("#wfpyear").val()
+        var reserveflag = $("#reserveflag").val()
+
+        if (document.getElementById("reserveincludeid").checked) {
+            $('#reserveincludeid').val(1)
+        }
+        else {
+            $('#reserveincludeid').val(0)
+        }
+
+        var reserveincludeid=$('#reserveincludeid').val()
+
+        if (reserveflag == 0) {
+            var url = "@Url.Action("setreserve", "Report")";
+            $.get(url, { officeid: officeid,programid:programid, accountid: accountid, yearof: yearof, reserveincludeid: reserveincludeid }, function (e) {
+                if (e == "success") {
+                    if (reserveincludeid == 1) {
+                        swal("Success", "Reserved amount has been set!", "success");
+                    }
+                    else {
+                        swal("Success", "Reserved amount has been removed!", "success");
+                    }
+                    fnaccount_sel()
+                } else {
+                    swal("Error", e, "error");
+                }
+            })
+        }
+        else {
+            swal("Warning", "Unable to remove reserved amount!","warning")
+            $('#reserveincludeid').prop('checked', true);
+            $('#reserveincludeid').val(1)
+        }
+    }
+    function other_loc() {
+        document.getElementById("otherlocationid").style = "display:inline-block"
+        document.getElementById("reportid").style = "display: inline-block; margin-left: 10px; width: 495px; height: 725px;"
+        document.getElementById("pgas_loc").value = "0"
+        document.getElementById("other_loc").value = "1"
+        $("#pgas_loc").prop('checked', false)
+    }
+    function pgas_loc() {
+        document.getElementById("otherlocationid").style = "display:none"
+        //document.getElementById("previewid").style = "margin-top:-75px"
+        document.getElementById("reportid").style = "display: inline-block; margin-left: 10px; width: 495px; height: 275px;"
+        document.getElementById("other_loc").value = "0"
+        document.getElementById("pgas_loc").value = "1"
+        $("#other_loc").prop('checked', false)
+    }
+
+    function addlocation() {
+        var officeid = $("#office").val()
+        //var programid
+        var accountid = $("#account").val()
+        var municipalid = $("#municipal").val()
+        var municipal = $("#municipal").data("kendoDropDownList").text()
+        var barangayid = $("#barangay").val()
+        var barangay = $("#barangay").data("kendoDropDownList").text()
+        var yearof = $("#wfpyear").val()
+        if (barangayid == 0 || municipalid == 0) {
+            swal("","Please select the municipality and barangay from the list!","info")
+        }
+        else {
+            swal({
+                title: "Add Location?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: status,
+                closeOnConfirm: false,
+                showLoaderOnConfirm: true
+            },
+                function (isConfirm) {
+                    if (isConfirm) {
+                        var url = "@Url.Action("savelocation", "Report")";
+                        $.get(url, { officeid: officeid, accountid: accountid, municipalid: municipalid, municipal: municipal, barangayid: barangayid, barangay: barangay, yearof: yearof }, function (e) {
+                            if (e == "success") {
+                                swal("Success", "Location has been added!", "success");
+                                $("#wfplocation").data("kendoGrid").dataSource.read();
+                                $("#municipal").data("kendoDropDownList").value("")
+                                $("#barangay").data("kendoDropDownList").value("")
+                            } else {
+                                swal("Error", e, "error");
+                            }
+                        });
+                    }
+                });
+        }
+    }
+
+    $(function () {
+        $("#anglehidedownid").click(function (e) {
+            document.getElementById("reportid").style = 'display:inline-block;margin-left:10px;width:495px;height:340px;'
+            document.getElementById("anglehidedownid").style = 'display:none'
+            document.getElementById("anglehideupid").style = 'float:right;margin-right:5px;font-size:16px;font-weight:bolder;padding:5px 5px 5px 5px" class="fa fa-angle-up'
+            $("#reporthide").val(1)
+        });
+
+        $("#anglehideupid").click(function (e) {
+            document.getElementById("reportid").style = "display:none"
+            document.getElementById("anglehideupid").style = 'display:none'
+            document.getElementById("anglehidedownid").style = 'float:right;margin-right:5px;display:normal;font-weight:bolder;font-size:16px;padding:5px 5px 5px 5px;'
+            $("#reporthide").val(0)
+        });
+
+    });
+    function borderid() {
+        if ($("#reporthide").val() == 1) {
+            document.getElementById("reportid").style = "display:none"
+            document.getElementById("anglehideupid").style = 'display:none'
+            document.getElementById("anglehidedownid").style = 'float:right;margin-right:5px;display:normal;font-weight:bolder;font-size:16px;padding:5px 5px 5px 5px;'
+            $("#reporthide").val(0)
+            //document.getElementById("previewid").style="margin-top:-20px"
+        }
+        else {
+            //document.getElementById("reportid").style = 'display:inline-block;margin-left:10px;width:495px;height:340px;'
+            if ($("#other_loc").val() == 1) {
+                document.getElementById("reportid").style = "display: inline-block; margin-left: 10px; width: 495px; height: 725px;"
+            }
+            else {
+                document.getElementById("reportid").style = "display: inline-block; margin-left: 10px; width: 495px; height: 275px;"
+            }
+            document.getElementById("anglehidedownid").style = 'display:none'
+            document.getElementById("anglehideupid").style = 'float:right;margin-right:5px;font-size:16px;font-weight:bolder;padding:5px 5px 5px 5px" class="fa fa-angle-up'
+            $("#reporthide").val(1)
+            //document.getElementById("previewid").style = "margin-top:-75px"
+        }
+    }
+    function prepdfppt(id) {
+        if (id == 1) {
+            if (document.getElementById("prepwfp").checked) {
+
+                document.getElementById("prepwfp").value = "1";
+                $("#submitwfp").prop("checked", false);
+                document.getElementById("submitwfp").value = "0";
+                $("#approvewfp").prop("checked", false);
+                document.getElementById("approvewfp").value = "0";
+            }
+            //else{
+
+            //    $("#prepdfppt").prop("checked",false);
+            //    document.getElementById("prepdfppt").value="0";
+            //}
+        }
+        else if (id == 2) {
+            if (document.getElementById("submitwfp").checked) {
+                document.getElementById("submitwfp").value = "1";
+                $("#prepwfp").prop("checked", false);
+                document.getElementById("prepwfp").value = "0";
+                $("#approvewfp").prop("checked", false);
+                document.getElementById("approvewfp").value = "0";
+            }
+            //else{
+            //    document.getElementById("prepdfppt").value="0";
+            //}
+        }
+        else {//approvedfppt
+            if (document.getElementById("approvewfp").checked) {
+                document.getElementById("approvewfp").value = "1";
+                $("#submitwfp").prop("checked", false);
+                document.getElementById("submitwfp").value = "0";
+                $("#prepwfp").prop("checked", false);
+                document.getElementById("prepwfp").value = "0";
+            }
+        }
+    }
+
+    function prepdfpptlabel(id) {
+        if (id == 1) {
+            if (document.getElementById("prepwfp").checked) {
+                //$("#prepdfppt").prop("checked",true);
+                //document.getElementById("prepdfppt").value="1";
+                //$("#prepdfpptonly").prop("checked",false);
+                //document.getElementById("prepdfpptonly").value="0";
+            }
+            else {
+                $("#submitwfp").prop("checked", false);
+                document.getElementById("submitwfp").value = "0";
+                $("#prepwfp").prop("checked", true);
+                document.getElementById("prepwfp").value = "1";
+                $("#approvewfp").prop("checked", false);
+                document.getElementById("approvewfp").value = "0";
+            }
+        }
+        else if (id == 2) {
+            if (document.getElementById("submitwfp").checked) {
+                //$("#prepdfpptonly").prop("checked",true);
+                //document.getElementById("prepdfpptonly").value="1";
+                //$("#prepdfppt").prop("checked",false);
+                //document.getElementById("prepdfppt").value="0";
+            }
+            else {
+                $("#prepwfp").prop("checked", false);
+                document.getElementById("prepwfp").value = "0";
+                $("#submitwfp").prop("checked", true);
+                document.getElementById("submitwfp").value = "1";
+                $("#approvewfp").prop("checked", false);
+                document.getElementById("approvewfp").value = "0";
+            }
+        }
+        else {
+            if (document.getElementById("approvewfp").checked) {
+            }
+            else {
+                $("#prepwfp").prop("checked", false);
+                document.getElementById("prepwfp").value = "0";
+                $("#submitwfp").prop("checked", false);
+                document.getElementById("submitwfp").value = "0";
+                $("#approvewfp").prop("checked", true);
+                document.getElementById("approvewfp").value = "1";
+            }
+        }
+    }
+    function reqSave() {
+        
+        var year = $("#wfpyear").val()
+        var officeid = $("#office").val()
+        var programid = $("#ooe").val()
+        var accountid = $("#account").val()
+        var activity = $("#activity").val()
+        var activityspecific = $("#specificactivity").val()
+        var itemname = $("#itemname").val()
+        var description = $("#description").val()
+        var unit = $("#unit").val()
+        var weight = $("#weight").val()
+        var m1 = $("#jan").val()
+        var m2 = $("#feb").val()
+        var m3 = $("#mar").val()
+        var m4 = $("#apr").val()
+        var m5 = $("#may").val()
+        var m6 = $("#jun").val()
+        var m7 = $("#jul").val()
+        var m8 = $("#aug").val()
+        var m9 = $("#sep").val()
+        var m10 = $("#oct").val()
+        var m11 = $("#nov").val()
+        var m12 = $("#dec").val()
+        var totalqty = $("#totqty").val()
+        var amount = $("#amount").val()
+        var days = $("#nodays").val()
+        var totamount = $("#totamount").val()
+        var ptarget = $("#ptarget").val()
+        var indicator = $("#indicator").val()
+        var resperson = $("#resperson").val()
+        var wfpid = $("#wfpid").val() == "" ? 0 : $("#wfpid").val()
+        var subwfpid = $("#wfpid").val() == "" ? 1 : 0 // 1: new, 0: update
+        var title = "";
+        var status = "";
+        var includeppa = $("#includeppa").val()
+        var isPPMPTag = $("#isPPMPTag").val()
+        var MotherAccount = $("#groupactivity").val()
+        var nonofficeid_temp = $("#nonofficeid_temp").val()
+        var accountnameid=$("#subppaid_temp").val()
+        var kpmid=$("#kpmid").val()
+        var fundreqid=$("#fundreqid").val()
+        var breakdownid=$("#breakdownid").val()
+        var fund = $("#fund").val()
+        var dtecomple = $("#datepicker").val();
+        var ooeclass = $("#ooeclass").val()
+        var firstqtr=$("#1qtr").val()
+        var secondqtr=$("#2qtr").val()
+        var thirdqtr=$("#3qtr").val()
+        var fourthqtr = $("#4qtr").val()
+        var propoffice = $("#propoffice").val()
+        var fundid = $("#gfid").val() == 1 ? 0 : 1
+        var mode_trans= $("#gf_currentid").val()
+        var dtpckerfrom = $("#datepicker_activityfrom").val()
+        var dtpckerto = $("#datepicker_activityto").val()
+        var applied80per=$("#applied80per").val()
+        var balapp= covert_empty($("#appbalance").val());
+        var subppabal=covert_empty($("#BalAppropriation").val());
+        var startDate = $("#datepicker_activityfrom").data("kendoDatePicker").value();
+        var endDate = $("#datepicker_activityto").data("kendoDatePicker").value();
+        var project = $("#projectid").val();
+        var programexcess= $("#programexcess").val();
+        var supplemetal = $("#supplemetalapp").val();
+        var withad_tmp= $("#withad_tmp").val();
+        var fpaysupplier=$("#fpaysupplier").val() == "" ? 0 : $("#fpaysupplier").val();
+       
+        //var startDate = $("#datepicker_activityfrom").val();
+        //var endDate = $("#datepicker_activityto").val();
+    
+        if (wfpid != 0) {
+            title = "Update Item details?"
+            status="Update"
+        }
+        else {
+            title = "Save new item?"
+            status = "Save"
+        }
+        //alert(startDate)
+        //alert(endDate)
+        //if (officeid == "" || programid == "" || accountid == "" || activity == "" || activity.length < 2 || activity.length > 10 || itemname == "" || itemname.length == 0 || unit == "" || (m1 == 0 && m2 == 0 && m3 == 0 && m4 == 0 && m5 == 0 && m6 == 0 && m7 == 0 && m8 == 0 && m9 == 0 && m10 == 0 && m11 == 0 && m12 == 0) || totalqty == 0 || amount == 0 || days == 0) {
+        if ((officeid == "" || programid == "" || accountid == "" || activity == "" || activityspecific == "" || unit == "" || activityspecific.length < 2 || indicator == "" || indicator.length < 2 || activity.length < 2 || firstqtr.trim == "" || firstqtr.length == 0 || secondqtr.trim == "" || secondqtr.length == 0 || thirdqtr.trim == "" || thirdqtr.length == 0 || fourthqtr.trim == "" || fourthqtr.length == 0 || itemname == "" || itemname.length == 0) && ooeclass != 1 && fundid==0 && mode_trans == 1) {
+            swal("Warning","Please fill out completely the required fields marked with asterisk(*)!","warning")
+        }
+        else if (activityspecific == "")
+        {
+            swal("Warning","Please fill out completely the required fields marked with asterisk(*)!","warning")
+        }
+        else if ((officeid == "" || accountid == "" || activityspecific == "" || activityspecific.length < 2 || indicator == "" || unit=="" || indicator.length < 2 || firstqtr.trim == "" || firstqtr.length == 0 || secondqtr.trim == "" || secondqtr.length == 0 || thirdqtr.trim == "" || thirdqtr.length == 0 || fourthqtr.trim == "" || fourthqtr.length == 0 || itemname == "" || itemname.length == 0) && fundid==1) {
+            swal("Warning","Please fill out completely the required fields marked with asterisk(*)!","warning")
+        }
+        else if ((officeid == "" || accountid == ""  || activity == "" || activityspecific == "" || activityspecific.length < 2 || indicator == "" || indicator.length < 2 || activity.length < 2 || firstqtr.trim == "" || firstqtr.length == 0 || secondqtr.trim == "" || secondqtr.length == 0 || thirdqtr.trim == "" || thirdqtr.length == 0 || fourthqtr.trim == "" || fourthqtr.length == 0 || itemname == "" || itemname.length == 0) && mode_trans==0) {
+            swal("Warning","Please fill out completely the required fields marked with asterisk(*)!","warning")
+        }
+        else if (ooeclass == 1 && (activity == "" || activity.length < 2 || firstqtr.trim == "" || firstqtr.length == 0 || secondqtr.trim == "" || secondqtr.length == 0 || thirdqtr.trim == "" || thirdqtr.length == 0 || fourthqtr.trim == "" || fourthqtr.length == 0)) {
+            swal("Warning", "Please fill out completely the activity and physical target!", "warning")
+            $("#1qtr").focus()
+        }
+        else if (ooeclass == 3 && Number(amount) < 50000 && fundid == 0 && mode_trans == 1 && accountid != 16169 && accountid != 2861){ //excess piping -item
+            swal("Warning", "Please be reminded, that the amount of every items under capital outlay must be 50,000.00 and above!", "warning")
+        }
+        else if ((dtpckerfrom == "" || dtpckerto == "") && mode_trans == 1) {
+            swal("Warning", "Please choose the activity date, specifying both the starting and ending dates.", "warning")
+        }
+        else if (startDate > endDate) {
+            swal("Warning","Please review the activity's date, the start date should not occur after the end date.","warning");
+        }
+        else if (dtpckerfrom == dtpckerto && mode_trans == 1) {
+            swal("Warning","Please review the activity's date, ensuring that the start date is not the same as the end date.","warning");
+        }
+        else if (includeppa == 1 && (activityspecific.length == 0 || activityspecific == "" || activityspecific.replace(" ","") == "")) {
+            swal("","Please enter the specific activity for sub-ppa!","info")
+        }
+        else if (project =="" && mode_trans == 0){ //continuing wfp
+            swal("","Please enter the project!","info")
+            $("#projectid").focus();
+        }
+        else if (programexcess =="" && mode_trans == 0){ //continuing wfp
+            swal("","Please enter the program!","info")
+            $("#programexcess").focus();
+        }
+        //else if (withad_tmp == 1){
+        //    swal("Warning","This item has activity design, and updates are being restricted!","warning");
+        //}
+        //else if (Number(balapp) < 0){ //whole of nation approach
+        //    swal("Warning","Insufficient balance, please check the appropriation details!","warning")
+        //}
+        //else if (Number(subppabal) < 0){ //sub-ppa
+        //    swal("Warning","Insufficient balance, please check the sub-ppa appropriation balance!","warning")
+        //}
+        else {
+            swal({
+                title: title,
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: status,
+                closeOnConfirm: false,
+                showLoaderOnConfirm: true
+            },
+            function (isConfirm) {
+                if (isConfirm) {
+                    var url = "@Url.Action("SaveWFPActual", "Report")";
+                    $.get(url, { officeid: officeid, programid: programid, accountid: accountid, activity: activity, activityspecific: activityspecific, itemname: itemname, unit: unit, weight: weight, m1: m1, m2: m2, m3: m3, m4: m4, m5: m5, m6: m6, m7: m7, m8: m8, m9: m9, m10: m10, m11: m11, m12: m12, totalqty: totalqty, amount: amount, days: days, totamount: totamount, ptarget: ptarget, indicator: indicator, resperson: resperson, year: year, wfpid: wfpid, includeppa: includeppa, description: description, isPPMPTag: isPPMPTag, MotherAccount: MotherAccount, fund: fund, kpmid: kpmid, fundreqid: fundreqid, breakdownid: breakdownid, dtecomple: dtecomple, firstqtr: firstqtr, secondqtr: secondqtr, thirdqtr: thirdqtr, fourthqtr: fourthqtr, propoffice: propoffice,fundid:fundid,mode_trans:mode_trans,dtpckerfrom:dtpckerfrom,dtpckerto:dtpckerto,applied80per:applied80per,project:project,programexcess:programexcess,supplemetal:supplemetal,fpaysupplier:fpaysupplier }, function (e) {
+
+                        if (e == "success") {
+
+                                if (wfpid != 0) {
+                                    swal("Success", "Item has been updated!", "success");
+
+                                }
+                                else {
+                                    swal("Success", "Item has been saved!", "success");
+                                }
+                                reqClearPartial()
+                                fnaccount_sel()
+
+                        } else {
+                            swal("Warning", e, "warning");
+                        }
+                    });
+                }
+            });
+        }
+    }
+    function reqPrint() {
+        var officeid = $("#office").val();
+        var officename = $("#office").data("kendoComboBox").text()
+        var programID = $("#ooe").val();
+        var yearof = $("#wfpyear").val();
+        var repHistory = $("#repHistory").val();
+        var prepby = $("#prepby").val();
+        var prepwfp= $("#prepwfp").val() == 1 ? 1: 0;
+        var submitwfp = $("#submitwfp").val() == 1? 2:0;
+        var approvewfp = $("#approvewfp").val() == 1 ? 3 : 0;
+        var printstatus = Number(prepwfp) + Number(submitwfp) + Number(approvewfp)
+        var projectaip = 0//$("#projectaip").val()
+        var fundsource = $("#fundsource").data("kendoDropDownList").text()
+        var accountid = $("#account").val();
+        var accountname = $("#account").data("kendoComboBox").text()
+        var municipal = $("#municipal").data("kendoDropDownList").text()
+        var barangay = $("#barangay").data("kendoDropDownList").text()
+        var ooeclass = $("#ooeclass").data("kendoDropDownList").text()
+        var pgas_loc = $("#pgas_loc").val() == 1 ? 1 : 0;
+        var reportpdf = $("#repHistory").data("kendoComboBox").text() + '.pdf';
+        var activityid=$("#activity").val()
+        var fundid = $("#gfid").val() == 1 ? 0 : 1
+        var mode_trans = $("#gf_currentid").val()
+        var issupplemetal =$("#supplemetalapp").val();
+      
+        //if ((prepby == "" || prepby == "0" || prepby.length == 0) && repHistory.length == 0) {
+        //    swal("Warning", "Please select prepared by from the dropdown list!", "warning")
+        //}
+        //else if (projectaip == 0) {
+        //    swal("Warning", "Please select project in the dropdown list!", "warning")
+        //}
+        if ((accountid == 0 || accountid.length > 6) && repHistory == 0) {
+            swal("Warning", "Please select an account from the dropdown list!", "warning")
+        }
+        //else if (repHistory != 0) {
+        //    swal("", "Report history is not yet available as of this time.", "info")
+        //}
+        else {
+            if (repHistory == 0) {
+                $.ajax({
+                    async: false,
+                    dataType: 'html',
+                    success: window.open("../Reports/ReportViewer.aspx?rid=37&OfficeID=" + officeid + "&year=" + yearof + "&OfficeName=" + officename + "&prepby=" + prepby + "&fundsource=1&ProjectName=&funddescription=&repHistory=" + repHistory + "&printstatus=" + printstatus + "&projectaip=" + projectaip + "&fundsourcename=" + fundsource + "&accountID=" + accountid + "&accountname=" + accountname + "&municipal=" + municipal + "&barangay=" + barangay + "&ooeclass=" + ooeclass + "&pgas_loc=" + pgas_loc + "&programID=" + programID + "&activityid="+activityid+"&fundid="+fundid+"&mode_trans=" + mode_trans + "&issupplemetalid="+ issupplemetal +"")
+
+                });
+                $("#repHistory").data("kendoComboBox").dataSource.read();
+            }
+            else {
+
+                var url = "@Url.Action("getdocid", "Report")";
+                $.get(url, { docname: reportpdf }, function (e) {
+                    $.ajax({
+                        async: false,
+                        dataType: 'html',
+                        //success: window.open("https://pgas.ph/bmsattachment/" + reportpdf)
+                        success: window.open("https://pgas.ph/dgsign/blank/getPDF_View?pdfData=application/pdf&FormID="+ e )
+
+                    });
+                })
+            }
+        }
+    }
+    function reqPPMP(id) {
+        // swal("","Sorry! PPMP download is not yet available!","warning")
+        var transyear = $("#wfpyear").val();
+        var officeid = $("#office").val();
+        var url = "@Url.Action("DownloadPPMPNew", "Report")";
+        @*var url = "@Url.Action("DownloadPPMP", "Report")";*@
+        swal({
+            title: "System Notice!",
+            text: "This will download or copy all prepared PPMP from ePS. Do you want to proceed?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes",
+            closeOnConfirm: false,
+            showLoaderOnConfirm: true
+        }, function () {
+            //var dialog = $(id).data('dialog');
+            //dialog.open();
+            $.get(url, { officeid: officeid, transyear: transyear }, function (e) {
+                if (e == "success") {
+                    //dialog.close();
+                    swal("Success!", "PPMP has been successfully downloaded!", "success");
+                    $("#WFPDetails").data("kendoGrid").dataSource.read();
+                } else {
+                    //   dialog.close();
+                    swal("Error!", "Download failed!", "error");
+                    $("#WFPDetails").data("kendoGrid").dataSource.read();
+                }
+            });
+        });
+    }
+    function WFPgrid() {
+
+        var entityGrid = $("#WFPPrepareGrid").data("kendoGrid");
+        var selItem = entityGrid.dataItem(entityGrid.select());
+        $("#activity").data("kendoComboBox").value(selItem.activityid)
+        $("#specificactivity").val(selItem.specificactivity)
+        $("#itemname").val(selItem.particular)
+        $("#unit").val(selItem.unit)
+        $("#weight").val(selItem.weight)
+        $("#jan").val(selItem.m1)
+        $("#feb").val(selItem.m2)
+        $("#mar").val(selItem.m3)
+        $("#apr").val(selItem.m4)
+        $("#may").val(selItem.m5)
+        $("#jun").val(selItem.m6)
+        $("#jul").val(selItem.m7)
+        $("#aug").val(selItem.m8)
+        $("#sep").val(selItem.m9)
+        $("#oct").val(selItem.m10)
+        $("#nov").val(selItem.m11)
+        $("#dec").val(selItem.m12)
+        $("#totqty").val(selItem.totalqty)
+        $("#amount").val(selItem.amount)
+        $("#nodays").val(selItem.noofdays)
+        $("#totamount").val(selItem.totalamount)
+        $("#ptarget").val(selItem.physicaltarget)
+        $("#indicator").val(selItem.devtindicator)
+        $("#resperson").data("kendoComboBox").value(selItem.responsibleperson)
+        $("#wfpid").val(selItem.wfpid)
+        $("#description").val(selItem.description)
+        $("#isPPMPTag").val(selItem.isPPMP)
+        $("#nonofficeid_temp").val(selItem.nonofficeid)
+        $("#subppaid_temp").val(selItem.subppaid)
+        $("#nonofficeidparent_temp").val(selItem.nonofficeidparent)
+        $("#amountTemp").val(selItem.totalamount)
+        $("#projectid").val(selItem.project)
+        $("#programexcess").val(selItem.program)
+        $("#fpaysupplier").data("kendoComboBox").value(selItem.fpay)
+        
+        $("#groupactivity").data("kendoComboBox").value(selItem.subppaid)
+            fnMainaccount()
+        //if (selItem.nonofficeidparent == 0){
+        //    $("#groupactivity").data("kendoComboBox").value(selItem.subppaid)
+        //    fnMainaccount()
+        //}
+        //else{
+        //    $("#groupactivity").data("kendoComboBox").value(selItem.nonofficeidparent)
+        //    fnMainaccount()
+        //}
+        $("#kpmid").val(selItem.kpmid)
+        $("#fundreqid").val(selItem.fundreqid)
+        $("#breakdownid").val(selItem.breakdownid)
+        $("#fund").val(selItem.fund)
+        $("#datepicker").val(selItem.completiondate)
+        $("#1qtr").val(selItem.firstqtr)
+        $("#2qtr").val(selItem.secondqtr)
+        $("#3qtr").val(selItem.thirdqtr)
+        $("#4qtr").val(selItem.fourthqtr)
+        $("#qtytotal_temp").val(selItem.totalqty)
+        $("#propoffice").data("kendoComboBox").value(selItem.prepareuser)
+        $("#withad_tmp").val(selItem.withad)
+
+        $("#datepicker_activityfrom").data("kendoDatePicker").value(selItem.activityfrom)
+        $("#datepicker_activityto").data("kendoDatePicker").value(selItem.activityto)
+
+        //if (selItem.nonofficeidparent != 0) { //for sub-ppa
+        //    fnMainaccount()
+        //}
+        //else
+        if (selItem.nonofficeidparent == 0)
+        {
+            $("#MainAppropriation").val("0.00")
+            $("#SubAppropriation").val("0.00")
+            $("#BalAppropriation").val("0.00")
+        }
+        document.getElementById("btnSave").innerHTML='<span class="fa fa-edit"></span> Update'
+
+        if (selItem.subppaid != 0){
+            document.getElementById("includeppa").checked = true
+            document.getElementById("includeppa").value = 1
+        }
+        else{
+            document.getElementById("includeppa").checked = false
+            document.getElementById("includeppa").value = 0
+        }
+        $("#mode").val(1)
+
+        //if (selItem.isPPMP == 1 && $("#unit").val().toLocaleUpperCase() != "LUMPSUM") { //ppmp
+       
+        if (selItem.isPPMP == 1 && $("#unit").val().toLowerCase() != "lot" &&  $("#unit").val().toLowerCase() != "lumpsum") { //ppmp
+            $("#amount").attr("readonly", true)
+            $("#itemname").attr("readonly", true)
+            $("#description").attr("readonly",true)
+            $("#unit").attr("readonly", true)
+            if ($("#amount").val() == 0) {
+                $("#amount").attr("readonly", false)
+            }
+            else {
+                $("#amount").attr("readonly", true)
+            }
+        }
+        else {
+            $("#itemname").attr("readonly", false)
+            $("#amount").attr("readonly", false)
+            $("#unit").attr("readonly", false)
+            $("#description").attr("readonly",false)
+        }
+        // sync()
+        
+        @*var url_epa = "@Url.Action("wfplock_epa", "Report")";
+        $.get(url_epa, { yearof:  $("#wfpyear").val()}, function (d) {
+            //$("#epa_lockid").val(d);
+            if(d==1){
+                $("#jan").attr("readonly", true)
+                $("#feb").attr("readonly", true)
+                $("#mar").attr("readonly", true)
+            }
+            else{
+                $("#jan").attr("readonly", false)
+                $("#feb").attr("readonly", false)
+                $("#mar").attr("readonly", false)
+            }
+        })*@
+
+    }
+    function fnOffice_activity(){
+        $("#datepicker_activityfrom").data("kendoDatePicker").value(new Date().toLocaleDateString())
+        $("#datepicker_activityto").data("kendoDatePicker").value("")
+        //$("#datepicker_activityfrom").val(new Date().toLocaleDateString());
+        //$("#datepicker_activityto").val("");
+    }
+    function reqClear() {
+
+            $("#office").data("kendoComboBox").value("")
+            $("#ooe").data("kendoComboBox").value("")
+            $("#account").data("kendoComboBox").value("")
+            $("#activity").data("kendoComboBox").value("")
+            $("#specificactivity").val("")
+            $("#itemname").val("")
+            $("#description").val("")
+            $("#unit").val("")
+            $("#weight").val("")
+            $("#jan").val(0)
+            $("#feb").val(0)
+            $("#mar").val(0)
+            $("#apr").val(0)
+            $("#may").val(0)
+            $("#jun").val(0)
+            $("#jul").val(0)
+            $("#aug").val(0)
+            $("#sep").val(0)
+            $("#oct").val(0)
+            $("#nov").val(0)
+            $("#dec").val(0)
+            $("#totqty").val(0)
+            $("#amount").val(0.00)
+            $("#nodays").val(1)
+            $("#totamount").val(0.00)
+            $("#ptarget").val("")
+            $("#indicator").val("")
+            $("#resperson").data("kendoComboBox").value("")
+            $("#appropriation").val("0.00")
+            $("#allotment").val("0.00")
+            $("#appbalance").val("0.00")
+            $("#appropriation_temp").val(0)
+            $("#allotment_temp").val(0)
+            $("#balance_temp").val(0)
+            $("#WFPPrepareGrid").data("kendoGrid").dataSource.read()
+            document.getElementById("btnSave").innerHTML = '<span class="fa fa-save"></span> Save'
+            $("#wfpid").val(0)
+            document.getElementById("includeppa").checked = false
+            document.getElementById("includeppa").value = 0
+            $("#MainAppropriation").val("0.00")
+            $("#SubAppropriation").val("0.00")
+            $("#BalAppropriation").val("0.00")
+            $("#mode").val(0)
+            $("#kpmid").val(0)
+            $("#fundreqid").val(0)
+            $("#breakdownid").val(0)
+            $("#fund").val("")
+            $("#appropriation_whole").val("0.00")
+            $("#reserve").val("0.00")
+            $("#reserveflag").val(0)
+            $("#1qtr").val("")
+            $("#2qtr").val("")
+            $("#3qtr").val("")
+            $("#4qtr").val("")
+            $("#qtytotal_temp").val(0)
+            $("#datepicker_activityfrom").val(new Date().toLocaleDateString());
+            $("#datepicker_activityto").val("");
+            $("#projectid").val("")
+            $("#programexcess").val("")
+            $("#fpaysupplier").data("kendoComboBox").value("")
+    }
+    function reqClearPartial() {
+      //  $("#account").data("kendoComboBox").value("")
+     //   $("#activity").data("kendoComboBox").value("")
+        $("#specificactivity").val("")
+        $("#itemname").val("")
+        $("#description").val("")
+        $("#unit").val("")
+        $("#weight").val("")
+        $("#jan").val(0)
+        $("#feb").val(0)
+        $("#mar").val(0)
+        $("#apr").val(0)
+        $("#may").val(0)
+        $("#jun").val(0)
+        $("#jul").val(0)
+        $("#aug").val(0)
+        $("#sep").val(0)
+        $("#oct").val(0)
+        $("#nov").val(0)
+        $("#dec").val(0)
+        $("#totqty").val(0)
+        $("#amount").val(0.00)
+        $("#nodays").val(1)
+        $("#totamount").val(0.00)
+        $("#ptarget").val("")
+        $("#indicator").val("")
+        $("#resperson").data("kendoComboBox").value("")
+        $("#appropriation").val("0.00")
+        $("#allotment").val("0.00")
+        $("#appbalance").val("0.00")
+        $("#appropriation_temp").val(0)
+        $("#allotment_temp").val(0)
+        $("#balance_temp").val(0)
+        $("#WFPPrepareGrid").data("kendoGrid").dataSource.read()
+        document.getElementById("btnSave").innerHTML = '<span class="fa fa-save"></span> Save'
+        $("#wfpid").val(0)
+        document.getElementById("includeppa").checked = false
+        document.getElementById("includeppa").value = 0
+        $("#MainAppropriation").val("0.00")
+        $("#SubAppropriation").val("0.00")
+        $("#BalAppropriation").val("0.00")
+        $("#mode").val(0)
+        $("#1qtr").val("")
+        $("#2qtr").val("")
+        $("#3qtr").val("")
+        $("#4qtr").val("")
+        $("#qtytotal_temp").val(0)
+        $("#projectid").val("")
+        $("#programexcess").val("")
+        $("#fpaysupplier").data("kendoComboBox").value("")
+    }
+    function vwSubmitted() {
+        $(window).scrollTop(0);
+        var url = "@Url.Action("wfpsubmitted", "Report")";
+        var office = $("#office").val();
+        var program = $("#ooe").val()
+        var account = $("#account").val()
+        var tyear = $("#wfpyear").val();
+        var fundid = $("#gfid").val() == 1 ? 0 : 1
+        var mode_trans = $("#gf_currentid").val()
+        //if ((office == 0 || program == 0 || account ==0) && fundid == 0 && mode_trans == 1) {
+        //    swal("", "Please select office, program, expense class and account respectively!", "info")
+        //}
+        //else if ((office == 0 || account ==0) && fundid != 0) {
+        //    swal("", "Please select office and account!", "info")
+        //}
+        //else if ((office == 0 || account ==0) && mode_trans == 0) {
+        //    swal("", "Please select office and account!", "info")
+        //}
+        //else {
+            
+            $.get(url,
+            {
+                office: $("#office").val(),
+                program: program,
+                account:account,
+                tyear:tyear,
+                fundid:fundid,
+                mode_trans:mode_trans
+            },
+        function (d) {
+            $('#wfpsubmitted').html(d);
+        })
+
+            $('#wfpsubmitted').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Submitted WFP").center().open();
+        //}
+        
+    }
+    function WFPstatus() {
+        $(window).scrollTop(0);
+        var url = "@Url.Action("wfpstatus", "Report")";
+        var office = $("#office").val();
+        var program = $("#ooe").val()
+        var account = $("#account").val()
+        var tyear = $("#wfpyear").val();
+        var fundid = $("#gfid").val() == 1 ? 0 : 1
+
+        if ((office == 0) && @Account.UserInfo.UserTypeID !=4) {
+            swal("","Please select an office from dropdown list!","info")
+        }
+        else {
+            $.get(url,
+                {
+                    office: $("#office").val(),
+                    tyear: tyear,
+                    fundid:fundid
+                },
+            function (d) {
+                $('#wfpstatus').html(d);
+            })
+            $('#wfpstatus').data('kendoWindow').title("<i class='fa fa-navicon'> </i> WFP Return").center().open();
+        }
+    }
+
+    function WFPstatus_reviewonly() {
+        $(window).scrollTop(0);
+        var url = "@Url.Action("WFPstatus_reviewonly", "Report")";
+        var office = $("#office").val();
+        var program = $("#ooe").val()
+        var account = $("#account").val()
+        var tyear = $("#wfpyear").val();
+
+        if (office == 0) {
+            swal("","Please select an office from dropdown list!","info")
+        }
+        else {
+            $.get(url,
+                {
+                    office: $("#office").val(),
+                    program:program,
+                    account:account,
+                    tyear: tyear
+                },
+            function (d) {
+                $('#WFPstatus_reviewonly').html(d);
+            })
+            $('#WFPstatus_reviewonly').data('kendoWindow').title("<i class='fa fa-navicon'> </i> WFP Status").center().open();
+        }
+    }
+    
+    function linkitem_eps() {
+        $(window).scrollTop(0);
+        var url = "@Url.Action("wfplink", "Report")";
+        var office = $("#office").val();
+        var program = $("#ooe").val()
+        var account = $("#account").val()
+        var tyear = $("#wfpyear").val();
+        var breakdownid = $("#breakdownid").val()
+        var itemname=$("#itemname").val()
+        //if (office != 0 && program != 0 && account != 0 && breakdownid !=0) {
+            $.get(url,
+                {
+                    office: $("#office").val(),
+                    program: program,
+                    account: account,
+                    breakdownid:breakdownid,
+                    tyear: tyear
+                },
+            function (d) {
+                $('#wfplink').html(d);
+            })
+            $('#wfplink').data('kendoWindow').title("<i class='fa fa-navicon'> </i> ITEM Link - (" + itemname + ")").center().open();
+        //}
+        //else {
+        //    swal("","Please select office, program, account and item from the abovelist!","info")
+        //}
+    }
+    function vwApproved() {
+        $(window).scrollTop(0);
+        var url = "@Url.Action("wfpApproved", "Report")";
+        var office = $("#office").val();
+        var program = $("#ooe").val()
+        var account = $("#account").val()
+        var tyear = $("#wfpyear").val();
+        var fundid = $("#gfid").val() == 1 ? 0 : 1
+        var mode_trans = $("#gf_currentid").val()
+        if ((office == 0 || program == 0 || account ==0) && fundid == 0 && mode_trans == 1) {
+            swal("", "Please select office, program, expense class and account respectively!", "info")
+        }
+        else if ((office == 0 || account ==0) && fundid != 0) {
+            swal("", "Please select office and account!", "info")
+        }
+        else if ((office == 0 || account ==0) && mode_trans == 0) {
+            swal("", "Please select office and account!", "info")
+        }
+        else {
+            $.get(url,
+                {
+                    office: $("#office").val(),
+                    program: program,
+                    account: account,
+                    tyear: tyear,
+                    fundid:fundid,
+                    mode_trans:mode_trans
+                },
+            function (d) {
+                $('#vwApproved').html(d);
+            })
+
+            $('#vwApproved').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Reviewed WFP").center().open();
+        }
+       
+    }
+    function vwApproved_lce() {
+        $(window).scrollTop(0);
+        var url = "@Url.Action("wfpApproved_lce", "Report")";
+        var office = $("#office").val();
+        var program = $("#ooe").val()
+        var account = $("#account").val()
+        var tyear = $("#wfpyear").val();
+        var fundid = $("#gfid").val() == 1 ? 0 : 1
+        var mode_trans = $("#gf_currentid").val()
+
+        $.get(url,
+            {
+                office: $("#office").val(),
+                program: program,
+                account: account,
+                tyear: tyear,
+                fundid:fundid,
+                mode_trans:mode_trans
+
+            },
+        function (d) {
+            $('#vwApproved_lce').html(d);
+        })
+
+        $('#vwApproved_lce').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Approved WFP").center().open();
+    }
+    function wfpstatus() {
+        $(window).scrollTop(0);
+        var url = "@Url.Action("wfpstatus_review", "Report")";
+        var office = $("#office").val();
+        var program = $("#ooe").val()
+        var account = $("#account").val()
+        var tyear = $("#wfpyear").val();
+
+        $.get(url,
+            {
+                office: $("#office").val(),
+                program: program,
+                account: account,
+                tyear: tyear
+            },
+        function (d) {
+            $('#wfpstatus').html(d);
+        })
+
+        $('#wfpstatus').data('kendoWindow').title("<i class='fa fa-navicon'> </i> WFP Status").center().open();
+    }
+</script>
+<div style="display:none">
+    <input type="number" id="appropriation_temp" value="0"/>
+    <input type="number" id="allotment_temp" value="0" />
+    <input type="number" id="balance_temp" value="0"/>
+    <input type="number" id="nonofficeidparent_temp" value="0"/>
+    <input type="number" id="appBalTemp" value="0"/>
+    <input type="number" id="amountTemp" value="0" />
+
+    <input id="mainAccountUsed" name="mainAccountUsed" type="number" />
+    <input id="mode" value="0" type="number" />
+    <input id="withad_tmp" value="0" type="number"/>
+</div>
+
+<style>
+    .ChangeBackColor {
+        background-color: #FFFF80;
+    }
+    .ChangeBackColorRPerson {
+        background-color: #41f644;
+    }
+    .ChangeApprovedColor {
+        background-color: #00ff21;
+    }
+    .ChangeSubppaColor {
+        background-color:cyan;
+        /*color:white;*/
+    }
+    .ChangeNotPPMPSubppaColor {
+        background-color:lightgreen;
+    }
+    .k-dropdown-wrap.k-state-default {
+        border-left-style: solid;
+    }
+    .k-grid tr td {
+        border-bottom: 1px solid black;
+    }
+    .ChangePullitemColor{
+         background-color:#CCCCCC;
+         /*color:white;*/
+    }
+    .changesupplemental{
+        background-color:orange;
+    }
+    .changesupplementalnotppmp{
+        background-color:indianred;
+    }
+    .changesBackColorWithAD{
+        background-color:lightblue;
+    }
+    .changesBackColorWithADPPMP{
+        background-color:beige;
+    }
+</style>
+@(Html.Kendo().Window()
+        .Name("wfpsubmitted")
+        //.Title("")
+        .Width(870)
+        .Height(630)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+        .Events(e => e.Close("closewfpsubmit"))
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+                .Actions(a => { a.Close(); })
+)
+
+
+@(Html.Kendo().Window()
+        .Name("vwApproved")
+        //.Title("")
+        .Width(810)
+        .Height(635)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+        .Events(e => e.Close("closewfpapproved"))
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+                .Actions(a => { a.Close(); })
+)
+@(Html.Kendo().Window()
+        .Name("vwApproved_lce")
+        //.Title("")
+        .Width(810)
+        .Height(590)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+        .Events(e => e.Close("closewfpapproved_lce"))
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+                .Actions(a => { a.Close(); })
+)
+
+@(Html.Kendo().Window()
+        .Name("wfpstatus")
+        //.Title("")
+        .Width(1010)
+        .Height(565)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+      //  .Events(e => e.Close("closewfpapproved_lce"))
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+                .Actions(a => { a.Close(); })
+)
+
+@(Html.Kendo().Window()
+        .Name("WFPstatus_reviewonly")
+        //.Title("")
+        .Width(1010)
+        .Height(565)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+        //  .Events(e => e.Close("closewfpapproved_lce"))
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+                .Actions(a => { a.Close(); })
+)
+@(Html.Kendo().Window()
+        .Name("wfplink")
+        //.Title("")
+        .Width(520)
+        .Height(105)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+        //  .Events(e => e.Close("closewfpapproved_lce"))
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+                .Actions(a => { a.Close(); })
+)
+@(Html.Kendo().Window()
+        .Name("wfpadditem")
+        //.Title("")
+        .Width(1020)
+        .Height(610)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+        //  .Events(e => e.Close("closewfpapproved_lce"))
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+                .Actions(a => { a.Close(); })
+)
+
+@(Html.Kendo().Window()
+        .Name("wfpstatus_review")
+        //.Title("")
+        .Width(810)
+        .Height(750)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+        .Events(e => e.Close("closewfpstatus_review"))
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+                .Actions(a => { a.Close(); })
+)

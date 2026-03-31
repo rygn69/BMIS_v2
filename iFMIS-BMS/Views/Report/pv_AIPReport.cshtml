@@ -1,0 +1,110 @@
+﻿@model iFMIS_BMS.BusinessLayer.Models.ReportModel
+<script>
+
+
+                                                function reqPrintNon(e) {
+                                                    var urlShowReport = "@Url.Action("PrintReportAIP", "Report")";
+                                                    var urlSendData = "@Url.Action("SendDataAIP", "Report")"
+                                                  
+
+                                                    if ($("#ddlOffices").val() != "" && $("#ddlProgram").val() != "") {
+
+                                                            var officeID = $("#ddlOffices").val()
+                                                            var officeName = $("#ddlOffices").data("kendoComboBox").text();
+                                                            var Year = $("#ddlYear").val()
+                                                            var grants = $("#grants_amount").val();
+                                                            var others = $("#others_amount").val();
+                                                            var ReportID = 'AppropriationReport';
+
+
+                                                        $.ajax({
+                                                            url: urlSendData,
+                                                            async: false,
+                                                            dataType: 'html',
+                                                            data: { Year: Year, OfficeID: officeID, OfficeName: officeName, grants: grants, others: others },
+                                                            success: window.open(urlShowReport)
+                                                        });
+                                                        }
+                                                        else {
+                                                            alert("Please Select Office and Program");
+                                                        }
+
+                                                }
+
+
+    function ProgramData() {
+        var proyy = $("#ddlYear").val();
+        var off_id = $("#ddlOffices").val();
+        var grants = $("#grants_amount").val();
+        var others = $("#others_amount").val();
+
+        return {
+            propYear: proyy,
+            office_ID: off_id,
+            grants: grants,
+            others: others
+
+        }
+    }
+    function LoadPrograms() {
+        $("#ddlProgram").data("kendoDropDownList").dataSource.read();
+    }
+</script>
+<div style="width : 100%; margin-top: 0px;border-style: solid; border-color: #1fa67a;">
+    <div style="width:100%;height : 25px ; background-color:#1fa67a; color: white">
+        <label class="fa fa-file-text-o fa-lg" style="margin-left: 5px; display:inline-block">  PRINT REPORT</label>
+    </div>
+    <div style="margin-left: 5px; margin-bottom:5px">
+        <label style="margin-left: 0px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px; display : inline-block">
+            &nbsp;&nbsp;&nbsp;&nbsp; Office &nbsp;&nbsp;:&nbsp;&nbsp;
+            @Html.HiddenFor(m => m.OfficeID)
+            @(Html.Kendo().ComboBox()
+                         .Name("ddlOffices")
+                         .DataTextField("OfficeName")
+                         .DataValueField("OfficeID")
+                         .Filter("contains")
+                         .MinLength(1)
+                         .Placeholder("Select Office...")
+                         .HtmlAttributes(new { @style = "width: 527px;" })
+                         .DataSource(source => source.Read(read => read.Action("ddlOffice", "User")))
+                         .Events(e => e.Change("LoadPrograms"))
+            )
+
+        </label>
+
+        <label style="margin-left: 0px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px; display : inline-block">
+            &nbsp;&nbsp;&nbsp;&nbsp; Budget Year &nbsp;&nbsp;: &nbsp;&nbsp; @(Html.Kendo().DropDownList()
+                        .Name("ddlYear")
+                        .DataTextField("ProposalYear")
+                        .DataValueField("ProposalYear")
+                        .SelectedIndex(0)
+                        .HtmlAttributes(new { @style = "width: 90px;" })
+                        .DataSource(source => source.Read(read => read.Action("GetPropYear", "PYear")))
+                        .Events(e => e.Change("LoadPrograms"))
+            )
+        </label>
+        <form id="formNewSystem" method="post" style="margin: 5px;">
+
+            Grants :
+            <input type="text" class="k-textbox" style="width: 310px;" id="grants_amount" name="grants_amount" />
+            Others :
+            <input type="text" class="k-textbox" style="width: 310px;" id="others_amount" name="others_amount" />
+        </form>
+
+    </div>
+    <div style="display:inline-block;width:100%">
+        <div id="btnPrint" class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 80px;float:right; margin-top: 5px; margin-right:10px; margin-bottom:5px" onclick="reqPrintNon()">PrintNon</div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        if ('@Model.UserTypeDesc' == 'Budget In-Charge') {
+            $("#ddlOffices").data("kendoComboBox").value(@Model.OfficeID);
+            $("#ddlOffices").data("kendoComboBox").enable(false);
+        }
+        else {
+            $("#ddlOffices").data("kendoComboBox").enable(@Model.OfficeID);
+            $("#ddlOffices").data("kendoComboBox").value(@Model.OfficeName);
+        }
+    });
+</script>

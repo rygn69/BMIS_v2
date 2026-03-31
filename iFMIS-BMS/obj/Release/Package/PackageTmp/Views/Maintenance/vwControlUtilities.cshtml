@@ -1,0 +1,106 @@
+﻿<script src="~/Scripts/BMS/Maintenance/ControlUtilities.js"></script>
+<style>
+     .k-grid {
+    font-size: 12px;
+    }
+    
+</style>
+
+<h2>Build-up Function Code</h2>
+@(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.BudgetControlModel>()
+        .HtmlAttributes(new { style = "height:510px" })
+        .Name("grNonOfficeFunctionCode")
+        .Scrollable()
+        .Columns(col =>
+        {
+            col.Bound(m => m.grNonOfficeAcctID).Hidden();
+            col.Bound(m => m.grNonOfficeAcctName).Title("Account").Width(250);
+            col.Bound(m => m.grNonOfficeFunctionCode).Title("Function Code").Width(80);
+        })
+        .ToolBar(t => t.Template(@<text>
+
+            <div style="float: left; width: 0; margin-top:-3px;margin-bottom:-100px;margin-left:-3px; height: 0; border-right: 0px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;">
+                <div style="float: left; width: 0; margin-top:0px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 37px solid #EEE; ">
+
+                    <div style="float: left; height:28px; margin-left:-59px; margin-top: 5px;">
+                        <i class="fa fa-tasks fa-2x fg-white"></i>
+                    </div>
+                </div>
+                
+            </div>
+            <div style="float: right; height:28px;margin-top:2px;">
+                <link href="~/Content/metroui/css/docs.css" rel="stylesheet" />
+                <div class="k-button" style="margin-right:5px;float:left" onclick="NonOfficeControl()"><span class="fa fa-plus"></span> Add Function Code</div>
+                <div style="background-color:white;border:solid;border-color:whitesmoke;border-width:thin;width:280px;height:33px;float:right;padding:0px;margin-top:-3px;" id="search">
+                    <input type="text" style="width:200px;border-collapse:collapse;border-color:white;margin:0px;margin-left:0px;height:70%;outline:none;border-left-style:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search.." id="SearchData" name="SearchData">
+                    <div class="k-button k-button-icontext" style="height:33px;width:40px;" onclick="searchAccount()"><span class="mif-search"></span></div>
+                
+                </div>
+                <div style="float: left;">
+                    @(Html.Kendo().DropDownList()
+                        .Name("Years")
+                        .DataTextField("Years")
+                        .DataValueField("Years")
+                        .OptionLabel("Year")
+                        .Events(e => e.Change("RefreshGrid"))
+                        .SelectedIndex(1)
+                        .HtmlAttributes(new { @style = "width: 80px;text-align:left;margin-right:5px;" })
+                        .DataSource(source => source.Read(read => read.Action("NonOfficeCodeYears", "Dropdowns")))
+
+                    )
+                </div>
+            </div>
+
+        </text>))
+
+       .Pageable(page => page.Refresh(true)
+       .Enabled(true)
+       .ButtonCount(4)
+       .PreviousNext(true)
+       )
+                .Selectable(selectable => selectable.Mode(GridSelectionMode.Single))
+       .AutoBind(false)
+       .DataSource(d => d
+       .Ajax()
+       .ServerOperation(false)
+       .PageSize(13)
+       .Model(m => m.Id(i => i.grNonOfficeAcctID))
+       .Read(read => read.Action("grNonOfficeFunctionCode", "BudgetControl").Data("GridParam"))
+       )
+)
+
+<script>
+
+    function NonOfficeControlURL() {
+        return "@Url.Action("NonOfficeControl", "BudgetControl")";
+    }
+
+
+    $(document).ready(function () {
+
+        setTimeout(function () {
+            $("#grNonOfficeFunctionCode").data("kendoGrid").dataSource.read();
+        }, 1000);
+
+    });
+</script>
+
+@(Html.Kendo().Window()
+    .Name("NonOfficeCode")
+    .Title("Add Non-Office Code")
+    .Width(450)
+    .Height(380)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(true)
+    .AutoFocus(true)
+        //.Events(e => e.Close("onClose"))
+    .Animation(a =>
+        {
+            a.Open(o => o.Fade(FadeDirection.In));
+            a.Close(c =>
+            {
+                c.Fade(FadeDirection.In);
+                c.Reverse(true);
+            });
+        }).Actions(a => { a.Close(); }))

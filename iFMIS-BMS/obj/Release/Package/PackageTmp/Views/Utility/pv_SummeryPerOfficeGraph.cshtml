@@ -1,0 +1,775 @@
+﻿
+@model IEnumerable<iFMIS_BMS.BusinessLayer.Models.DashBoard.DashBoardModel>
+
+<script>
+    Hidechart();
+    setwindow();
+    $('#viewSummary').closest(".k-window").css({
+        position: 'fixed',
+        margin: '0%',
+
+        left:'0px',
+        top:'0px'
+        //overflow: scroll
+    });
+
+    function getBudgetYear() {
+        return {
+            BudgetYear:@Session["year_of"],// '@ViewBag.year_of',
+            OfficeId: @Session["office_id"],
+            ooeid:$("#ExpClass").val() == ""? 0:$("#ExpClass").val()
+        }
+    }
+    function getProposedSummary(){
+        var url = "@Url.Action("getProposedSummary", "Utility")";
+        $.post(url, { Yearof: @Session["year_of"],OfficeId: @Session["office_id"]}, function (dd) {
+            document.getElementById('TotalExpenseClass').innerHTML = "Total Expense Class Amount : ₱" + MoneyFormat(parseFloat(dd).toFixed(2))
+            document.getElementById('TotalProgram').innerHTML = "Total Program Amount : ₱" + MoneyFormat(parseFloat(dd).toFixed(2))
+        });
+    }
+    function setwindow() {
+        var window = $("#viewSummary")
+        window.data("kendoWindow")
+        .center()
+        .open()
+        .setOptions({width: '100%',height:'95%'});
+    }
+    function Hidechart(){
+        $(GridAccountDetails).hide();
+        $("#BarChartComparison").hide();
+        $("#BarChartComparisonTotal").hide();
+        
+        //var chart = $("#Expensechart").data("kendoChart");
+        //chart.le.select(1).visible = false
+        //chart.redraw();
+        //var options = new Object();
+
+    }
+    function LoadChartSummary() {//expense class event
+        var url = "@Url.Action("expenseclassgraph", "Utility")";
+        $.get(url, { LineYear: @Session["year_of"], LineOffice: @Session["office_id"], LineOOE: $("#ExpClass").val() == ""? 1:$("#ExpClass").val() }, function (d) {
+            $('#Expensechart').html(d);
+            $("#PieChartPSMooeCADetails").data("kendoChart").dataSource.read();
+            $("#PieChartPSMooeCADetailsPart2").data("kendoChart").dataSource.read();
+            $("#PieChartPSMooeCADetailsPart3").data("kendoChart").dataSource.read();
+            $("#GridAccountDetails").data("kendoGrid").dataSource.read();
+            $("#PieChartPSMooeCACount").data("kendoChart").dataSource.read();
+            $("#BarChartComparison").data("kendoChart").dataSource.read();
+          
+            $("#PieChartPSMooeCADetailsPart2").hide();  
+            $("#PieChartPSMooeCADetailsPart3").hide();
+            $("#TotalExpenseClassDetails3").hide();
+            $("#PieChartPSMooeCACount").hide();
+            $("#PieChartPSMooeCACountDetails").hide();
+            $("#BarChartComparison").hide();
+            $("#BarChartComparisonTotal").hide();
+            
+        })
+        var ochart = $("#PieChartPSMooeCADetails").data("kendoChart");
+        ochart.setOptions({
+                title: {
+                    text: $("#ExpClass").data("kendoComboBox").text()
+                }
+        });
+        var ochart2 = $("#PieChartPSMooeCADetailsPart2").data("kendoChart");
+        ochart2.setOptions({
+            title: {
+                text: ""
+            }
+        });
+        $("#acctdenom").hide(); 
+        $("#gridacctdenom").hide(); 
+        $(GridAccountDetails).hide();
+        $("#TotalExpenseClassDetails2").hide();
+        $("#PieChartPSMooeCACountTotal").hide();
+        getProposedExpenseSummary();
+    }
+    function getProposedExpenseSummary(){
+        var url = "@Url.Action("getProposedExpenseSummary", "Utility")";
+        $.post(url, { Yearof: @Session["year_of"],OfficeId: @Session["office_id"],ooeid:$("#ExpClass").val()}, function (dd) {
+            document.getElementById('TotalExpenseClassDetails').innerHTML = "Total "+ $("#ExpClass").data("kendoComboBox").text() +" : ₱" + MoneyFormat(parseFloat(dd).toFixed(2))
+            //document.getElementById('TotalExpenseClassDetails2').innerHTML = "Total "+ $("#ExpClass").data("kendoComboBox").text() +" : ₱" + MoneyFormat(dd)
+        });
+    }
+
+    function getProposedPerAccount(){
+        var url = "@Url.Action("getProposedPerAccount", "Utility")";
+        $.post(url, { Yearof: @Session["year_of"],OfficeId: @Session["office_id"],ooeid:$("#ExpClass").val(),expid2:$("#SelectedPie").val()}, function (dd) {
+            document.getElementById('TotalExpenseClassDetails2').innerHTML = "Total "+ $("#SelectedPieText").val() +" : ₱" + MoneyFormat(parseFloat(dd).toFixed(2))
+        });
+    }
+
+    function getProposedPerAccountBreakdown(){
+        var url = "@Url.Action("getProposedPerAccountBreakdown", "Utility")";
+        $.post(url, { Yearof: @Session["year_of"],OfficeId: @Session["office_id"],ooeid:$("#ExpClass").val(),expid2:$("#SelectedPie").val()}, function (dd) {
+            document.getElementById('TotalExpenseClassDetails3').innerHTML = "Total "+ $("#SelectedPieText").val() +" : ₱" + MoneyFormat(parseFloat(dd).toFixed(2))
+        });
+    }
+    function getPieChartPSMooeCACountTotal(){
+        
+        var url = "@Url.Action("getPieChartPSMooeCACountTotal", "Utility")";
+        $.post(url, { Yearof: @Session["year_of"],OfficeId: @Session["office_id"],expid2:$("#SelectedPie").val()}, function (dd) {
+            document.getElementById('PieChartPSMooeCACountTotal').innerHTML = "Total No. of "+ $("#SelectedPieText").val() +" : " + dd
+        });
+    }
+    function getBarChartComparisonTotal(){
+       
+        var url = "@Url.Action("getBarChartComparisonTotal", "Utility")";
+        $.post(url, { Yearof: @Session["year_of"],expid2:$("#SelectedPie").val()}, function (dd) {
+            document.getElementById('BarChartComparisonTotal').innerHTML = "Total Amount of "+ $("#SelectedPie").val() +" : ₱" + MoneyFormat(parseFloat(dd).toFixed(2))
+        });
+    }
+    function getParam(){
+        return {
+            yrof:@Session["year_of"],// '@ViewBag.year_of',
+            offId: @Session["office_id"],
+            expid:$("#ExpClass").val() == ""? 0: $("#ExpClass").val(),
+            expid2:$("#SelectedPie").val() ==""? 0: $("#SelectedPie").val()
+        }
+    }
+    function onSeriesClick(e) {//Expense Class Details
+        //CurrentScrollPosition = $(window).scrollTop()
+        var ViewType = e.category;
+        var tmpNo=0;
+        $("#SelectedPieText").val(ViewType);
+        $("#PieChartPSMooeCADetailsPart2").show();
+        if (ViewType=="Plantilla")
+        {
+            tmpNo=1;
+        }
+        else if ((ViewType=="Casual"))
+        {
+            tmpNo=2;
+        }
+        else if ((ViewType=="MOOE"))
+        {
+            tmpNo=3;
+            ViewType='Maintenance and Other Operating Expenses Account'
+        }
+        else if ((ViewType=="CO"))
+        {
+            tmpNo=4;
+            ViewType='Capital Outlay Account'
+        }
+        
+        $("#SelectedPie").val(tmpNo);
+        $("#PieChartPSMooeCADetailsPart2").data("kendoChart").dataSource.read();
+       // $("#PieChartPSMooeCADetailsPart3").data("kendoChart").dataSource.read();
+       // $("#GridAccountDetails").data("kendoGrid").dataSource.read();
+
+        var ochart = $("#PieChartPSMooeCADetailsPart2").data("kendoChart");
+        ochart.setOptions({
+            title: {
+                text: ViewType
+            }
+        });
+
+        var ochart = $("#PieChartPSMooeCADetailsPart3").data("kendoChart");
+        ochart.setOptions({
+            title: {
+                text: ""
+            }
+        });
+
+        $("#TotalExpenseClassDetails2").show();
+        $("#TotalExpenseClassDetails3").hide();
+        $("#PieChartPSMooeCACount").hide();
+        $("#PieChartPSMooeCADetailsPart3").hide();
+        $("#GridAccountDetails").hide();
+        document.getElementById('acctdenom').innerHTML = "";
+        document.getElementById('TotalExpenseClassDetails3').innerHTML = "";
+        
+      //  $("#PieChartPSMooeCACountDetails").hide();
+        $(PieChartPSMooeCACountDetails).hide()
+        $("#gridacctdenom").hide(); 
+        getProposedExpenseSummary();
+        getProposedPerAccount();
+    }
+    function getOtherParam(){
+       // alert($("#SelectedPie").val());
+        return {
+            yrof:@Session["year_of"],// '@ViewBag.year_of',
+            offId: @Session["office_id"],
+            expid:$("#ExpClass").val() == ""? 0: $("#ExpClass").val(),
+            selPie:$("#SelectedPie").val() ==""? "": $("#SelectedPie").val()
+        }
+    }
+    function getOtherParam2(){
+        // alert($("#SelectedPie").val());
+        return {
+            yrof:@Session["year_of"],// '@ViewBag.year_of',
+            offId: @Session["office_id"],
+            selPie:$("#SelectedPie").val() ==""? "": $("#SelectedPie").val()
+        }
+    }
+    function onPieClick(x){//Expense Classification
+        var ViewType = x.category//.css("")
+      //  var colorsel=;//$("#PieChartPSMooeCADetailsPart2").fil
+        
+        //var ctx = document.getElementById("PieChartPSMooeCADetailsPart2")//.getContext("2d");
+        //var myNewChart = new Chart(ctx).Pie(data);
+        //alert(myNewChart);
+      
+        $("#SelectedPie").val(ViewType)
+        //alert($("#SelectedPie").val());
+       
+        if (ViewType == 'Existing Casual' || ViewType == 'Proposed Casual')
+        {
+            ViewType = 'Casual'
+            $("#SelectedPie").val("Existing Casual")
+        }
+        
+        $("#SelectedPieText").val(ViewType);    
+        if ($("#ExpClass").val() == 1){
+            $("#PieChartPSMooeCADetailsPart3").data("kendoChart").dataSource.read();
+            var ochart = $("#PieChartPSMooeCADetailsPart3").data("kendoChart");
+            ochart.setOptions({
+                title: {
+                    text: ViewType + ' Statutory Benefits'
+                }
+            });
+            var ochart = $("#PieChartPSMooeCACount").data("kendoChart");
+            ochart.setOptions({
+                title: {
+                    text: ViewType 
+                }
+            });
+            $(PieChartPSMooeCADetailsPart3).show();
+            getProposedPerAccountBreakdown();
+            getPieChartPSMooeCACountTotal();
+            $(PieChartPSMooeCACountTotal).show();
+            $("#TotalExpenseClassDetails3").show();
+            $("#PieChartPSMooeCACount").show();
+            $("#PieChartPSMooeCACount").data("kendoChart").dataSource.read();
+        }
+        else {
+            $("#GridAccountDetails").data("kendoGrid").dataSource.read();
+            $("#acctdenom").html($("#SelectedPieText").val() + ' Account Denomination') 
+            //alert($("#SelectedPieText").val());
+            $(GridAccountDetails).show();
+            $("#acctdenom").show(); //label denomination
+            $("#PieChartPSMooeCACount").hide();
+            $("#BarChartComparison").hide();
+            $("#BarChartComparisonTotal").hide();
+            
+            if (ViewType == "Training Expenses" || ViewType == "IT Equipment and Software" || ViewType == "Repairs and Maintenance - IT Equipment and Software" || ViewType == "Fuel, Oil and Lubricants Expenses" || ViewType == "Office Supplies Expenses")
+            {
+                $("#BarChartComparison").show();
+                $("#BarChartComparisonTotal").show();
+                $("#BarChartComparison").data("kendoChart").dataSource.read();
+                var ochart = $("#BarChartComparison").data("kendoChart");
+                ochart.setOptions({
+                    title: {
+                        text: ViewType 
+                    }
+                });
+                getBarChartComparisonTotal()
+            }
+
+
+        }
+        $(PieChartPSMooeCACountDetails).hide();
+    }
+    function onPieClick2(x){
+        var ViewType = x.category;
+        $("#SelectedPie").val(ViewType)
+        // alert($("#SelectedPie").val());
+        if ($("#SelectedPie").val() =="No. of Filled-up")
+        {
+            $("#gridacctdenom").html("List of Filled-up Position") 
+        }
+        else if ($("#SelectedPie").val()=="No. of Vacant")
+        {
+            $("#gridacctdenom").html("List of Vacant Position") 
+        }
+        else if ($("#SelectedPie").val()=="No. of Proposed for Funding")
+        {
+            $("#gridacctdenom").html("List of Proposed For Funding") 
+        }
+        else if ($("#SelectedPie").val()=="No. of Casual")
+        {
+            $("#gridacctdenom").html("List of Casual") 
+        }
+        
+        $(PieChartPSMooeCACountDetails).show();
+        $("#gridacctdenom").show(); 
+        $("#PieChartPSMooeCACountDetails").data("kendoGrid").dataSource.read();
+       
+    }
+    function getAccountParam(){
+        return {
+            BudgetYear:@Session["year_of"],// '@ViewBag.year_of',
+            acctname:$("#SelectedPie").val() ==""? 0: $("#SelectedPie").val()
+        }
+    }
+</script>
+
+@*<script>
+    function hideSeriesAll() {
+       
+
+        for (var i = 0; i <= 30; i++) {
+            if ($("#PieChartPSMooeCADetailsPart2").data("kendoChart")._sourceSeries[i].visible) {
+                $("#PieChartPSMooeCADetailsPart2").data("kendoChart")._legendItemClick(i);
+            }
+        }
+    }
+    function showSeriesAll() {
+        for (var i = 0; i <= 30; i++) {
+            if (!$("#PieChartPSMooeCADetailsPart2").getKendoChart()._sourceSeries[i].visible) {
+                $("#PieChartPSMooeCADetailsPart2").getKendoChart()._legendItemClick(i);
+            }
+        }
+    }
+
+</script>*@
+
+<div style="width:100%;border-color:#808080;border-style:solid;border-width:2px;">
+       <div style="width:50%;">
+        @(Html.Kendo().Chart(Model)
+            .Name("PieChartPSMooeCAxxx")
+            .Title(title => title
+                  .Text("Expense Class")
+                  .Position(ChartTitlePosition.Top))
+            .Legend(legend => legend
+                .Visible(true)
+                .Position(ChartLegendPosition.Top)
+            )
+            .Series(series =>
+            {
+                series.Pie(m => m.TotalPSMooeCA, m => m.LegendPiePSMooeCA ).Labels(labels => labels
+                    .Template("#= category #: \n #=kendo.toString(value, 'c2')# (#= kendo.format('{0:P4}', percentage)#)")
+                    .Background("transparent")
+                    .Visible(true)
+                );
+            })
+            .Tooltip(tooltip => tooltip
+                .Visible(true)
+                .Format("{0:c2}")
+            )
+            .DataSource(source => source.Read(read => read.Action("OfficePSMooeCA", "Utility").Data("getBudgetYear")))
+          
+        )
+
+       <span id="TotalExpenseClass" style="font-weight:600;margin-left: 150px; font-size:15px;"></span>
+
+    </div>
+
+    <div style="width:50%;float:right;margin-top:-420px">
+       
+        @(Html.Kendo().Chart(Model)
+            .Name("PieChartPSMooeCAx")
+            .Title(title => title
+                  .Text("Program Description")
+                  .Position(ChartTitlePosition.Top))
+            .Legend(legend => legend
+                .Visible(true)
+                .Position(ChartLegendPosition.Top)
+            )
+            .Series(series =>
+            {
+                series.Pie(m => m.TotalPSMooeCA, m => m.LegendPiePSMooeCA ).Labels(labels => labels
+                    .Template("#= category #: \n #=kendo.toString(value, 'c2')# (#= kendo.format('{0:P4}', percentage)#)")
+                    .Background("transparent")
+                    .Visible(true)
+                );
+            })
+            .Tooltip(tooltip => tooltip
+                .Visible(true)
+                .Format("{0:c2}")
+            )
+            .DataSource(source => source.Read(read => read.Action("OfficePSMooeCAProgram", "Utility").Data("getBudgetYear")))
+          
+        )
+
+       <span id="TotalProgram" style="font-weight:600;margin-left: 175px; font-size:15px;margin-bottom: 20px"></span>
+    </div>
+    
+</div>
+
+@*Line Graph*@
+<br />
+
+<div style="width:100%;border-color:#808080;border-style:solid;border-width:2px;margin-top:-15px;">
+   
+        <label style="margin-left:10px;margin-top:15px;font-size:14px;font-style:normal">
+            Expense Class    :
+        </label>
+   
+    <div style="width:1000px;margin-left:120px;margin-top:-25px">
+     
+        @(Html.Kendo().ComboBox()
+            .Name("ExpClass")
+            .DataTextField("Text")
+            .DataValueField("Value")
+            .Placeholder("Select Expenses...")
+            .BindTo(new List<SelectListItem>() {
+                    new SelectListItem() {
+                        Text = "Personal Services",
+                        Value = "1"
+                    },
+                    new SelectListItem() {
+                        Text = "Maintenance and Other Operating Expenses",
+                        Value = "2"
+                    },
+                    new SelectListItem() {
+                        Text = "Capital Outlay",
+                        Value = "3"
+                    },
+                      
+                })
+            .HtmlAttributes(new { @style = "width: 300px;" })
+            .AutoBind(true)
+            .Events(e => e.Change("LoadChartSummary"))
+              
+        )
+    </div>
+    <div style="width:50%;margin-top:10px">
+        @(Html.Kendo().Chart(Model)
+            .Name("Expensechart")
+            .Title("Utilization Trend")
+            @*.Title((string)ViewBag.accountName)
+            .Title(title => title
+                  .Text("Program Description")
+                  .Position(ChartTitlePosition.Top))*@
+            .Legend(legend => legend
+                .Position(ChartLegendPosition.Bottom)
+            )
+            //.ChartArea(chartArea => chartArea
+            //    .Background("transparent")
+            //)
+            .SeriesDefaults(seriesDefaults =>
+                seriesDefaults.Line().Style(ChartLineStyle.Normal)
+            )
+            .Series(series =>
+            {
+                series.Line(s => s.amount1).Name("Obligation").Color("#1fa67a");
+                series.Line(s => s.amount2).Name("Appropriation").Color("#6F7916");
+                @*series.Line(s => s.amount3).Name("Difference").Color("#FF0404");*@
+                series.Line(s => s.amount3).Name("Difference").Visible(false);
+            
+            })
+            
+            .CategoryAxis(axis => axis
+                .Categories("2016","2017","2018","2019","2020","2021")
+                .MajorGridLines(lines => lines.Visible(false))  
+            )
+            .ValueAxis(axis => axis
+                .Numeric().Labels(labels => labels.Format("₱ {0:N0}"))
+                .Line(line => line.Visible(false))
+                .AxisCrossingValue(-10)
+            )
+            .Tooltip(tooltip => tooltip
+                .Visible(true)
+                .Format("₱ {0:N2}")
+            
+            )
+        
+                  //   .Legend(legend => legend.Position(ChartLegendPosition.Bottom).Labels(x => x.Font(font: "bold 12px Arial,Helvetica,sans-serif").Template("History Amount")))
+        )
+    </div>
+    <div class="demo-section k-content wide" style="width:50%;float:right;margin-top:-440px">
+       
+        @(Html.Kendo().Chart(Model)
+            .Name("PieChartPSMooeCADetails")
+            @*.Title("oksdf")*@
+            @*.Title(title => title
+                  .Text("Expense Class Details")
+                  .Position(ChartTitlePosition.Top))*@
+            .Legend(legend => legend
+                .Visible(true)
+                .Position(ChartLegendPosition.Top)
+            )
+            .Series(series =>
+            {
+                series.Pie( m => m.TotalPSMooeCA, m => m.LegendPiePSMooeCA ).Labels(labels => labels
+                    .Template("#= category #: \n #=kendo.toString(value, 'c2')# (#= kendo.format('{0:P4}', percentage)#)")
+                    .Background("transparent")
+                    .Visible(true)
+                ); 
+            })
+            .Tooltip(tooltip => tooltip
+                .Visible(true)
+                .Format("{0:c2}")
+            )
+            .Events(e => e.SeriesClick("onSeriesClick"))
+            .DataSource(source => source.Read(read => read.Action("PieChartPSMooeCADetails", "Utility").Data("getBudgetYear")))
+          
+        )
+
+       <span id="TotalExpenseClassDetails" style="font-weight:600;margin-left: 120px; font-size:15px;margin-bottom: 20px"></span>
+    </div>
+
+</div>
+<br />
+<div  style="width:100%;height:600px;border-color:#808080;border-style:solid;border-width:2px;margin-top:-15px;">
+    <div style="width:50%;">
+     @*  <div class="k-button" onclick="hideSeriesAll()"> hide</div>
+        <div class="k-button" onclick="showSeriesAll()"> show</div>*@
+
+        @(Html.Kendo().Chart(Model)
+            .Name("PieChartPSMooeCADetailsPart2")
+            @*.Title((string)ViewBag.accountName)*@
+            @*.Title(title => title
+                  .Text("Expense Classification")
+                  .Position(ChartTitlePosition.Top))*@
+            .Legend(legend => legend
+                .Visible(true)
+                .Position(ChartLegendPosition.Top)
+            )
+            .Series(series =>
+            {
+                series.Pie( m => m.TotalPSMooeCA, m => m.LegendPiePSMooeCA ).Labels(labels => labels
+                    .Template("#= category #: \n #=kendo.toString(value, 'c2')# (#= kendo.format('{0:P4}', percentage)#)")
+                    .Background("transparent")
+                    .Visible(true)
+                ); 
+            })
+            .Tooltip(tooltip => tooltip
+                .Visible(true)
+                .Format("{0:c2}")
+            )
+            .HtmlAttributes(new { style = "height:600px" })
+            .Events(e => e.SeriesClick("onPieClick"))
+            .DataSource(source => source.Read(read => read.Action("PieChartPSMooeCADetailsP2", "Utility").Data("getParam")))
+          
+        )
+
+      <span id="TotalExpenseClassDetails2" style="font-weight: 500; margin-left: 150px;float:left ;margin-top:-30px;position:relative;display: inline; font-size: 15px;"></span>
+   
+   </div> 
+    <div style="width:50%;float:right;margin-top:-600px;">
+    
+        @(Html.Kendo().Chart(Model)
+            .Name("PieChartPSMooeCADetailsPart3")
+            @*.Title(title => title
+                  .Text("Statutory Benefits")
+                  .Position(ChartTitlePosition.Top))*@
+            .Legend(legend => legend
+                .Visible(true)
+                .Position(ChartLegendPosition.Top)
+            )
+            .Series(series =>
+            {
+                series.Pie( m => m.TotalPSMooeCA, m => m.LegendPiePSMooeCA ).Labels(labels => labels
+                    .Template("#= category #: \n #=kendo.toString(value, 'c2')# (#= kendo.format('{0:P4}', percentage)#)")
+                    .Background("transparent"   )
+                    .Visible(true)
+                ); 
+            })
+            .Tooltip(tooltip => tooltip
+                .Visible(true)
+                .Format("{0:c2}")
+            )
+            .HtmlAttributes(new { style = "height:600px" })
+            .DataSource(source => source.Read(read => read.Action("GetAccountDetails", "Utility").Data("getOtherParam")))
+        )
+        <span id="TotalExpenseClassDetails3" style="font-weight: 500; margin-left: 150px;position: relative;float:left;margin-top:-30px; font-size: 15px; display: inline;"></span>
+   </div> 
+   <label id="acctdenom" style="stop-color: rgb(255, 255, 255); opacity: 0.5;text-align:center; margin-top: -590px; float: right;margin-right:100px;font-style:italic"></label>
+   
+    <div style="width:50%;float:right;">
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.DashBoard.DashBoardModel>()
+            .Name("GridAccountDetails")
+            .HtmlAttributes(new { style = "height:500px;width:550px;margin-left:50px;margin-top:-550px"})
+            .Scrollable()
+            .Columns(col =>
+                { 
+                col.Template(@<text></text>)
+                    @*.Hidden()*@
+                     .HeaderTemplate(@<text>No.</text>)
+                     .Width(40) 
+                     .HtmlAttributes(new { style = "text-align:center;" })
+                     .HeaderHtmlAttributes(new { style = "text-align:center;height:30px;", @class = "metro-header" })
+                     @*.HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal"})*@
+                     .ClientTemplate("<div>#=id# </div>");
+               
+                col.Template(@<text></text>)
+                     .HeaderTemplate(@<text>Denomination</text>)
+                     .Width(280) 
+                     .HtmlAttributes(new { style = "text-align:left;" })
+                     .HeaderHtmlAttributes(new { style = "text-align:center;height:30px;", @class = "metro-header" })
+                     @*.HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal"})*@
+                     .ClientTemplate("<div>#=AccountName# </div>")
+                     .ClientFooterTemplate("<div style='text-align:center;color:darkgreen'><label>Total :</label></div>"); 
+                 col.Template(@<text></text>)
+                     .HeaderTemplate(@<text>Qty</text>)
+                     .Width(50) 
+                     .HtmlAttributes(new { style = "text-align:center;" })
+                     .HeaderHtmlAttributes(new { style = "text-align:center;height:30px;", @class = "metro-header" })
+                     @*.HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal"})*@
+                     .ClientTemplate("<div>#=qty# </div>");
+                     
+                 col.Bound(c => c.Amount)
+                    .HeaderTemplate(@<text>Amount</text>)
+                    .Width(150)
+                    .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center;height:30px;", @class = "metro-header" })
+                    @*.HeaderHtmlAttributes(new { style = "text-align:right; vertical-align: middle; overflow: visible; white-space: normal" })*@
+                    .ClientTemplate("<div>#=kendo.toString(Amount,'c2')# </div>")
+                    .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> </label><label> #=kendo.toString(sum, 'c2')#</label></div>");
+                   
+             })
+            .Pageable(pageable => pageable
+                    .Refresh(true)
+                    .ButtonCount(2))
+            
+            .DataSource(dataSource => dataSource
+            .Ajax()
+            .Batch(true)
+            .Model(m => m.Id(i => i.id))
+            .ServerOperation(false)
+            .Aggregates(a =>
+                    {
+                        a.Add(c => c.Amount).Sum();
+                    })
+            .PageSize(10)
+            .Read(read => read.Action("GetAccountDetailsGrid", "Utility").Data("getOtherParam"))
+            )
+    ) 
+   </div>
+</div>
+@*Account comparison*@
+<div  style="width:100%;border-color:#808080;border-style:solid;border-width:2px;margin-top:5px;">
+    <div style="width:100%;">
+        
+    @(Html.Kendo().Chart(Model)
+            .Name("BarChartComparison")
+            .Legend(legend => legend
+                .Visible(false)
+                .Position(ChartLegendPosition.Top)
+            )
+            .Series(series =>
+            {
+                series.Column(m => m.TotalPSMooeCA).ColorField("").Color("#EEAB06").Labels(labels => labels
+                    .Template(" #=value# (#= kendo.format('{0:P4}', percentage)#)")
+                    .Background("transparent")
+                    .Visible(false)
+                //.Rotation(90)
+                );
+            })
+            .CategoryAxis(axis => axis
+                .Categories(m => m.LegendPiePSMooeCA)
+                .MajorGridLines(lines => lines.Visible(true))
+                .Labels(labels => labels.Rotation(-45))
+                
+            )
+            .Tooltip(tooltip => tooltip
+                .Visible(true)
+                @*.BackColor("#050303")*@
+               @* .Color("#D40000")*@
+                .Format("{0:c2}")   
+                
+            )
+            .HtmlAttributes(new { style = "height:600px;width:100%" })
+            .DataSource(source => source.Read(read => read.Action("BarAccountComparison", "Utility").Data("getAccountParam")))
+        )
+    <span id="BarChartComparisonTotal" style="font-weight:600;margin-left: 150px; font-size:15px;"></span>
+    </div>
+</div>
+
+@*Account comparison  END *@
+
+<div style="width:100%;border-color:#808080;border-style:solid;border-width:2px;margin-top:5px;">
+    <div style="width:50%;">
+        @(Html.Kendo().Chart(Model)
+            .Name("PieChartPSMooeCACount")
+            @*.Title(title => title
+                  .Text("Statutory Benefits")
+                  .Position(ChartTitlePosition.Top))*@
+            .Legend(legend => legend
+                .Visible(true)
+                .Position(ChartLegendPosition.Top)
+            )
+            .Series(series =>
+            {
+                series.Pie( m => m.TotalPSMooeCA, m => m.LegendPiePSMooeCA ).Labels(labels => labels
+                    .Template("#= category #: \n #=value# (#= kendo.format('{0:P4}', percentage)#)")
+                    .Background("transparent"   )
+                    .Visible(true)
+                ); 
+            })
+            .Tooltip(tooltip => tooltip
+                .Visible(true)
+                .Format("{0:c2}")
+            )
+            .Events(e => e.SeriesClick("onPieClick2"))
+            .DataSource(source => source.Read(read => read.Action("GetProposeCount", "Utility").Data("getParam")))
+        )
+    <span id="PieChartPSMooeCACountTotal" style="font-weight:500;margin-left: 150px; font-size:15px;"></span>
+    </div>
+    <label id="gridacctdenom" style="stop-color: rgb(255, 255, 255); opacity: 0.5;text-align:center; margin-top: -405px; float: right;margin-right:270px;font-style:italic"></label>
+    <div style="width:50%;float:right;margin-top:-360px;">
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.DashBoard.DashBoardModel>()
+            .Name("PieChartPSMooeCACountDetails")
+            .HtmlAttributes(new { style = "height:350px;width:550px;margin-left:50px;"})
+            .Scrollable()
+            .Columns(col =>
+                { 
+                col.Template(@<text></text>)
+                    @*.Hidden()*@
+                     .HeaderTemplate(@<text>No.</text>)
+                     .Width(40) 
+                     .HtmlAttributes(new { style = "text-align:center;" })
+                     .HeaderHtmlAttributes(new { style = "text-align:center;height:30px;", @class = "metro-header" })
+                     @*.HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal"})*@
+                     .ClientTemplate("<div>#=id# </div>");
+               
+                col.Template(@<text></text>)
+                     .HeaderTemplate(@<text>Name</text>)
+                     .Width(280) 
+                     .HtmlAttributes(new { style = "text-align:left;" })
+                     .HeaderHtmlAttributes(new { style = "text-align:center;height:30px;", @class = "metro-header" })
+                     @*.HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal"})*@
+                     .ClientTemplate("<div>#=Position# </div>")
+                     .ClientFooterTemplate("<div style='text-align:center;color:darkgreen'><label>Total :</label></div>"); 
+                     
+                 col.Bound(c => c.Amount)
+                    .HeaderTemplate(@<text>Amount</text>)
+                    .Width(150)
+                    .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center;height:30px;", @class = "metro-header" })
+                    @*.HeaderHtmlAttributes(new { style = "text-align:right; vertical-align: middle; overflow: visible; white-space: normal" })*@
+                    .ClientTemplate("<div>#=kendo.toString(Amount,'c2')# </div>")
+                    .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> </label><label> #=kendo.toString(sum, 'c2')#</label></div>");
+                   
+             })
+            .Pageable(pageable => pageable
+            .Refresh(true)
+            .ButtonCount(2))
+            .DataSource(dataSource => dataSource
+            .Ajax()
+            .Batch(true)
+            .Model(m => m.Id(i => i.id))
+            .ServerOperation(false)
+            .Aggregates(a =>
+                    {
+                        a.Add(c => c.Amount).Sum();
+                    })
+            .PageSize(10)
+            .Read(read => read.Action("GetPSDetail", "Utility").Data("getOtherParam2"))
+            )
+    ) 
+   </div>
+</div>
+
+<div style="display:none">
+    <input type="text" id="SelectedPie" name="SelectedPie" value="0" style="display:none;">
+    <input type="text" id="SelectedPieText" name="SelectedPieText" value="0" style="display:none;">
+</div>
+@*<style>
+    .k-tooltip {
+    background: black !important;
+    border-color: black !important;    
+    }
+</style>*@
+<script>
+
+    
+    $(document).ready(function () {
+       
+        getProposedSummary()
+
+    }, 1000);
+   
+</script>

@@ -1,0 +1,246 @@
+﻿<script>
+    function getParam() {
+        return {
+            office: $("#office").val(),
+            year: $("#tyear").val()
+        }
+    }
+    function returnwfpitem(id, officeid, accountid, yearof, isPPMP) {
+        var year= $("#wfpyear").val()
+        var fundid = $("#gfid").val() == 1 ? 0 : 1;
+        var mode_trans= $("#gf_currentid").val()
+        swal({
+            title: "Return the ITEM?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes",
+            closeOnConfirm: false,
+            showLoaderOnConfirm: true
+        },
+            function () {
+                var url = "@Url.Action("returnwfpitem", "Report")";
+                $.get(url, { id: id, officeid: officeid, accountid: accountid, yearof: yearof, isPPMP: isPPMP }, function (e) {
+                    if (e =='success'){
+                        swal("Success", "The item has been successfully returned..", "success")
+                        $("#WFPCancel").data("kendoGrid").dataSource.read()
+                    }
+                    else{
+                        swal("Error",e,"error")
+                    }
+                })
+            })
+    }
+    function fnoffice() {
+        return {
+            officeid: $("#office").val(),
+            fundid: 0
+        }
+
+    }
+    function fnaccount() {
+        return {
+            officeid: $("#office").val(),
+            tyear: $("#tyear").val()
+        }
+    }
+    function fnOffice_sel() {
+        $("#account").data("kendoComboBox").value("")
+        $("#account").data("kendoComboBox").dataSource.read()
+        $("#WFPAddAccount").data("kendoGrid").dataSource.read()
+    }
+    function returnaccount(officeid,accountid,yearof) {
+        var year= $("#wfpyear").val()
+        var fundid = $("#gfid").val() == 1 ? 0 : 1;
+        var mode_trans= $("#gf_currentid").val()
+        swal({
+            title: "Remove the Account?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes",
+            closeOnConfirm: false,
+            showLoaderOnConfirm: true
+        },
+            function () {
+                var url = "@Url.Action("returnaccount", "Report")";
+                $.get(url, { officeid: officeid, accountid: accountid, yearof: yearof}, function (e) {
+                    if (e =='success'){
+                        swal("Success", "The account has been successfully removed.", "success")
+                        $("#WFPAddAccount").data("kendoGrid").dataSource.read()
+                        $("#account").data("kendoComboBox").dataSource.read()
+                    }
+                    else{
+                        swal("Error",e,"error")
+                    }
+                })
+            })
+    }
+</script>
+<div style="width:100%;float:left;margin-top:1px;">
+    <label style="display:inline-block;margin-left:10px;margin-top:10px;font-size:12px;">
+        Year 
+    </label>
+    <br />
+    <div style="margin-left:10px;width:100px;margin-top:0px">
+        @(Html.Kendo().ComboBox()
+                .Name("tyear")
+                .DataTextField("ProposalYear")
+                .DataValueField("ProposalYear")
+                .SelectedIndex(0)
+                //  .Events(e => e.Select("fnyear"))
+                .HtmlAttributes(new { style = "width:100%; height:100%;font-size:12px;", @class = "form-control autoselect" })
+
+                .DataSource(source => source.Read(read => read.Action("WFPYears", "PYear")))
+        )
+
+    </div>
+
+    <label style="display:inline-block;margin-left:10px;margin-top:10px;font-size:12px;">
+        Office 
+    </label>
+    <div style="margin-left:10px;width:500px;">
+        @(Html.Kendo().ComboBox()
+            .Name("office")
+            .DataTextField("offname")
+            .DataValueField("OfficeID")
+            .AutoBind(true)
+            .Placeholder("Select Office...")
+            .Filter("contains")
+            .MinLength(3)
+            .Events(e => e.Change("fnOffice_sel"))
+            //       .SelectedIndex(0)
+            .HtmlAttributes(new { style = "width:100%; height:100%;font-size:12px;", @class = "form-control autoselect" })
+            .DataSource(source =>
+            {
+                source.Read(read =>
+                {
+                    read.Action("GetOfficeWFP", "Report").Data("fnoffice");
+                })
+            .ServerFiltering(false);
+            })
+        )
+    </div>
+    <label style="display:inline-block;margin-left:10px;margin-top:10px;font-size:12px;">
+        Account 
+    </label>
+    <div style="margin-left:10px;width:500px;">
+        @(Html.Kendo().ComboBox()
+            .Name("account")
+            .DataTextField("AccountName")
+            .DataValueField("AccountID")
+            .AutoBind(true)
+            .Placeholder("Select account...")
+            .Filter("contains")
+            .MinLength(3)
+          //  .Events(e => e.Change("fnaccount_sel"))
+            .SelectedIndex(-1)
+            .HtmlAttributes(new { style = "width:100%; height:100%;font-size:12px;", @class = "form-control autoselect" })
+            .DataSource(source =>
+            {
+                source.Read(read =>
+                {
+                    read.Action("AddAccountExempt", "Report").Data("fnaccount");
+                })
+            .ServerFiltering(false);
+            })
+        )
+     
+    </div>
+    <div style="display:inline-block;margin-left:380px;">
+        <div id="btnSave" class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 75px;float:left; margin-top: 10px; margin-left:15px;border-radius:50px;background-color:cornflowerblue;color:white; margin-bottom:0px" onclick="reqSave()"><span class="fa fa-save"></span> Save</div>
+    </div>
+    <div style="margin-top:10px">
+        @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.WFPrepare>()
+        .Name("WFPAddAccount")
+        .HtmlAttributes(new { style = "" })
+        .Scrollable()
+        .Columns(col =>
+        {
+     
+        col.Template(@<text></text>)
+            .Hidden()
+            .ClientTemplate("<div>#=officeid# </div>");
+        col.Template(@<text></text>)
+            .Hidden()
+            .ClientTemplate("<div>#=accountid# </div>");
+        col.Template(@<text></text>)
+            .Hidden()
+            .ClientTemplate("<div>#=yearof# </div>");
+        col.Template(@<text></text>)
+            .HeaderTemplate(@<text>Office</text>)
+            .Width(300)
+            .HtmlAttributes(new { style = "text-align:left;vertical-align:top" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=office# </div>");
+        col.Template(@<text></text>)
+            .HeaderTemplate(@<text>Account</text>)
+            .Width(200)
+            .HtmlAttributes(new { style = "text-align:left;font-size:12px;vertical-align:top" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=accountname# </div>");
+        col.Template(@<text></text>)
+            .HeaderTemplate(@<text></text>)
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:10px;color:beige;" })
+            .ClientTemplate(
+                "<div id='deleteid#=accountid#' style='border-radius:50px;' onclick='returnaccount(#=officeid#,#=accountid#,#=yearof#)'><span class='fa fa-trash' title='Click to remove the account from the list!' style='font-size: 16px;margin: 1px;margin-top: -1px;margin-left: 2px;margin-right: 2px;color:red;cursor:pointer'> </span></div> ")
+            .HtmlAttributes(new { style = "vertical-align: top;text-align:center" })
+            .Width(30);
+        })
+        .Resizable(e => e.Columns(true))
+        .Pageable(pageable => pageable
+        .Refresh(true)
+        .ButtonCount(5))
+        .HtmlAttributes(new { @class = "table-responsive", style = "height:410px;" })
+        .Selectable()
+        //.Events(e => e.DataBound("onDataBound").Change("WFPgrid"))
+        .DataSource(dataSource => dataSource
+        .Ajax()
+        .Batch(true)
+        .Model(m => m.Id(i => i.wfpid))
+        .ServerOperation(false)
+        //.Aggregates(a =>
+        //{
+        //    a.Add(c => c.totalamount).Sum();
+        //})
+        .PageSize(1000)
+        .Read(read => read.Action("GetWFPAddExempt", "Report").Data("getParam"))
+        )
+        )
+    </div>
+</div>
+<script>
+    function reqSave() {
+        var officeid = $("#office").val()
+        var accountid = $("#account").val()
+        var tyear = $("#tyear").val()
+        if (officeid == 0 || accountid == 0) {
+            swal("Warning", "Please select the office and the account accordingly.", "warning")
+        }
+        else {
+            swal({
+                title: "Save?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                closeOnConfirm: false,
+                showLoaderOnConfirm: true
+            },
+            function (isConfirm) {
+                if (isConfirm) {
+                    var url = "@Url.Action("AddAccountItem", "Report")";
+                    $.get(url, { officeid: officeid, accountid: accountid, tyear: tyear }, function (e) {
+                        if (e == "success") {
+                            swal("Success", "The account has been successfully added and is now exempted from adding a new item.", "success");
+                            $("#WFPAddAccount").data("kendoGrid").dataSource.read()
+                            $("#account").data("kendoComboBox").dataSource.read()
+                        } else {
+                            swal("Warning", e, "warning");
+                        }
+                    });
+                }
+            });
+        }
+    }
+</script>

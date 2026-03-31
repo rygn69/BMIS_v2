@@ -1,0 +1,137 @@
+﻿<script>
+    var AccountList = '@ViewBag.AccountsList'
+    function searchAccount() {
+        var SearchProgramData = $("#SearchData").val();
+        $("#grChartOfAccounts").data("kendoGrid").dataSource.filter([
+            {
+                field: "AccountDescripttion",
+                operator: "contains",
+                value: SearchProgramData
+            }
+        ]);
+    }
+    function getAccountOrderNo()
+    {
+        var ProgramID = $("#program_id").val();
+        var OOEID = $("#ooe_id").val();
+        var YearOf = $("#YearOf").val();
+        var url2 = "@Url.Action("getAccountOrderNo", "Maintenance")";
+        $.post(url2, { ProgramID: ProgramID, OOEID: OOEID, YearOf: YearOf }, function (d) {
+            $("#txtAccountOrderNo").val(d);
+        })
+    }
+    function AddProgramAccount(AccountID,AccountName) {
+        var OfficeID = $("#office_id").val();
+        var ProgramID = $("#program_id").val();
+        var OOEID = $("#ooe_id").val();
+        var YearOf = $("#YearOf").val();
+        var OrderNo = $("#txtAccountOrderNo").val();
+        if (OrderNo == '') {
+            OrderNo = '1';
+        }
+        if ($("#btnIcon"+AccountID).attr("class") != 'fa fa-spinner fa-spin') {
+            $("#btnIcon"+AccountID).attr('class', 'fa fa-spinner fa-spin');
+            var url = "@Url.Action("AddOfficeAccounts", "Maintenance")";
+            $.post(url, { OfficeID: OfficeID, ProgramID: ProgramID, OOEID: OOEID, YearOf: YearOf, AccountID: AccountID, OrderNo: OrderNo,AccountName:AccountName }, function (d) {
+                if (d == "Success") {
+                    $("#grAccountList").data("kendoGrid").dataSource.read();
+                    $("#btnIcon" + AccountID).removeClass('fa fa-spinner fa-spin');
+                    $("#btnIcon" + AccountID).attr('class', 'fa fa-check');
+                    $("#btnIcon" + AccountID).css("color", "green");
+                    AccountList = AccountList + ',' + AccountID.toString();
+                    getAccountOrderNo();
+                } else {
+                    $("#btnIcon" + AccountID).removeClass('fa fa-spinner fa-spin');
+                    $("#btnIcon" + AccountID).attr('class', 'fa fa-check');
+                    $("#btnIcon" + AccountID).css("color", "red");
+                    getAccountOrderNo();
+                }
+            })
+        }
+    }
+    function OnGridDataBound(e) {
+        var Arr = AccountList.split(',');
+        var rows = e.sender.tbody.children();
+        for (var j = 0; j < rows.length; j++) {
+            
+            var row = $(rows[j]);
+            var dataItem = e.sender.dataItem(row);
+            if (Arr.indexOf(dataItem.get("AccountID").toString()) != -1) {
+                $("#btnIcon" + dataItem.get("AccountID")).css("color", "green");
+            }
+            else {
+                $("#btnIcon" + dataItem.get("AccountID")).css("color", "red");
+            }
+        }
+    }
+</script>
+<div style="margin-top:10px;">
+
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.ProgramAccountsModel>()
+            .Name("grChartOfAccounts")
+            .HtmlAttributes(new { style = "height:430px;" })
+            .Columns(col =>
+            {
+                col.Bound(m => m.AccountDescripttion).Title("Account Name")
+                    .Width(250).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                    .ClientTemplate("<div>#=AccountDescripttion#  (#=ProgramDescription#)</div>");
+                col.Template(t => { })
+                    .ClientTemplate(
+                    "<div class='btn-delete'style='inline-block; height: 15px;width:110px;'> <a  id='Add#=AccountID#' title='Add Account' onclick='AddProgramAccount(#=AccountID#,\"#=kendo.htmlEncode(AccountDescripttion)#\")' style='margin-left:2px;'><span id='btnIcon#=AccountID#' class='fa fa-check' style='font-size: 12pt;'></span></a>").Width(50);
+                col.Bound(m => m.AccountID).Title("Account ID").Hidden();
+            })
+            .ToolBar(t => t.Template(@<text>
+                <div style="float: left; width: 0; margin-top:-3px;margin-bottom:-100px;margin-left:-3px; height: 0; border-right: 0px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;">
+                    <div style="float: left; width: 0; margin-top:0px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 37px solid #EEE; ">
+                        <div style="float: left; height:28px; margin-left:-59px; margin-top: 5px;">
+                            <i class="fa fa-tasks fa-2x fg-white"></i>
+                        </div>
+                    </div>
+                </div>
+                <div style="float: right; height:28px;margin-top:2px;">
+                    <link href="~/Content/metroui/css/docs.css" rel="stylesheet" />
+                    <div style="background-color:white;border:solid;border-color:whitesmoke;border-width:thin;width:310px;height:33px;float:right;padding:0px;margin-top:-3px;" id="search">
+                        <input type="text" style="width:260px;border-collapse:collapse;border-color:white;margin:0px;margin-left:-10px;height:70%;outline:none;border-left-style:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search by Account Name" id="SearchData" name="SearchData">
+                        <div class="k-button k-button-icontext" style="height:33px;width:40px;" onclick="searchAccount()"><span class="mif-search"></span></div>
+                    </div>
+                </div>
+            </text>))
+                    .Pageable(page => page.Refresh(true)
+                        .Enabled(true)
+                        .ButtonCount(4)
+                        .PreviousNext(true)
+                    )
+                    .Events(e => e.DataBound("OnGridDataBound"))
+                    .Scrollable(s => s.Enabled(true))
+                    .Selectable(selectable => selectable.Mode(GridSelectionMode.Single))
+                    .DataSource(d => d
+                        .Ajax()
+                        .PageSize(10)
+                        .Model(m => m.Id(i => i.AccountID))
+                        .Read(read => read.Action("getChartOfAccountsData", "Maintenance"))
+                        )
+    )
+</div>
+<div style="width:100%;display:inline-block;margin-top:10px">
+    <div  style="float:left;">Order No :
+        <input id="txtAccountOrderNo" style ="width:80px" />
+    </div> 
+    <div style="float:right" class="k-button k-button-icontext" onclick="btnSelectAccountsClick()"> Close</div>
+</div>
+
+<script>
+    $("#SearchData").keypress(function (e) {
+        if (e.keyCode == 13) {
+            searchAccount();
+        }
+    });
+    document.getElementById('SearchData').onkeyup = function () {
+        if (($(this).val() == '' || $(this).val() == 'Search by Account Name') && $(this).attr('type') != 'hidden') {
+            searchAccount()
+        }
+    }
+    $(document).ready(function () {
+        getAccountOrderNo();
+    });
+</script>

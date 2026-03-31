@@ -1,0 +1,337 @@
+﻿<script>
+    function ResizeDIV() {
+        var DIVSize = $("#GridDIVSizeIndicator").val();
+        var DIV_ID = 'GridDIV';
+        if (DIVSize == 0) {
+            MaximizeDIV(DIV_ID);
+            document.getElementById('GridDIVSizeIndicator').value = 1;
+            document.getElementById('btnResizeText').innerHTML = " Minimize";
+            document.getElementById('btnResizeIcon').className = "fa fa-arrows";
+
+        }
+        else {
+            MinimizeDIV(DIV_ID);
+            document.getElementById('GridDIVSizeIndicator').value = 0;
+            document.getElementById('btnResizeText').innerHTML = " Maximize";
+            document.getElementById('btnResizeIcon').className = "fa fa-arrows-alt";
+        }
+    }
+    function GridParameters() {
+        var FundType = $("#ddlFundingSource").val();
+        var YearOf = $("#ddlYear").val();
+        return {
+            FundType: FundType,
+            YearOf: YearOf
+        }
+    }
+    function AddNewItem() {
+        var FundType = $("#ddlFundingSource").val();
+        var YearOf = $("#ddlYear").val();
+        if (FundType == "" || YearOf == "") {
+            swal({
+                title: "Error!",
+                text: "Please Select Fund Type and Year",
+                type: "warning",
+                showConfirmButton: true
+            });
+        }
+        else {
+            var Mode = "Add"
+            var url = "@Url.Action("ShowNewItemWindow", "LBPForm1")";
+            $('#AddNewItemWindow').html('<div style="width: 100%;height:100%;"><img src="@Url.Content("~/Content/images/loading.gif")" alt="Loading..." style="position: absolute;top: 20%;left: 30%;margin-top: 0px;margin-left: 0px;" /></div>');
+            $.post(url, { Mode: Mode, SeriesID: 'NONE' }, function (pvData) {
+                $(window).scrollTop(0);
+                $('#AddNewItemWindow').html(pvData);
+                $('#AddNewItemWindow').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Add New Particular").center().open();
+            })
+        }
+
+    }
+    function getAIPGridFooterTotal() {
+        var url = "@Url.Action("getAIPGridFooterTotal", "BudgetPreparation")";
+        var OfficeID = $("#ddlAIPOffices").val();
+        var ReturnValue = "";
+        $.get(url, { OfficeID: OfficeID }, function (d) {
+            document.getElementById('GridFooterTotal').innerHTML = d;
+        })
+    }
+    function OnAIPGridEdit(arg) {
+        if (arg.container.find("input[name=OrderNo]").length <= 0) {
+            $("#grdAIPList").data("kendoGrid").closeCell(arg.container)
+        }
+
+        var gridName = $('#grdAIPList').data('kendoGrid');
+        var ds = gridName.dataSource.data();
+        var dataRows = gridName.items();
+        var AIP_ID = "";
+
+        var input = arg.container.find("input[name=OrderNo]");
+        var value = input.val();
+        var OldValue = input.val();
+
+        input.keyup(function () {
+            value = input.val();
+        });
+        input.blur(function () {
+            var rowIndex = dataRows.index(gridName.select());
+            AIP_ID = ds[rowIndex].AIPID;
+            if (value != OldValue) {
+                var url = "@Url.Action("UpdateAIPOrderNo", "BudgetPreparation")";
+                $.post(url, { AIP_ID: AIP_ID, OrderNo: value }, function (d) {
+                    if (d == "1") {
+                        $("#grdAIPList").data("kendoGrid").dataSource.read();
+                    }
+                    else {
+                        swal({
+                            title: "Error!",
+                            text: d,
+                            type: "error",
+                            showConfirmButton: true
+                        });
+                    }
+                })
+            }
+        });
+    }
+    function reqEditItem(SeriesID) {
+        var Mode = "Edit"
+        var url = "@Url.Action("ShowNewItemWindow", "LBPForm1")";
+        $('#AddNewItemWindow').html('<div style="width: 100%;height:100%;"><img src="@Url.Content("~/Content/images/loading.gif")" alt="Loading..." style="position: absolute;top: 20%;left: 30%;margin-top: 0px;margin-left: 0px;" /></div>');
+        $.post(url, { Mode: Mode, SeriesID: SeriesID }, function (pvData) {
+            $(window).scrollTop(0);
+            $('#AddNewItemWindow').html(pvData);
+            $('#AddNewItemWindow').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Update Particular").center().open();
+        })
+
+    }
+    function reqRemoveItem(SeriesID) {
+        var url = "@Url.Action("RemoveItem", "LBPForm1")";
+        $.post(url, { SeriesID: SeriesID }, function (d) {
+            if (d == "1") {
+                swal({
+                    title: "Success!",
+                    text: "Item Successfuly Removed",
+                    type: "success",
+                    showConfirmButton: true
+                });
+                $("#grdLBPForm1").data("kendoGrid").dataSource.read();
+            }
+            else {
+                swal({
+                    title: "Error!",
+                    text: d,
+                    type: "error",
+                    showConfirmButton: true
+                });
+            }
+        })
+    }
+    function GenerateActualYearAmount() {
+        swal({
+            title: "Are you sure?",
+            text: "This Action will Generate Actual Year Amount",
+            type: "warning",
+            showCancelButton: true,
+            closeOnConfirm: false,
+            showLoaderOnConfirm: true,
+        },
+        function () {
+            var url = "@Url.Action("Generate1SemActualYear", "LBPForm1")";
+            var YearOf = $("#ddlYear").val();
+            $.post(url, { YearOf: YearOf }, function (d) {
+                if (d == 1) {
+                    swal({
+                        title: "Success!",
+                        text: "Amount Generated!",
+                        type: "success",
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                }
+                else {
+                    swal({
+                        title: "Error!",
+                        text: d,
+                        type: "error",
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                }
+            })
+        });
+    }
+    function onDropDownChange() {
+        var FundType = $("#ddlFundingSource").val();
+        var YearOf = $("#ddlYear").val();
+        if (FundType == "" || YearOf == "") {
+
+        }
+        else {
+            $("#grdLBPForm1").data("kendoGrid").dataSource.read();
+        }
+    }
+    function BoldToogle(SeriesID) {
+        var url = "@Url.Action("NonOfficeToogleAIP", "BudgetPreparation")";
+        $.post(url, { SeriesID: SeriesID, isNonOffice: $("#cbNonOffice" + SeriesID).is(':checked') })
+    }
+    function useAmountToogle() {
+        var url = "@Url.Action("NonOfficeToogleAIP", "BudgetPreparation")";
+        $.post(url, { SeriesID: SeriesID, isNonOffice: $("#cbNonOffice" + SeriesID).is(':checked') })
+    }
+    function hasFooterTotalToogle() {
+        var url = "@Url.Action("NonOfficeToogleAIP", "BudgetPreparation")";
+        $.post(url, { SeriesID: SeriesID, isNonOffice: $("#cbNonOffice" + SeriesID).is(':checked') })
+    }
+    function useInGraphToogle() {
+        var url = "@Url.Action("NonOfficeToogleAIP", "BudgetPreparation")";
+        $.post(url, { SeriesID: SeriesID, isNonOffice: $("#cbNonOffice" + SeriesID).is(':checked') })
+    }
+</script>
+
+<div style="width : 100%; border-style: solid; border-color: #1fa67a">
+    <div style="width:100%;height : 25px ; background-color:#1fa67a; color: white">
+        <label class="fa fa-file-powerpoint-o fa-lg" style="margin-left: 5px; display:inline-block">  Configure LBP Form 1</label>
+    </div>
+    <label style="margin-left: 0px;margin-left: 10px;margin-top: 10px;margin-bottom: 2px; display : inline-block;width:65%">
+        Fund Type :
+        @(Html.Kendo().DropDownList()
+                .Name("ddlFundingSource")
+                .DataValueField("Value")
+                .DataTextField("Text")
+                .OptionLabel("Select Fund Source...")
+                .HtmlAttributes(new { @style = "width: 100%;margin-top:5px" })
+                .Events(e => e.Change("onDropDownChange"))
+                .DataSource(source => source.Read(read => read.Action("getFundType", "LBPForm1")))
+        )
+    </label>
+    <label style="margin-left: 0px;margin-left: 10px;margin-top: 10px;margin-bottom: 2px; display : inline-block;width:25%">
+        Budget Year :
+        @(Html.Kendo().DropDownList()
+                        .Name("ddlYear")
+                        .DataTextField("ProposalYear")
+                        .DataValueField("ProposalYear")
+                        .SelectedIndex(0)
+                        .HtmlAttributes(new { @style = "width: 90px;" })
+                        .Events(e => e.Change("onDropDownChange"))
+                        .DataSource(source => source.Read(read => read.Action("GetPropYear", "PYear")))
+        )
+    </label>
+    <div id="GridDIV" value="0">
+        <input type="hidden" value="0" id="GridDIVSizeIndicator" />
+        <div style="border: outset;clear:both;border-width:1px;border-color:#1fa67a; width: 100%; padding-left:0px;padding-right:0px;padding-top:0px;padding-bottom:7px;margin-top: 10px;">
+            <div style=" width: 91.5%;height: 100%; border-right: 0px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;margin-top: -1px; ">
+                <div style="float: left; width: 100%; margin-top:1px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 36px solid #1fa67a; ">
+                    <div style="float:right; width:100%">
+                        <div style="float:right;margin-right:6px;margin-top:5px;">
+                            <button class="k-button k-button-icontext" onclick="ResizeDIV()"> <i id="btnResizeIcon" style="display:inline-block" class="fa fa-arrows-alt"></i><div style="display:inline-block; margin-left:2px" id="btnResizeText"> Maximize</div></button>
+                            <button class="k-button k-button-icontext" onclick="AddNewItem()"> <i class="fa fa-plus-circle"></i> Add </button>
+                            <button class="k-button k-button-icontext" onclick="GenerateActualYearAmount()"> <i class="fa fa-plus-circle"></i> Generate Actual Year Amount </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.LbpForm1Model>()
+            .Name("grdLBPForm1")
+            .Columns(columns =>
+            {
+                columns.Bound(c => c.SeriesID).Hidden();
+                columns.Bound(c => c.OrderNo).Title("Order No.").Width(65)
+                    .HtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+                columns.Bound(c => c.Particular).Title("Particular").Width(300).Encoded(false)
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+                columns.Bound(c => c.AccountCode).Title("Account Code").Width(100)
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+                columns.Bound(c => c.IncomeClassification).Title("Income Classification").Width(100)
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+                columns.Bound(c => c.PastYear).Title("Past Year (Actual)").Width(100)
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+                columns.Bound(c => c.CurrentYear).Title("Current Year Appropriation").Width(100)
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+                columns.Bound(c => c.BudgetYear).Title("Budget Year").Width(100)
+                    .HtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+                columns.Bound(c => c.isBold).Title("Bold").Width(100)
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                    .HtmlAttributes(new { style = "text-align:left" })
+                    .ClientTemplate("# if(isBold == 1) { #" +
+                                    "<input id='cbBold#=SeriesID#' onclick='BoldToogle(#=SeriesID#)' type='checkbox' checked class='checkbox'/>" +
+                                    "# } else { #" +
+                                    "<input id='cbBold#=SeriesID#' onclick='BoldToogle(#=SeriesID#)' type='checkbox' class='checkbox'/>" +
+                                    "# } #"
+                    );
+                columns.Bound(c => c.useAmount).Title("Use Amount").Width(100)
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                    .HtmlAttributes(new { style = "text-align:left" })
+                    .ClientTemplate("# if(useAmount == 1) { #" +
+                                    "<input id='cbuseAmount#=SeriesID#' onclick='useAmountToogle(#=SeriesID#)' type='checkbox' checked class='checkbox'/>" +
+                                    "# } else { #" +
+                                    "<input id='cbuseAmount#=SeriesID#' onclick='useAmountToogle(#=SeriesID#)' type='checkbox' class='checkbox'/>" +
+                                    "# } #"
+                    );
+                columns.Bound(c => c.hasFooterTotal).Title("has footer total").Width(100)
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                    .HtmlAttributes(new { style = "text-align:left" })
+                    .ClientTemplate("# if(hasFooterTotal == 1) { #" +
+                                    "<input id='cbhasFooterTotal#=SeriesID#' onclick='hasFooterTotalToogle(#=SeriesID#)' type='checkbox' checked class='checkbox'/>" +
+                                    "# } else { #" +
+                                    "<input id='cbhasFooterTotal#=SeriesID#' onclick='hasFooterTotalToogle(#=SeriesID#)' type='checkbox' class='checkbox'/>" +
+                                    "# } #"
+                    );
+                columns.Bound(c => c.useInGraph).Title("Use Total in Graph").Width(100)
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-   align: middle; overflow: visible; white-space: normal" })
+                    .HtmlAttributes(new { style = "text-align:left" })
+                    .ClientTemplate("# if(useInGraph == 1) { #" +
+                                    "<input id='cbuseInGraph#=SeriesID#' onclick='useInGraphToogle(#=SeriesID#)' type='checkbox' checked class='checkbox'/>" +
+                                    "# } else { #" +
+                                    "<input id='cbuseInGraph#=SeriesID#' onclick='useInGraphToogle(#=SeriesID#)' type='checkbox' class='checkbox'/>" +
+                                    "# } #"
+                    );
+                columns.Template(t => { })
+                    .ClientTemplate("<div class='k-button' onclick='reqEditItem(#=SeriesID#)' style='inline-block' title='Edit'>Edit</div>")
+                    .Width(85);
+                columns.Template(t => { })
+                    .ClientTemplate("<div class='k-button' onclick='reqRemoveItem(#=SeriesID#)' style='inline-block' title='Remove'>Remove</div>")
+                    .Width(85);
+
+            })
+            .HtmlAttributes(new { style = "height: 525px;" })
+            .Scrollable(s => s.Enabled(true))
+            .Selectable()
+            .AutoBind(false)
+            .Pageable(p => p.ButtonCount(4).Refresh(true))
+            //.Editable(editable => editable.Mode(GridEditMode.InCell))
+            .Events(e => e.Edit("OnAIPGridEdit"))
+            .DataSource(dataSource => dataSource
+                .Ajax()
+                .Batch(true)
+                .ServerOperation(true)
+                .Model(m => m.Id(i => i.SeriesID))
+                .AutoSync(true)
+                .Read(read => read.Action("getLbpForm1Data", "LBPForm1").Data("GridParameters"))
+                .Sort(s =>
+                {
+                    s.Add(c => c.OrderNo);
+                })
+            )
+            )
+        </div>
+    </div>
+</div>
+@(Html.Kendo().Window()
+    .Name("AddNewItemWindow")
+    .Width(700)
+    .Height(390)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(true)
+    .AutoFocus(true)
+    .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        }).Actions(a => { a.Close(); }))

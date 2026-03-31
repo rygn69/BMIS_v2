@@ -1,0 +1,420 @@
+﻿
+<script>
+    function fn_includeAir() {
+      
+        if (document.getElementById('includeAir_ID').checked) {
+            document.getElementById("includeAir").value = "2";
+        } else {
+            document.getElementById("includeAir").value = "1";
+        }
+    }
+    function fn_includePgo() {
+      
+        if (document.getElementById('includePgo').checked) {
+            document.getElementById("includePgo").value = "2";
+        } else {
+            document.getElementById("includePgo").value = "1";
+        }
+    }
+    function CurrentYearUrl() {
+        return '@Url.Action("CurrentYear", "Global")';
+    }
+
+    setTimeout(function () { 
+        $("#boiyear").data("kendoDropDownList").dataSource.read();
+        setTimeout(function () {
+
+          
+
+            var yearOf = $("#boiyear").val();
+            var yawa__ = @ViewBag.MonthVaue;
+            if(yearOf == yawa__)
+            {
+                $("#Months_To").data("kendoDropDownList").value(yawa__)
+            }else{
+                $("#Months_To").data("kendoDropDownList").value(12)
+            }
+
+        }, 100);
+    }, 100);
+    function reqPrint() {
+        var Fundtype = $("#Fundtype").val();
+        var changed_To = $("#changed_To").val();
+        var month_ = $("#Months").val();
+        var month_To = $("#Months_To").val();
+        var year = $("#boiyear").val();// == "----"? CurrentYear() :  $("#boiyear").val()
+        var air = $("#includeAir").val();
+        var pgo=$("#includePgo").val();
+        var rephistory = $("#rephistory").val();
+        var reptype=$("#reptype").val()
+        var tyear=CurrentYear()
+    
+        if (Fundtype == ""){
+        swal("Warning","Please select fund type!","warning")
+        }
+        else{
+            $.ajax({
+                async: false,
+                dataType: 'html',
+                success: window.open("../Reports/ReportViewer.aspx?rid=15&Fundtype=" + Fundtype + "&changed_To=" + changed_To + "&month_=" + month_ + "&month_To=" + month_To + "&year=" + year + "&air=" + air + "&pgo_="+pgo+"&repxmlhistory=" + rephistory + "&reptype="+reptype+"&tyear="+tyear+"")
+            });
+
+            $.ajax({
+                async: false,
+                dataType: 'html',
+                success: window.open("../Reports/ReportViewer.aspx?rid=151&Fundtype=" + Fundtype + "&changed_To=" + changed_To + "&month_=" + month_ + "&month_To=" + month_To + "&year=" + year + "&air=" + air + "&pgo_="+pgo+"&repxmlhistory=" + rephistory + "&reptype="+reptype+"&tyear="+tyear+"")
+            });
+        }
+    }
+
+
+
+    function repres() {
+
+        $("#changed_To").data("kendoComboBox").dataSource.read();
+
+
+    }
+
+
+    function selectedyear() {
+        return {
+            type: 3,
+            office: $("#changed_To").val(),
+            year: $("#boiyear").val(),
+            saaotag:0
+        }
+    }
+
+    function chargeto(){
+        $("#rephistory").data("kendoComboBox").dataSource.read();
+        $("#rephistory").data("kendoComboBox").value("")
+    }
+
+
+</script>
+
+<h2><span class="fa fa-print"></span> Generate Breakdown of Obligations Incurred Report &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br />(Excess Budget)</h2>
+
+<br /><br />
+
+<div style="float: none;clear:both;">
+    <div style="float: left;margin-left:8.5px;margin-top:2px;">
+        <label style="float:left;margin-left: 50px;">
+            Fund Type    :
+        </label>
+    </div>
+
+    <div style="float: right;margin-right:70px;margin-top:0px;">
+        @(Html.Kendo().DropDownList()
+                            .Name("Fundtype")
+                            .DataTextField("FundName")
+                            .DataValueField("FundFlag")
+                            .OptionLabel("Select Fund Type...")
+                            .HtmlAttributes(new { @style = "width: 500px;" })
+                            .Events(e => e.Change("repres"))
+                   .DataSource(source => source.Read(read => read.Action("FundType_Desu", "Release")))
+        )
+
+
+
+    </div>
+
+    <div style="height:10px;">
+
+    </div>
+
+    <div id="ProgramAndExpenseClassDiv" style="float: none;clear:both; margin-top: 25px">
+
+        <div style="float: left;margin-right:10px;margin-top:5px;">
+            <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                Charged To :
+            </label>
+        </div>
+        <div style="float: right;margin-right:70px;margin-top:5px;">
+            <script>
+                function Fund_Flag() {
+                   
+                        var fund_type = $("#Fundtype").val();
+                       // var yearOf = $("#boiyear").val();
+                        
+                        return {
+                            fund_type: fund_type
+                        }
+                   
+                    
+                }
+            </script>
+
+            @(Html.Kendo().ComboBox()
+                            .Name("changed_To")
+                            .DataTextField("Account_Name")
+                            .DataValueField("TransactionNo")
+                            .Placeholder("Select Charged to...")
+                            .Filter("contains")
+                            .MinLength(1)
+                            .Events(e => e.Change("chargeto"))
+                            .HtmlAttributes(new { @style = "width: 500px;" })
+                            .DataSource(source => source.Read(read => read.Action("Changed_To", "Release").Data("Fund_Flag")))
+            )
+
+
+
+
+        </div>
+            
+
+
+    </div>
+
+  
+</div>
+<br />
+
+<div style="display:inline-block;clear:both;margin-top:-5px;margin-left:1px;">
+    <div style="display:inline-block;margin-left:53.5px;margin-top:0px;">
+        <label style="float:left;margin-left: 42px;margin-top:10px;">
+            From    :
+        </label>
+    </div>
+
+    <div style="display:inline-block;margin-left:41.5px;margin-top:10px;">
+
+        @(Html.Kendo().DropDownList()
+            .Name("Months")
+            .DataTextField("Text")
+            .DataValueField("Value")
+                //.Events(e => e.Change("change"))
+            .BindTo(new List<SelectListItem>() {
+                new SelectListItem() {
+                    Text = "January",
+                    Value = "1"
+                },
+                new SelectListItem() {
+                    Text = "Febuary",
+                    Value = "2"
+                },
+                new SelectListItem() {
+                    Text = "March",
+                    Value = "3"
+                },
+                new SelectListItem() {
+                    Text = "April",
+                    Value = "4"
+                },
+                new SelectListItem() {
+                    Text = "May",
+                    Value = "5"
+                },
+                new SelectListItem() {
+                    Text = "June",
+                    Value = "6"
+                },
+                new SelectListItem() {
+                    Text = "July",
+                    Value = "7"
+                },
+                new SelectListItem() {
+                    Text = "August",
+                    Value = "8"
+                },
+                new SelectListItem() {
+                    Text = "September",
+                    Value = "9"
+                },
+                new SelectListItem() {
+                    Text = "October",
+                    Value = "10"
+                },
+                new SelectListItem() {
+                    Text = "November",
+                    Value = "11"
+                },
+                new SelectListItem() {
+                    Text = "December",
+                    Value = "12"
+                }
+            })
+                //  .Value(@ViewBag.MonthVaue)
+            .HtmlAttributes(new { style = "width: 150px" })
+        )
+
+
+
+
+
+
+
+
+    </div>
+
+
+    <div style="display:inline-block;margin-left:133px;margin-top:10px;">
+        <label>
+            To   :
+        </label>
+    </div>
+    <div style="display:inline-block;margin-left:30px;margin-top:10px;">
+
+
+
+        @(Html.Kendo().DropDownList()
+            .Name("Months_To")
+            .DataTextField("Text")
+            .DataValueField("Value")
+                //.Events(e => e.Change("change"))
+            .BindTo(new List<SelectListItem>() {
+                new SelectListItem() {
+                    Text = "January",
+                    Value = "1"
+                },
+                new SelectListItem() {
+                    Text = "Febuary",
+                    Value = "2"
+                },
+                new SelectListItem() {
+                    Text = "March",
+                    Value = "3"
+                },
+                new SelectListItem() {
+                    Text = "April",
+                    Value = "4"
+                },
+                new SelectListItem() {
+                    Text = "May",
+                    Value = "5"
+                },
+                new SelectListItem() {
+                    Text = "June",
+                    Value = "6"
+                },
+                new SelectListItem() {
+                    Text = "July",
+                    Value = "7"
+                },
+                new SelectListItem() {
+                    Text = "August",
+                    Value = "8"
+                },
+                new SelectListItem() {
+                    Text = "September",
+                    Value = "9"
+                },
+                new SelectListItem() {
+                    Text = "October",
+                    Value = "10"
+                },
+                new SelectListItem() {
+                    Text = "November",
+                    Value = "11"
+                },
+                new SelectListItem() {
+                    Text = "December",
+                    Value = "12"
+                }
+            })
+            .Value(@ViewBag.MonthVaue)
+            .HtmlAttributes(new { style = "width: 150px" })
+        )
+
+
+
+    </div>
+
+
+
+    <div style="height:10px;">
+
+    </div>
+
+
+    <div id="MonthDepartment" style="float: none;clear:both; margin-top: 0px">
+
+
+        <div style="float:left;margin-left:102.5px;margin-top:5px;">
+            <label>
+                Year :
+            </label>
+        </div>
+
+
+        <div style="float:left;margin-left:45px;margin-top:2px;">
+
+            @(Html.Kendo().DropDownList()
+                        .Name("boiyear")
+                        .DataTextField("ProposalYear_")
+                        .DataValueField("ProposalYear_")
+                        .SelectedIndex(0)
+                        .HtmlAttributes(new { @style = "width: 95px;" })
+                        .Events(e => e.Change("repres"))
+                        .DataSource(source => source.Read(read => read.Action("boi_year", "PYear")))
+            )
+
+
+        </div>
+        <div style="float:left;margin-left:-236px;margin-top:45px;">
+            <label>
+                Report Type     :
+            </label>
+        </div>
+        <div style="float:left;margin-left:-95px;margin-top:45px;">
+            @(Html.Kendo().DropDownList()
+            .Name("reptype")
+            .DataTextField("Text")
+            .DataValueField("Value")
+            //.Events(e => e.Change("change"))
+            .BindTo(new List<SelectListItem>() {
+                new SelectListItem() {
+                    Text = "RAO",
+                    Value = "1"
+                },
+                new SelectListItem() {
+                    Text = "SAAO",
+                    Value = "2"
+                }
+            })
+            .Value(@ViewBag.MonthVaue)
+            .HtmlAttributes(new { style = "width: 150px" })
+            )
+        </div>
+        <div style="float:left;margin-left:-309px;margin-top:90px;">
+            <label>
+                Report History     :
+            </label>
+        </div>
+        <div style="float:left;margin-left:-150px;margin-top:90px;">
+            @(Html.Kendo().ComboBox()
+                            .Name("rephistory")
+                            .DataTextField("dateprinted")
+                            .DataValueField("rprtid")
+                            .Placeholder("Report history...")
+                            .Filter("contains")
+                            .MinLength(1)
+                            .HtmlAttributes(new { @style = "width: 250px;" })
+                            .DataSource(source => source.Read(read => read.Action("rephistory", "Report").Data("selectedyear")))
+            )
+        </div>
+  <div style="float:left;margin-left:200px;margin-top:25px; ">
+      <div style="display:inline-block">
+          <input type='checkbox' class='checkbox' style="zoom:1.5" id="includeAir_ID" onclick=fn_includeAir() />
+          <label style="margin-left: 30px;margin-right: 5px;margin-top: -22px;margin-bottom: 0px;">
+              Include Earmark
+          </label>
+          <input type="text" style="width:20px" name="includeAir" id="includeAir" value="1" hidden disabled>
+      </div>
+      <div style="display:inline-block;margin-left:20px;">
+          <input type='checkbox' class='checkbox' style="zoom:1.5" id="includePgo" value="1" onclick=fn_includePgo() />
+          <label style="margin-left: 30px;margin-right: 5px;margin-top: -22px;margin-bottom: 0px;">
+              Include PGO/PPDO Control
+          </label>
+      </div>
+
+  </div>
+
+        <div id="MonthDepartment" style="float: none;clear:both; margin-top: 20px">
+
+            <div id="btnPrint" class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 90px;float:right;border-radius:50px; margin-top: 15px; margin-right:34px; margin-bottom:5px;background-color:cornflowerblue;color:white;" onclick="reqPrint()"><span class="mif-printer"></span> Preview</div>
+
+        </div>
+    </div>
+</div>

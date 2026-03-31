@@ -1,0 +1,839 @@
+﻿@model iFMIS_BMS.BusinessLayer.Models.BudgetControlModel
+@using iFMIS_BMS.Base
+@using iFMIS_BMS.Models
+@using iFMIS_BMS.Classes
+
+@(Html.Kendo().Window()
+    .Name("wndPayroll")
+    .Title("Casual/ Job Order / Contract of Service")
+    .Width(330)
+    .Height(150)
+    .Visible(false)
+    .Draggable(true)
+    .Modal(true)
+    .Actions(actions => actions.Close())
+    
+    )
+<script>
+
+    function trnnoURL() {
+        return '@Url.Action("SearchTrnnoID", "BudgetControl")';
+    }
+
+    function SearchOBRURL() {
+        return '@Url.Action("SearchOBR", "BudgetControl")';
+    }
+
+    function DBYearUrl() {
+        return '@Url.Action("CheckDBYear", "BudgetControl")';
+    }
+
+    function CheckIfCanceledURL() {
+        return '@Url.Action("CheckIfCanceled", "BudgetControl")';
+    }
+
+    function ClaimUrl() {
+        return '@Url.Action("CheckClaim", "BudgetControl")';
+    }
+
+    function CheckIfExistUrl() {
+        return '@Url.Action("CheckIfExisit", "BudgetControl")';
+    }
+
+    function ChangeOBRURL() {
+        return '@Url.Action("ChangeOBR", "BudgetControl")';
+    }
+
+    function NonOfficeFunctionCodeURL() {
+        return '@Url.Action("NonOfficeFunctionCode", "BudgetControl")';
+    }
+
+    function ChargeAllotmentAvailableURL() {
+        return '@Url.Action("ChargeAllotmentAvailable", "BudgetControl")';
+    }
+
+    function changeExpenseClassURL() {
+        return '@Url.Action("changeExpenseClass", "Dropdowns")';
+    }
+
+    @*function ChargeAllotmentAvailableURL() {
+        return '@Url.Action("ChargeAllotmentAvailable", "BudgetControl")';
+    }*@
+
+    function SearchAllocatedAmountURL() {
+        return '@Url.Action("SearchAllocatedAmount", "BudgetControl")';
+    }
+
+    function SearchObligatedURL() {
+        return '@Url.Action("SearchObligated", "BudgetControl")';
+    }
+
+    @*function SearchObligatedURL() {
+        return '@Url.Action("SearchObligated", "BudgetControl")';
+    }*@
+
+    function DiffObliandAllocatedURL() {
+        return '@Url.Action("DiffObliandAllocated", "BudgetControl")';
+    }
+
+    function AddRawDataURL() {
+        return '@Url.Action("AddRawData", "BudgetControl")';
+    }
+
+    function SaveControlURL() {
+        return '@Url.Action("SaveControl", "BudgetControl")';
+    }
+
+    function TrackingUrl(){
+        return '@Url.Action("financetracking", "BudgetControl")';
+    }
+    function UpdateControlURL() {
+        return '@Url.Action("UpdateControl", "BudgetControl")';
+    }
+
+    function ReturnControlURL() {
+        return '@Url.Action("ReturnControl", "BudgetControl")';
+    }
+
+    function CancelControlURL() {
+        return '@Url.Action("CancelControl", "BudgetControl")';
+    }
+
+    function DeleteControlURL() {
+        return '@Url.Action("DeleteControl", "BudgetControl")';
+    }
+    function AirMarkURL() {
+        return '@Url.Action("SearchAirMark", "BudgetControl")';
+    }
+    function TypeID() {
+        return @Account.UserInfo.UserTypeID;
+    }
+    function getOfficeID() {
+        return '@Account.UserInfo.Department';
+    }
+    function SetTempOBRURL() {
+        return '@Url.Action("SetPrefixTempOBR", "BudgetControl")';
+    }
+    function TempcomURL(){
+        return '@Url.Action("SeTempcomOBR", "BudgetControl")';
+    }
+    function YearMonthURL(){
+        return '@Url.Action("YearMonth", "BudgetControl")';
+    }
+    function OBRNoFromTempOBRURL(){
+        return '@Url.Action("OBRNoFromTempOBR", "BudgetControl")';
+    }
+    function VerifyOfficeRefURL(){
+        return '@Url.Action("VerifyOfficeRef", "BudgetControl")';
+    }
+    function GetFundCodeURL(){
+        return '@Url.Action("GetFundCode", "BudgetControl")';
+    }
+    function OfficeRemainingBalanceURL(){
+        return '@Url.Action("OfficeRemainingBalance", "BudgetControl")';
+    }
+    function TransactionURL(){
+        return '@Url.Action("GenerateTransaction", "BudgetControl")';
+    }
+    function ComputeLDRRMFURL(){
+        return '@Url.Action("ComputeLDRRMF", "BudgetControl")';
+    }
+
+    // New URL
+    function CurrentComputationURL(){
+        return '@Url.Action("CurrentComputation", "BudgetControl")';
+    }
+    function CheckIfAirmarkExistURL(){
+        return '@Url.Action("CheckIfAirmarkExist", "BudgetControl")';
+    }
+    function CheckStatusURL(){
+        return '@Url.Action("CheckDvNoStatus", "BudgetControl")';
+    }
+    function ComputeSPOURL(){
+        return '@Url.Action("SPOComputation", "BudgetControl")';
+    }
+    function GrossAmountUrl(){
+        return '@Url.Action("getGrossAmount", "BudgetControl")';
+    }
+    function GetPayrollBatchNo(){
+        return '@Url.Action("GetPayrollBatchNo", "BudgetControl")';
+    }
+    function GetExemptPayroll(){
+        return '@Url.Action("GetExemptPayroll", "BudgetControl")';
+    }
+    function NonOfficeSubAccount(){
+        return '@Url.Action("NonOfficeSubAccount", "BudgetControl")';
+    }
+    function SubAccountRemainingBal(){
+        return '@Url.Action("SubAccountbalance", "BudgetControl")';
+    }
+    function comurl(){
+        return '@Url.Action("commitmentdetails", "BudgetControl")';
+    }
+    function setTranstype()
+    {
+        var urlgu="@Url.Action("lgusystem", "Report")";
+        $.ajax({
+            type: "GET",
+            traditional: true,
+            url: "",
+            data: {
+            },
+            success: function (r) {
+                $.get(urlgu, function (e) {
+                    $("#lguid").val(e)
+                    if (e == 0) {
+                        if ($("#TransactionType").val()==2) //payroll only (Casual, JO, Cos)
+                        {
+                            $.get("@Url.Content("~/BudgetControl/PayrollCJC")", { TransactionType: $("#TransactionType").val() }, function (r) {
+                                $('#wndPayroll').html(r)
+                                var wnd = $('#wndPayroll').data('kendoWindow');
+                                wnd.center().open();
+                            })
+                        }
+                    }
+                });
+
+                
+            }
+        })
+    }
+
+    function checktransyear()
+    {
+        return '@Url.Action("checktransyear", "BudgetControl")';
+    }
+    $(document).ready(function () {
+      //  $('#AmountInputed').NumericOnly()
+    });
+    function SearchTransaction(){
+        return  '@Url.Action("SearchTransno", "BudgetControl")';
+    }
+    function officefunctioncode(){
+        return  '@Url.Action("getfunctioncode", "BudgetControl")';
+    }
+    //function fnperprogram(id){
+    //    if  (id == 1){
+    //        document.getElementById("ExpenseClass").checked=true
+    //        document.getElementById("ExpenseClass").value=1
+    //        document.getElementById("ObjectExpenditure").checked=false
+    //        document.getElementById("ObjectExpenditure").value=0
+    //    }
+    //    else{
+    //        document.getElementById("ExpenseClass").checked=false
+    //        document.getElementById("ExpenseClass").value=0
+    //        document.getElementById("ObjectExpenditure").checked=true
+    //        document.getElementById("ObjectExpenditure").value=2
+    //    }
+    //}
+</script>
+
+<script src="~/Scripts/BMS/BudgetControl/AddNewTransaction.js"></script>
+<style>
+    input[type="radio"] {
+        width: auto;
+    }
+
+    textarea {
+        resize: none;
+    }
+    textarea:focus, input:focus, input[type]:focus, .uneditable-input:focus {   
+    border-color: rgba(0, 128, 0, 0.8);
+    box-shadow: 0 1px 1px rgba(0, 128, 0, 0.075) inset, 0 0 8px rgba(0, 128, 0, 0.6);
+    outline: 0 none;
+}
+</style>
+<form id="ControlTransaction">
+    @*<div style="float:right;border-style:solid;border-color:black;border-width:1px;padding:5px;">
+            <span style="font-size:18px;font-weight:bold">MODE : <span id="mode-status" style="color:green">NEW</span></span>
+        </div>*@
+    <div style="border-color:gray;border-width:1px;border-style:solid;width:450px;margin-top:10px;float:left;height:569px">
+        <div style="background-color:white;width:110px;margin-top:-15px;margin-left:15px;"><span style="font-size:18px;margin-left:5px;">General Info</span></div>
+        <div style="padding:10px;">
+            <div style="width:87px;border-style:solid;border-color:black;border-width:1px;padding:3px;display:inline-block;margin-left:-7px;">
+                <span style="font-size:12px;font-weight:bold">MODE : <span id="mode-status" style="color:green">NEW</span></span>
+            </div>
+
+            <div id="btnid"style="float:left;margin-left:95px;width:350px;margin-top:-15px">
+                
+                <div style="margin-left:-1px;display:inline-block">
+                    <div style="width:400px;margin-left:-45px;margin-top:13px;">
+                        <label style="display:none;color:red" id="labelnote"> This transaction for C.Y. 2021 is closed"</label>
+                    </div> 
+                    <div class="k-button" style="padding:5px;width:67px;font-size:12px;margin-top:-10px;border-color:white;border-radius:50px;background-color:cornflowerblue;color:white;" id="Add" onclick="Add(1)"><span class="fa fa-plus"></span> Add</div>
+                    <div class="k-button" style="padding:5px;width:67px;font-size:12px;margin-top:-10px;margin-left:-2px;border-color:white;border-radius:50px;background-color:rgba(0, 128, 0, 0.6);color:white;" id="Save" onclick="Save(2)"><span class="fa fa-save"></span> Save</div>
+                    <div class="k-button" style="padding:5px;width:67px;font-size:12px;margin-top:-10px;margin-left:-2px;border-color:white;border-radius:50px;background-color:#bcbe17;color:white;display:none" id="Update" onclick="Update(2)"><span class="fa fa-pencil-square-o"></span> Update</div>
+                    <div class="k-button" style="padding:5px;width:67px;font-size:12px;margin-top:-10px;margin-left:-2px;border-color:black;border-radius:50px;display:none" id="Return" onclick="Return(2)"><span class="fa fa-undo"></span> Return</div>
+                    <div class="k-button" style="padding:5px;width:67px;font-size:12px;margin-top:-10px;margin-left:-2px;border-color:white;border-radius:50px;background-color:indianred;color:white;display:none" id="Cancel" onclick="Cancel()"><span class="fa fa-times"></span> Cancel</div>
+                    <div class="k-button" style="padding:5px;width:67px;font-size:12px;margin-top:-10px;margin-left:-2px;border-color:black; border-radius:50px;" id="Clear" onclick="ClearForm(3)"><span class="fa fa-eraser"></span> Clear</div>
+                </div>
+            </div>
+        <script>
+            
+        </script>
+            <div style="width:440px;margin-top:25px;">
+                <input type="text" id="ModeIndicator" name="ModeIndicator" value="0" style="display:none;"/>
+                <input type="text" id="UserID" name="UserID" value="@Account.UserInfo.eid" style="display:none;" />
+                <div style="width:120px;display:inline-block;">
+                    <span style="">QR No. :</span>
+                </div>
+                <div style="display:inline-block">
+                    <input class="k-input" type="text" style="background-color:#405b43;color:whitesmoke;font-size:large;text-align:center;width:308px" id="cttsEntry" name="cttsEntry" autocomplete="off" value="" />
+                </div>
+                <div style="width:120px;display:inline-block;">
+                    <span style="">Transaction No. :</span>
+                </div> 
+                <div style="display:inline-block;margin-top:5px;"> 
+                    @*<input class="k-input" type="text" id="OBRNoEntry" name="OBRNoEntry" style="width:308px" autocomplete="off" value="" onkeyup="formatnum()"/>*@
+                    <input class="k-input" type="text" id="OBRNoEntry" name="OBRNoEntry" style="width:308px" autocomplete="off" value="" />
+                    <input class="k-input" id="OBRNo" name="OBRNo" style="width:308px;display:none" value="0"/>
+                </div>
+                <input type="text" style="display:none;" id="grtrnnoID" name="grtrnnoID" />
+                <input type="text" style="display:none;" id="ReturnID" name="ReturnID" />
+            </div>
+            <div>
+
+            </div>
+            <div style="width:440px;margin-top:5px;">
+                <div style="width:120px;display:inline-block;"><span style="">Transaction Type :</span></div> <div style="display:inline-block">
+                    @(Html.Kendo().DropDownList()
+                                    .Name("TransactionType")
+                                    .DataTextField("TransTypeName")
+                                    .DataValueField("TransTypeID")
+                                    .OptionLabel("Select transaction type")
+                                    .Events(e => e.Select("setTranstype"))
+                                    .HtmlAttributes(new { @style = "width: 310px;" })
+                                    .DataSource(source => source.Read(read => read.Action("ddlTransactionType", "Dropdowns")))
+                    )
+                </div>
+            </div>
+            <div style="width:440px;margin-top:5px;">
+                <div style="width:120px;display:inline-block;"><span style="">Mode of Expense :</span></div> <div style="display:inline-block">
+                    @(Html.Kendo().DropDownList()
+                                    .Name("ModeOfExpense")
+                                    .DataTextField("ModeOfExpenseName")
+                                    .DataValueField("ModeOfExpenseID")
+                                    .OptionLabel("Select mode of expense")
+                                    .HtmlAttributes(new { @style = "width: 310px;" })
+                                    .DataSource(source => source.Read(read => read.Action("ddlModeOfExpense", "Dropdowns").Data("TransactionType")).ServerFiltering(true))
+                                    .Enable(false)
+                                    .AutoBind(false)
+                                    .CascadeFrom("TransactionType")
+
+                    )
+                </div>
+            </div>
+            <div style="width:440px;margin-top:5px;">
+                <div style="width:120px;display:inline-block;"><span style="">Office :</span></div> <div style="display:inline-block">
+                   
+                    @(Html.Kendo().ComboBox()
+                                    .Name("Office")
+                                    .DataTextField("office_name")
+                                    .DataValueField("office_id")
+                                    .Placeholder("Select office")
+                                    .Filter("contains")
+                                    .MinLength(3)
+                                    .Events(e => e.Change("refreshProgram"))
+                                    .HtmlAttributes(new { @style = "width: 310px;" })
+                                    .DataSource(source => source.Read(read => read.Action("ddlOfficeControl", "Dropdowns")))
+                    )
+                    <input type="text" id="OfficeID" name="OfficeID" style="display:none;">
+                </div>
+            </div>
+            <div style="width:440px;margin-top:5px;display:none">
+                <div style="width:120px;display:inline-block;"><span style="">Fund Type :</span></div> <div style="display:inline-block">
+                    @(Html.Kendo().ComboBox()
+                                    .Name("FundType")
+                                    .DataTextField("FundTypeName")
+                                    .DataValueField("FundTypeID")
+                                    .Placeholder("Select fund")
+                                    .Filter("contains")
+                                    .MinLength(3)
+                                    .Events(e => e.Change("setFundType"))
+                                    .HtmlAttributes(new { @style = "width: 310px;" })
+                                    .DataSource(source => source.Read(read => read.Action("ddlFundTypeControl", "Dropdowns")))
+                    )
+                    <input type="text" id="FundTypeValue" name="FundTypeValue" style="display:none;"/>
+                </div>
+            </div>
+            <div style="width:440px;margin-top:5px;">
+                <div style="width:120px;display:inline-block;"><span style="">Program :</span></div> <div style="display:inline-block">
+                    @(Html.Kendo().ComboBox()
+                                    .Name("Program")
+                                    .DataTextField("setProgramDesc")
+                                    .DataValueField("setProgramID")
+                                    .Placeholder("Select program")
+                                    .Filter("contains")
+                                    .MinLength(3)
+                                    .Events(e => e.Change("refreshExpenditure"))
+                                    .HtmlAttributes(new { @style = "width: 310px;" })
+                                    .DataSource(source => source.Read(read => read.Action("ddlgetPrograms", "Dropdowns").Data("getProgram")))
+                    )
+                </div>
+            </div>
+            <div style="width:440px;margin-top:10px;">
+                <div style="width:120px;display:inline-block;"></div>
+                <div style="display:inline-block">
+                    <span><input type="radio" id="hidden" name="ModePayment" value="2" style="display:none" checked> </span>
+                    <span><input type="radio" id="ExpenseClass" name="ModePayment" value="1"> By Program </span>
+                    <span style="margin-left:30px"><input type="radio" id="ObjectExpenditure" name="ModePayment" value="2"> By Account </span>
+                </div>
+            </div>
+            <div style="width:440px;margin-top:15px;">
+                <div style="width:120px;display:inline-block;"><span style="" id="ooename">Account:</span></div> <div style="display:inline-block">
+                    @(Html.Kendo().ComboBox()
+                                    .Name("ObjOfExpenditure")
+                                    .DataTextField("item_data")
+                                    .DataValueField("item_ID")
+                                    .Placeholder("Select account")
+                                    .Filter("contains")
+                                    .MinLength(3)
+                                    .Events(e => e.Change("checkEnabled"))
+                                    .HtmlAttributes(new { @style = "width: 310px;" })
+                                    .DataSource(source => source.Read(read => read.Action("ddlChecked", "Dropdowns").Data("checkChecked")))
+                    )
+                </div>
+            </div>
+            <div style="width:440px;margin-top:5px;">
+                <div style="width:120px;display:inline-block;"><span style="">TEV Control No :</span></div> <div style="display:inline-block">
+                    <input class="k-input" id="TEVControlNoText" name="TEVControlNoText" value="0" style="width:100px" />
+                    @(Html.Kendo().ComboBox()
+                                    .Name("TEVControlNo")
+                                    .DataTextField("Employee_Name")
+                                    .DataValueField("eid")
+                                    .Placeholder("Select employee")
+                                    .Filter("contains")
+                                    .MinLength(3)
+                                    .AutoBind(false)
+                                  //.Events(e => e.Change("checkEmployee"))
+                                    .HtmlAttributes(new { @style = "width: 205px;" })
+                                    .DataSource(source => source.Read(read => read.Action("ddlTEVControlNo", "Dropdowns").Data("TEVparam")))
+                    )
+                </div>
+            </div>
+            <div style="width:440px;margin-top:5px;">
+                <div style="width:120px;display:inline-block;"><span style="">Sub-PPA:</span></div> <div style="display:inline-block">
+                    @(Html.Kendo().ComboBox()
+                                    .Name("PPANonOffice")
+                                    .DataTextField("office_name")
+                                    .DataValueField("office_id")
+                                    .Placeholder("Select sub-ppa")
+                                    .Filter("contains")
+                                    .MinLength(3)
+                                    //.CascadeFrom("ObjOfExpenditure")
+                                    .Events(e => e.Change("PromptOfficeRemainingBalance"))
+                                    .HtmlAttributes(new { @style = "width: 310px;" })
+                                    @*.DataSource(source => source.Read(read => read.Action("ddlPPANonOffice", "Dropdowns").Data("getAccount")))*@
+                                    .DataSource(source => {
+                                        source.Read(read =>
+                                        {
+                                            read.Action("ddlPPANonOffice", "Dropdowns").Data("getAccount");
+                                        })
+                                        .ServerFiltering(false);
+                                    })
+                    )
+                </div>
+            </div>
+            <div style="width:440px;margin-top:5px;display:none">
+                <div style="width:120px;display:inline-block;"><span style="">Other Program:</span></div> <div style="display:inline-block">
+                    @(Html.Kendo().ComboBox()
+                                    .Name("SusProgram")
+                                    .DataTextField("ooe_name")
+                                    .DataValueField("ooe_id")
+                                    .Placeholder("Search . .")
+                                    .Filter("contains")
+                                    .MinLength(3)
+                                    .HtmlAttributes(new { @style = "width: 310px;" })
+                                    .DataSource(source => source.Read(read => read.Action("ddlOOE", "Dropdowns")))
+                    )
+                </div>
+            </div>
+            <div style="width:440px;margin-top:5px;">
+                <div style="width:120px;display:inline-block;"><span style="">Expense Class:</span></div> <div style="display:inline-block">
+                    @(Html.Kendo().ComboBox()
+                                    .Name("OOE")
+                                    .DataTextField("ooe_name")
+                                    .DataValueField("ooe_id")
+                                    .Placeholder("Select expense class")
+                                    .Filter("contains")
+                                    .MinLength(3)
+                                    .Events(e => e.Change("ComputeAppropriation"))
+                                    .HtmlAttributes(new { @style = "width: 310px;" })
+                                    .DataSource(source => source.Read(read => read.Action("ddlOOE", "Dropdowns")))
+                    )
+                    <input type="text" style="display:none" id="OOEText" name="OOEText" />
+                </div>
+            </div>
+            <div style="width:440px;margin-top:5px;">
+                <div style="width:120px;display:inline-block;"><span style="">Expense Description:</span></div> 
+                <div style="float:left;margin-top:-34px;margin-left:124px;">
+                    <textarea id="ExpenseDescription" name="ExpenseDescription" placeholder="Type description here!" value="@(Model == null ? "" : Model.particular)" style="width:300px;height:75px"></textarea>
+                </div>
+            </div>
+            <div style="width:440px;margin-top:5px;">
+                <div style="width:120px;display:inline-block;"></div>
+                <div style="display:inline-block">
+                    <div id="econOption" style="display:none">
+                        <input type="radio" id="EconomicDefault" name="SubsidyIncome" value="0" style="display:none">
+                        <span><input type="radio" id="EconomicSubsidy" name="SubsidyIncome" checked value="1"> Subsidy </span>
+                        <span><input type="radio" id="EconomicIncome" name="SubsidyIncome" value="0"> Income </span>
+                    </div>
+                    <span style="float:left;margin-left:190px;margin-top:-30px;"><input type="checkbox" id="lock" name="lock" value="lock" /> Lock</span>
+                    <div style="float:right;margin-left :90px;margin-top:-25px">
+                        <div class="k-button" style="padding:1px;width:90px;font-size:11px;margin-top:-10px;border-color:white;border-radius:50px;background-color:cornflowerblue;color:white;" id="Add" onclick="printcontrol()"><span class="fa fa-print"></span> Print Control</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div style="border-color:gray;border-width:1px;border-style:solid;width:775px;margin-top:10px;float:left;margin-left:5px;padding:5px;height:250px">
+
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.BudgetControlModel>()
+    .HtmlAttributes(new { style = "width:775px;height:220px;" })
+    .Name("grOBR1")
+    .Scrollable()
+    .Columns(col =>
+    {
+        col.Bound(m => m.grAccountName).Title("Account Name").Width(350).ClientFooterTemplate("Total :");
+        col.Bound(m => m.grAmountDummy).Title("Amount").Width(100).ClientTemplate("<div> #=kendo.toString(grAmountDummy, 'c2')# </div>")
+            .ClientFooterTemplate("<div > <span style='text-align:right;color:black;' id='SumAmount'> #=kendo.toString(sum, 'c2') # </span> </div>");
+        col.Bound(m => m.grDateTimeEntered).Title("Date Time Entered").Width(200);
+        col.Template(t => { }).ClientTemplate(
+            "# if (grAcctChecker == 1) { #" +
+            "<div class='k-button k-state-disabled'>DELETE</div>" +
+            "# } else if(grAcctChecker == 0 ){ #" +
+            "<div class='k-button' onclick='(Delete(#=grtrnnoID# , #=grAmount#, #=grAcctCharge#))'> DELETE </div>" + 
+            "# } #"
+            ).HtmlAttributes(new { style = "margin-left:5px;" }).Width(100);
+        col.Bound(m => m.grProgramID).Width(250).Hidden();
+        col.Bound(m => m.grAcctCharge).Width(250).Hidden();
+        col.Bound(m => m.grAcctCode).Width(250).Hidden();
+        col.Bound(m => m.grFundCode).Width(250).Hidden();
+        col.Bound(m => m.grModeOfExpense).Width(250).Hidden();
+        col.Bound(m => m.grOOEID).Width(250).Hidden();
+        col.Bound(m => m.grTransType).Width(250).Hidden();
+        col.Bound(m => m.grAmount).Width(250).Hidden();
+        col.Bound(m => m.grDescription).Width(250).Hidden();
+        col.Bound(m => m.grAcctChecker).Width(250).Hidden();
+        col.Bound(m => m.grModePayment).Width(250).Hidden();
+        col.Bound(m => m.grifExist).Width(250).Hidden();
+        col.Bound(m => m.grtrnnoID).Width(250).Hidden();
+        col.Bound(m => m.grTEVControlNo).Width(250).Hidden();
+        col.Bound(m => m.greID).Width(250).Hidden();
+        col.Bound(m => m.grNonOffice).Width(250).Hidden();
+        col.Bound(m => m.grRemarks).Width(250).Hidden();
+        col.Bound(m => m.grORNumber).Width(250).Hidden();
+        col.Bound(m => m.grClaimant).Width(250).Hidden();
+        col.Bound(m => m.grOffice).Width(250).Hidden();
+        col.Bound(m => m.grSubsidyIncome).Width(250).Hidden();
+        col.Bound(m => m.grRefNo).Width(250).Hidden();
+        col.Bound(m => m.grOBRNo).Width(250).Hidden();
+        col.Bound(m => m.RefAmount).Width(250).Hidden();
+    })
+            .AutoBind(false)
+            .Pageable(page => page.Refresh(true)
+            .Enabled(true)
+            .ButtonCount(4)
+            .PreviousNext(true)
+            )
+                .Selectable(selectable => selectable.Mode(GridSelectionMode.Single))
+                .Events(e => e.Change("GridClick"))
+                .DataSource (d => d
+                .Ajax()
+                .Aggregates(aggregates =>
+                    {
+                        aggregates.Add(p => p.grAmountDummy).Sum();
+                    })
+                .PageSize(10)
+                .Model(m => m.Id(i => i.grOBRNo))
+                .Read(read => read.Action("CurrentObligated", "BudgetControl").Data("ObligateParam"))
+                )
+)
+    </div>
+    <div style="border-color:gray;border-width:1px;border-style:solid;width:350px;margin-top:10px;float:left;margin-left:5px;height:297px">
+        <div style="background-color:white;width:180px;margin-top:-15px;margin-left:15px;"><span style="font-size:18px;margin-left:5px;">Appropriation Details</span></div>
+        <div style="padding:10px;">
+            <div style="width:340px">
+ 
+                <div id="divobrlabel" style="width:120px;display:inline-block;"><span style="" id="OBRLabel">ObR No. :</span></div> 
+                <div id="divobrno" style="display: inline;margin-left:62px;"> 
+                    <input class="k-input" id="TransOBRNo" name="TransOBRNo" style="width:200px;font-weight:700;text-align:center;color:black;font-size:18px;" readonly="readonly" value="0" /> 
+                </div>
+
+                <div id="divfunctionlableid" style="width:120px;display:inline-block;"><span style="" id="OBRLabel">Function Code :</span></div> 
+                <div id="divfuncnoid" style="display: inline;margin-left:25.5px;">
+                    <input class="k-input" id="functioncode" name="functioncode" style="width:200px;font-weight:700;text-align:center;color:black;font-size:18px;" readonly="readonly" value="0"  />
+                </div>
+                
+            </div>
+            <div style="width:340px;margin-top:5px;">
+                <div style="width:120px;display:inline-block;"><span style="">Appropriation:</span></div> <div style="display:inline-block">
+                    <input class="k-input" id="Appropriation" name="Appropriation" style="width:200px;text-align:right;font-weight:700;color:#4061ff;font-size:24px;" readonly="readonly" />
+                </div>
+            </div>
+            <div style="width:340px;margin-top:5px;">   
+                <div style="width:120px;display:inline-block;"><span style="font-size:12px;">Total Allotment released:</span></div> <div style="display:inline-block">
+                    <input class="k-input" id="AllotedAmount" name="AllotedAmount" style="width:200px;text-align:right;font-weight:700;color:gold;font-size:20px;margin-top:-15px" readonly="readonly" />
+               </div>
+            </div>
+            <div style="width:340px;margin-top:1px;">
+                <div style="width:120px;display:inline-block;"><span style="">Less: Total obligation incurred:</span></div> <div style="float:right;margin-top:5px;margin-right:15px;">
+                    <input class="k-input" id="Obligate" name="Obligate" style="width:200px;text-align:right;font-weight:700;color:#ff0000" readonly="readonly" />
+               </div>
+            </div>
+            <div style="width:340px;margin-top:1px;">
+                <div style="width:120px;display:inline-block;"><span style="">Total Allotment Available:</span></div> <div style="float:right;margin-top:5px;margin-right:15px;">
+                    <input class="k-input" id="DiffObliandAllocated" name="DiffObliandAllocated" style="width:200px;text-align:right;font-weight:700;color:green" readonly="readonly" />
+                </div>
+            </div>
+            <div style="width:340px;margin-top:1px;">
+                <div style="width:120px;float:left;margin-top:7px"><span>Less: This claim</span></div> <div style="float:right;margin-top:5px;margin-right:15px;">
+                    <input class="k-input" id="Claim" name="Claim" style="width:200px;text-align:right;font-weight:700;" readonly="readonly" value="0"/>
+                </div>
+            </div>
+            <div style="width:340px;margin-top:5px;margin-bottom:10px;">
+                <div style="width:120px;float:left;margin-top:9px"><span style="">Balance of Allotment:</span></div> <div style="float:right;margin-top:5px;margin-right:15px;margin-top:7px">
+                    <input class="k-input" id="BalanceAllotment" name="BalanceAllotment" style="width:200px;text-align:right;font-weight:700;" readonly="readonly" />
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div style="border-color:gray;border-width:1px;border-style:solid;width:420px;margin-top:10px;float:left;margin-left:5px;padding:5px;">
+        <div style="background-color:white;width:180px;margin-top:-20px;margin-left:15px;"><span style="font-size:18px;margin-left:5px;">Amount Obligated</span></div>
+        <div style="width:400px;margin-top:5px;">
+            <div style="width:120px;display:inline-block;"><span style="">Account Charged :</span></div> <div style="display:inline-block">
+                @(Html.Kendo().ComboBox()
+                                    .Name("AccountCharged")
+                                    .DataTextField("item_data")
+                                    .DataValueField("item_ID")
+                                    .Placeholder("Account Charge . .")
+                                    .Filter("contains")
+                                    .MinLength(3)
+                                    .Events(e => e.Change("ChargeAllotmentAvailable"))
+                                    .HtmlAttributes(new { @style = "width: 275px;" })
+                                    .AutoBind(false)
+                                    .DataSource(source => source.Read(read => read.Action("ddlChecked", "Dropdowns").Data("checkChecked")))
+                )
+            </div>
+        </div>
+        <div style="width:400px;margin-top:5px;display:none">
+            <div style="width:120px;display:inline-block;"><span style="">Actual Account :</span></div> <div style="display:inline-block">
+                @(Html.Kendo().ComboBox()
+                                    .Name("ActualAccount")
+                                    .DataTextField("AccountName")
+                                    .DataValueField("AccountID")
+                                    .Placeholder("Actual Account . .")
+                                    .Filter("contains")
+                                    .MinLength(3)
+                                    .Events(e => e.Change("ChangeActualAmountValue"))
+                                    .HtmlAttributes(new { @style = "width: 275px;" })
+                                    .AutoBind(false)
+                                    .DataSource(source => source.Read(read => read.Action("ddlAccounts", "Dropdowns").Data("AccountParam")))
+                )               
+            </div>
+        </div>
+        <div style="width:400px;margin-top:5px;">
+            <div style="width:120px;display:inline-block;"><span style="font-size:12px" id="AccntLabel" >Account Charged Available Allotment :</span></div> <div style="display:inline-block">
+                <input class="k-input" id="AccntCharge" name="AccntCharge" style="width:272px;text-align:right;font-weight:700;color:green;" readonly />
+            </div>
+        </div>
+        <div style="width:400px;margin-top:5px;">
+            <div style="width:120px;display:inline-block;"><span style="">Amount :</span></div> <div style="display:inline-block">
+                <input class="k-input" type="number" id="AmountInputed" name="AmountInputed" value="0" min="0" style="width:272px;text-align:right;font-weight:700;" onkeyup="sync()" />
+            </div>
+        </div>
+        <div style="width:400px;margin-top:5px;">
+            <div style="width:120px;display:inline-block;"><span style="">Balance Allotment :</span></div> <div style="display:inline-block">
+                <input class="k-input" id="BalanceAllotmentAppointment" name="BalanceAllotmentAppointment" style="width:272px;text-align:right;font-weight:700;" readonly />
+            </div>
+        </div>
+        <div style="width:400px;margin-top:5px;">
+            <div style="width:120px;display:inline-block;">
+                <span style="">Remarks</span>
+            </div>
+            <div style="display:inline-block">
+                <textarea id="Remarks" name="Remarks" style="width:262px;"></textarea>
+            </div>    
+        </div>
+        <div style="width:400px;margin-top:5px;display:none">
+            <div style="width:120px;display:inline-block;"><span style="font-size:12px">Current Available Allotment :</span></div> <div style="display:inline-block">
+                <input class="k-input" id="CurrentAllotment" name="CurrentAllotment" style="width:272px;background-color:#ededed;text-align:right;font-weight:700;" readonly />            
+            </div>
+        </div>
+        <div style="width:400px;margin-top:5px;">
+            <div style="width:120px;display:inline-block;"><span style="">O.R. Number :</span></div> <div style="display:inline-block">
+                <input type="text" class="k-input" id="ORNumber" name="ORNumber" style="width:272px;text-align:right;font-weight:700;"></div>
+        </div>
+        <hr />
+        <div style="width:400px;margin-top:10px;">
+            <div style="width:120px;display:inline-block;"><span style="">Claimant / Payee :</span></div> <div style="display:inline-block">
+                <input class="k-input" id="Claimant" name="Claimant" style="width:272px;font-size:small" readonly />
+            </div>
+        </div>    
+    </div>
+    
+    @*<input type="text" id="ObligateParamValue" name="ObligateParamValue" style="" />*@
+    
+    <div style="display:none">
+        
+        <input type="number" id="SelectedAccount" name="SelectedAccount" />
+        <input type="text" id="OBRNoCenter" name="OBRNoCenter" />
+        <input class="k-input" id="ObligateValue" name="ObligateValue" style="width:200px;text-align:right;font-weight:700;color:#ff0000;display:none" />
+        <input class="k-input" id="AllotedAmountValue" name="AllotedAmountValue" style="width:200px;text-align:right;font-weight:700;color:#4061ff;display:none" />
+        <input type="text" id="ObligateParamValue" name="ObligateParamValue" style="display:none;" />
+        <input type="text" id="DiffObliandAllocatedValue" name="DiffObliandAllocatedValue" style="display:none">
+        <input type="text" id="ClaimValue" name="ClaimValue" value="0" style="display:none;">
+        <input type="number" id="BalanceAllotmentValue" name="BalanceAllotmentValue" style="display:none">
+        <input type="text" style="display:none;" id="ActualAmountValue" name="ActualAmountValue" />
+        <input class="k-input" id="AccntChargeValue" name="AccntChargeValue" style="width:272px;display:none" />
+        <input type="number" id="AmountInputedValue" name="AmountInputedValue" value="0" style="display:none" />
+        <input type="number" id="BalanceAllotmentAppointmentValue" name="BalanceAllotmentAppointmentValue" style="display:none" />
+        <input type="number" id="CurrentAllotmentValue" name="CurrentAllotmentValue" style="display:none" />
+        <input type="number" id="CurrentAllotmentBalance" name="CurrentAllotmentBalance" style="display:none" /> 
+        <input type="text" id="CheckRefNo" name="CheckRefNo" style="display:none" value="0" />
+        <input type="number" id="PastAccount" name="PastAccount" style="display:none" />
+        <input type="number" id="_RefIdentifer" name="_RefIdentifer" style="display:none"/>
+        <input type="number" id="_NonOfficeTransaction" name="_NonOfficeTransaction" value="0"/>
+        <input type="text" id="batchno2" name="batchno2" />
+        <input type="text" id="grossAmount" name="grossAmount" value="0" style="display:none;">
+        <input type="text" id="PayrollAcctID" name="PayrollAcctID" value="0" style="display:none;">
+        <input type="text" id="loop" name="loop" value="0" style="display:none;">
+        <input type="text" id="NonOfficeCode" name="NonOfficeCode" value="0" style="display:none;">
+        <input type="text"id="enableFunction" name="enableFunction" value="0" style="display:none;"/>
+        <input type="number" id="beginyear" name="beginyear" value="0" style="display:none;" />
+        <input type="number" id="SelAccountCharged" name="SelAccountCharged" />
+        <input class="k-input" id="AccntChargeValueOrig" name="AccntChargeValueOrig" style="width:272px;display:none" />
+        <input type="number" id="yearendtrans" name="yearendtrans" value="0" />
+        <input type="number" id="lguid" name="lguid" />
+    </div>
+
+    <div style="display:none" id="TransactionDIV">
+        <input type="text" id="UserTransactionID" name="UserTransactionID" />
+    </div>
+
+</form>
+
+<script>
+    function printcontrol(){
+        var perprogram =0//$("#ExpenseClass").val()
+        var OBRNoEntry=$("#OBRNoEntry").val()
+        //var peraccount=$("#ObjectExpenditure").val()
+        if (document.getElementById("ExpenseClass").checked){
+            perprogram=1;
+        }
+        else{
+            perprogram=0
+        }
+        var controlno=$("#TransOBRNo").val() == 0 || $("#TransOBRNo").val().length== 10 ?  OBRNoEntry : $("#TransOBRNo").val()
+        if (controlno.length < 16 ){
+            swal("","Please enter either control or ObR number!")
+        }
+        else{
+            $.ajax({
+                async: false,
+                dataType: 'html',
+                success: window.open("../Reports/ReportViewer.aspx?rid=38&OfficeID=" + $("#Office").val() + "&year=" + $("#Years").val() + "&controlno="+controlno+"&perprogram="+ perprogram +"")
+            });
+        }
+    }
+    $(document).ready(function () {
+        //console.log("OBRValue: @Model.OBRValue");
+        CheckStatus();
+        Transaction();
+        $("#btnid").css({ "float": "left", "margin-left": "123px", "width": "220px", "margin-top": "-15px" });
+        //setTimeout(function (){
+        if("@Model.OBRValue" != "0"){
+            var str = "@Model.OBRValue";
+            var OBREntry = "";
+            if(str.length == 5){
+                OBREntry = ZeroPrefixFormat(@Model.OBRValue, 5);
+                console.log("OBREntry: ".OBREntry);
+                $("#OBRNoEntry").val("@Model.OBRValue");
+            }else{
+                $("#OBRNoEntry").val("@Model.OBRValue");
+            }
+
+        }
+        $("#Office").data("kendoComboBox").value("");
+        $("#Program").data("kendoComboBox").value("");
+        $("#ObjOfExpenditure").data("kendoComboBox").value("");
+        $("#TEVControlNoText").val("")
+        $("#TEVControlNo").data("kendoComboBox").value("");
+        $("#SusProgram").data("kendoComboBox").value("");
+        $("#AccountCharged").data("kendoComboBox").value("");
+        $("#OOE").data("kendoComboBox").value("");
+        $("#PPANonOffice").data("kendoComboBox").value("");
+
+
+        $("#TEVControlNoText").attr("readOnly", true);
+        $("#TEVControlNo").data("kendoComboBox").enable(false);
+        $("#PPANonOffice").data("kendoComboBox").enable(true);
+        $("#SusProgram").data("kendoComboBox").enable(false);
+      //  $("#Remarks").attr("disabled", true);
+      //  $("#ORNumber").attr("readOnly", true);
+        //$("#EconomicIncome").attr("disabled", true);
+        //$("#EconomicSubsidy").attr("disabled", true);
+        if ('@ViewBag.batchno' != "")
+        {
+            displayDetails('@ViewBag.batchno')
+        }
+        var url="@Url.Action("getFunctionEnableDisable","BudgetControl")"
+        $.get(url, { id: 1 }, function (e) {
+            $("#enableFunction").val(e.enablefunction);
+            $("#beginyear").val(e.beginyear)
+        });
+
+        var url="@Url.Action("getCAFOAmode", "Excess")"
+        $.get(url,function (e) {
+            if (e==1)
+            {
+                document.getElementById("divobrlabel").style.display = "none"
+                document.getElementById("divobrno").style.display = "none"
+                document.getElementById("divfunctionlableid").style.display = "inline"
+                document.getElementById("divfuncnoid").style.display = "inline"
+            }
+            else{
+                document.getElementById("divobrlabel").style.display = "inline"
+                document.getElementById("divobrno").style.display = "inline"
+                document.getElementById("divfunctionlableid").style.display = "none"
+                document.getElementById("divfuncnoid").style.display = "none"
+            }
+        })
+        var url="@Url.Action("transyearend", "BudgetControl")"
+        $.get(url,{year: $("#Years").val()},function (e) {
+            $("#yearendtrans").val(e)
+            if (e==0) {
+                document.getElementById("Save").style.display="none"
+                document.getElementById("Update").style.display="none"
+                document.getElementById("Add").style.display="none"
+                document.getElementById("Return").style.display="none"
+                document.getElementById("Cancel").style.display="none"
+                document.getElementById("Clear").style.display="none"
+                document.getElementById("labelnote").style.display="inline"
+                document.getElementById("labelnote").innerHTML="The financial transaction for C.Y. " + $("#Years").val()  +" has been closed!"
+            }
+        })
+
+        var urlgu="@Url.Action("lgusystem", "Report")";
+        $.ajax({
+            type: "GET",
+            traditional: true,
+            url: "",
+            data: {
+            },
+            success: function (r) {
+                $.get(urlgu, function (e) {
+                    $("#lguid").val(e)
+                });
+            }
+        })
+        
+        $("#OBRNoEntry").focus();
+
+    });
+</script>
+
+

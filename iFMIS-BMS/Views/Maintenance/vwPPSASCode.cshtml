@@ -1,0 +1,208 @@
+﻿<script>
+
+    //$(document).ready(function () {
+
+    //    var searchOperator = function (items, filterValue) {
+    //        var searchText = $('#SearchData').val().toLowerCase().split(/[\s,]+/);
+    //        if (searchText.length) {
+    //            var found = false;
+    //            for (var s in searchText) {
+    //                for (var t in items) {
+    //                    if (items[t].toLowerCase().indexOf(searchText[s]) != -1) {
+    //                        found = true;
+    //                        break;
+    //                    }
+    //                }
+    //            }
+    //            return found;
+    //        }
+    //        return true;
+    //    };
+
+    //    $('#SearchData').on('change', function () {
+    //        var dataSource = $("#grPPSASCode").data('kendoGrid').dataSource;
+    //        var searchText = $(this).val();
+    //        dataSource.filter({
+    //            logic: "or",
+    //            filters: [{
+    //                operator: searchOperator
+    //            }]
+    //        });
+
+    //    });
+
+    //});
+
+    function BuildUpPPSASCodeURL() {
+        return "@Url.Action("BuildUpPPSASCode", "Maintenance")";
+    }
+    function UpdateDataURL() {
+        return "@Url.Action("UpdatePPSASCode", "Maintenance")";
+    }
+    //function searchAccount() {
+
+    //    var SearchOBRData = $("#SearchData").val();
+    //    $("#grPPSASCode").data("kendoGrid").dataSource.filter(
+    //        {
+    //            logic: "or",
+    //            filters: [
+    //                {
+    //                    field: "AccountName",
+    //                    operator: "contains",
+    //                    value: SearchOBRData
+
+    //                }, {
+    //                    field: "ChildAccountCode",
+    //                    operator: "contains",
+    //                    value: SearchOBRData
+    //                }
+
+    //            ]
+    //        }
+
+        
+    //            );
+
+    //}
+    function searchAccount() {
+        var $filter = new Array();
+        $filter = [];
+
+        if ($('#SearchData').val().length > 0) {
+            $filter.push({ field: "AccountName", operator: "contains", value: $('#SearchData').val() }),
+            $filter.push({ field: "ChildAccountCode", operator: "contains", value: $('#SearchData').val() });
+        }
+
+        $('#grPPSASCode').data('kendoGrid').dataSource.filter({
+            logic: "or",
+            filters: $filter
+        });
+
+    }
+    $(function () {
+        $("#SearchData").keypress(function (e) {
+            if (e.keyCode == 13) {
+                searchAccount();
+            }
+        });
+    });
+
+    function AddPPSASCode(x,y,z) {
+
+        $(window).scrollTop(0);
+
+        var url = "@Url.Action("BuildUpPPSASCode", "Maintenance")";
+        $.get(url, { FMISAccountCode: x, PPSASCode: y, PPASeriesCode: z }, function (d) {
+            $('#PPSASCode').html(d);
+            checkIfIxist();
+        });
+        $('#PPSASCode').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Build up PPSAS Code").center().open();
+
+    }
+</script>
+<script src="~/Scripts/BMS/Maintenance/PPSASCode.js"></script>
+
+<h2><span class="fa fa-gears"></span> Build-up PPSAS Code</h2>
+<hr />
+@(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Maintenance.PPSASCode_Model>()
+    .HtmlAttributes(new { style = "height:540px" })
+    .Name("grPPSASCode")
+    .Scrollable()
+    .Columns(col =>
+    {
+        col.Bound(m => m.AccountName).Title("Account Name").Width(350);
+        col.Bound(m => m.ChildAccountCode).Title("AcctCode").Width(150).HtmlAttributes(new { style = "text-align:right" }).Hidden();
+        col.Bound(m => m.FMISAccountCode).Title("AcctCode").Width(90).HtmlAttributes(new { style = "text-align:right" }).Hidden();
+        col.Bound(m => m.PPAChildPPSASCode).Title("PPSAS Code").Width(100);
+        col.Bound(m => m.PPSASCode).Title("PPSASCode").Width(200).Hidden();
+        col.Bound(m => m.PPASeriesCode).Title("PPASeriesCode").Width(100).Hidden();
+        col.Template(t => { }).ClientTemplate(
+        "<div class='k-button' onclick=\"AddPPSASCode('#=FMISAccountCode#', '#=PPSASCode#', '#=PPASeriesCode#')\"><span class='fa fa-edit'></span> UPDATE </div>"
+        ).HtmlAttributes(new { style = "margin-left:5px;" }).Width(100);
+    })
+    .ToolBar(t => t.Template(@<text>
+
+
+        <div style="float: left; width: 0; margin-top:-3px;margin-bottom:-100px;margin-left:-3px; height: 0; border-right: 0px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;">
+            <div style="float: left; width: 0; margin-top:0px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 37px solid #EEE; ">
+
+                <div style="float: left; height:28px; margin-left:-59px; margin-top: 5px;">
+                    <i class="fa fa-tasks fa-2x fg-white"></i>
+
+                </div>
+
+            </div>
+        </div>
+        <div style="float: right; height:28px;margin-top:2px;">
+            <link href="~/Content/metroui/css/docs.css" rel="stylesheet" />
+            <div style="float: left;">
+                @(Html.Kendo().DropDownList()
+                        .Name("Years")
+                        .DataTextField("Years")
+                        .DataValueField("Years")
+                        .OptionLabel("Year")
+                        .SelectedIndex(1)
+                        .Events(e => e.Change("ChangeTransactionYear"))
+                        .HtmlAttributes(new { @style = "width: 80px;text-align:left;margin-right:5px;" })
+                        .DataSource(source => source.Read(read => read.Action("PPSASCode", "Dropdowns")))
+
+                )
+            </div>
+
+            <div style="background-color:white;border:solid;border-color:whitesmoke;border-width:thin;width:280px;height:33px;float:right;padding:0px;margin-top:-3px;" id="search">
+                <input type="text" style="width:180px;border-collapse:collapse;border-color:white;margin:0px;margin-left:0px;height:70%;outline:none;border-left-style:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search..." id="SearchData" name="SearchData">
+                <div class="k-button k-button-icontext" style="height:33px;width:40px;" onclick="searchAccount()"><span class="mif-search"></span></div>
+            </div>
+        </div>
+    </text>))
+
+    .Pageable(page => page.Refresh(true)
+    .Enabled(true)
+    .ButtonCount(4)
+    .PreviousNext(true)
+    )
+                                                                            
+    // .Editable(editable => editable.Mode(GridEditMode.InCell))
+    // .Events(e => e.Edit("onGridEdit"))
+        .Selectable(selectable => selectable.Mode(GridSelectionMode.Single))
+        .AutoBind(true)
+                                                                               
+        .DataSource(d => d
+                                                                               
+        .Ajax()
+        .Batch(true)
+        .PageSize(12)
+                                                                               
+        .Model(m => m.Id(i => i.AccountCode))
+                                                                                                   
+        .Read(read => read.Action("grPPSASACode", "Maintenance").Data("YearParam"))
+        )
+)
+
+@(Html.Kendo().Window()
+    .Name("PPSASCode")
+    .Title("Build Up PPSAS Code")
+    .Width(450)
+    .Height(250)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(true)
+    .AutoFocus(true)
+        //.Events(e => e.Close("onClose"))
+    .Animation(a =>
+        {
+            a.Open(o => o.Fade(FadeDirection.In));
+            a.Close(c =>
+            {
+                c.Fade(FadeDirection.In);
+                c.Reverse(true);
+            });
+        }).Actions(a => { a.Close(); }))
+
+<script>
+    $(document).ready(function () {
+        setTimeout(function () {
+            $("#grPPSASCode").data("kendoGrid").dataSource.read();
+        }, 1000)
+    });
+</script>

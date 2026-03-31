@@ -1,0 +1,311 @@
+﻿
+<script>
+
+    function reqPrint() {
+
+        var year_ = $("#ddlYear").val();
+        var month_ = $("#Months").val();
+        var month_To = $("#Months_To").val();
+        var rephistory=$("#rephistory").val();
+        $.ajax({
+            async: false,
+            dataType: 'html',
+            success: window.open("../Reports/ReportViewer.aspx?rid=13&Year=" + year_ + "&month_=" + month_ + "&month_To=" + month_To + "&repxmlhistory=" + rephistory + "")
+        });
+    }
+
+
+    setTimeout(function () {
+        var todayDate = kendo.toString(kendo.parseDate(new Date()), 'MMMM');
+        $("#datepicker_desu").data("kendoDatePicker").value(todayDate);
+    }, 100);
+
+
+
+
+
+    var thisculture = kendo.culture();
+    thisculture.numberFormat.currency.symbol = '₱'; // Script For Changing The Currency Sign
+
+
+
+
+    setTimeout(function () {
+        $("#offs").data("kendoComboBox").dataSource.read();
+    }, 100);
+
+
+
+
+
+
+    function ocake() {
+        setTimeout(function () {
+
+            fn_Offices();
+
+        }, 1000);
+    }
+
+
+    function repris() {
+        $("#offs").data("kendoComboBox").dataSource.read();
+    }
+
+    function Select_Office() {
+
+        var classtype = $("#classtype").val();
+
+        if (classtype == null || classtype == "") {
+
+            return { classtype: 1 }
+        }
+        else {
+            return { classtype: classtype }
+        }
+    }
+    function fn_dprefresherOOied() {
+        $("#account_list").data("kendoComboBox").dataSource.read();
+    }
+    function fn_dprefresherprogs() {
+        $("#ooe_id").data("kendoDropDownList").dataSource.read();
+        $("#account_list").data("kendoComboBox").dataSource.read();
+    }
+
+
+
+
+
+    function fn_dprefresher() {
+
+        ocake();
+        $("#Progss").data("kendoDropDownList").dataSource.read();
+        $("#ooe_id").data("kendoDropDownList").dataSource.read();
+        $("#account_list").data("kendoComboBox").dataSource.read();
+
+    }
+    function ExpenseClassOnChange() {
+        $("#grd_BudgetApprovalBudget").data("kendoGrid").dataSource.read();
+    }
+    function selectedyear() {
+        return {
+            type: 6,
+            office: 0,
+            year: $("#ddlYear").val(),
+            saaotag: 0
+        }
+    }
+</script>
+
+<h2><span class="fa fa-print"></span> Generate Total Release Report</h2>
+<br /><br />
+
+<div style="float: none;clear:both;">
+    <div style="float: left;margin-left:19.5px;margin-top:0px;">
+        <label style="float:left;margin-left: 50px;">
+            From    :
+        </label>
+    </div>
+
+    <div style="float: left;margin-left:41px;margin-top:0px;">
+
+        @(Html.Kendo().DropDownList()
+            .Name("Months")
+            .DataTextField("Text")
+            .DataValueField("Value")
+                //.Events(e => e.Change("change"))
+            .BindTo(new List<SelectListItem>() {
+                new SelectListItem() {
+                    Text = "January",
+                    Value = "1"
+                },
+                new SelectListItem() {
+                    Text = "Febuary",
+                    Value = "2"
+                },
+                new SelectListItem() {
+                    Text = "March",
+                    Value = "3"
+                },
+                new SelectListItem() {
+                    Text = "April",
+                    Value = "4"
+                },
+                new SelectListItem() {
+                    Text = "May",
+                    Value = "5"
+                },
+                new SelectListItem() {
+                    Text = "June",
+                    Value = "6"
+                },
+                new SelectListItem() {
+                    Text = "July",
+                    Value = "7"
+                },
+                new SelectListItem() {
+                    Text = "August",
+                    Value = "8"
+                },
+                new SelectListItem() {
+                    Text = "September",
+                    Value = "9"
+                },
+                new SelectListItem() {
+                    Text = "October",
+                    Value = "10"
+                },
+                new SelectListItem() {
+                    Text = "November",
+                    Value = "11"
+                },
+                new SelectListItem() {
+                    Text = "December",
+                    Value = "12"
+                }
+            })
+          //  .Value(@ViewBag.MonthVaue)
+            .HtmlAttributes(new { style = "width: 150px" })
+        )
+
+
+
+
+
+
+
+
+    </div>
+
+
+    <div style="float: left;margin-left:160px;margin-top:0px;">
+        <label>
+            To   :
+        </label>
+    </div>
+    <div style="float:left;margin-left:30px;margin-top:0px;">
+
+
+
+        @(Html.Kendo().DropDownList()
+            .Name("Months_To")
+            .DataTextField("Text")
+            .DataValueField("Value")
+                //.Events(e => e.Change("change"))
+            .BindTo(new List<SelectListItem>() {
+                new SelectListItem() {
+                    Text = "January",
+                    Value = "1"
+                },
+                new SelectListItem() {
+                    Text = "Febuary",
+                    Value = "2"
+                },
+                new SelectListItem() {
+                    Text = "March",
+                    Value = "3"
+                },
+                new SelectListItem() {
+                    Text = "April",
+                    Value = "4"
+                },
+                new SelectListItem() {
+                    Text = "May",
+                    Value = "5"
+                },
+                new SelectListItem() {
+                    Text = "June",
+                    Value = "6"
+                },
+                new SelectListItem() {
+                    Text = "July",
+                    Value = "7"
+                },
+                new SelectListItem() {
+                    Text = "August",
+                    Value = "8"
+                },
+                new SelectListItem() {
+                    Text = "September",
+                    Value = "9"
+                },
+                new SelectListItem() {
+                    Text = "October",
+                    Value = "10"
+                },
+                new SelectListItem() {
+                    Text = "November",
+                    Value = "11"
+                },
+                new SelectListItem() {
+                    Text = "December",
+                    Value = "12"
+                }
+            })
+            .Value(@ViewBag.MonthVaue)
+            .HtmlAttributes(new { style = "width: 150px" })
+        )
+
+
+
+    </div>
+
+
+
+    <div style="height:10px;">
+
+    </div>
+
+    <div id="MonthDepartment" style="float: none;clear:both; margin-top: 20px">
+
+       
+        <div style="float:left;margin-left:75px;margin-top:5px;">
+            <label>
+                Year :
+            </label>
+        </div>
+
+
+        <div style="float:left;margin-left:41px;margin-top:5px;">
+
+            @(Html.Kendo().DropDownList()
+                        .Name("ddlYear")
+                        .DataTextField("ProposalYear")
+                        .DataValueField("ProposalYear")
+                        .SelectedIndex(1)
+                        .HtmlAttributes(new { @style = "width: 95px;" })
+                        .Events(e => e.Change("ocake"))
+                        .DataSource(source => source.Read(read => read.Action("GetPropYear2", "PYear")))
+            )
+
+
+        </div>
+        <div style="float:left;margin-left:-250px;margin-top:41px;">
+            <label>
+                Report History     :
+            </label>
+        </div>
+        <div style="float:right;margin-right:351.5px;margin-top:7px;">
+            @(Html.Kendo().ComboBox()
+                            .Name("rephistory")
+                            .DataTextField("dateprinted")
+                            .DataValueField("rprtid")
+                            .Placeholder("Report history...")
+                            .Filter("contains")
+                            .MinLength(1)
+                            .HtmlAttributes(new { @style = "width: 250px;" })
+                            .DataSource(source => source.Read(read => read.Action("rephistory", "Report").Data("selectedyear")))
+            )
+        </div>
+
+
+
+        <div id="btnPrint" class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 100px;float:left; margin-top: 40px; margin-left:530px; margin-bottom:5px;border-radius:50px;background-color:#1a9134;color:white" onclick="reqPrint()"><span class="mif-printer"></span> Preview</div>
+
+    </div>
+</div>
+<script>
+     $(document).ready(function () {
+         $("#rephistory").data("kendoComboBox").dataSource.read();
+     }, 5000);
+</script>

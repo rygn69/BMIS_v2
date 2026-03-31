@@ -1,0 +1,157 @@
+﻿@model iFMIS_BMS.BusinessLayer.Models.AccountDenomination
+
+<script>
+    function CloseWindow() {
+        //var Budget = $("#moneyUpdatedBudget").text();
+        //alert(Budget);
+        document.documentElement.style.overflow = 'auto';  // firefox, chrome
+        document.body.scroll = "yes";
+        $("#CreateNewDenominationAccount").data("kendoWindow").close();
+    }
+    function reqSave() {
+        var name = document.getElementById("DenominationName").value;
+        var amount = document.getElementById("DenominationAmount").value;
+        var month = document.getElementById("DenominationMonth").value;
+        if (name == '' || amount == '' || month == '') {
+            $.Notify({
+                caption: 'Notice!',
+                content: 'All Fields Required',
+                icon: "<span class='fa fa-times-circle'></span>",
+                type: 'alert',
+            });
+        }
+        else{
+            var url = "@Url.Action("SaveNewAccountDenominationLFC", "BudgetPreparation")";
+            var frmData = $('#AccountDenomination').serialize();
+            $.post(url, frmData, function (d) {
+                if (d == "success") {
+                    $("#CreateNewDenominationAccount").data("kendoWindow").close();
+
+
+                    var gridName = "#grid_"+ @Model.AccountID;
+                    $(gridName).data("kendoGrid").dataSource.read();
+                    swal({
+                        title: "Success!",
+                        text: 'Account Denomination Saved',
+                        type: "success",
+                        showConfirmButton: true
+                    });
+                    $("#grd_BudgetApprovalBudget").data("kendoGrid").dataSource.read();
+                }
+                else {
+                    swal({
+                        title: "Error!",
+                        text: d,
+                        type: "error",
+                        showConfirmButton: true
+                    });
+                }
+            })
+        }
+    }
+    function CheckIfMax(){
+        if(document.getElementById("DenominationMonth").value > 12 ||document.getElementById("DenominationMonth").value < 1){
+            document.getElementById("DenominationMonth").value = 1;
+            sync();
+        }
+    }
+</script>
+
+<form id="AccountDenomination">
+    <div style="display:none;">
+        <input type="text" id="ProgramID" name="ProgramID" value="" />
+        <input type="text" id="AccountID" name="AccountID" value="@Model.AccountID" />
+        <input type="text" id="TransactionYear" name="TransactionYear" value="" />
+        @*<input type="text" name="OfficeID" value="@Model.OfficeID" />*@
+    </div>
+    <div style="margin-bottom:5px;margin-top:5px;margin-left:5px;margin-right:15px">
+        <label> Office : </label>
+        @(Html.Kendo().ComboBox()
+                            .Name("Office")
+                            .DataTextField("OfficeName")
+                            .DataValueField("OfficeID")
+                            .Placeholder("Select office...")
+                            .Filter("contains")
+                            .MinLength(1)
+                            .HtmlAttributes(new { @style = "width: 570px;" })
+                            //.Events(e => e.Change("fn_dprefresher"))
+                       .DataSource(source => source.Read(read => read.Action("GetOffice", "dpOffice")))
+        )
+    </div>
+    <div style="margin-bottom:5px;margin-top:5px;margin-left:5px;margin-right:15px">
+        <label>Particular Name</label> <input type="text" id="DenominationName" name="DenominationName" style="width:100%" required autofocus />
+    </div>
+    <div style="display:inline-block;width:550px;">
+        <div style="margin-bottom:5px;margin-top:5px;margin-left:5px;margin-right:15px;display:inline-block;">
+            <script>
+                function sync() {
+                    var n1 = $("#QuantityPercentage").val();
+                    var n2 = document.getElementById("DenominationAmount");
+                    var n3 = document.getElementById("TotalDenominationAmount");
+                    var n4 = document.getElementById("DenominationMonth");
+                    n3.value = n1 * n2.value * n4.value;
+
+
+                }
+            </script>
+            <label>Quantity/Percentage Increase</label>
+            @(Html.Kendo().NumericTextBox<double>()
+            .Name("QuantityPercentage")
+            .Value(1)
+            .Events(e => e.Change("sync").Spin("sync"))
+            .Placeholder("Enter Quantity or Percentage")
+            )
+        </div>
+        <style>
+            #QuantityPercentage {
+                width: 100px;
+            }
+        </style>
+
+
+        <div style="margin-bottom:5px;margin-top:5px;display:inline-block;width:300px">
+            <div style="display:inline-block">
+                <label>Amount</label>
+                <input type="number" id="DenominationAmount" name="DenominationAmount" style="width:200px" required onkeyup="sync()" onclick="sync()" value="@Model.DenominationAmount" />
+            </div>
+            <div style="display:inline-block; margin-left:10px">
+                <label>Months</label>
+                <input type="number" id="DenominationMonth" name="DenominationMonth" style="width:50px" required onkeyup="sync()" onclick="sync()" value="1" max="12" min="1" onblur="CheckIfMax()" />
+            </div>
+        </div>
+        <div></div>
+    </div>
+    <div style="margin-bottom:5px;margin-top:5px;margin-left:5px; margin-right:15px">
+        <label>=Total Amount</label> <input type="text" id="TotalDenominationAmount" name="TotalDenominationAmount" style="width:100%" readonly="readonly" />
+    </div>
+    <div style="float:right;margin-top:10px; margin-right: 5px">
+        <div class="k-button" onclick="CloseWindow()"><span class="fa fa-close"></span> Cancel</div> <div class="k-button k-state-active" onclick="reqSave()"><span class="fa fa-check"></span> Save </div>
+    </div>
+</form>
+
+<script>
+    $(document).ready(function () {
+        @*if ('@Model.ActionCode' == '1') {
+            $("#DenominationAmount").prop("readonly", false);
+        }
+        else {
+            $("#DenominationAmount").prop("readonly", true);
+        }*@
+
+        var x = $("#offs").val();
+        //alert(x);
+        $("#Office").data("kendoComboBox").value(x);
+
+        var Program =$("#Progss").val();
+        //alert(Program);
+        var Prog = document.getElementById('ProgramID');
+        Prog.value = Program;
+        var ProposalYear = $("#ddlYear").val();
+        document.getElementById('TransactionYear').value = ProposalYear;
+        if (x != 43) {
+           $("#Office").data("kendoComboBox").readonly();
+        }
+    });
+
+
+</script>

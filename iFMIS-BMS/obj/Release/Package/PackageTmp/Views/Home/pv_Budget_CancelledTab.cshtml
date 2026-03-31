@@ -1,0 +1,205 @@
+﻿
+<script type="text/javascript">
+
+    function errorHandler(e) {
+        if (e.errors) {
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "\n";
+                    });
+                }
+            });
+            alert(message);
+        }
+    }
+    function showDetailsWindow(e) {
+        var notifi = new $("#popupNotification").data("kendoNotification");
+        notifi.hide();
+        var url = "@Url.Action("ShowDetailsWindow", "Home")";
+        var grid = $("#grd_BudgetCancelledBudget").data("kendoGrid")
+        var ds = grid.dataSource.view();
+        var Rows = grid.select();
+        var rowIndex = Rows.index();
+        var ProposalID = ds[rowIndex].ProposalID
+        var OfficeID = $("#offs").val();
+        var Year = $("#ddlYear").val();
+        var ProgramId = $("#Progss").val();
+        $('#PartialContent').html('<div style="width: 100%;height:100%;"><img src="@Url.Content("~/Content/images/loading.gif")" alt="Loading..." style="position: absolute;top: 25%;left: 30%;margin-top: 0px;margin-left: 0px;" /></div>');
+        $.get(url, { ProposalID: ProposalID, OfficeID: OfficeID, Year: Year, ProgramID: ProgramId }, function (d) {
+            $('#CancelledDetails').html(d);
+        })
+        $(window).scrollTop(0);
+        $('#CancelledDetails').data('kendoWindow').wrapper.css({
+            width: 550,
+            height: 450
+        });
+        $('#CancelledDetails').data('kendoWindow').center().open().title('');
+    }
+    function reqUndoCancelled() {
+
+        swal({
+            title: "Are you sure?",
+            text: "Move this account to for approval tab!",
+            type: "warning", showCancelButton: true,
+            cancelButtonColor: "#DD6B55",
+            confirmButtonColor: "#1FA67A",
+            confirmButtonText: "Yes!",
+            cancelButtonText: "No!",
+            closeOnConfirm: false
+        },
+        function (isConfirm)
+        {
+            if (isConfirm)
+            {
+                var notifi = new $("#popupNotification").data("kendoNotification");
+                notifi.hide();
+                var url = "@Url.Action("reqUndoCancelled", "Home")";
+                var grid = $("#grd_BudgetCancelledBudget").data("kendoGrid")
+                var ds = grid.dataSource.view();
+                var Rows = grid.select();
+                var rowIndex = Rows.index();
+                var ProposalID = ds[rowIndex].ProposalID
+                $.get(url, { ProposalID: ProposalID}, function (d) {
+                    if (d == "1") {
+                        $("#grd_BudgetCancelledBudget").data("kendoGrid").dataSource.read();
+                        swal({ title: "Success!", text: "Selected Account Successfuly Moved.", timer: 1000, showConfirmButton: false, type: "success" });
+                    }
+                    else {
+                        swal("Something Went Wrong!", d, "error");
+                    }
+                })
+            }
+        });
+    }
+    function searchAccount() {
+
+        var SearchProgramData = $("#SearchAccount").val();
+        var ProgramgGrid = $("#grd_BudgetCancelledBudget").data("kendoGrid").dataSource;
+        ProgramgGrid.filter([
+            {
+                logic: "or",
+                filters: [{
+                    field: "AccountName",
+                    operator: "contains",
+                    value: SearchProgramData
+                },
+                {
+                    field: "OOEName",
+                    operator: "contains",
+                    value: SearchProgramData
+                }]
+            }
+        ]);
+    }
+
+    document.getElementById('SearchAccount').onkeydown = function (event) {
+        if (event.keyCode == 13) {
+            searchAccount();
+        }
+    }
+    document.getElementById('SearchAccount').onkeyup = function () {
+        if (($(this).val() == '' || $(this).val() == 'Search Accounts') && $(this).attr('type') != 'hidden') {
+            searchAccount()
+        }
+    }
+</script>
+
+@(Html.Kendo().Notification()
+            .Name("popupNotification")
+            .Stacking(NotificationStackingSettings.Up)
+            .Position(p => p.Top(-5))
+            .HideOnClick(true)
+            .Animation(a => { a.Close(c => { c.SlideIn(SlideDirection.Left); c.Reverse(true); }); a.Open(o => o.SlideIn(SlideDirection.Left)); })
+            .Events(e => e.Show("onShow"))
+            .AppendTo("#note-field")
+)
+
+@(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.AccountsModel>()
+        .Name("grd_BudgetCancelledBudget")
+        .HtmlAttributes(new { style = "height:550px" })
+        .Scrollable()
+    .Columns(col =>
+    {
+        col.Template(@<text></text>)
+        .HeaderTemplate(@<text><div style="font-weight:900;">Accounts</div></text>)
+        .HtmlAttributes(new { style = "text-align:center;height:30px" })
+        .HeaderHtmlAttributes(new { style = "text-align:center" })
+        .ClientTemplate("<div>#=AccountName# </div>").Width(100);
+
+        col.Template(@<text></text>)
+        .HeaderTemplate(@<text><div style="font-weight:900;">OOE</div></text>)
+        .HtmlAttributes(new { style = "text-align:center;height:30px" })
+        .HeaderHtmlAttributes(new { style = "text-align:center" })
+        .ClientTemplate("<div>#=OOEName# </div>").Width(50);
+
+
+        col.Template(@<text></text>)
+        .HeaderTemplate(@<text><div style="font-weight:600;">Year</div></text>)
+        .HtmlAttributes(new { style = "text-align:center;height:30px" })
+        .HeaderHtmlAttributes(new { style = "text-align:center" })
+        .ClientTemplate("<div>#=ProposalYear# </div>").Width(30);
+
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;">Proposed Amount</div></text>)
+                        .Width(90)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div>#=kendo.toString(ProposalAmmount,'c2')# </div>");
+
+        col.Template(@<text></text>)
+                        .Width(15)
+                        .HtmlAttributes(new { style = "text-align:center;height:30px" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div style='width:20px; padding:0px; background-color:white; border-style:groove; border-color:white;' title='View Details' class='button' onclick=showDetailsWindow(this)><span><i class ='fa fa-question-circle'></i></span></div><div style='width:20px; padding:0px; background-color:white; border-style:groove; border-color:white;' title='Undo Action' class='button' onclick=reqUndoCancelled(this)><span><i class ='fa fa-reply'></i></span></div>");
+
+
+    })
+     .ToolBar(toolbar =>
+       {
+           toolbar.Template(@<text>
+            <div style="float: right; height:28px;margin-top:2px;">
+                <link href="~/Content/metroui/css/docs.css" rel="stylesheet" />
+                <div style="background-color:white;border:solid;border-color:whitesmoke;border-width:thin;width:310px;height:30px;float:right;padding:0px;margin-top:-3px;" id="search">
+                    <input type="text" style="width:260px;border-collapse:collapse;border-color:white;margin:0px;margin-left:-10px;height:70%;outline:none;border-left-style:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search Accounts" id="SearchAccount" name="SearchAccount">
+                    <div class="k-button k-button-icontext" style="height:29px;width:40px;margin-top:0.6px;" onclick="searchAccount()"><span class="mif-search"></span></div>
+                </div>
+
+            </div>
+        </text>);
+    })
+        .Pageable(page => page.Refresh(true)
+            .Enabled(true)
+            .ButtonCount(4)
+            .PreviousNext(true)
+        )
+        .Selectable()
+        .DataSource(d => d
+            .Ajax()
+            .Batch(true)
+            .PageSize(10)
+            .Model(m => m.Id(i => i.AccountID))
+            .Read(read => read.Action("BudgetAccounts_read_Cancelled", "Home").Data("fn_Program"))
+            .Update("_update", "Home")
+        )
+)
+
+@(Html.Kendo().Window()
+    .Name("CancelledDetails")
+    .Width(550)
+    .Height(450)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(true)
+    .AutoFocus(true)
+    .Animation(a =>
+    {
+        a.Open(o => o.SlideIn(SlideDirection.Down));
+        a.Close(c => { c.SlideIn(SlideDirection.Down); c.Reverse(true); });
+    })
+    .Actions(a => { a.Close(); }))
+
+
+
+

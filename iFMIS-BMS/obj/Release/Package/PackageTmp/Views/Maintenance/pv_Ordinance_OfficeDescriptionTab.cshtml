@@ -1,0 +1,173 @@
+﻿<script>
+    function UpdateOfficeDesc() {
+        var url = "@Url.Action("UpdateOfficeDescWindow", "Maintenance")";
+        $.post(url, function (d) {
+            $(window).scrollTop(0);
+            $('#UpdateOfficeDescriptionWindow').html(d);
+            $('#UpdateOfficeDescriptionWindow').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Update Office Description").center().open();
+        })
+    }
+    function ResizeOfficeDescriptionDIV() {
+        var gridname = 'Grid_OfficeDescriptionDIV';
+        if (document.getElementById("OfficeDescriptionDIVIndicator").value == 0) {
+            MaximizeDIV(gridname);
+            document.getElementById("OfficeDescriptionDIVIndicator").value = 1
+            $('#grOfficeDescriptionList').css("height", "550px");
+            $("#grOfficeDescriptionList").data("kendoGrid").dataSource.read();
+        }
+        else {
+            MinimizeDIV(gridname)
+            document.getElementById("OfficeDescriptionDIVIndicator").value = 0
+            $('#grOfficeDescriptionList').css("height", "300px");
+            $("#grOfficeDescriptionList").data("kendoGrid").dataSource.read();
+        }
+    }
+    function reqRemoveDescription(DescriptionID) {
+        swal({
+            title: "Are you sure?",
+            text: "This Action Will Remove The Description of this Office.",
+            type: "info",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes!",
+            closeOnConfirm: false
+        }, function () {
+            var url = "@Url.Action("RemoveOfficeDescription", "Maintenance")";
+            $.post(url, { DescriptionID: DescriptionID }, function (d) {
+                if (d == 1) {
+                    swal({
+                        title: "Success!",
+                        text: "Office Description Succesffuly Removed!",
+                        type: "success",
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    $("#grOfficeDescriptionList").data("kendoGrid").dataSource.read();
+                }
+                else {
+                    swal({
+                        title: "Something went wrong!",
+                        text: d,
+                        type: "error",
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                }
+            })
+        });
+    }
+    function onGridEdit(arg) {
+
+        var gridName = $('#grOfficeDescriptionList').data('kendoGrid');
+        var dataRows = gridName.items();
+        var rowIndex = dataRows.index(gridName.select());
+        var ds = gridName.dataSource.view();
+        var OfficeID = "";
+        var lastIndex = ds.length - 1;
+        var MaxValue = ds[lastIndex].OfficeOrder;
+        
+        $(gridName.tbody).on("blur", "td", function (e) {
+            var row = $(this).closest("tr");
+            var rowIdx = $("tr", gridName.tbody).index(row);
+            var colIdx = $("td", row).index(this);
+            OfficeID = ds[rowIdx].OfficeID;
+        });
+        if (arg.container.find("input[name=OfficeName]").length > 0) {
+            $("#grOfficeDescriptionList").data("kendoGrid").closeCell(arg.container)
+        }
+        if (arg.container.find("input[name=OfficeDescription]").length > 0) {
+            $("#grOfficeDescriptionList").data("kendoGrid").closeCell(arg.container)
+        }
+        var input = arg.container.find("input[name=OfficeOrder]");
+        var value = input.val();
+        var OldValue = input.val();
+        input.keyup(function () {
+            value = input.val();
+        });
+        input.blur(function () {
+            if (value != OldValue || value == MaxValue) {
+                var url = "@Url.Action("UpdateOfficeOrder", "Maintenance")";
+                $.post(url, { OfficeID: OfficeID, OrderNo: value },function (d){
+                    if (d == "1") {
+                        $("#grOfficeDescriptionList").data("kendoGrid").dataSource.read();
+                    }
+                    else {
+                            alert('Failed To Update Order No. Please Try Again')
+                    }
+                })
+         }
+        });
+    }
+</script>
+<div id="Grid_OfficeDescriptionDIV">
+    <input type="hidden" value="0" id="OfficeDescriptionDIVIndicator" />
+    <div style="border: outset;clear:both;border-width:1px;border-color:#1fa67a; width: 100%; padding-left:0px;padding-right:0px;padding-top:0px;padding-bottom:7px;margin-top: 10px;">
+        <div style=" width: 91.5%;height: 100%; border-right: 0px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;margin-top: -1px; ">
+            <div style="float: left; width: 100%; margin-top:1px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 36px solid #1fa67a; ">
+
+                <div style="float: left; height:28px; margin-left:-59px; margin-top: 5px;">
+                    <i class="fa fa-tasks fa-2x fg-white"> <span>Office Descriptions </span></i>
+                </div>
+                <div style="float:right">
+                    <div style="float:right;margin-right:6px;margin-top:5px;">
+                        <button class="k-button k-button-icontext" onclick="ResizeOfficeDescriptionDIV()"> <i class="fa fa-arrows-alt"></i> </button>
+                        <button class="k-button k-button-icontext" onclick="UpdateOfficeDesc()"> <i class="fa fa-exchange"></i> Update Office Description </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Maintenance.OrdinanceDescriptionModel>()
+                .Name("grOfficeDescriptionList")
+                .Columns(columns =>
+                {
+                    columns.Bound(c => c.DescriptionID).Hidden();
+                    columns.Bound(c => c.OfficeID).Hidden();
+                    columns.Bound(c => c.OfficeOrder).Title("Order No").Width(50)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div>#=OfficeOrder# </div>")
+                        .HtmlAttributes(new { style = "text-align:center;" });
+                    columns.Bound(c => c.OfficeName).Title("Office").Width(150)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+                    columns.Bound(c => c.OfficeDescription).Title("Description").Width(200)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+                    columns.Template(t => { }).ClientTemplate("# if(DescriptionID == 0) { #" +
+                                               "" +
+                                               "# } else { #" +
+                                               "<div class='k-button' onclick='reqRemoveDescription(#=DescriptionID#)' style='inline-block' title='Remove'> <span class='fa fa-times'></span>Remove</div>" +
+                                               "# }#"
+                        ).Width(60);
+                })
+                        .HtmlAttributes(new { style = "height: 300px;" })
+                        .Scrollable(s => s.Enabled(true))
+                        .Selectable()
+                        .Editable(editable => editable.Mode(GridEditMode.InCell))
+                        .Events(e => e.Edit("onGridEdit"))
+                        .DataSource(dataSource => dataSource
+                            .Ajax()
+                            .Batch(true)
+                            .ServerOperation(false)
+                            .Model(m => m.Id(i => i.DescriptionID))
+                            .Read(read => read.Action("ReadOrdinanceDescriptions", "Maintenance"))
+                        )
+        )
+    </div>
+</div>
+@(Html.Kendo().Window()
+    .Name("UpdateOfficeDescriptionWindow")
+    .Title("Update Office Description")
+    .Width(530)
+    .Height(250)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(true)
+    .AutoFocus(true)
+    .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        }).Actions(a => { a.Close(); })
+)

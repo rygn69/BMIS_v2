@@ -1,0 +1,168 @@
+﻿
+<script>
+    
+    function getParam() {
+        return {
+            office:'@Session["office"]',
+            tyear: '@Session["tyear"]',
+            id:'@Session["id"]',
+            ooeid:'@Session["ooeid"]',
+            qtr:'@Session["qtr"]',
+            accountid:'@Session["accountid"]'
+        }
+    }
+  
+    var thisculture = kendo.culture();
+    thisculture.numberFormat.currency.symbol = ' ';
+
+    function frmclose() {
+        $("#ppmpdetailsconsol").data("kendoWindow").close();
+        
+    }
+    @*function onDataBound(e) {
+        $(".k-hierarchy-cell").hide();
+        $(".k-hierarchy-col").hide();
+        var grid = $("#grd_dffptapproveoffice").data("kendoGrid")
+        var ds = grid.dataSource.view();
+        var rows = e.sender.tbody.children();
+
+        for (var i = 0; i < ds.length; i++) {
+            trnno = ds[i].trnno;
+            firstmon_release=ds[i].firstmonth_rel
+            secondmon_release=ds[i].secondmonth_rel
+            thirdmon_release=ds[i].thirdmonth_rel
+
+            var row = $(rows[i]);
+            if (@Session["id"] == 1 && (firstmon_release == 0 || secondmon_release == 0 || thirdmon_release == 0)) {
+                $('#deleteid' + trnno + '').css("display", "normal");
+            }
+            else {
+                $('#deleteid' + trnno + '').css("display", "none");
+                grid.hideColumn('deleteid' + trnno + '');
+            }
+        }
+    }*@
+    function searchSubmitConsol() {
+        var $filter = new Array();
+        $filter = [];
+
+        if ($('#searchSubmitConsol').val().length > 0) {
+            $filter.push({ field: "AccountName", operator: "contains", value: $('#searchSubmitConsol').val() }),
+            $filter.push({ field: "ooe", operator: "contains", value: $('#searchSubmitConsol').val() }),
+            $filter.push({ field: "Qtr", operator: "contains", value: $('#searchSubmitConsol').val() })
+        }
+
+        $('#grd_ppmpdetailsConsol').data('kendoGrid').dataSource.filter({
+            logic: "or",
+            filters: $filter
+        });
+
+    }
+
+    $(function () {
+        $("#searchSubmitConsol").keypress(function (e) {
+            if (e.keyCode == 13) {
+                searchSubmitConsol();
+            }
+        });
+    });
+</script>
+<div id="searchAccountid" style="height: 30px; margin-top: 0px; float: right; margin-left: 200px;">
+    <input type="text" style="width:406px;border-collapse:collapse;margin:0px;border-style:solid;margin-left:0px;height:70%;outline:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search..." id="searchSubmitConsol" name="searchSubmitConsol">
+    <div class="k-button k-button-icontext" style="height:30px;width:40px;border-style:solid;" onclick="searchSubmitConsol()"><span class="mif-search"></span></div>
+</div>
+<div class="fa fa-re">
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.WFPSubmitted>()
+        .Name("grd_ppmpdetailsConsol")
+        .HtmlAttributes(new { style = "height:450px;" })
+        .Scrollable()
+        .Columns(col =>
+        {
+      
+        col.Template(@<text></text>)
+       //col.Bound(m => m.AccountName)
+                    .HeaderTemplate(@<text>Account</text>)
+                    .Width(280)
+                    .HtmlAttributes(new { style = "text-align:left;" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                    .ClientTemplate("<div>#=AccountName# </div>")
+                    .ClientFooterTemplate("<div style='text-align:center;font-weight:bold'> TOTAL </div>");
+        @*col.Template(@<text></text>)
+                    .HeaderTemplate(@<text>Qtr</text>)
+                    .Width(50)
+                    .HtmlAttributes(new { style = "text-align:center;height:30px" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                    .ClientTemplate("<div>#=Qtr# </div>");*@
+        col.Template(@<text></text>)
+                    .HeaderTemplate(@<text>Amount</text>)
+                    .Width(100)
+                    .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                    .ClientTemplate("<div>#=kendo.toString(denoAmount,'c2')# </div>");
+                    
+        col.Template(@<text></text>)
+                    .HeaderTemplate(@<text>Qty</text>)
+                    .Width(100)
+                    .HtmlAttributes(new { style = "text-align:center;height:30px" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                    .ClientTemplate("<div>#=qty# </div>");
+        col.Bound(c => c.TotaldenoAmount)
+                    .HeaderTemplate(@<text>Total Amount</text>)
+                    .Width(135)
+                    .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                    .ClientTemplate("<div>#=kendo.toString(TotaldenoAmount,'c2')# </div>")
+                    .ClientFooterTemplate("<div style='text-align:right'><label> </label><label> #=kendo.toString(sum, 'c2')#</label></div>");
+
+        })
+            //.Editable(editable => editable.Mode(GridEditMode.InCell))
+            //.Navigatable()
+            .Pageable(pageable => pageable
+            .Refresh(true)
+            .Enabled(true)
+            .ButtonCount(2))
+            .Selectable()
+            .AutoBind(false)
+            .Resizable(s => s.Columns(true))
+            //.Sortable(sortable => sortable
+            //.AllowUnsort(true)
+            //.SortMode(GridSortMode.MultipleColumn))
+            //.Events(e => e.DataBound("onDataBound"))
+            .DataSource(dataSource => dataSource
+            .Ajax()
+            .Batch(true)
+            .Model(m => m.Id(i => i.trnno))
+            .ServerOperation(false)
+            .Aggregates(a =>
+            {
+                a.Add(c => c.TotaldenoAmount).Sum();
+            })
+            .PageSize(500)
+            .Read(read => read.Action("GetPPMPdenomination", "Report").Data("getParam"))
+            //  .Update("Editing_Update", "Report")
+            )
+)
+</div>
+<div style="margin-top:45px">
+    <div  class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 100px;float:right;background-color:indianred; color:white; margin-top: 20px; margin-right:80px;border-radius:50px;margin-top:-30px; margin-bottom:0px" onclick="frmclose()"><span class="fa fa-close"></span> Close</div>
+</div>
+<script>
+    $(document).ready(function () {
+        
+        $("#grd_ppmpdetailsConsol").data("kendoGrid").dataSource.read();
+        var lbl = ""
+        if ('@Session["id"]' == 1) {
+            lbl = "First Month"
+        }
+        else if ('@Session["id"]' == 2) {
+            lbl = "Second Month"
+        }
+        else 
+        {
+            lbl = "Third Month"
+        }
+        $('#ppmpdetailsconsol').data('kendoWindow').title("<i class='fa fa-navicon'> </i> PPMP denomination - " + lbl + "").center().open();
+
+    });
+
+</script>

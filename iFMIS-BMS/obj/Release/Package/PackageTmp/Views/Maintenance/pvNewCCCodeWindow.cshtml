@@ -1,0 +1,157 @@
+﻿<script>
+    function onCCRadioButtonChange() {
+        var CCType = $('input[name=ccRadioButton]:checked').val();
+        var txtCCTypologyCode = $("#txtCCTypologyCode").val();
+        if (CCType == 1) {
+            getLatestOrderNoCCCode(CCType);
+            if (txtCCTypologyCode == "") {
+                $("#txtCCTypologyCode").val("A")
+            }
+            else {
+                $("#txtCCTypologyCode").val(txtCCTypologyCode.replace("M", "A"));
+            }
+        }
+        else if (CCType == 2) {
+            getLatestOrderNoCCCode(CCType);
+            if (txtCCTypologyCode == "") {
+                $("#txtCCTypologyCode").val("M")
+            }
+            else {
+                $("#txtCCTypologyCode").val(txtCCTypologyCode.replace("A", "M"));
+            }
+        }
+    }
+    function ReqAddCCCode() {
+        var OrderNo = $("#txtOrderNo").val();
+        var CCType = $('input[name=ccRadioButton]:checked').val();
+        var CCTypologyCode = $("#txtCCTypologyCode").val();
+        var Description = $("#txtDescription").val();
+        if (CCType == undefined || OrderNo == "" || CCTypologyCode == "" || Description == "") {
+            swal({
+                title: "Error!",
+                text: "All Fields Required",
+                type: "error",
+                showConfirmButton: true
+            });
+        }
+        else {
+            if ('@ViewBag.Mode' == "Add") {
+                var url = "@Url.Action("AddNewCCCode", "Maintenance")";
+                $.post(url, { CCTypologyCode: CCTypologyCode, Description: Description, CCType: CCType, OrderNo: OrderNo }, function (d) {
+                    if (d == "1") {
+                        swal({
+                            title: "Success!",
+                            text: "Climate Change Code Successfuly added",
+                            type: "success",
+                            showConfirmButton: true
+                        });
+                        ClearAllFields();
+                    }
+                    else {
+                        swal({
+                            title: "Error!",
+                            text: d,
+                            type: "error",
+                            showConfirmButton: true
+                        });
+                    }
+                })
+            }
+            else {
+                var url = "@Url.Action("UpdateCCCode", "Maintenance")";
+                $.post(url, { CCTypologyCode: CCTypologyCode, Description: Description, CCType: CCType, OrderNo: OrderNo,CCCodeID :'@ViewBag.CCCOdeID' }, function (d) {
+                    if (d == "1") {
+                        swal({
+                            title: "Success!",
+                            text: "Climate Change Code Successfuly Updated",
+                            type: "success",
+                            showConfirmButton: true
+                        });
+                        CloseKendoWindow('AddNewCCCodeWindow');
+                        $("#grdCCCodeList").data("kendoGrid").dataSource.read();
+                    }
+                    else {
+                        swal({
+                            title: "Error!",
+                            text: d,
+                            type: "error",
+                            showConfirmButton: true
+                        });
+                    }
+                })
+            }
+        }
+
+    }
+    function ClearAllFields() {
+        var TypologyCodeValue = "";
+        if ($('input[name=ccRadioButton]:checked').val() == 1) {
+            TypologyCodeValue = "A";
+        }
+        else if ($('input[name=ccRadioButton]:checked').val() == 2) {
+            TypologyCodeValue = "M";
+        }
+        $("#txtCCTypologyCode").val(TypologyCodeValue);
+        $("#txtDescription").val("");
+        $("#grdCCCodeList").data("kendoGrid").dataSource.read();
+        getLatestOrderNoCCCode($('input[name=ccRadioButton]:checked').val());
+    }
+</script>
+<div>
+    <div style="display:inline-block;width:100%">
+        <input type="radio" name="ccRadioButton" id="rbCCAdaptation" style="width:15px" value="1" onchange="onCCRadioButtonChange()">
+        <label style="display:inline-block" for="rbCCAdaptation">Adaptation</label>
+
+        <input type="radio" name="ccRadioButton" id="rbCCMitigation" style="width:15px;margin-left:10px" value="2" onchange="onCCRadioButtonChange()">
+        <label style="display:inline-block" for="rbCCMitigation">Mitigation</label>
+    </div>
+    <div style="width:48%;display:inline-block">
+        <label>CC Typology Code :</label>
+        <input id="txtCCTypologyCode" placeholder="CC Typology Code" style="width:100%"/>
+    </div>
+    <div style="width:20%;display:inline-block;margin-left:20px;">
+        <label>Order No. :</label>
+        <input id="txtOrderNo" placeholder="Order No." onkeydown="FilterNumericOnly(event)" style="width:100px;" />
+    </div>
+    <label>Description :</label>
+    <textarea id="txtDescription" style="width:98%; height:70px" placeholder="Description" />
+    <div style="float:right; margin-top: 10px">
+        <div style="display:inline-block" class="k-button k-button-icontext" onclick="ReqAddCCCode()"> <i class="fa fa-save"></i> <span id="btnAddext">Add</span> </div>
+        <div style="display:inline-block" class="k-button k-button-icontext" onclick="CloseKendoWindow('AddNewCCCodeWindow')"> <i class="fa fa-times"></i> Close </div>
+    </div>
+</div>
+
+<script>
+    function getLatestOrderNoCCCode(CCType) {
+        if (CCType == undefined) {
+            CCType == 0;
+        }
+        var url = "@Url.Action("getLatestOrderNoCCCode", "Maintenance")";
+        $.post(url, { CCTYpe: CCType }, function (d) {
+            $("#txtOrderNo").val(d);
+        })
+    }
+    $(document).ready(function () {
+        if ('@ViewBag.Mode' == "Add") {
+            getLatestOrderNoCCCode(0);
+            document.getElementById("btnAddext").innerHTML = "Add";
+        }
+        else {
+            var CCCodeID = '@ViewBag.CCCOdeID';
+            if (CCCodeID != "NONE") {
+                var url = "@Url.Action("GetSelectedCCCodeData", "Maintenance")";
+                $.post(url, { CCCodeID: CCCodeID }, function (d) {
+                    $("#txtCCTypologyCode").val(d[0]);
+                    $("#txtDescription").val(d[1]);
+                    $("#txtOrderNo").val(d[3]);
+                    if (d[2] == 1) {
+                        document.getElementById("rbCCAdaptation").checked = true;
+                    } else if (d[2] == 2) {
+                        document.getElementById("rbCCMitigation").checked = true;
+                    }
+                    document.getElementById("btnAddext").innerHTML = "Update"
+                })
+            }
+        }
+    })
+</script>

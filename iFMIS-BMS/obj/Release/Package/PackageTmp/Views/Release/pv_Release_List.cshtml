@@ -1,0 +1,833 @@
+﻿<script>
+    function covert_empty(str) {
+        str = str.toString().replace(/,/g, "");
+        parseInt(str, 20);
+        return str;
+    }
+    function converter_(str) {
+        str = str.toString().replace(/,/g, "");
+        parseInt(str, 20);
+        return str;
+    }
+    function save_edit_release() {
+        var url = "@Url.Action("Edit_rel", "Release")";
+
+
+        var ID_ = $('#ID_rel').val();
+        var EDIT_Amount = $('#EDIT_Amount').val();//new relese amount
+        var AmountRelease = $('#AmountRelease').val();
+        var AmountObligate = $('#AmountObligate').val();
+        var AmountRemain = $('#AmountRemain').val();
+        var Real_amount = $('#Real_amount').val();//original release amount
+        var remain_amount = $('#remain_amount').val(); //available allotment
+        var ooe_id = $("#ooe_id").val() == 4 ? 2 : $("#ooe_id").val();
+        var progid = $("#Progss").val();
+        var accountid = $("#account_list").val();
+        var yearof = $("#ddlYear").val();
+        var DateEntered = $("#DateEntered").val();
+        var EDIT_Batch=$("#EDIT_Batch").val();
+        var edit_bal = parseFloat(Number(ConvertCommasToEmpty(remain_amount)) + Number(ConvertCommasToEmpty(Real_amount))).toFixed(2)
+        var edit_bal2 = parseFloat(Number(edit_bal) - Number(ConvertCommasToEmpty(EDIT_Amount))).toFixed(2)
+        var app_available = $("#available_EEOK").val(); //available appropriation
+        var releasedate = $("#reldatetime").val();
+        var relcopydatetag = $("#relcopydate").val();
+
+        if (Number(ConvertCommasToEmpty(EDIT_Amount))< Number(ConvertCommasToEmpty(Real_amount))) {
+
+            var difference = parseFloat(Number(ConvertCommasToEmpty(Real_amount)) - Number(ConvertCommasToEmpty(EDIT_Amount))).toFixed(2)
+            var difference2 = parseFloat(Number(ConvertCommasToEmpty(remain_amount)) - Number(ConvertCommasToEmpty(difference))).toFixed(2)
+
+            if (parseFloat(converter_(difference2)).toFixed(2) < 0) {
+                swal({
+                    title: "Ooops!",
+                    text: "Sorry! Please check available allotment.",
+                    timer: 2000,
+                    type: "error",
+                    showConfirmButton: false
+                })
+            } else {
+                $.get(url, { ID_: ID_, EDIT_Amount: covert_empty(EDIT_Amount), ooe_id: ooe_id, progid: progid, accountid: accountid, yearof: yearof, DateEntered: DateEntered, EDIT_Batch: EDIT_Batch, releasedate: releasedate, relcopydatetag: relcopydatetag }, function (e) {
+                    if (e == "1") {
+                        swal({
+                            title: "Success!",
+                            text: "Allotment has been updated!",
+                            timer: 2000,
+                            type: "success",
+                            showConfirmButton: false
+                        })
+                        document.getElementById("Edit_").hidden = true;
+                        refresh_();
+                    }else if (e == "2") {
+                        swal({
+                            title: "Error!",
+                            text: "System Error! Please Refresh the Page.",
+                            timer: 2000,
+                            type: "error",
+                            showConfirmButton: false
+                        })
+
+                    } else {
+                        swal({
+                            title: "Error!",
+                            text: "System Error! Please try again.",
+                            timer: 2000,
+                            type: "error",
+                            showConfirmButton: false
+                        })
+                    }
+                })
+            }
+        } else {
+
+            var difference = parseFloat(Number(ConvertCommasToEmpty(EDIT_Amount)) - Number(ConvertCommasToEmpty(Real_amount))).toFixed(2)
+            var difference2 = parseFloat(Number(ConvertCommasToEmpty(app_available)) - Number(ConvertCommasToEmpty(difference))).toFixed(2)
+
+            if (parseFloat(difference2).toFixed(2) < 0) {
+                swal({
+                    title: "Ooops!",
+                    text: "Sorry! Please check the balance of appropriation.",
+                    timer: 2000,
+                    type: "error",
+                    showConfirmButton: false
+                })
+            } else {
+                $.get(url, { ID_: ID_, EDIT_Amount: covert_empty(EDIT_Amount), ooe_id: ooe_id, progid: progid, accountid: accountid, yearof: yearof, DateEntered: DateEntered, EDIT_Batch: EDIT_Batch, releasedate: releasedate, relcopydatetag: relcopydatetag }, function (e) {
+                    if (e == "1") {
+                        swal({
+                            title: "Success!",
+                            text: "Allotment has been updated!",
+                            timer: 2000,
+                            type: "success",
+                            showConfirmButton: false
+                        })
+                        document.getElementById("Edit_").hidden = true;
+                        refresh_();
+                        acc_availble_mount() //refresh appropriation balance
+
+                    } else if (e == "2") {
+                        swal({
+                            title: "Error!",
+                            text: "System Error! Please Refresh the Page.",
+                            timer: 2000,
+                            type: "error",
+                            showConfirmButton: false
+                        })
+
+                    } else {
+                        swal({
+                            title: "Error!",
+                            text: "System Error! Please try again.",
+                            timer: 2000,
+                            type: "error",
+                            showConfirmButton: false
+                        })
+                    }
+                })
+
+            }
+        }
+      }
+    function coma_sepa(val) {
+        //while (/(\d+)(\d{3})/.test(val.toString())) {
+        //    val = val.toString().replace(/(\d+)(\d{3})/, '$1' + ',' + '$2');
+        //}
+        //return val;
+        // val = val.parseFlaot.toFixed(2);
+
+
+
+        val = val.toString().replace(/,/g, ''); //remove existing commas first
+        //var valSplit = val.toFixed(2).split('.'); //then separate decimals
+
+        var valSplit = val.split('.'); //then separate decimals
+        while (/(\d+)(\d{3})/.test(valSplit[0].toString())) {
+            valSplit[0] = valSplit[0].toString().replace(/(\d+)(\d{3})/, '$1' + ',' + '$2');
+        }
+
+        if (valSplit.length == 2) { //if there were decimals
+            val = valSplit[0] + "." + valSplit[1]; //add decimals back
+        } else {
+            val = valSplit[0];
+        }
+
+        return val;
+    }
+    function KAMMA(val) {
+
+
+
+        //var num = parseFloat($(this).val());
+        //var cleanNum = num.toFixed(2);
+        //$(this).val(cleanNum);
+
+
+        var ReturnValue = $('#' + val + '').val();
+
+
+
+        ReturnValue = ReturnValue.toString().replace(/,/g, ''); //remove existing commas first
+        
+        var valSplit = ReturnValue.split('.'); //then separate decimals
+
+        while (/(\d+)(\d{3})/.test(valSplit[0].toString())) {
+            valSplit[0] = valSplit[0].toString().replace(/(\d+)(\d{3})/, '$1' + ',' + '$2');
+        }
+
+        if (valSplit.length == 2) { //if there were decimals
+            ReturnValue = valSplit[0] + "." + valSplit[1]; //add decimals back
+        } else {
+            ReturnValue = valSplit[0];
+        }
+
+
+
+        $('#' + val + '').val(ReturnValue);
+
+
+
+    }
+
+    function RelieseListG() {
+        var entityGrid = $("#release_List").data("kendoGrid");
+        var selectedItem = entityGrid.dataItem(entityGrid.select());
+        $("#EDIT_Amount").val(coma_sepa(selectedItem.Amount_release));
+        $("#Real_amount").val(coma_sepa(selectedItem.Amount_release));
+        $("#ID_rel").val(selectedItem.release_id);
+        $("#DateEntered").val(selectedItem.DateTimeEntered);
+        $("#EDIT_Batch").val(selectedItem.batch);
+        $("#reldatetime").data("kendoDateTimePicker").value(selectedItem.DateReleased);
+        $('#ReleaseWindow').data('kendoWindow').setOptions({width:845, height: 655 });//title("<i class='fa fa-navicon'> </i> Summary").center().open();
+        $("#relsave").css({ 'margin-top': 100 + 'px' })
+    }
+
+    function Edit_Release(release_id, DateTimeEntered) {
+        document.getElementById("Edit_").hidden = false;
+
+        if ($("#EDIT_Amount").val() == "")
+            { RelieseListG() }
+        else
+        {
+           var entityGrid = $("#release_List").data("kendoGrid");
+            var selectedItem = entityGrid.dataItem(entityGrid.select());
+
+            $("#EDIT_Amount").val(coma_sepa(selectedItem.Amount_release));
+            $("#Real_amount").val(coma_sepa(selectedItem.Amount_release));
+            $("#ID_rel").val(release_id);
+            $("#DateEntered").val(selectedItem.DateTimeEntered);
+            $("#EDIT_Batch").val(selectedItem.batch);
+            $("#reldatetime").data("kendoDateTimePicker").value(DateTimeEntered);
+            $('#ReleaseWindow').data('kendoWindow').setOptions({ width: 845, height: 640 });//title("<i class='fa fa-navicon'> </i> Summary").center().open();
+            $("#relsave").css({ 'margin-top': 100 + 'px' })
+        }
+    }
+
+    function delete_reverse_(supplementalreverse_id) {
+        var url = "@Url.Action("Edit_Supplement_reverse", "Release")";
+
+        $.get(url, { supplementalreverse_id: supplementalreverse_id }, function (e) {
+
+            document.getElementById("supplement_Subs_Ammount_DUM").value = e.Amount;
+
+            document.getElementById("supplement_Subs_Ammount_ID").value = e.supplementalbudget_id;
+
+
+
+        })
+    }
+
+    function refresh_() {
+        $('#release_List').data('kendoGrid').dataSource.read();
+
+
+        var lure = "@Url.Action("get_Obli_Remain", "Release")";
+        var lur = "@Url.Action("datass_balat", "Release")";
+
+
+        var office_id = $("#offs").val();
+        var program_id = $("#Progss").val();
+        var ooe_id = $("#ooe_id").val() == 4 ? 2 : $("#ooe_id").val();
+
+        var year_ = $("#ddlYear").val();
+        var account_id = $("#account_list").val();
+
+
+        if (account_id == null || account_id == '') {
+
+
+            document.getElementById("release_identification").textContent = '';
+
+
+
+        } else {
+            $.post(lure, { office_id: office_id, program_id: program_id, ooe_id: ooe_id, account_id: account_id, year_: year_ }, function (e) {
+
+                document.getElementById("AmountRelease").value = e.AmountRelease;
+                document.getElementById("AmountObligate").value = e.AmountObligate;
+                document.getElementById("AmountRemain").value = e.AmountRemain;
+
+            })
+
+            $.post(lur, { office_id: office_id, program_id: program_id, ooe_id: ooe_id, account_id: account_id, year_: year_ }, function (e) {
+
+                document.getElementById("remain_amount").value = e;
+            })
+        }
+    }
+    setTimeout(function () {
+
+
+        $('#release_List').data('kendoGrid').dataSource.read();
+
+        var url = "@Url.Action("get_AccountName", "Release")";
+        var lure = "@Url.Action("get_Obli_Remain", "Release")";
+        var lur = "@Url.Action("datass_balat", "Release")";
+
+
+        var office_id = $("#offs").val();
+        var program_id = $("#Progss").val();
+        var ooe_id = $("#ooe_id").val() == 4 ? 2 : $("#ooe_id").val();
+
+        var year_ = $("#ddlYear").val();
+        var account_id = $("#account_list").val();
+
+
+        if (account_id == null || account_id == '') {
+
+                document.getElementById("release_identification").textContent = '';
+
+
+
+        } else {
+
+            $.post(lure, { office_id: office_id, program_id: program_id, ooe_id: ooe_id, account_id: account_id, year_: year_ }, function (e) {
+
+                document.getElementById("AmountRelease").value = e.AmountRelease;
+                document.getElementById("AmountObligate").value = e.AmountObligate;
+                document.getElementById("AmountRemain").value = e.AmountRemain;
+
+            })
+        $.post(url, { program_id: program_id, ooe_id: ooe_id, account_id: account_id, year_: year_ }, function (e) {
+            document.getElementById("release_identification").textContent = e;
+
+        })
+        $.post(lur, { office_id: office_id, program_id: program_id, ooe_id: ooe_id, account_id: account_id, year_: year_ }, function (e) {
+
+            document.getElementById("remain_amount").value = e;
+        })
+        }
+    }, 50);
+    function fn_close_Release_() {
+        var classtype_ = $("#classtype").val();
+        if (classtype_ == 2 || classtype_ == 1) {
+            $("#ReleaseWindow").data("kendoWindow").close();
+        } else {
+            $("#ReleaseWindow_EE").data("kendoWindow").close();
+        }
+
+    }
+    function Delete_Release(release_id, MonthOf_) {
+        get_amountRelease(release_id);
+
+        setTimeout(function () {
+
+        var lure = "@Url.Action("get_TotalReleaseAcc", "Release")";
+        var month_ =MonthOf_
+        var totrelease = 0;
+        var office_id = $('#offs').val()
+        var program_id = $('#Progss').val()
+        var account_id = $('#account_list').val()
+        var year_ = $("#ddlYear").val();
+      
+        $.post(lure, { office_id: office_id, program_id: program_id, account_id: account_id, year_: year_, month_: month_ }, function (d) {
+            totrelease = d;
+
+        var url = "@Url.Action("delete_Release", "Release")";
+        var lure = "@Url.Action("delete_Release_EE", "Release")";
+
+        var acc_available = $("#available_EEOK").val();
+        var amount_Release = $("#amount_Release").val();
+
+        var Expense = $("#Expense_").val();
+        var Total_Release = Number(parseFloat(totrelease).toFixed(2));
+
+        var TO_E = parseFloat(Number(Total_Release) - Number(Expense)).toFixed(2);
+
+        var ooe_id = $("#ooe_id").val() == 4 ? 2 : $("#ooe_id").val();
+       
+        if (Number(Total_Release) < Number(Expense)) {
+
+            swal({
+                title: "Sorry!",
+                text: "This allotment was already used in obligation/earmark.",
+                timer: 2000,
+                type: "error",
+                showConfirmButton: false
+            })
+
+        } else {
+            if (TO_E < Number(amount_Release)) {
+
+            swal({
+                title: "Sorry!",
+                text: "This allotment was already used in obligation/earmark.",
+                timer: 2000,
+                type: "error",
+                showConfirmButton: false
+            })
+
+        } else {
+
+        if (Number(amount_Release) == "") {
+
+            swal({
+                title: "Oopps!",
+                text: "Network Error!",
+                timer: 2000,
+                type: "error",
+                showConfirmButton: false
+            })
+
+        }
+        else {
+            var classtype = $("#classtype").val();
+            if (classtype == 2) {
+                swal({
+                    title: "Are you sure?",
+                    text: "This allotment will be removed!",
+                    type: "info",
+                    showCancelButton: true,
+                    closeOnConfirm: false,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Yes, Remove It!",
+                    showLoaderOnConfirm: true,
+                }, function () {
+
+                    $.get(url, { release_id: release_id, ooe_id: ooe_id }, function (e) {
+
+                        if (e == "1") {
+                            swal({
+                                title: "Success!",
+                                text: "Allotment has been Removed.",
+                                timer: 2000,
+                                type: "success",
+                                showConfirmButton: false
+                            })
+
+
+                            acc_availble_mount();
+                            income_available_();
+                            subsidy_available_();
+                            var classtype = $("#classtype").val();
+
+                            if (classtype == 1) {
+                                $('#GeneralFund_Grid').data('kendoGrid').dataSource.read();
+
+                            } else if (classtype == 3) {
+
+                                $('#EconomicEnterprise_Grid').data('kendoGrid').dataSource.read();
+                            }
+
+
+
+
+                            $('#release_List').data('kendoGrid').dataSource.read();
+                            document.getElementById("amount_Release").value = "";
+
+                        } else {
+                            swal({
+                                title: "Error!",
+                                text: "System Error! Please try again.",
+                                timer: 2000,
+                                type: "error",
+                                showConfirmButton: false
+                            })
+                        }
+
+                    })
+                });
+
+
+            } else if (classtype == 1 || classtype == 3) {
+                //EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+
+                var subsIn = $("#WithSubsidyFlag").val();
+
+                swal({
+                    title: "Are you sure?",
+                    text: "This allotment will be removed!",
+                    type: "info",
+                    showCancelButton: true,
+                    closeOnConfirm: false,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Yes, Remove It!",
+                    showLoaderOnConfirm: true,
+                }, function () {
+
+                    $.get(lure, { release_id: release_id, ooe_id: ooe_id, subsIn: subsIn }, function (e) {
+
+                        if (e == "1") {
+                            swal({
+                                title: "Success!",
+                                text: "Allotment has been Removed.",
+                                timer: 2000,
+                                type: "success",
+                                showConfirmButton: false
+                            })
+
+
+                            acc_availble_mount();
+                            income_available_();
+                            subsidy_available_();
+                            var classtype = $("#classtype").val();
+
+                            if (classtype == 1) {
+                                $('#GeneralFund_Grid').data('kendoGrid').dataSource.read();
+
+                            } else if (classtype == 3) {
+
+                                $('#EconomicEnterprise_Grid').data('kendoGrid').dataSource.read();
+                            }
+
+
+
+
+                            $('#release_List').data('kendoGrid').dataSource.read();
+                            document.getElementById("amount_Release").value = "";
+
+                        } else {
+                            swal({
+                                title: "Error!",
+                                text: "System Error! Please try again.",
+                                timer: 2000,
+                                type: "error",
+                                showConfirmButton: false
+                            })
+                        }
+
+                    })
+                });
+
+            }
+            //EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+
+
+
+             }
+            }
+           }
+         })
+        }, 500);
+
+    }
+
+    function get_amountRelease(release_id) {
+
+
+        var url = "@Url.Action("amount_Release", "Release")";
+
+        var ooe_id = $("#ooe_id").val() == 4 ? 2 : $("#ooe_id").val();
+        var month_ = $("#Months").val();
+
+        $.post(url, {release_id: release_id, ooe_id: ooe_id }, function (e) {
+            document.getElementById("amount_Release").value = e;
+
+        })
+
+
+    }
+
+    var thisculture = kendo.culture();
+    thisculture.numberFormat.currency.symbol = '₱'; // Script For Changing The Currency Sign
+    function Read_Release() {
+        var office_id = $("#offs").val();
+        var program_id = $("#Progss").val();
+        var ooe_id = $("#ooe_id").val() == 4 ? 2 : $("#ooe_id").val();
+        var account_id = $("#account_list").val();
+        var month_ = $("#Months").val();
+        var numeric_ = $("#numeric").val();
+        var year_ = $("#ddlYear").val();
+        var classtype = $("#classtype").val();
+
+        return {
+            office_id: office_id,
+            program_id: program_id,
+            ooe_id: ooe_id,
+            account_id: account_id,
+            month_: month_,
+            numeric_: numeric_,
+            year_: year_
+        }
+    }
+
+    function relcopydate() {
+        if (document.getElementById("relcopydate").checked) {
+            document.getElementById("relcopydate").value = "1"
+        }
+        else {
+            document.getElementById("relcopydate").value = "0"
+        }
+    }
+    function Close() {
+
+    }
+    function revertallotment()
+    {
+        var url = "@Url.Action("ReleaseReversion", "Release")";
+            $.get(url, {
+                year_: $("#ddlYear").val()
+            }, function (d) {
+                $('#RevertAllotment').html(d);
+            })
+
+            $('#RevertAllotment').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Reversion of Allotment").center().open();
+        
+    }
+</script>
+
+
+
+<div style="border: outset;clear:both;border-width:1px;border-color:#1fa67a; width: 830px;   padding-left:0px;padding-right:0px;padding-top:0px;padding-bottom:7px;margin-top: 0px;">
+    <div id="reversioallomentlinkid" style="display:none">
+        @*<a href="" onclick="@{ MultiLanguageProvider.Instance.SwapLanguage(); }">*@
+            <a onclick="revertallotment()">
+                <i style="font-size:12px;color:red;cursor:pointer"> <u> Reversion of Allotment </u> </i>
+            </a>
+    </div>
+    <div style=" width: 0;height: 0; border-right: 5px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;margin-top: -1px; ">
+        
+        <div style="float: left; width: 764px; margin-top:1px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 36px solid #1fa67a; ">
+           
+            <div style="float: left; height:28px; margin-left:-59px; margin-top: 5px;">
+                <i class="fa fa-tasks fa-2x fg-white"></i>
+              
+
+            </div>
+            <div style='color:white;font-size: 20px;font-weight: bold;margin-top: 1px;' id="release_identification"></div>
+           
+            <div style="float:left;margin-left:321px;margin-top:1px;">
+
+                <input type="text" style="width:140px" name="available_EEOK" id="amount_Release" value="0" hidden disabled>
+            </div>
+
+              
+        </div>
+    </div>
+
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Release_Float_Model>()
+    .Name("release_List")
+       .Scrollable()
+    .Columns(col =>
+    {
+
+       
+        col.Bound(m => m.DateReleased).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Date Release</div></text>)
+                        .Width(190)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                         .ClientFooterTemplate("<div style='text-align:center;color:darkgreen'><label> </label><label> Total Release </label></div>"); 
+        col.Bound(m => m.Amount_release)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Amount</div></text>)
+                        .Width(180)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div>#=kendo.toString(Amount_release,'c2')# </div>")
+                        .ClientFooterTemplate("<div style='text-align:left;color:darkgreen'><label> </label><label> #=kendo.toString(sum, 'c2')#</label></div>");
+        col.Bound(m => m.MonthOf).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Month of</div></text>)
+                        .Width(80)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Bound(m => m.YearOf).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Year</div></text>)
+                        .Width(60)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Bound(m => m.balance_amount)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Balance<br />Amount</div></text>)
+                        .Width(170)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div>#=kendo.toString(balance_amount,'c2')# </div>");
+        col.Bound(m => m.batch).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Batch</div></text>)
+                        .Width(50)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Bound(m => m.DateTimeEntered).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">DateTimeEntered</div></text>)
+                        .Hidden()
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Bound(m => m.enduser).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Released By</div></text>)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .Width(200);
+        col.Bound(m=> m.MonthOf_).Hidden();
+
+        col.Template(t => { }).ClientTemplate(
+                   "<div class='k-button k-button-icontext' style='border-radius:50px;color:\\#ffffff;background-color:\\#1FA67A;'    onclick='Edit_Release(#=release_id#,\"#=DateTimeEntered#\")'   ><span class='fa fa-pencil-square-o' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'> </span>edit</div> " +
+                   "<div class='k-button k-button-icontext' style='border-radius:50px;color:\\#ffffff;background-color:\\#DE5555;'   onclick='Delete_Release(#=release_id#,#=MonthOf_#)'   ><span class='fa fa-trash-o' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'> </span>del</div> "
+
+                  ).HtmlAttributes(new { style = "vertical-align: top;" }).Width(85);
+
+        col.Bound(m => m.release_id).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                       .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Transaction ID</div></text>)
+                        .Hidden()
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+
+
+
+    })
+
+                                                       
+
+
+        .HtmlAttributes(new { style = "height: 400px" })
+                    .DataSource(d => d
+                                    .Ajax()
+                                    .Aggregates(a =>
+                                            {
+                                                a.Add(c => c.Amount_release).Sum();
+                                            })
+                                    .PageSize(50)
+                                    .Model(m => m.Id(i => i.release_id))
+                        //.Events(e => e.Change("okkk"))
+
+                                    .Read(read => read.Action("Release_List", "Release").Data("Read_Release")))
+            .Pageable(page => page.Refresh(true)
+            .Enabled(true)
+            .ButtonCount(4)
+            .PreviousNext(true))
+            .Selectable()
+            .Events(e => e.Change("RelieseListG"))
+
+)
+
+</div>
+<div>
+    <div id="relsave" style="float:right;margin-top:100px;margin-right:30px">
+        <div class="k-button k-button-icontext" style=" bottom: 15px; right: 220px;width: 80px; border-radius:50px;color:#ffffff;background-color:#DE5555;" onclick="fn_close_Release_()"><span class='fa fa-times' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'></span> Close</div>
+    </div>
+</div>
+<div hidden id="Edit_">
+    <div style="float:left;margin-top:10px;margin-left:76px">
+        <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+            Batch :
+        </label>
+
+    </div>
+
+    <div style="float:left;margin-top:6px;margin-left:16px">
+
+        <input type="number" style="width:55px" name="EDIT_Batch" id="EDIT_Batch" min="1">
+
+    </div>
+    <div style="float:left;margin-top:10px;margin-left:6px">
+        <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+            Amount :
+        </label>
+
+    </div>
+   
+    <div style="float:left;margin-top:-27px;margin-left:436px">
+
+        <input type="text" style="width:156px" name="EDIT_Amount" id="EDIT_Amount" onkeyup="KAMMA('EDIT_Amount')" onfocus="this.select();">
+
+    </div>
+
+    <div style="float: left;margin-left:-504.5px;margin-top:10px;">
+        <label style="margin-top: 0px;margin-bottom: 2px;">
+            Date <br />and Time :
+        </label>
+    </div>
+    <div style="float: left;margin-left:195px;margin-top:20px;">
+
+        @(Html.Kendo().DateTimePicker()
+              .Name("reldatetime")
+              //.Start(CalendarView.Year)
+              //.Depth(CalendarView.Year)
+              .Format("M/d/yyyy hh:mm:ss tt")
+              .HtmlAttributes(new { style = "width: 250px" })
+        )
+        <div style="display:inline-block">
+            <input type="checkbox" id="relcopydate" value="0" onclick="relcopydate()" style="zoom:1.5" />
+            <label style="display:inline-block;font-size:14px;color:red"> Copy Original Date/Time </label>
+        </div>
+
+    </div>
+    <div style="float:left;margin-top:15px;margin-left:625px">
+        <div class="k-button k-button-icontext" style=" bottom: 15px; right: 220px;width: 80px; border-radius:50px;color:#ffffff;background-color:#1FA67A;" onclick="save_edit_release()"><span class='fa fa-save' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'></span> Save</div>
+    </div>
+</div>
+   
+<div>
+
+    <div style="float:left;margin-top:-24px;margin-left:0px">
+
+        <input type="text" style="width:156px" name="AmountRelease" id="AmountRelease" disabled hidden >
+
+    </div>
+    <div style="float:left;margin-top:-24px;margin-left:0px">
+
+        <input type="text" style="width:156px" name="AmountObligate" id="AmountObligate" disabled hidden >
+
+    </div>
+    <div style="float:left;margin-top:-24px;margin-left:0px">
+
+        <input type="text" style="width:156px" name="AmountRemain" id="AmountRemain" disabled hidden>
+
+    </div>
+    <div style="float:left;margin-top:-24px;margin-left:0px">
+
+        <input type="text" style="width:156px" name="Real_amount" id="Real_amount" disabled hidden>
+
+    </div>
+    <div style="float:left;margin-top:-24px;margin-left:0px">
+
+        <input type="text" style="width:156px" name="remain_amount" id="remain_amount" disabled hidden>
+
+    </div>
+    <div style="float:left;margin-top:-24px;margin-left:0px">
+
+        <input type="text" style="width:56px" name="ID_rel" id="ID_rel" disabled hidden>
+
+    </div>
+    <div style="float:left;margin-top:-24px;margin-left:0px">
+
+        <input type="text" style="width:56px" name="DateEntered" id="DateEntered" disabled hidden>
+
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('#ReleaseWindow').data('kendoWindow').setOptions({ height: 550});//title("<i class='fa fa-navicon'> </i> Summary").center().open();
+        $("#relsave").css({ 'margin-top': 40 + 'px' })
+
+        if ('@Session["reversioallomentlinkid"]' > 0) {
+            document.getElementById("reversioallomentlinkid").style.display = "inline";
+        }
+        else{
+            document.getElementById("reversioallomentlinkid").style.display = "none"
+        }
+    }, 1000);
+</script>
+
+@(Html.Kendo().Window()
+        .Name("RevertAllotment")
+        //.Title("Release Summary")
+        .Width(790)
+        .Height(715)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+        .Events(e => e.Close("Close"))
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+                .Actions(a => { a.Close(); })
+)
+

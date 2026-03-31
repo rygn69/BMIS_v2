@@ -1,0 +1,1380 @@
+﻿
+@model IEnumerable<iFMIS_BMS.BusinessLayer.Models.WFP>
+
+<style>
+     .dialog-overlay {
+        background-color: #000000;
+        opacity: 0.4;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        min-height: 100%;
+        min-width: 100%;
+        z-index: 99999;
+    }
+</style>
+    <script>
+
+        function coma_sepa(val) {
+            val = val.toString().replace(/,/g, ''); //remove existing commas first
+
+            var valSplit = val.split('.'); //then separate decimals
+            while (/(\d+)(\d{3})/.test(valSplit[0].toString())) {
+                valSplit[0] = valSplit[0].toString().replace(/(\d+)(\d{3})/, '$1' + ',' + '$2');
+            }
+
+            if (valSplit.length == 2) { //if there were decimals
+                val = valSplit[0] + "." + valSplit[1]; //add decimals back
+            } else {
+                val = valSplit[0];
+            }
+
+            return val;
+        }
+
+        function covert_empty(str) {
+            str = str.toString().replace(/,/g, "");
+            parseInt(str, 20);
+            return str;
+        }
+        function fnOffice_sel(){
+            $("#repHistory").val("");
+            $("#repHistory").data("kendoComboBox").dataSource.read();
+        }
+        function fnooeid() {
+            var officeid=$("#office").val()
+            var transyear=$("#ProposalYear").val()
+            setTimeout(function () {
+                $("#WFPDetails").data("kendoGrid").dataSource.read();
+                $("#mfoid").data("kendoComboBox").value("");
+                var url = "@Url.Action("DownloadAIPdetails", "Report")";
+                $.get(url,{officeid:officeid,transyear:transyear}, function(e){
+                    if(e == "success"){     
+                        $("#mfoid").data("kendoComboBox").dataSource.read();
+                    }else{
+                        swal("Error!", "Download failed!", "error");
+                    }
+                });
+
+            }, 500);
+
+        }
+        function fnyear() {
+            setTimeout(function () {
+                $("#WFPDetails").data("kendoGrid").dataSource.read();
+                $("#repHistory").val("");
+                $("#repHistory").data("kendoComboBox").dataSource.read();
+
+            }, 500);
+        }
+        function fnquarter() {
+            setTimeout(function () {
+                $("#WFPDetails").data("kendoGrid").dataSource.read();
+                $("#repHistory").val("");
+                $("#repHistory").data("kendoComboBox").dataSource.read();
+                clearentry()
+            }, 500);
+        }
+        function getParam(){
+            return {
+                office: $("#office").val(),
+                ooeid: $("#ooe_id").val(),
+                propyear: $("#ProposalYear").val(),
+                qtr: $("#quarter").val()
+            }
+        }
+        function getparamindicator(){
+            return {
+                office: $("#office").val(),
+                propyear: $("#ProposalYear").val()
+            }
+        }
+        function fnoffice() {
+        //    return {
+                officeid=@Account.UserInfo.Department;
+        //    }
+        }
+
+        function reqPPMP(id){
+          // swal("","Sorry! PPMP download is not yet available!","warning")
+            var transyear = $("#ProposalYear").val();
+            var officeid =$("#office").val();
+            var url = "@Url.Action("DownloadPPMPNew", "Report")";
+            @*var url = "@Url.Action("DownloadPPMP", "Report")";*@
+            swal("","Sorry! PPMP download is not yet available as of this time.","info")
+            //swal({
+            //    title: "System Notice!",
+            //    text: "This will download or copy all prepared PPMP from ePS. Do you want to proceed?",
+            //    type: "warning",
+            //    showCancelButton: true,
+            //    confirmButtonColor: "#DD6B55",
+            //    confirmButtonText: "Yes",
+            //    closeOnConfirm: false,
+            //    showLoaderOnConfirm: true
+            //}, function(){
+            //    //var dialog = $(id).data('dialog');
+            //    //dialog.open();
+            //    $.get(url,{officeid:officeid,transyear:transyear}, function(e){
+            //        if(e == "success"){
+            //            //dialog.close();
+            //            swal("Success!", "PPMP has been successfully downloaded!", "success");
+            //            $("#WFPDetails").data("kendoGrid").dataSource.read();
+            //        }else{
+            //         //   dialog.close();
+            //            swal("Error!", "Download failed!", "error");
+            //            $("#WFPDetails").data("kendoGrid").dataSource.read();
+            //        }
+            //    });
+            //});
+        }
+        function reqPrint() {
+
+            var officeid = $("#office").val();
+            var ooeid = $("#ooe_id").val();
+            var yearof = $("#ProposalYear").val();
+            var qtr = $("#quarter").val();
+            var mpoffice = $("#office").data("kendoComboBox").text();
+            var empname=$("#empid").data("kendoComboBox").text();
+            var empid=$("#empid").val();
+            var repHistory=$("#repHistory").val();
+            var prepdfppt=$("#prepdfppt").val();
+            var approvedfppt=$("#approvedfppt").val();
+
+            $.ajax({
+                async: false,
+                dataType: 'html',
+                success: window.open("../Reports/ReportViewer.aspx?rid=31&officeid=" + officeid + "&ooeid=" + ooeid + "&yearof=" + yearof + "&qtr=" + qtr + "&mpoffice=" + mpoffice + "&empname="+ empname +"&empid="+ empid +"&repHistory="+ repHistory +"&prepdfppt="+ prepdfppt +"&approvedfppt="+ approvedfppt +"")
+            });
+
+        }
+
+        var thisculture = kendo.culture();
+        thisculture.numberFormat.currency.symbol = '₱'; // Script For Changing The Currency Sign
+
+        function comma_sepa(val) {
+
+            val = val.toString().replace(/,/g, ''); //remove existing commas first
+
+            var valSplit = val.split('.'); //then separate decimals
+            while (/(\d+)(\d{3})/.test(valSplit[0].toString())) {
+                valSplit[0] = valSplit[0].toString().replace(/(\d+)(\d{3})/, '$1' + ',' + '$2');
+            }
+
+            if (valSplit.length == 2) { //if there were decimals
+                val = valSplit[0] + "." + valSplit[1]; //add decimals back
+            } else {
+                val = valSplit[0];
+            }
+
+            return val;
+        }
+
+        function searchAccount() {
+            var $filter = new Array();
+            $filter = [];
+
+            if ($('#SearchData').val().length > 0) {
+                $filter.push({ field: "objectexpenditure", operator: "contains", value: $('#SearchData').val() });
+            }
+
+            $('#WFPDetails').data('kendoGrid').dataSource.filter({
+                logic: "or",
+                filters: $filter
+            });
+
+        }
+
+        $(function () {
+            $("#SearchData").keypress(function (e) {
+                if (e.keyCode == 13) {
+                    searchAccount();
+                }
+            });
+        });
+        function  sync(){
+            var tallocation= $("#totalalloc").val();
+            var app=$("#appropriation").val()
+            //firstmonFin=covert_empty($("#firstmonFin").val())
+            //secondmonFin=covert_empty($("#secondmonFin").val())
+            //thirdmonFin=covert_empty($("#thirdmonFin").val())
+            if ($("#fmonthrel").val() == 0) {
+                firstmonFin = covert_empty($("#firstmonFin").val())
+            }
+            else {
+                firstmonFin =0
+            }
+
+            if ($("#smonthrel").val() == 0) {
+                secondmonFin = covert_empty($("#secondmonFin").val())
+            }
+            else {
+                secondmonFin=0
+            }
+            if ($("#tmonthrel").val() == 0) {
+                thirdmonFin = covert_empty($("#thirdmonFin").val())
+            }
+            else {
+                thirdmonFin=0
+            }
+           
+            $("#appbal_temp").val(0)
+            var sumallocation=parseFloat(Number(firstmonFin)+ Number(secondmonFin) + Number(thirdmonFin)).toFixed(2)
+            var balapp=parseFloat(Number(app) - (Number(tallocation ) + Number(sumallocation))).toFixed(2)
+            if ( balapp < 0 ){
+                //swal("Warning","Insufficient balance, please check the amount you've entered!","warning")
+                swal({
+                    title: "Warning!",
+                    text: "Insufficient balance, please check the amount you've entered!",
+                    type: "warning",
+                    showCancelButton: false,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Ok",
+                    closeOnConfirm: true
+                },function(confirmed){
+                    if (confirmed){
+                        $(this).close;
+                    }
+                })
+                if (Number(firstmonFin) != Number($("#firstmonFin_temp").val()) )
+                {
+                    $("#firstmonFin").val("0.00")
+                }
+                else {
+                    $("#firstmonFin").val(MoneyFormatWithDecimal($("#firstmonFin_temp").val()))
+                }
+                if (Number(secondmonFin) != Number($("#secondmonFin_temp").val()) ){
+                    $("#secondmonFin").val("0.00")
+                }
+                else{
+                    $("#secondmonFin").val(MoneyFormatWithDecimal($("#secondmonFin_temp").val()))
+                }
+                if (Number(thirdmonFin) != Number($("#thirdmonFin_temp").val()) ){
+                    $("#thirdmonFin").val("0.00")
+                }
+                else{
+                    $("#thirdmonFin").val(MoneyFormatWithDecimal($("#thirdmonFin_temp").val()))
+                }
+                $("#appbal_temp").val(1)
+            }
+        }
+        function prepdfppt(id){
+            if (id==1){
+                if (document.getElementById("prepdfpptonly").checked)
+                {
+
+                    document.getElementById("prepdfpptonly").value="1";
+                    $("#prepdfppt").prop("checked",false);
+                    document.getElementById("prepdfppt").value="0";
+                    $("#approvedfppt").prop("checked",false);
+                    document.getElementById("approvedfppt").value="0";
+                }
+                //else{
+
+                //    $("#prepdfppt").prop("checked",false);
+                //    document.getElementById("prepdfppt").value="0";
+                //}
+            }
+            else if (id == 2){
+                if (document.getElementById("prepdfppt").checked)
+                {
+                    document.getElementById("prepdfppt").value="1";
+                    $("#prepdfpptonly").prop("checked",false);
+                    document.getElementById("prepdfpptonly").value="0";
+                    $("#approvedfppt").prop("checked",false);
+                    document.getElementById("approvedfppt").value="0";
+                }
+                //else{
+                //    document.getElementById("prepdfppt").value="0";
+                //}
+            }
+            else{//approvedfppt
+                if (document.getElementById("approvedfppt").checked)
+                {
+                    document.getElementById("approvedfppt").value="1";
+                    $("#prepdfpptonly").prop("checked",false);
+                    document.getElementById("prepdfpptonly").value="0";
+                    $("#prepdfppt").prop("checked",false);
+                    document.getElementById("prepdfppt").value="1";
+                }
+            }
+        }
+        function prepdfpptlabel(id){
+            if (id==1){
+                if (document.getElementById("prepdfpptonly").checked)
+                {
+                    //$("#prepdfppt").prop("checked",true);
+                    //document.getElementById("prepdfppt").value="1";
+                    //$("#prepdfpptonly").prop("checked",false);
+                    //document.getElementById("prepdfpptonly").value="0";
+                }
+                else{
+                    $("#prepdfppt").prop("checked",false);
+                    document.getElementById("prepdfppt").value="0";
+                    $("#prepdfpptonly").prop("checked",true);
+                    document.getElementById("prepdfpptonly").value="1";
+                    $("#approvedfppt").prop("checked",false);
+                    document.getElementById("approvedfppt").value="0";
+                }
+            }
+            else if (id==2){
+                if (document.getElementById("prepdfppt").checked)
+                {
+                    //$("#prepdfpptonly").prop("checked",true);
+                    //document.getElementById("prepdfpptonly").value="1";
+                    //$("#prepdfppt").prop("checked",false);
+                    //document.getElementById("prepdfppt").value="0";
+                }
+                else{
+                    $("#prepdfpptonly").prop("checked",false);
+                    document.getElementById("prepdfpptonly").value="0";
+                    $("#prepdfppt").prop("checked",true);
+                    document.getElementById("prepdfppt").value="1";
+                    $("#approvedfppt").prop("checked",false);
+                    document.getElementById("approvedfppt").value="0";
+                }
+            }
+            else{
+                if (document.getElementById("approvedfppt").checked)
+                {
+                }
+                else{
+                    $("#prepdfpptonly").prop("checked",false);
+                    document.getElementById("prepdfpptonly").value="0";
+                    $("#prepdfppt").prop("checked",false);
+                    document.getElementById("prepdfppt").value="1";
+                    $("#approvedfppt").prop("checked",true);
+                    document.getElementById("approvedfppt").value="1";
+                }
+            }
+
+        }
+    </script>
+
+    <h2 style="font-size:18px;font-weight:bold"><span class="fa fa-tasks"></span> Detailed Financial and Physical Performance Target </h2>
+
+    @*<font size="3"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>Note:</strong> You can generate report with or without Office </font>*@
+    <br />
+
+    <div style="float: left;margin-right:10px;margin-top:2px;">
+        <label style="float:left;margin-left: 108px;">
+            Office    :
+        </label>
+    </div>
+    <div style="float:left;margin-left:4px;width:500px">
+        @(Html.Kendo().ComboBox()
+            .Name("office")
+            .DataTextField("offname")
+            .DataValueField("OfficeID")
+            .AutoBind(true)
+            .Placeholder("Select Office...")
+            .Filter("contains")
+            .MinLength(3)
+            .Events(e => e.Change("fnOffice_sel"))
+            .SelectedIndex(0)
+            .HtmlAttributes(new { style = "width:100%; height:100%", @class = "form-control autoselect" })
+            .DataSource(source =>
+            {
+                source.Read(read =>
+                {
+                    read.Action("GetOfficeWFP", "Report").Data("fnoffice");
+                })
+            .ServerFiltering(false);
+            })
+        )
+    </div>
+
+
+    <div style="float: left;margin-right:10px;margin-top:10px;">
+        <label style="float:left;margin-left: 50px;">
+            Expense Class    :
+        </label>
+    </div>
+    <div style="float:left;margin-left:4px;width:500px;margin-top:10px;">
+        @(Html.Kendo().ComboBox()
+                .Name("ooe_id")
+                .DataTextField("OOEName")
+                .DataValueField("OOEID")
+                .AutoBind(true)
+                .Placeholder("Select expense class...")
+                .Filter("contains")
+                .MinLength(3)
+                .Events(e => e.Select("fnooeid"))
+                .SelectedIndex(-1)
+                .HtmlAttributes(new { style = "width:100%; height:100%", @class = "form-control autoselect" })
+                .DataSource(source =>
+                {
+                    source.Read(read =>
+                    {
+                        read.Action("dp_OOE", "Dropdowns");
+                    })
+                    .ServerFiltering(false);
+                })
+        )
+    </div>
+
+
+    <div style="float: left;margin-right:10px;margin-top:10px;">
+        <label style="float:left;margin-left: 120px;">
+            Year    :
+        </label>
+    </div>
+    <div style="float:left;margin-left:4.5px;width:100px;margin-top:10px;">
+        @(Html.Kendo().ComboBox()
+                .Name("ProposalYear")
+                .DataTextField("ProposalYear")
+                .DataValueField("ProposalYear")
+                .SelectedIndex(0)
+                .Events(e => e.Select("fnyear"))
+                .HtmlAttributes(new { style = "width:100%; height:100%", @class = "form-control autoselect" })
+               
+                .DataSource(source => source.Read(read => read.Action("GetWFPYear", "PYear")))
+        )
+
+    </div>
+
+    <div style="float: left;margin-right:10px;margin-top:13px;">
+        <label style="float:left;margin-left: 50px;">
+            Period    :
+        </label>
+    </div>
+    <div style="float:left;margin-left:26px;width:150px;margin-top:10px;">
+        @(Html.Kendo().DropDownList()
+                .Name("quarter")
+                .DataTextField("period")
+                .DataValueField("id")
+                .Events(e => e.Change("fnquarter"))
+                .DataSource(source => source.Read(read => read.Action("dfpptperiod", "Report")))
+                //.Value(@ViewBag.MonthVaue)
+                .HtmlAttributes(new { style = "width:100%; height:100%", @class = "form-control autoselect" })
+                .SelectedIndex(0)
+        )
+    </div>
+   
+    <input type="text" style="width:20px" name="type_pgo" id="type_pgo" value="1" hidden disabled>
+    <div data-role="dialog" data-overlay="true" data-close-button="false" data-width="350px" data-height="150px" id="dialog" class="dialog">    
+        <div>
+            <h2 style="text-shadow:none;padding-left:20px;padding-top:30px;">Please wait. . . <i class="fa fa-refresh fa-spin fa-3x" style="font-size:30px;"></i> </h2>
+        </div>
+    </div>
+    <div style="float:left;margin-left:595px;width:200px;margin-top:50px;">
+        <div id="btnppmp"  class="k-button k-button-icontext"  style="bottom: 15px; right: 25px;width: 200px;float:right; margin-top: 20px; margin-right:80px;margin-top:-28px;background-color:cornflowerblue;border-radius:50px;color:white; margin-bottom:0px;width:150px;" onclick="reqPPMP('#dialog')">
+            <span class="fa fa-download"></span> Download PPMP
+        </div>
+    </div>
+    <div style="float:left;margin-top:45px">
+        <div class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 120px;float:right;border-style:solid;border-width:1px; margin-top: 20px; margin-right:80px;margin-top:-30px; margin-bottom:0px" title="Click to view list of prepared dfppt!" onclick="vwsubmitdfppt(0)"><span class="fa fa-book"></span> Prepared</div>
+    </div>
+    <div style="float:left;margin-top:45px;margin-left:-80px">
+        <div class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 120px;float:right;border-style:solid;border-width:1px; margin-top: 20px; margin-right:80px;margin-top:-30px; margin-bottom:0px" title="Click to view list of submitted dfppt!" onclick="vwsubmitdfppt(1)"><span class="fa fa-send"></span> Submitted</div>
+       
+    </div>
+    <div style="float:left;margin-top:45px;margin-left:-80px">
+        <div class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 120px;float:right;border-style:solid;border-width:1px; margin-top: 20px; margin-right:30px;margin-top:-30px; margin-bottom:0px" title="Click to view list of approved dfppt!" onclick="vwapprovedfpptoffice()"><span class="fa fa-thumbs-o-up"></span> Approved</div>
+    </div>
+    <div style="float:left;margin-top:15px;margin-left:-30px">
+        <div class="k-button k-button-icontext" style="width: 128px;" title="Click to view release history!" onclick="vwrelease()"><span class="fa fa-history"></span> Release History</div>
+    </div>
+    <div id="searchAccountid" style="height: 30px; margin-top: -30px; float: right; margin-left:200px;">
+        <input type="text" style="width:210px;border-collapse:collapse;margin:0px;border-style:solid;margin-left:0px;height:70%;outline:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search account..." id="SearchData" name="SearchData">
+        <div class="k-button k-button-icontext" style="height:30px;width:40px;border-style:solid;" onclick="searchAccount()"><span class="mif-search"></span></div>
+    </div>
+    <div style="width:100%;float:left;margin-top:0px;">
+        @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.WFP>()
+        .Name("WFPDetails")
+        .HtmlAttributes(new { style = "height:450px;" })
+        .Scrollable()
+        .Columns(col =>
+        {
+        col.Template(@<text></text>)
+                                @*.Hidden()*@
+                    .HeaderTemplate(@<text>No.</text>)
+                    .Width(40)
+                    .HtmlAttributes(new { style = "text-align:center;" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                    @*.HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal"})*@
+                    .ClientTemplate("<div>#=trnno# </div>");
+        col.Template(@<text></text>)
+                    .HeaderTemplate(@<text>Account</text>)
+        .Width(280)
+        .HtmlAttributes(new { style = "text-align:left;" })
+        //.HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;", @class = "metro-header" })
+        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+        .ClientTemplate("<div>#=objectexpenditure# </div>");
+
+col.Bound(c => c.Appropriation)
+                .HeaderTemplate(@<text>Appropriation</text>)
+                .Width(150)
+                .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                .ClientTemplate("<div>#=kendo.toString(Appropriation,'c2')# </div>");
+col.Bound(c => c.Reserved)
+                .HeaderTemplate(@<text>Reserve</text>)
+                .Width(150)
+                .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                .ClientTemplate("<div>#=kendo.toString(Reserved,'c2')# </div>");
+col.Bound(c => c.Netprogram)
+                .HeaderTemplate(@<text>Net Program</text>)
+                .Hidden()
+                .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                .ClientTemplate("<div>#=kendo.toString(Netprogram,'c2')# </div>");
+col.Bound(c => c.Firstmonth)
+                .HeaderTemplate(@<text>1st Month</text>)
+                .Width(150)
+                .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                .ClientTemplate("<div>#=kendo.toString(Firstmonth,'c2')# </div>");
+col.Bound(c => c.Secondmonth)
+                .HeaderTemplate(@<text>2nd Month</text>)
+                .Width(150)
+                .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                .ClientTemplate("<div>#=kendo.toString(Secondmonth,'c2')# </div>");
+col.Bound(c => c.Thirdmonth)
+                .HeaderTemplate(@<text>3rd Month</text>)
+                    .Width(150)
+                    .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                    .ClientTemplate("<div>#=kendo.toString(Thirdmonth,'c2')# </div>");
+        col.Template(@<text></text>)
+                    .HeaderTemplate(@<text>Performance Indicator</text>)
+                    .Width(280)
+                    .HtmlAttributes(new { style = "text-align:left;" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                    .ClientTemplate("<div>#=MFO# </div>");
+        col.Template(@<text></text>)
+                    .HeaderTemplate(@<text>Physical Target1</text>)
+                    .Width(280)
+                    .HtmlAttributes(new { style = "text-align:left;" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                    .ClientTemplate("<div>#=PTFirstmonth# </div>");
+        col.Template(@<text></text>)
+                    .HeaderTemplate(@<text>Physical Target2</text>)
+                    .Width(280)
+                    .HtmlAttributes(new { style = "text-align:left;" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                    .ClientTemplate("<div>#=PTSecondmonth# </div>");
+        col.Template(@<text></text>)
+                    .HeaderTemplate(@<text>Physical Target3</text>)
+                    .Width(280)
+                    .HtmlAttributes(new { style = "text-align:left;" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                    .ClientTemplate("<div>#=PTThirdmonth# </div>");
+        col.Template(@<text></text>)
+                    .HeaderTemplate(@<text></text>)
+                    .Width(0)
+                    .HtmlAttributes(new { style = "text-align:left;" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                    .ClientTemplate("<div>#=officeid# </div>");
+        col.Template(@<text></text>)
+                    .HeaderTemplate(@<text></text>)
+                  .Width(0)
+                    .HtmlAttributes(new { style = "text-align:left;" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                    .ClientTemplate("<div>#=programid# </div>");
+        col.Template(@<text></text>)
+                    .HeaderTemplate(@<text></text>)
+                   .Width(0)
+                    .HtmlAttributes(new { style = "text-align:left;" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                    .ClientTemplate("<div>#=accountid# </div>");
+        col.Template(@<text></text>)
+                    .HeaderTemplate(@<text></text>)
+                    .Hidden()
+                    .HtmlAttributes(new { style = "text-align:left;" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                    .ClientTemplate("<div>#=officemfo# </div>");
+        col.Template(@<text></text>)
+                    .HeaderTemplate(@<text></text>)
+                .Hidden()
+                .HtmlAttributes(new { style = "text-align:left;" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                .ClientTemplate("<div>#=qtr# </div>");
+col.Bound(c => c.firstmonth_rel)
+                .HeaderTemplate(@<text>first month rel</text>)
+                .Hidden()
+                .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                .ClientTemplate("<div>#=kendo.toString(firstmonth_rel,'c2')# </div>");
+col.Bound(c => c.secondmonth_rel)
+                .HeaderTemplate(@<text>second month rel</text>)
+                .Hidden()
+                .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                .ClientTemplate("<div>#=kendo.toString(secondmonth_rel,'c2')# </div>");
+col.Bound(c => c.thirdmonth_rel)
+                .HeaderTemplate(@<text>third month rel</text>)
+                .Hidden()
+                .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                .ClientTemplate("<div>#=kendo.toString(thirdmonth_rel,'c2')# </div>");
+ col.Bound(c => c.transno)
+                .HeaderTemplate(@<text>transaction no.</text>)
+                .Hidden()
+                .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                .ClientTemplate("<div>#=transno#</div>");
+col.Bound(c => c.MFOid)
+            .HeaderTemplate(@<text>MFO ID</text>)
+                .Hidden()
+                .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                .ClientTemplate("<div>#=MFOid#</div>");
+        })
+            //.Editable(editable => editable.Mode(GridEditMode.InCell))
+            .Pageable(pageable => pageable
+            .Refresh(true)
+            .ButtonCount(2))
+            .Selectable()
+            .Events(e => e.Change("WFPgrid"))
+            .DataSource(dataSource => dataSource
+            .Ajax()
+            .Batch(true)
+            .Model(m => m.Id(i => i.trnno))
+            .ServerOperation(false)
+
+
+            //.Aggregates(a =>
+            //{
+            //    a.Add(c => c.Amount).Sum();
+            //})
+            .PageSize(10)
+            .Read(read => read.Action("GetWFPDetail", "Report").Data("getParam"))
+            )
+)
+    </div>
+
+    <div style="width:765px;float:left;">
+        <div style="float: left;margin-right:10px;margin-top:10px;">
+            <label style="float:left;margin-left: 100px;">
+                Account    :
+            </label>
+        </div>
+        <div style="display:inline-block;margin-left:5.5px;margin-top:10px;background-color:#17c3d5;height:30px;">
+            <span style="font-size:16px;font-weight:bold;vertical-align:middle;color:beige;margin-left:5px;margin-right:5px" id="selectaccountname"></span>
+        </div>
+    </div>
+
+
+    <div style="width:750px;float:left;margin-top:15px;display:none">
+        <div style="float: left;margin-right:10px;margin-top:10px;">
+            <label style="float:left;margin-left: 50px;">
+                MFO    :
+            </label>
+        </div>
+        <div style="display:inline-block;margin-left:70px">
+            <span style="color:red;font-weight:bold">*</span>
+            <textarea id="mfoid2" name="mfoid2" required="" value="" style="width:400px;"></textarea>
+        </div>
+    </div>
+
+    <div style="width:750px;float:left;margin-top:15px;">
+        <div style="float: left;margin-right:10px;margin-top:0px;">
+            <label style="float:left;margin-left: -2px;">
+                Performance Indicator    :
+            </label>
+        </div>
+        <div style="float:left;margin-left:-3px;width:457px;,margin-top:-10px">
+            <span style="color:red;font-weight:bold">*</span>
+            @*<textarea id="mfoid" name="mfoid" value="" style="width:400px;"></textarea>*@
+                @(Html.Kendo().ComboBox()
+                .Name("mfoid")
+                .DataTextField("kpm")
+                .DataValueField("kpmid")
+                .SelectedIndex(-1)
+                .Filter("contains")
+                .MinLength(3)
+                .SelectedIndex(0)
+                // .Events(e => e.Select("fnyear"))
+                .HtmlAttributes(new { style = "width:90%; height:100%", @class = "form-control autoselect" })
+
+                .DataSource(source => source.Read(read => read.Action("GetPeformIndicator", "Report").Data("getparamindicator")))
+                )
+
+            
+        </div>
+        <div class="k-button k-button-icontext" style="background-color:cornflowerblue;border-radius:7px;margin-left:-33px" title="Click to edit performance indicator!" onclick="editindicator()"><span class="fa fa-edit" style="color:white"></span></div>
+    </div>
+
+    <div style="border-color:gray;border-width:1px;border-style:solid;width:757px;margin-top:20px;float:left">
+        <div style="background-color:#ff6a00;width:150px;margin-top:-15px;margin-left:10px;"><span style="font-size:15px;margin-left:5px;color:beige;font-style:italic">Financial Allocation</span></div>
+        <div style="width:400px;margin-top:5px;">
+            <div style="float: left;margin-left:-26px;margin-top:15px;">
+                <label style="float:left;margin-left:50px;">
+                    Net Appropriation    :
+                </label>
+            </div>
+            <div style="display:inline-block;margin-top:10px;margin-left:7.5px">
+                <span style="color:white;font-weight:bold">*</span>
+                <input class="k-input" id="appropriation_orig" name="appropriation_orig" type="text" disabled style="width:150px;color:cornflowerblue;font-size:large;font-weight:bold" />
+            </div>
+        </div>
+        <div style="width:700px;margin-top:2px;margin-left:-2px;">
+            <div style="float: left;margin-right:-18px;margin-top:15px;">
+                <label style="float:left;margin-left: 46px;">
+                    Total Allocation    :
+                </label>
+            </div>
+            <div style="display:inline-block;margin-top:10px;margin-left:25px">
+                <span style="color:white;font-weight:bold">*</span>
+                <input class="k-input" id="totallocation" name="totallocation" type="text" disabled style="width:150px;color:green;font-size:large;font-weight:bold" />
+            </div>
+            <div style="float:right;margin-right:100px;margin-top:17px;">
+                <label>
+                    Balance    :
+                </label>
+                <div style="float:right;margin-top:-30px;margin-left:70px">
+                    <input class="k-input" id="appbal" name="appbal" type="text" disabled style="width:150px;color:indianred;font-size:large;font-weight:bold" />
+                </div>
+            </div>
+
+        </div>
+        <div style="border-color:gray;border-width:1px;border-style:dashed;width:757px;margin-top:10px;float:left"></div>
+        <div style="width:420px;margin-top:2px;">
+            <div style="float: left;margin-right:10px;margin-top:15px;">
+                <label style="float:left;margin-left: 72px;">
+                    First Month    :
+                </label>
+            </div>
+            <div style="display:inline-block;margin-top:10px;margin-left:-1.5px">
+                <span style="color:red;font-weight:bold">*</span>
+                <input class="k-input" id="firstmonFin" name="firstmonFin" type="text" onkeyup="sync()" style="width:150px;font-size:large" />
+                <div class="k-button k-button-icontext" style="background-color:indianred;border-radius:7px;" title="Click to add denomination!" onclick="addbreakdown(1)"><span class="fa fa-plus" style="color:white"></span></div>
+                <div class="k-button k-button-icontext" style="background-color:cornflowerblue;border-radius:7px;" title="Click to view PPMP details!" onclick="vwppmplist(1)"><span class="fa fa-list" style="color:white"></span></div>
+            </div>
+        </div>
+
+        <div style="width:420px;margin-top:2px;">
+            <div style="float: left;margin-right:10px;margin-top:15px;">
+                <label style="float:left;margin-left: 48px;">
+                    Second Month    :
+                </label>
+            </div>
+            <div style="display:inline-block;margin-top:10px;margin-left:-0.8px">
+                <span style="color:red;font-weight:bold">*</span>
+                <input class="k-input" id="secondmonFin" name="secondmonFin" type="text" onkeyup="sync()" style="width:150px;font-size:large" />
+                <div class="k-button k-button-icontext" style="background-color:indianred;border-radius:7px;" title="Click to add denomination!" onclick="addbreakdown(2)"><span class="fa fa-plus" style="color:white"></span></div>
+                <div class="k-button k-button-icontext" style="background-color:cornflowerblue;border-radius:7px;" title="Click to view the PPMP details!" onclick="vwppmplist(2)"><span class="fa fa-list" style="color:white"></span></div>
+            </div>
+        </div>
+
+        <div style="width:420px;margin-top:2px;margin-bottom:10px;">
+            <div style="float: left;margin-right:10px;margin-top:15px;">
+                <label style="float:left;margin-left: 63.5px;">
+                    Third Month    :
+                </label>
+            </div>
+            <div style="display:inline-block;margin-top:10px;margin-left:0px">
+                <span style="color:red;font-weight:bold">*</span>
+                <input class="k-input" id="thirdmonFin" name="thirdmonFin" type="text" onkeyup="sync()" style="width:150px;font-size:large" />
+               <div class="k-button k-button-icontext" style="background-color:indianred;border-radius:7px;" title="Click to add denomination!" onclick="addbreakdown(3)"><span class="fa fa-plus" style="color:white"></span></div>
+                 <div class="k-button k-button-icontext" style="background-color:cornflowerblue;border-radius:7px;" title="Click to view the PPMP details!" onclick="vwppmplist(3)"><span class="fa fa-list" style="color:white"></span></div>
+            </div>
+            <div style="display:inline-block;margin-left:10px;margin-top:10px">
+                <label>
+                    <span style="font-size:14px;">   NOTE : </span><span style="font-size:12px;background-color:indianred;color:white"> Fields colored with red are the released amount! </span>
+                </label>
+            </div>
+        </div>
+    </div>
+    <div style="border-color:gray;border-width:1px;border-style:solid;width:757px;margin-top:20px;float:left">
+        <div style="background-color:#ff6a00;width:120px;margin-top:-15px;margin-left:10px;"><span style="font-size:15px;margin-left:5px;color:beige;font-style:italic">Physical Target</span></div>
+        <div style="width:600px;margin-top:5px;">
+            <div style="float: left;margin-right:10px;margin-top:15px;">
+                <label style="float:left;margin-left: 70px;">
+                    First Month    :
+                </label>
+            </div>
+            <div style="display:inline-block;margin-top:10px;margin-left:-1px">
+                <span style="color:red;font-weight:bold">*</span>
+                <input class="k-input" id="firstmon" name="firstmon" type="text" style="width:400px;" />
+            </div>
+        </div>
+
+        <div style="width:600px;margin-top:2px;">
+            <div style="float: left;margin-right:10px;margin-top:11px;">
+                <label style="float:left;margin-left: 47px;">
+                    Second Month    :
+                </label>
+            </div>
+            <div style="display:inline-block;margin-top:10px;margin-left:-1px">
+                <span style="color:red;font-weight:bold">*</span>
+                <input class="k-input" id="secondmon" name="secondmon" type="text" style="width:400px;" />
+            </div>
+        </div>
+
+        <div style="width:600px;margin-top:2px;margin-bottom:15px;">
+            <div style="float: left;margin-right:10px;margin-top:10px;">
+                <label style="float:left;margin-left: 63px;">
+                    Third Month    :
+                </label>
+            </div>
+            <div style="display:inline-block;margin-top:10px;margin-left:-1px">
+                <span style="color:red;font-weight:bold">*</span>
+                <input class="k-input" id="thirdmon" name="thirdmon" type="text" style="width:400px;" />
+            </div>
+        </div>
+    </div>
+    <div style="display:none; float: left;margin-right:10px;margin-top:15px;width:150px;">
+        <label style="float:left;margin-left: 50px;">
+            Prepared by    :
+        </label>
+    </div>
+    <div style="display:none; float:left;margin-left:24.5px;width:403px;margin-top:15px;">
+        @(Html.Kendo().ComboBox()
+                .Name("empid")
+                .DataTextField("EmpNameFull")
+                .DataValueField("eid")
+                .SelectedIndex(-1)
+                .Filter("contains")
+                .MinLength(3)
+                .SelectedIndex(0)
+                // .Events(e => e.Select("fnyear"))
+                .HtmlAttributes(new { style = "width:100%; height:100%", @class = "form-control autoselect" })
+
+                .DataSource(source => source.Read(read => read.Action("GetEmployeePerOffice", "Report")))
+        )
+
+    </div>
+    <div style="float: left;margin-right:500px;margin-top:10px;width:170px;">
+        <label style="float:left;margin-left: 49px;">
+            Report History   :
+        </label>
+    </div>
+    <div style="float:left;margin-left:182px;width:220px;margin-top:-25px;">
+        @(Html.Kendo().ComboBox()
+                    .Name("repHistory")
+                    .DataTextField("datetimentered")
+                    .DataValueField("dfpt_id")
+                    .SelectedIndex(-1)
+                    .Filter("contains")
+                    .MinLength(3)
+                    .HtmlAttributes(new { style = "width:100%; height:100%", @class = "form-control autoselect" })
+                    .DataSource(source => source.Read(read => read.Action("GetReportHistory", "Report").Data("fnReportHistory")))
+        )
+    </div>
+    <div style="float:left;margin-left:184px;width:320px;margin-top:5px;">
+        <span style="font-weight:bold;font-size:11px">Note:</span> <span style="font-style:italic;color:red;font-size:11px">Please fill out the required fields marked with asterisk!</span>
+    </div>
+    <div style="float:left;margin-left:123px;width:500px;margin-top:10px;width:225px">
+        <input style="width:10px;zoom:1.5" type="radio" checked="checked" id="prepdfpptonly" onclick="prepdfppt(1)" value="1" />
+        <label style="display:inline-block" onclick="prepdfpptlabel(1)"> Print prepared DFPPT</label>
+    </div>
+    <div style="float:left;margin-left:340px;width:500px;margin-top:-24px;width:225px">
+        <input style="width:10px;zoom:1.5" type="radio" id="prepdfppt" onclick="prepdfppt(2)" value="0" />
+        <label style="display:inline-block" onclick="prepdfpptlabel(2)"> Print submitted DFPPT</label>
+    </div>
+    <div style="float:left;margin-left:560px;width:500px;margin-top:-25px;width:225px">
+        <input style="width:10px;zoom:1.5" type="radio" id="approvedfppt" onclick="prepdfppt(3)" value="0" />
+        <label style="display:inline-block" onclick="prepdfpptlabel(3)"> Print Approved DFPPT</label>
+    </div>
+
+    <div style="display:none">
+        <input type="text" id="officeid" name="officeid" value="0" style="display:none;">
+        <input type="text" id="programid" name="programid" value="0" style="display:none;">
+        <input type="text" id="accountid" name="accountid" value="0" style="display:none;">
+        <input type="number" id="firstmonFin_temp" name="firstmonFin_temp" value="0" style="display:none;">
+        <input type="number" id="secondmonFin_temp" name="secondmonFin_temp" value="0" style="display:none;">
+        <input type="number" id="thirdmonFin_temp" name="thirdmonFin_temp" value="0" style="display:none;">
+        <input type="number" id="totalalloc" name="totalalloc" value="0" style="display:none;">
+        <input type="number" id="appropriation" name="appropriation" value="0" style="display:none;">
+        <input type="number" id="fmonthrel" name="fmonthrel" value="0" style="display:none;">
+        <input type="number" id="smonthrel" name="smonthrel" value="0" style="display:none;">
+        <input type="number" id="tmonthrel" name="tmonthrel" value="0" style="display:none;">
+        <input type="number" id="appbal_temp" name="appbal_temp" value="0" style="display:none;">
+        <input type="number" id="maintrnno" name="maintrnno" value="0" style="display:none;">
+    </div>
+
+    <div style="float:left;margin-left:0px;width:760px;margin-top:15px;margin-bottom:15px;background-color:#bdbcbc;height:50px;">
+        @*<div id="btnSave" class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 100px;float:left; margin-top: 10px; margin-left:265px;border-radius:50px;background-color:cornflowerblue;color:white; margin-bottom:0px" onclick="reqSave()"><span class="fa fa-save"></span> Save</div>*@
+        @*<div id="btnSubmit" class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 100px;float:right; margin-top: 10px; margin-right:200px;border-radius:50px;background-color:forestgreen;color:white; margin-bottom:0px"  onclick="reqSubmit()"><span class="fa fa-send-o"></span> Submit</div>*@
+        <div id="btnPrint" class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 100px;float:right;border-style:solid;border-width:2px; margin-top:8px; margin-right:270px;border-radius:50px;margin-bottom:0px" onclick="reqPrint()"><span class="mif-printer"></span> Preview</div>
+    </div>
+
+    <script>
+
+        //$(document).ready(function (){
+        
+        //})
+        function reqSave() {
+            var mfo = $("#mfoid").data("kendoComboBox").text();
+            var officeid=$("#officeid").val();
+            var programid=$("#programid").val();
+            var accountid=$("#accountid").val();
+            var firstmon=$("#firstmon").val().replace(" ","").toString();
+            var secondmon=$("#secondmon").val().replace(" ","").toString();
+            var thirdmon = $("#thirdmon").val().replace(" ","").toString();
+            var yearof = $("#ProposalYear").val();
+            var officemfo = $("#mfoid2").val();
+            var firstmonFin=$("#fmonthrel").val()==0? covert_empty($("#firstmonFin").val()):0;
+            var secondmonFin=$("#smonthrel").val() ==0? covert_empty($("#secondmonFin").val()):0;
+            var thirdmonFin=$("#tmonthrel").val() ==0? covert_empty($("#thirdmonFin").val()):0;
+            var quarter=$("#quarter").val();
+            var totamount=parseFloat(Number(firstmonFin) + Number(secondmonFin) + Number(thirdmonFin)).toFixed(2)
+            var appbal=covert_empty($("#appbal").val());
+            var mfoid = $("#mfoid").val();
+            
+            if ($("#appropriation").val() == 0){
+                swal("Warning", "There is nothing to save!", "warning");
+            }
+            else if (firstmonFin < 0 || secondmonFin < 0 || thirdmonFin < 0 || Number(appbal) < Number(totamount)  ){
+                swal("Warning", "Insufficient balance, please check the amount you've entered!", "warning")
+            }
+            else if (mfo == '' || mfo == '0' || mfoid == '' || firstmon == '' || secondmon=='' || thirdmon== '' || (firstmonFin == 0 && secondmonFin==0 && thirdmonFin==0 && $("#tmonthrel").val() == 0 && $("#fmonthrel").val()==0 && $("#smonthrel").val()==0)){
+                swal("Warning", "Please fill out the required fields marked with asterisk(*)!", "warning")
+            }
+            else{
+                swal({
+                    title: "Save?",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Save",
+                    closeOnConfirm: false,
+                    showLoaderOnConfirm: true
+                },
+                function (isConfirm) {
+
+                    if (isConfirm) {
+                        var url = "@Url.Action("SaveWFPDetails", "Report")";//SaveWFPdetails();
+                        $.get(url, { officeid: officeid, programid: programid, accountid: accountid, mfo: mfo, firstmon: firstmon, secondmon: secondmon, thirdmon: thirdmon, yearof: yearof, officemfo: officemfo,firstmonFin: firstmonFin,secondmonFin: secondmonFin, thirdmonFin: thirdmonFin,quarter: quarter,mfoid:mfoid }, function (e) {
+
+                            if (e == "Success") {
+
+                                swal("Success", "Saved!", "success");
+                                fnquarter()
+                            } else {
+                                swal("Error", e, "error");
+                            }
+                        });
+                    }
+                });
+            }
+        }
+
+        function WFPgrid() {
+
+            var entityGrid = $("#WFPDetails").data("kendoGrid");
+            var selectedItem = entityGrid.dataItem(entityGrid.select());
+
+            $("#fmonthrel").val(selectedItem.firstmonth_rel)
+            $("#smonthrel").val(selectedItem.secondmonth_rel)
+            $("#tmonthrel").val(selectedItem.thirdmonth_rel)
+
+            $("#mfoid").val(selectedItem.MFO);
+            $("#firstmon").val(selectedItem.PTFirstmonth);
+            $("#secondmon").val(selectedItem.PTSecondmonth);
+            $("#thirdmon").val(selectedItem.PTThirdmonth);
+            $("#officeid").val(selectedItem.officeid);
+            $("#programid").val(selectedItem.programid);
+            $("#accountid").val(selectedItem.accountid);
+            $("#mfoid2").val(selectedItem.officemfo);
+            $("#programid").val(selectedItem.programid);
+            $("#maintrnno").val(selectedItem.transno);
+
+            if ($("#fmonthrel").val() == 0) {
+                $("#firstmonFin").val(MoneyFormatWithDecimal(selectedItem.Firstmonth));
+                $("#firstmonFin").css('background-color', 'white')
+                $("#firstmonFin").css('color', 'black')
+                $("#firstmonFin").prop('readOnly',false)
+
+            }
+            else {
+                $("#firstmonFin").val(MoneyFormatWithDecimal(selectedItem.firstmonth_rel));
+                $("#firstmonFin").css('background-color', 'indianred')
+                $("#firstmonFin").css('color', 'white')
+                $("#firstmonFin").prop('readOnly',true)
+
+            }
+            if ($("#smonthrel").val() == 0) {
+                $("#secondmonFin").val(MoneyFormatWithDecimal(selectedItem.Secondmonth));
+                $("#secondmonFin").css('background-color', 'white')
+                $("#secondmonFin").css('color', 'black')
+                $("#secondmonFin").prop('readOnly',false)
+
+            }
+            else {
+                $("#secondmonFin").val(MoneyFormatWithDecimal(selectedItem.secondmonth_rel));
+                $("#secondmonFin").css('background-color', 'indianred')
+                $("#secondmonFin").css('color', 'white')
+                $("#secondmonFin").prop('readOnly',true)
+
+            }
+            if ($("#tmonthrel").val() == 0) {
+
+                $("#thirdmonFin").val(MoneyFormatWithDecimal(selectedItem.Thirdmonth));
+                $("#thirdmonFin").css('background-color', 'white')
+                $("#thirdmonFin").css('color', 'black')
+                $("#thirdmonFin").prop('readOnly',false)
+            }
+            else {
+
+                $("#thirdmonFin").val(MoneyFormatWithDecimal(selectedItem.thirdmonth_rel));
+                $("#thirdmonFin").css('background-color', 'indianred')
+                $("#thirdmonFin").css('color', 'white')
+                $("#thirdmonFin").prop('readOnly',true)
+
+            }
+            $("#appropriation").val(selectedItem.AppropriationNet);
+            $("#appropriation_orig").val(MoneyFormatWithDecimal(selectedItem.AppropriationNet));
+            $("#firstmonFin_temp").val(selectedItem.Firstmonth);
+            $("#secondmonFin_temp").val(selectedItem.Secondmonth);
+            $("#thirdmonFin_temp").val(selectedItem.Thirdmonth);
+            $("#mfoid").data("kendoComboBox").value(selectedItem.MFOid);
+
+            document.getElementById("selectaccountname").innerHTML=selectedItem.objectexpenditure
+
+            var qtr=$("#quarter").val();
+
+            var url = "@Url.Action("totalallocation", "Report")";
+            $.get(url, { programid:selectedItem.programid,accountid:selectedItem.accountid, transyear: $("#ProposalYear").val(),qtr:qtr, trnno: selectedItem.transno, selmon:"0" }, function(e){
+                $("#totalalloc").val(e.TotaldenoAmount)
+                $("#totallocation").val(MoneyFormatWithDecimal(e.TotaldenoAmount));
+                var appbal = parseFloat(Number(selectedItem.AppropriationNet)-Number(e.TotaldenoAmount)).toFixed(2)
+                $("#appbal").val(MoneyFormatWithDecimal(appbal));
+            })
+        }
+        function clearentry(){
+            $("input[type=number]").val("");
+            //$("input[type=text]").val("");
+            //$("input[type=text]").not("#office").val("");
+            //$("input[type=text]").not("#ooe_id").val("");
+            $("#firstmon").val("")
+            $("#secondmon").val("")
+            $("#thirdmon").val("")
+            $("#appropriation").val(0)
+            $("#appropriation_orig").val("0.00")
+            $("#totallocation").val("0.00")
+            $("#appbal").val("0.00")
+            $("#firstmonFin").val("0.00")
+            $("#secondmonFin").val("0.00")
+            $("#thirdmonFin").val("0.00")
+            $("#mfoid#ExcessDescription").val("");
+            $("#mfoid").val("");
+            $("#mfoid2").val("");
+            document.getElementById("selectaccountname").innerHTML="";
+            $("#appbal_temp").val(0)
+        }
+        function fnReportHistory(){
+            return {
+                officeid : $("#office").val(),
+                yearof : $("#ProposalYear").val(),
+                qtr : $("#quarter").val()
+            }
+        }
+        //$(document).ready(function () {
+        //    $("#repHistory").data("kendoComboBox").dataSource.read();
+        //})
+
+        function vwsubmitdfppt(id){
+
+            $(window).scrollTop(0);
+            var url = "@Url.Action("dfpptlist", "Report")";
+            var office=$("#office").val();
+            var ooeid=$("#ooe_id").val()
+            var tyear=$("#ProposalYear").val();
+            var qtr=$("#quarter").val()
+            var lbl="";
+            if (id == 0){
+                lbl="Prepared"
+            }
+            else
+            {
+                lbl="Submitted"
+            }
+            $.get(url,
+                {
+                    office:$("#office").val(),
+                    tyear:$("#ProposalYear").val(),
+                    id:id,
+                    ooeid:ooeid,
+                    qtr:qtr
+                },
+            function (d) {
+                $('#dffptsubmitted').html(d);
+            })
+
+            $('#dffptsubmitted').data('kendoWindow').title("<i class='fa fa-navicon'> </i> "+ lbl +"").center().open();
+        }
+        function vwapprovedfpptoffice() {
+
+            $(window).scrollTop(0);
+            var url = "@Url.Action("dfpptapproveoffice", "Report")";
+            var office=$("#office").val();
+            var ooeid=$("#ooe_id").val()
+            var tyear = $("#ProposalYear").val();
+            var qtr=$("#quarter").val()
+
+            $.get(url,
+                {
+                    office: office,
+                    tyear: tyear,
+                    id: 1,
+                    ooeid:ooeid,
+                    qtr: qtr
+                },
+            function (d) {
+                $('#dffptapprovedOffice').html(d);
+            })
+
+            $('#dffptapprovedOffice').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Approved").center().open();
+        }
+
+        function vwrelease() {
+
+            $(window).scrollTop(0);
+            var url = "@Url.Action("dfpptrelease_office", "Release")";
+            var office = $("#office").val();
+            var ooeid=$("#ooe_id").val()
+            var tyear = $("#ProposalYear").val();
+            var qtr=$("#quarter").val()
+
+            $.get(url,
+                {
+                    office: office,
+                    tyear: tyear,
+                    ooeid: ooeid,
+                    qtr: qtr
+                },function (d) {
+                    $('#vwrelease_wndow_office').html(d);
+                })
+
+            $('#vwrelease_wndow_office').data('kendoWindow').title("<i class='fa fa-navicon'> Release</i>").center().open();
+        }
+
+        function Close() {
+            //$('#GeneralFund_Grid').data('kendoGrid').dataSource.read();
+            //acc_availble_mount();
+        }
+        function ClosePerOffice(){
+
+        }
+
+        function vwppmplist(id){
+            $(window).scrollTop(0);
+            var url = "@Url.Action("getppmpdetails", "Report")";
+            var office=$("#office").val();
+            var ooeid=$("#ooe_id").val()
+            var tyear = $("#ProposalYear").val();
+            var qtr=$("#quarter").val()
+            var accountid= $("#accountid").val();
+            $.get(url,
+                {
+                    office: office,
+                    tyear: tyear,
+                    id: id,
+                    ooeid:ooeid,
+                    qtr: qtr,
+                    accountid:accountid
+                },
+            function (d) {
+                $('#ppmpdetails').html(d);
+            })
+
+            $('#ppmpdetails').data('kendoWindow').title("<i class='fa fa-navicon'> </i> PPMP denomination").center().open();
+        }
+        function addbreakdown(id){
+            $(window).scrollTop($(window).height - $(window).width + 100)
+
+            //var div = document.getElementById("dvScroll");  
+            //var div_position = document.getElementById("div_position");  
+            //var position = parseInt('<%=Request.Form["div_position"] %>');  
+            //if (isNaN(position)) {  
+            //    position = 0;  
+            //}  
+            //div.scrollTop = position;  
+            //div.onscroll = function() {  
+            //    divdiv_position.value = div.scrollTop;  
+            //};  
+
+            var url = "@Url.Action("addofficebreakdown", "Report")";
+            var office=$("#office").val();
+            var ooeid=$("#ooe_id").val()
+            var tyear = $("#ProposalYear").val();
+            var qtr=$("#quarter").val()
+            var programid=$("#programid").val();
+            var accountid= $("#accountid").val();
+            var maintrnno=$("#maintrnno").val();
+
+            $.get(url,
+                {
+                    office: office,
+                    tyear: tyear,
+                    id: id,
+                    ooeid:ooeid,
+                    qtr: qtr,
+                    programid:programid,
+                    accountid:accountid,
+                    maintrnno:maintrnno
+                },
+            function (d) {
+                $('#addbrekdownform').html(d);
+            })
+
+            $('#addbrekdownform').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Denomination").center().open();
+        }
+
+        function editindicator(){
+            $(window).scrollTop(0);
+            var url = "@Url.Action("editperformanceindic", "Report")";
+            var office=$("#office").val();
+            var tyear = $("#ProposalYear").val();
+            var perindicator= $("#mfoid").val();
+            var perindicatorname= $("#mfoid").data("kendoComboBox").text()
+
+            $.get(url,
+                {
+                    office: office,
+                    tyear: tyear,
+                    perindicator:perindicator,
+                    perindicatorname:perindicatorname
+                },
+            function (d) {
+                $('#performedit').html(d);
+            })
+
+            $('#performedit').data('kendoWindow').title("<i class='fa fa-edit'> </i>UPDATE Performance Indicator").center().open();
+        }
+    </script>
+
+    @(Html.Kendo().Window()
+        .Name("dffptsubmitted")
+        //.Title("")
+        .Width(1010)
+        .Height(575)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+          .Events(e => e.Close("Close"))
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+                .Actions(a => { a.Close(); })
+    )
+    @(Html.Kendo().Window()
+        .Name("vwrelease_wndow_office")
+        //.Title("")
+        .Width(1010)
+        .Height(552)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+          .Events(e => e.Close("ClosePerOffice"))
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+        .Actions(a => { a.Close(); })
+    )
+    @(Html.Kendo().Window()
+        .Name("dffptapprovedOffice")
+        //.Title("")
+        .Width(1250)
+        .Height(552)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+          .Events(e => e.Close("Close"))
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+                .Actions(a => { a.Close(); })
+    )
+    @(Html.Kendo().Window()
+        .Name("ppmpdetails")
+        //.Title("")
+        .Width(900)
+        .Height(552)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+          .Events(e => e.Close("Close"))
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+                .Actions(a => { a.Close(); })
+    )
+
+@(Html.Kendo().Window()
+        .Name("addbrekdownform")
+        //.Title("")
+        .Width(1000)
+        .Height(720)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+          .Events(e => e.Close("Close"))
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+                .Actions(a => { a.Close(); })
+)
+@(Html.Kendo().Window()
+        .Name("performedit")
+        //.Title("")
+        .Width(500)
+        .Height(120)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+          .Events(e => e.Close("Close"))
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+                .Actions(a => { a.Close(); })
+)
+
+    <style>
+        .pageContent {
+            border: 1px solid #dadada;
+            padding: 5px;
+            margin-top: 7px;
+            height: 1565px;
+            background-color: #fff;
+            padding: 10px;
+        }
+    </style>

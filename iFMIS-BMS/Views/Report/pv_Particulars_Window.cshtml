@@ -1,0 +1,327 @@
+﻿
+<script>
+    var thisculture = kendo.culture();
+    thisculture.numberFormat.currency.symbol = '₱';
+
+    function dataBound() {
+        this.expandRow(this.tbody.find("tr.k-master-row").first());
+    }
+
+    function GetEco_ID() {
+        return {
+            Eco_ID: '@Session["Eco_ID"]',
+            Year_of: '@Session["Year_of"]'
+        }
+    }
+
+    var Proposal = $("#propsYears").val();
+    var Estimate = Proposal - 1;
+    var Actual = Proposal - 2;
+    document.getElementById("Proposals").innerHTML = Proposal;
+    document.getElementById("Estimates").innerHTML = Estimate;
+    document.getElementById("Actuals").innerHTML = Actual;
+    document.getElementById("Differences").innerHTML = Proposal + ' - ' + Estimate;
+
+
+
+    function reqADDTypeEE() {
+        var url = "@Url.Action("NewTypeEE", "Report")";
+        $.get(url, { Eco_ID: '@Session["Eco_ID"]', Year_of: '@Session["Year_of"]' }, function (d) {
+            $('#newAccounts22').html(d);
+        })
+        $('#newAccounts22').data('kendoWindow').title("<i class='fa fa-navicon'> </i>").center().open();
+    }
+
+    function reqAddSubEE(Eco_Type_ID) {
+        var url = "@Url.Action("NewSubbAddEE", "Report")";
+        //alert("ahhhhhhhhhh")
+        $.get(url, { Eco_Type_ID: Eco_Type_ID, Year_Of: '@Session["Year_of"]' }, function (d) {
+            $('#newAccounts').html(d);
+        })
+        $('#newAccounts').data('kendoWindow').title("<i class='fa fa-navicon'> </i>").center().open();
+    }
+
+    function reqDeleteTyEE(e) {
+        var url = "@Url.Action("RemoveTYEE", "Report")";
+        var Year_of = $("#propsYears").val()
+
+        swal({
+            title: "System Notice!",
+            text: "This will remove your Revenue. This Action can't be undone. Are you sure you want to Proceed?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes",
+            cancelButtonText: "Cancel",
+            closeOnConfirm: false
+        }, function () {
+            $.get(url, { Eco_Type_ID: e, Year_Of: '@Session["Year_of"]' }, function (d) {
+                if (d == "success") {
+                    swal({
+                        title: "Success!",
+                        text: "Successfully Remove.",
+                        timer: 2000,
+                        type: "success",
+                        showConfirmButton: false
+                    })
+                    $('#EETypeGrid').data('kendoGrid').dataSource.read();
+                } else {
+                    swal({
+                        title: "Error!",
+                        text: "System Error! Please try again.",
+                        timer: 2000,
+                        type: "error",
+                        showConfirmButton: false
+                    })
+                }
+
+            });
+        });
+
+    }
+
+    function reqDeleteSubEE(EE_Sub2_ID) {
+        var url = "@Url.Action("RemoveSubsEE", "Report")";
+        var Year_of = $("#propsYears").val()
+
+        swal({
+            title: "System Notice!",
+            text: "This will remove your Revenue. This Action can't be undone. Are you sure you want to Proceed?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes",
+            cancelButtonText: "Cancel",
+            closeOnConfirm: false
+        }, function () {
+            $.get(url, { EE_Sub2_ID: EE_Sub2_ID, Year_Of: '@Session["Year_of"]' }, function (d) {
+                if (d == "success") {
+                    swal({
+                        title: "Success!",
+                        text: "Successfully Remove.",
+                        timer: 2000,
+                        type: "success",
+                        showConfirmButton: false
+                    })
+                    $('#EETypeGrid').data('kendoGrid').dataSource.read();
+                } else {
+                    swal({
+                        title: "Error!",
+                        text: "System Error! Please try again.",
+                        timer: 2000,
+                        type: "error",
+                        showConfirmButton: false
+                    })
+                }
+
+            });
+        });
+
+    }
+    function reqEditSubEE(EE_Sub2_ID, ECO_ID) {
+        var url = "@Url.Action("editSubsEE", "Report")";
+        $.get(url, { EE_Sub2_ID: EE_Sub2_ID, Year_of: '@Session["Year_of"]', ECO_ID: ECO_ID }, function (d) {
+            $('#newAccounts').html(d);
+        })
+        $('#newAccounts').data('kendoWindow').title("<i class='fa fa-navicon'> </i>").center().open();
+    }
+</script>
+
+<div style="border: outset;clear:both;border-width:1px;border-color:#1fa67a; width: 960px; padding-left:0px;padding-right:0px;padding-top:0px;padding-bottom:7px;margin-top: 10px;">
+    <div style=" width: 0;height: 0; border-right: 5px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;margin-top: -1px;margin-bottom: 0px; ">
+        <div style="float: left; width: 895px; margin-top:1px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 36px solid #1fa67a; ">
+
+            <div style="float: left; height:28px; margin-left:-59px; margin-top: 5px;">
+                <i class="fa fa-tasks fa-2x fg-white">  &nbsp;&nbsp; </i>
+                <script>
+                    function refreshGrid() {
+                        $("#SourceFundsGrid").data("kendoGrid").dataSource.read();
+                    }
+                </script>
+            </div>
+            <div class="k-button" onclick="reqADDTypeEE()" style="float: right;margin-bottom: 0px;margin-top:3px;margin-right: 30px">
+                <span class="k-icon k-i-plus" style="margin-left: -2px;margin-right: 3px;margin-top: 0px;"></span>
+                ADD Revenue
+
+            </div>
+
+            @*<div style="float: right;margin-right:10px;margin-top:2px;">
+                    <i class="fa fa-calendar fa-2x #33333"></i>
+                </div>*@
+
+        </div>
+
+    </div>
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.LBPone_EETypeModel>()
+        .Name("EETypeGrid")
+        .Columns(columns =>
+        {
+            columns.Bound(e => e.Eco_Type_ID).Hidden();
+            columns.Bound(e => e.Eco_Type_Desc).Width(160).Title("Particular")
+                  .ClientFooterTemplate("TOTAL");
+            columns.Bound(e => e.Year1_AmountEE).Width(90)
+                .HeaderTemplate(@<text><div style="font-weight:600;">Past Year<br><span id="Actuals"></span><br>(Actual)</div></text>)
+            .ClientFooterTemplate("#=kendo.toString(sum, 'c2')#");
+            columns.Bound(e => e.Year2_AmountEE).Width(90)
+                .HeaderTemplate(@<text><div style="font-weight:600;">Current Year<br><span id="Estimates"></span><br>(Estimate)</div></text>)
+            .ClientFooterTemplate("#=kendo.toString(sum, 'c2')#");
+            columns.Bound(e => e.Year3_AmountEE).Width(90)
+                .HeaderTemplate(@<text><div style="font-weight:600;">Budget Year<br><span id="Proposals"></span><br>(Proposal)</div></text>)
+            .ClientFooterTemplate("#=kendo.toString(sum, 'c2')#");
+            columns.Bound(e => e.DifferenceEE).Width(90)
+                .HeaderTemplate(@<text><div style="font-weight:600;">Difference<br><span id="Differences"></span></div></text>)
+                .ClientFooterTemplate("#=kendo.toString(sum, 'c2')#");
+            columns.Template(t => { }).ClientTemplate(
+                //"<div class='k-button' title='View Accounts' onclick='reqEdit(#=Fund_ID#)'><span class='fa fa-edit' style='width: 10px'> </span></div> " +
+                //"<div class='k-button' title='View Accounts' onclick='reqEdit(#=Fund_ID#)'><span class='fa fa-close' style='width: 10px'> </span></div>"
+                                     "<div class='btn-delete'style='inline-block; height: 15px;width:65px;margin-left:30px;'> " +
+                //"<a  title='Submit' onclick='reqEdit(#=Fund_ID#)' style='margin-left:2px;'><span class='fa fa-search-plus' style='font-size: 12pt;'></span></a>" +
+                                      "<a  title='remove' onclick='reqDeleteTyEE(#=Eco_Type_ID#)' style='margin-left:2px;'><span class='fa fa-remove' style='font-size: 12pt;'></span></a>" +
+                                      " </div>"
+                                    ).HtmlAttributes(new { style = "vertical-align: top;" }).Width(70);
+
+            columns.Bound(e => e.Year_Of).Hidden();
+        })
+
+                                    .Sortable()
+                                    .Pageable()
+                                    .Scrollable()
+                                    .ClientDetailTemplateId("template")
+                                    .HtmlAttributes(new { style = "height:600px;" })
+                                    .DataSource(dataSource => dataSource
+
+                                        .Ajax()
+                                        .PageSize(6)
+                                                         .Aggregates(aggregates =>
+                                                                                {
+
+                                                                                    aggregates.Add(p => p.Year1_AmountEE).Sum();
+                                                                                    aggregates.Add(p => p.Year2_AmountEE).Sum();
+                                                                                    aggregates.Add(p => p.Year3_AmountEE).Sum();
+                                                                                    aggregates.Add(p => p.DifferenceEE).Sum();
+
+                                                                                })
+                                        .Read(read => read.Action("ReadEETF", "Report").Data("GetEco_ID"))
+                                    )
+            //.Events(events => events.DataBound("dataBound"))
+    )
+    <script>
+        function onLoadgrdTemplate() {
+            document.getElementById("tProposal").innerHTML = Proposal;
+            document.getElementById("tEstimate").innerHTML = Estimate;
+            document.getElementById("tActual").innerHTML = Actual;
+            document.getElementById("tDifference").innerHTML = Proposal + ' - ' + Estimate;
+        }
+    </script>
+    <script id="template" type="text/kendo-tmpl">
+        @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.LBPone_EESub2Model>()
+            .Name("grid_#=Eco_Type_ID#") // template expression, to be evaluated in the master context
+            .Columns(columns =>
+            {
+                columns.Bound(o => o.EE_Sub2_ID).Hidden();
+                columns.Bound(o => o.EE_Sub1_Desc).Hidden().ClientGroupHeaderTemplate("\\#=value\\#");
+
+                columns.Bound(o => o.EE_Sub2_Desc).Width(160).Title("Sub Description")
+                     .ClientGroupFooterTemplate("Total")
+                     .ClientFooterTemplate("#=Eco_Type_Desc#");
+
+                columns.Bound(o => o.Year1_AmountEE).Width(90)
+                    .HeaderTemplate(@<text>
+                        <div style="font-weight:600;">Past Year<br><span id="tActual"></span><br>(Actual)</div></text>)
+                     .ClientGroupFooterTemplate("\\#=kendo.toString(sum, 'c2')\\#")
+                    .ClientFooterTemplate("\\#=kendo.toString(sum, 'c2')\\#");
+                columns.Bound(o => o.Year2_AmountEE).Width(90)
+                     .HeaderTemplate(@<text>
+                        <div style="font-weight:600;">Current Year<br><span id="tEstimate"></span><br>(Estimate)</div></text>)
+                    .ClientGroupFooterTemplate("\\#=kendo.toString(sum, 'c2')\\#")
+                    .ClientFooterTemplate("\\#=kendo.toString(sum, 'c2')\\#");
+
+                columns.Bound(o => o.Year3_AmountEE).Width(90)
+                    .HeaderTemplate(@<text>
+                        <div style="font-weight:600;">Budget Year<br><span id="tProposal"></span><br>(Proposal)</div></text>)
+                    .ClientGroupFooterTemplate("\\#=kendo.toString(sum, 'c2')\\#")
+                    .ClientFooterTemplate("\\#=kendo.toString(sum, 'c2')\\#");
+                columns.Bound(e => e.DifferenceEE).Width(90)
+                     .HeaderTemplate(@<text>
+                        <div style="font-weight:600;">Difference<br><span id="tDifference"></span></div></text>)
+                    .ClientGroupFooterTemplate("\\#=kendo.toString(sum, 'c2')\\#")
+                    .ClientFooterTemplate("\\#=kendo.toString(sum, 'c2')\\#");
+                columns.Template(t => { }).ClientTemplate(
+                                  // "<div class='k-button' title='View Accounts' onclick='reqEdit(#=Fund_ID#)'><span class='fa fa-edit' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'> </span></div>"
+                                    "<div class='btn-delete'style='inline-block; height: 15px;width:65px;margin-left:30px;'> " +
+                                        "<a  title='Edit' onclick='reqEditSubEE(\\#=EE_Sub2_ID\\#,#=Eco_Type_ID#)' style='margin-left:2px;'><span class='fa fa-edit' style='font-size: 12pt;'></span></a>" +
+                                      "<a  title='remove' onclick='reqDeleteSubEE(\\#=EE_Sub2_ID\\#)' style='margin-left:2px;'><span class='fa fa-remove' style='font-size: 12pt;'></span></a>" +
+                                      " </div>"
+                                  ).HtmlAttributes(new { style = "vertical-align: top;" }).Width(70);
+            })
+            .Events(e => e.DataBound("onLoadgrdTemplate"))
+
+             .ToolBar(t => t.Template(@<text>
+                <div class="k-button" onclick="reqAddSubEE('#=Eco_Type_ID#')" style="float: right;margin-bottom: 0px;">
+                    <span class="k-icon k-i-plus" style="margin-left: -2px;margin-right: 3px;margin-top: 0px;"></span>
+                    ADD Subs
+
+                </div>
+            </text>))
+                                                .DataSource(dataSource => dataSource
+                                                    .Ajax()
+                                                    .PageSize(10)
+                                                    .Model(m => m.Id(i => i.EE_Sub1_ID))
+                                                            .Aggregates(aggregates =>
+                                                                        {
+
+                                                                            aggregates.Add(p => p.Year1_AmountEE).Sum();
+                                                                            aggregates.Add(p => p.Year2_AmountEE).Sum();
+                                                                            aggregates.Add(p => p.Year3_AmountEE).Sum();
+                                                                            aggregates.Add(p => p.DifferenceEE).Sum();
+                                                                        })
+                                                      .Read(read => read.Action("readPartSub", "Report", new { Eco_Type_ID = "#=Eco_Type_ID#", Year_Of = "#=Year_Of#" }))
+                                                    //.Update(update => update.Action("EditingInline_Update", "Report"))
+                                                      .Group(g => g.Add(c => c.EE_Sub1_Desc))
+                                                )
+                                                .Pageable()
+                                                .Sortable()
+
+                                                .ToClientTemplate()
+        )
+    </script>
+</div>
+@(Html.Kendo().Window()
+    .Name("newAccounts")
+    .Title("Propose Account")
+    .Width(600)
+    .Height(360)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(false)
+    .AutoFocus(true)
+    .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+
+        }).Actions(a => { a.Close(); }))
+@(Html.Kendo().Window()
+    .Name("newAccounts22")
+    .Title("Propose Account")
+    .Width(600)
+    .Height(210)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(false)
+    .AutoFocus(true)
+    .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+
+        }).Actions(a => { a.Close(); }))
+

@@ -1,0 +1,420 @@
+﻿@model IEnumerable<iFMIS_BMS.BusinessLayer.Models.DashBoard.DashBoardModel>
+<script>
+    function change_text() {
+        var ooe_ids = $('#float_ooe_id_null').val()
+        $("#float_account_list_null").data("kendoComboBox").dataSource.read();
+        if (ooe_ids == 1) {
+
+            document.getElementById("float_PS_nulls").disabled = false;
+            document.getElementById("float_MOOE_nulls").disabled = true;
+            document.getElementById("float_CO_nulls").disabled = true;
+
+        }
+        else if (ooe_ids == 2) {
+            document.getElementById("float_PS_nulls").disabled = true;
+            document.getElementById("float_MOOE_nulls").disabled = false;
+            document.getElementById("float_CO_nulls").disabled = true;
+        }
+        else if (ooe_ids == 3) {
+            document.getElementById("float_PS_nulls").disabled = true;
+            document.getElementById("float_MOOE_nulls").disabled = true;
+            document.getElementById("float_CO_nulls").disabled = false;
+        }
+        else {
+            document.getElementById("float_PS_nulls").disabled = true;
+            document.getElementById("float_MOOE_nulls").disabled = true;
+            document.getElementById("float_CO_nulls").disabled = true;
+        }
+    }
+
+    function ApproveControl() {
+        var url = "@Url.Action("ApproveControl", "BudgetControl")";
+        var idsToSend = [];
+        var grid = $("#grd_controlapproval").data("kendoGrid")
+        var ds = grid.dataSource.view();
+        var officeid = $("#offs").val() == "" ? 0 : $("#offs").val();
+        var accountid = $("#account_list").val() == "" ? 0 : $("#account_list").val();
+        var yearof=$("#ddlYear").val();
+
+        //if ($("#offs").val() != "" && $("#account_list").val() != "") {
+            var url2 = "@Url.Action("ApproveControl", "BudgetControl")";
+            for (var i = 0; i < ds.length; i++) {
+                var row = grid.table.find("tr[data-uid='" + ds[i].uid + "']");
+                var checkbox = $(row).find(".checkbox");
+                if (checkbox.is(":checked")) {
+                    idsToSend.push(ds[i].transno);
+                    alert(ds[i].transno)
+                }
+            }
+                //alert(idsToSend)
+                if (idsToSend == "") {
+                    swal({ title: "Error!", text: "Please checked the transaction first!", timer: 2500, showConfirmButton: false, type: "error" });
+                } else {
+                    swal({
+                        title: "Are you sure?",
+                        text: "You want to approve the selected transactions?",
+                        type: "info",
+                        showCancelButton: true,
+                        closeOnConfirm: false,
+                        confirmButtonColor: "#1fa67a",
+                        confirmButtonText: "Yes!",
+                        showLoaderOnConfirm: true,
+                    }, function () {
+
+                        $.post(url2, { trnno_id: idsToSend }, function (d) {
+                            if (d == 'success') {
+                                swal({ title: "Success!", text: "Successfully approved!", timer: 2500, showConfirmButton: false, type: "success" });
+                                $("#grd_controlapproval").data("kendoGrid").dataSource.read();
+                            }
+                            else {
+                                swal("Something Went Wrong!", d, "error");
+                            }
+                        });
+                    });
+                }
+            //}
+        //}
+
+    }
+
+    function remove_control(transno) {
+
+        
+        var url = "@Url.Action("ForApprovalCancel", "BudgetControl")";
+        swal({
+            title: "Are you sure?",
+            text: "This transaction will be remove!",
+            type: "info",
+            showCancelButton: true,
+            closeOnConfirm: false,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Remove",
+            showLoaderOnConfirm: true,
+        }, function () {
+
+            $.get(url, { transno: transno }, function (e) {
+
+                if (e == "success") {
+                    swal({
+                        title: "Success!",
+                        text: "Transaction has been removed.",
+                        timer: 2000,
+                        type: "success",
+                        showConfirmButton: false
+                    })
+                
+                    $('#grd_controlapproval').data('kendoGrid').dataSource.read();
+                
+                } else {
+                    swal({
+                        title: "Error!",
+                        text: "System Error! Please try again.",
+                        timer: 2000,
+                        type: "error",
+                        showConfirmButton: false
+                    })
+                }
+
+            })
+        });
+    }
+    function fn_refresher_float_null() {
+
+        $("#FloatWindow").data("kendoWindow").close();
+        $("#GeneralFund_Grid").data("kendoGrid").dataSource.read();
+
+    }
+    setTimeout(function () {
+
+        FundGrid_Load();
+
+    }, 1000);
+
+    function fn_grid_refresh_div_null() {
+
+        setTimeout(function () {
+            get_Balance();
+            FundGrid_Load();
+            fn_Offices();
+            $("#grd_controlapproval").data("kendoGrid").refresh();
+            $("#grd_controlapproval").data("kendoGrid").dataSource.read();
+        }, 500);
+    }
+
+
+    setTimeout(function () {
+        var url = "@Url.Action("FundGrid_Load", "Release")";
+
+
+        $.get(url, { }, function (d) {
+
+                $("#FundGrid_id_null").html(d);
+
+        })
+
+    }, 1000);
+
+
+        function FundGrid_Load() {
+
+        var url = "@Url.Action("FundGrid_Load", "Release")";
+        var office_id = $("#float_offs_null").val();
+        var program_id = $("#float_Progss_null").val();
+        var ooe_id = $("#float_ooe_id_null").val();
+        var account_id = $("#float_account_list_null").val();
+        var month_ = $("#float_Months_null").val();
+        var numeric_ = $("#float_numeric_null").val();
+        var year_ = $("#float_ddlYear_null").val();
+        var classtype = $("#classtype").val();
+
+
+        $.get(url, { office_id: office_id, program_id: program_id, ooe_id: ooe_id, account_id: account_id, month_: month_, numeric_: numeric_, year_: year_ }, function (d) {
+            $("#FundGrid_id_null").html(d);
+        })
+
+    }
+    function fn_dprefresher_fund_null() {
+
+
+        setTimeout(function () {
+            $("#float_Progss_null").data("kendoDropDownList").dataSource.read();
+            $("#float_ooe_id_null").data("kendoDropDownList").dataSource.read();
+            $("#float_account_list_null").data("kendoComboBox").dataSource.read();
+
+        }, 1000);
+
+    }
+
+    function fn_summary() {
+        var year_ = $("#Years").val();
+        return {
+            year_: year_
+        }
+    }
+
+    function fn_checkbox(value) {
+
+        if (value == 1) {
+            return "<input type='checkbox' class='checkbox' disabled='disabled' checked/>";
+        }
+        else {
+            return "<input type='checkbox' class='checkbox' />";
+        }
+    }
+    function viewdetail(code, officeid, programid, accountid, particular, muncode, brgycode, Amount_release, YearOf) {
+
+        $(window).scrollTop(0);
+        var url = "@Url.Action("comdetails", "Release")";
+
+        $.get(url, { officeid: officeid, programid: programid, accountid: accountid, particular: particular, muncode: muncode, brgycode: brgycode, Amount_release: Amount_release, code: code, YearOf: YearOf }, function (d) {
+
+            $("#CommitmenDetail").html(d);
+        })
+        $('#CommitmenDetail').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Commitment Details").center().open();
+
+    }
+    function onDataBound(e) {
+        $(".k-hierarchy-cell").hide();
+        $(".k-hierarchy-col").hide();
+        var grid = $("#grd_controlapproval").data("kendoGrid")
+        var ds = grid.dataSource.view();
+        var rows = e.sender.tbody.children();
+        var release_float_id = 0;
+        var gov_com = 0;
+        var comtag = 0;
+
+        for (var i = 0; i < ds.length; i++) {
+            gov_com = ds[i].gov_com;
+            release_float_id = ds[i].release_float_id;
+            comtag = ds[i].comtag;
+
+            var row = $(rows[i]);
+
+            if (gov_com != 0) {
+                $('#deleteid' + release_float_id + '').css("display", "none");
+            }
+            if (comtag == 1) {
+                row.addClass("ChangeBackColor");
+            }
+            else if (comtag == 2) {
+                row.addClass("ChangeApprovedColor");
+                $('#deleteid' + release_float_id + '').css("display", "none");
+            }
+            else {
+                $('#viewdetailid' + release_float_id + '').css("display", "none");
+            }
+        }
+    }
+    function CheckAll(e) {
+        $("#grd_controlapproval tbody input:checkbox").prop("checked", e.checked);
+    }
+    function searchNoObr() {
+        var $filter = new Array();
+        $filter = [];
+
+        if ($('#SearchTransNoObr').val().length > 0) {
+            $filter.push({ field: "OBRNo", operator: "contains", value: $('#SearchTransNoObr').val() }),
+            $filter.push({ field: "OfficeName", operator: "contains", value: $('#SearchTransNoObr').val() });
+            $filter.push({ field: "Description", operator: "contains", value: $('#SearchTransNoObr').val() }); 
+        }
+
+        $('#grd_controlapproval').data('kendoGrid').dataSource.filter({
+            logic: "or",
+            filters: $filter
+        });
+
+    }
+
+    $(function () {
+        $("#SearchTransNoObr").keypress(function (e) {
+            if (e.keyCode == 13) {
+                searchNoObr();
+            }
+        });
+    });
+
+</script>
+
+<div style="border: outset;clear:both;border-width:1px;border-color:#1fa67a; width: 1019px; padding-left:0px;padding-right:0px;padding-top:0px;padding-bottom:7px;margin-top: 0px;">
+    <div style=" width: 0;height: 0; border-right: 5px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;margin-top: -1px; ">
+        <div style="float: left; width: 952px; margin-top:1px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 36px solid #1fa67a; ">
+            <div style="float: left; height:28px; margin-left:-59px; margin-top: 5px;">
+                <i class="fa fa-tasks fa-2x fg-white"></i>
+                <div style="background-color:white;border:solid;border-color:whitesmoke;border-width:thin;width:300px;height:30px;float:right;padding:0px;margin-top:-3px;margin-left:660px" id="search">
+                    <input type="text" style="width:250px;border-collapse:collapse;border-color:white;margin:0px;margin-left:0px;height:70%;outline:none;border-left-style:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search..." id="SearchTransNoObr" name="SearchTransNoObr">
+                    <div class="k-button k-button-icontext" style="height:30px;width:40px;border-style:none" onclick="searchNoObr()"><span class="mif-search"></span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="demo-section k-content" style=" float:right;margin-top: 7px;margin-right:7px ">
+
+    </div>
+    <div id="" class="demo-section k-content">
+        @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.BudgetControlModel>()
+            .Name("grd_controlapproval")
+            .Scrollable()
+            .Columns(col =>
+            {
+                @*col.Template(@<text></text>).Hidden().ClientTemplate("<div>#=transno# </div>");
+                col.Template(@<text></text>)
+                .ClientTemplate("<input type='checkbox' class='checkbox'/>")
+                .Title("<input onclick=CheckAll(this) type='checkbox'  class='checkbox'/>")
+                .Width(30)
+                .HtmlAttributes(new { @onclick = "click", style = "align:center;float:none;text-align:center; vertical-align: middle;" })
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });*@
+                col.Bound(m => m.OBRNo)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Transaction No.</div></text>)
+                            .Width(80)
+                            .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+
+                col.Bound(m => m.OfficeName)
+                .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Office</div></text>)
+                            .Width(150)
+                            .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+                
+                col.Bound(m => m.Description)
+                            .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                            .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Description</div></text>)
+                            .Width(200)
+                            .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+                            
+                 col.Bound(m => m.Amount)
+                            .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                            .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Amount</div></text>)
+                            .Width(70)
+                            .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                            .ClientTemplate("<div>#=kendo.toString(Amount,'c2')# </div>");
+                col.Bound(m => m.DateTimeEntered)
+                            .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                            .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Date and Time</div></text>)
+                            .Width(120)
+                            .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+                 col.Bound(m => m.username)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Entered By</div></text>)
+                            // .Width(170)
+                            .Hidden()
+                            .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+                //col.Template(t => { }).ClientTemplate(
+                //        "<div class='k-button k-button-icontext' id='deleteid#=transno#' style='border-radius:50px;color:\\#ffffff;background-color:\\#DE5555;' onclick='remove_control(#=transno#)'><span class='fa fa-trash-o' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'> </span>Remove</div> "
+                //    ).HtmlAttributes(new { style = "vertical-align: top;" }).Width(108);
+            })
+            .Pageable(page => page.Refresh(true)
+            .Enabled(true)
+            .ButtonCount(4)
+            .PreviousNext(true))
+            .Sortable()
+            .Scrollable()
+            .HtmlAttributes(new { style = "height:450px;" })
+            //.Events(e => e.DataBound("onDataBound"))
+            .DataSource(d => d
+            .Ajax()
+            //.PageSize(50000)
+                 
+            .Model(m => m.Id(i => i.transno))
+            .Read(read => read.Action("control_for_approval", "BudgetControl").Data("fn_summary")))
+        )
+
+
+
+
+    </div>
+  
+</div>
+
+
+<div style="float: none;clear:both;margin-top:-5px;">
+   
+    @*<div id="div_approvecontrol"  style="float:left;margin-top:26px;margin-left:724px;display:none">*@
+    @*@if (Session["userspecialaccess"].ToString() != "0")
+    {*@
+        @*<div class="k-button k-button-icontext" style=" bottom: 15px; right: 220px;width: 100px; border-radius:50px;color:#ffffff;background-color:#1FA67A;" onclick="ApproveControl()"><span class='fa fa-plus-circle' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'></span> Approve</div>*@
+    @*}*@
+    @*</div>*@
+    
+    <div id="div_close" style="float:left;margin-top:30px;margin-left:835px">
+        <div class="k-button k-button-icontext" style=" bottom: 15px; right: 220px;width: 80px; border-radius:50px;color:#ffffff;background-color:#DE5555;" onclick="fn_close()"><span class='fa fa-times' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'></span> Close</div>
+    </div>
+    @*<div class="k-button k-button-icontext" style="position: absolute; bottom: 15px; right: 120px;width: 80px;" onclick="addFloat()">Release</div>
+    <div class="k-button k-button-icontext" style="position: absolute; bottom: 15px; right: 20px;width: 80px;" onclick="fn_refresher_float_null()">Close</div>*@
+</div>
+
+<script>
+    $(document).ready(function () {
+        @*if (@Session["usercontrolapproved"].ToString() != "0")
+            {
+            document.getElementById("div_approvecontrol").style.display = "inline";
+            }
+            else
+            {
+            document.getElementById("div_approvecontrol").style.display = "none";
+            $("#div_close").css('margin-top','29px');
+            }*@
+        $("#grd_controlapproval").data("kendoGrid").dataSource.read();    
+    });
+
+      
+    function fn_close() {
+        $("#ControlForApproval").data("kendoWindow").close();
+        $("#grOBR").data("kendoGrid").dataSource.read();
+        
+    }
+
+</script>
+
+<style>
+    .ChangeBackColor {
+        background-color: #FFFF80;
+    }
+
+    .ChangeApprovedColor {
+        background-color: #00ff21;
+    }
+
+    .k-dropdown-wrap.k-state-default {
+        border-left-style: solid;
+    }
+</style>

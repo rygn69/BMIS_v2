@@ -1,0 +1,260 @@
+﻿<script>
+    function fn_param() {
+        return {
+            office: '@Session["officeid"]',
+            account: $("#account").val(),
+            tyear: $("#proyear").val()
+        }
+    }
+    var thisculture = kendo.culture();
+    thisculture.numberFormat.currency.symbol = '₱';
+
+    function onGridEdit(arg) {
+        var gridName = $('#grd_proposalsummary_detail').data('kendoGrid');
+        var dataRows = gridName.items();
+        var rowIndex = dataRows.index(gridName.select());
+        var ds = gridName.dataSource.view();
+        if (arg.container.find("input[name=totalamount]").length > 0) {
+            this.closeCell();
+        }
+    }
+
+    function searchAccount() {
+        var $filter = new Array();
+        $filter = [];
+
+        if ($('#SearchData').val().length > 0) {
+            $filter.push({ field: "AccountName", operator: "contains", value: $('#SearchData').val() }),
+            $filter.push({ field: "Description", operator: "contains", value: $('#SearchData').val() });
+
+            //Description
+        }
+
+        $('#grd_proposalsummary_detail').data('kendoGrid').dataSource.filter({
+            logic: "or",
+            filters: $filter
+        });
+    }
+
+    $(function () {
+        $("#SearchData").keypress(function (e) {
+            if (e.keyCode == 13) {
+                searchAccount();
+            }
+        });
+    });
+    function reqSave() {
+        var entityGrid = $("#grd_proposalsummary_detail").data("kendoGrid");
+        var selectedItem = entityGrid.dataItem(entityGrid.select());
+
+        var qty=selectedItem.qty2
+        var amount= selectedItem.Amount
+        var remark = selectedItem.Remarks
+        var id = selectedItem.trnno_id
+
+        var url="@Url.Action("Checksavechanges", "Report")"
+        $.get(url, { id: id, qty: qty, amount: amount, remark: remark }, function (d) {
+        //if (d == "success") {
+            swal("Success", "Changes successfully saved!", "success")
+            $("#grd_proposalsummary_detail").data("kendoGrid").dataSource.read();
+        //}
+        //else {
+        //    swal("Error", "Something went wrong!", "error")
+        //}
+        })
+    }
+    function RefreshGrid() {
+        $("#grd_proposalsummary_detail").data("kendoGrid").dataSource.read();
+    }
+    function btnppmpitem_prop() {
+        var officeid = @Session["officeid"];//$("#office").val() == "" ? 0 : $("#office").val()
+
+        var programid = 4;//$("#ooe").val() == "" ? 0 : $("#ooe").val()
+        var accountid = $("#account").val();//$("#account").val() == "" ? 0 : $("#account").val()
+        var tyear = 2024//$("#wfpyear").val()
+
+        var fundid = 0;//$("#gfid").val() == 1 ? 0 : 1
+        var mode_trans= 0;//$("#gf_currentid").val()
+        var url = "@Url.Action("wfpadditempropose", "Report")";
+        if ((officeid == 0 || programid == 0 || accountid == 0 || tyear == 0) && fundid == 0 && mode_trans == 1) {
+            swal("", "Please select office, program, and account from the dropdown list above!", "info");
+        }
+        else if((officeid == 0 || accountid == 0) && fundid == 1){ //trust fund
+            swal("", "Please select office and account from the dropdown list above!", "info");
+        }
+        else if((officeid == 0 || accountid == 0) && mode_trans == 0){ //excess
+            swal("", "Please select office and account from the dropdown list above!", "info");
+        }
+        else {
+
+            $.get(url,
+                {
+                    office: officeid,
+                    program: programid,
+                    account: accountid,
+                    tyear: tyear,
+                    fundid:fundid,
+                    mode_trans:mode_trans
+                },
+            function (d) {
+                $('#wfpadditempropose').html(d);
+            })
+            $('#wfpadditempropose').data('kendoWindow').title("<i class='fa fa-navicon'> </i> ADD PROCUREMENT ITEM").center().open();
+        }
+    }
+    function deletewfp(id){
+        var account= $("#account").val()
+        swal({
+            title: "Delete ITEM?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes",
+            closeOnConfirm: false,
+            showLoaderOnConfirm: true
+        },
+            function () {
+                var url = "@Url.Action("deleteitem_proposed", "Report")";
+                $.get(url, { id: id,account:account}, function (e) {
+                    if (e =='success'){
+                        swal("Success", "Item has been deleted.", "success")
+                        $("#grd_proposalsummary_detail").data("kendoGrid").dataSource.read()
+                    }
+                    else{
+                        swal("Error",e,"error")
+                    }
+                })
+            })
+    }
+</script>
+
+
+<div id="searchAccountid" style="height: 30px; margin-top:0px; float: right; margin-left: 200px;">
+    <input type="text" style="width:400px;border-collapse:collapse;margin:0px;border-style:solid;border-color:black;margin-left:0px;height:70%;outline:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search..." id="SearchData" name="SearchData">
+    <div class="k-button k-button-icontext" style="height:30px;width:40px;border-style:solid;border-color:black;" onclick="searchAccount()"><span class="mif-search"></span></div>
+</div>
+
+<div style="margin-top:32px">
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.BudgetControlModel>()
+        .Name("grd_proposalsummary_detail")
+        .HtmlAttributes(new { style = "height:450px;" })
+        .Scrollable()
+    .Columns(col =>
+    {
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;">Account</div></text>)
+                        .Width(200)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px; vertical-align: top" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div>#=AccountName# </div>");
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;">Description</div></text>)
+                        .Width(270)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div>#=Description# </div>")
+                        .ClientFooterTemplate("<div style='text-align:center;font-weight:bold'> TOTAL </div>");
+        col.Bound(m => m.qty2)
+                        .HtmlAttributes(new { style = "font-weight:600;text-align:center; vertical-align: top; overflow: visible; white-space: normal;" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Qty</div></text>    )
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle" })
+                    .Width(50)
+                    .ClientTemplate("<div>#=kendo.toString(qty2,'N0')# </div>")
+                    .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> </label><label> #=kendo.toString(sum, 'N0')#</label></div>");
+        col.Bound(m => m.Amount)
+                    .HtmlAttributes(new { style = "font-weight:600;text-align:right; vertical-align: top; overflow: visible; white-space: normal;" })
+                    .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Amount</div></text>    )
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle" })
+                    .Width(90)
+                    .ClientTemplate("<div>#=kendo.toString(Amount,'c2')# </div>");
+        col.Bound(m => m.totalamount)
+                    .HtmlAttributes(new { style = "font-weight:600;text-align:right; vertical-align: top; overflow: visible; white-space: normal;" })
+                    .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Total <br>Amount</div></text>    )
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle" })
+                    .Width(90)
+                    .ClientTemplate("<div>#=kendo.toString(totalamount,'c2')# </div>")
+                    .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> </label><label> #=kendo.toString(sum, 'c2')#</label></div>");
+        @*col.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;">Remarks</div></text>)
+                        .Width(200)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div>#=Remarks# </div>");*@
+    col.Bound(m => m.Remarks)
+            .HtmlAttributes(new { style = "text-align:left;height:30px;vertical-align: top" }).Title("Remarks")
+            .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" }).Width(200);
+    col.Bound(m => m.OfficeID).Title("office").Hidden();
+    col.Bound(m => m.trnno_id).Title("denomination id").Hidden();
+
+    col.Template(@<text></text>)
+        .HeaderTemplate(@<text></text>)
+        .HeaderHtmlAttributes(new { style ="text - align:center; vertical - align: middle" })
+        .ClientTemplate(
+            //"<div class='k-button k-button-icontext' id='deleteid#=wfpid#' style='border-radius:50px;color:\\#ffffff;background-color:\\#DE5555;' onclick='deletewfp(#=wfpid#)'><span class='fa fa-trash' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'> </span></div> ")
+            "<div id='deleteid#=trnno_id#' style='border-radius:50px;' onclick='deletewfp(#=trnno_id#)'><span class='fa fa-trash' title='Click to delete item!' style='font-size: 16px;margin: 1px;margin-top: -1px;margin-left: 2px;margin-right: 2px;color:red;cursor:pointer'> </span></div> ")
+        .HtmlAttributes(new { style = "vertical-align: top;text-align:center;" })
+        .Width(40);
+
+    })
+    .ToolBar(toolbar =>
+    {
+        toolbar.Custom().Text("<span  class='fa fa-plus' title='Click to ADD PROCUREMENT ITEM!' ></span> Add").Url("javascript:void(0)").HtmlAttributes(new { onclick = "btnppmpitem_prop()", style = "float:left;margin-left:0px;background-color:cornflowerblue;color:white", title = "Click to ADD PROCUREMENT ITEM!" });
+        toolbar.Custom().Text("<span id='RefreshGrid' class='fa fa-refresh'> </span> Refresh").Name("Refresh").Url("javascript:void(0)").HtmlAttributes(new { onclick = "RefreshGrid()" });
+        toolbar.Save();
+    })
+         .AutoBind(false)
+         .Editable(editable => editable.Mode(GridEditMode.InCell))
+         .Events(e => e.SaveChanges("reqSave").Edit("onGridEdit"))
+         .Pageable(page => page.Refresh(true)
+            .Enabled(true)
+            .ButtonCount(4)
+            .PreviousNext(true)
+         )
+         // .ClientDetailTemplateId("template_table")
+         .Selectable()
+           .Scrollable()
+
+         .DataSource(d => d
+         .Ajax()
+         .Batch(true)
+         .ServerOperation(false)
+         .Aggregates(a =>
+         {
+        a.Add(c => c.qty2).Sum();
+        a.Add(c => c.totalamount).Sum();
+    })
+         .PageSize(12)
+         .Model(m => m.Id(i => i.trnno_id))
+         .Read(read => read.Action("proposal_summary_detail", "Report").Data("fn_param"))
+         .Update("UpdateProposed_Summary", "Report"))
+)
+
+</div>
+<script>
+    $(document).ready(function () {
+        @*alert(@Session["officeid"])*@
+    });
+   
+</script>
+
+@(Html.Kendo().Window()
+        .Name("wfpadditempropose")
+        //.Title("")
+        .Width(1020)
+        .Height(610)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+        //  .Events(e => e.Close("closewfpapproved_lce"))
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+                .Actions(a => { a.Close(); })
+)

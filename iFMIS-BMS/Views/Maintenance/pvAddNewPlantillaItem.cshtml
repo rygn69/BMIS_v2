@@ -1,0 +1,282 @@
+﻿@model iFMIS_BMS.BusinessLayer.Models.Maintenance.PlantillaModel
+<script>
+    function LoadPositionData(PositionID) {
+
+        var PlanYear=$("#PlanYear").val()  -1
+        var url = "@Url.Action("GetPositionData", "Maintenance")";
+        $.getJSON(url,{PositionID:PositionID, PlanYear:PlanYear}, function(result){
+            $.each(result, function(i, field){
+                if (i == 'PositionID') {
+                    document.getElementById("lblPositionID").innerHTML = field;
+                }
+                else if(i == 'Position') {
+                    document.getElementById("lblPosition").innerHTML = field;
+                }
+                else if (i == 'sg') {
+                    document.getElementById("lblSalaryGrade").innerHTML = field;
+                }
+                else if (i == 'strSalary') {
+                    document.getElementById("lblSalary").innerHTML = field;
+                }
+            });
+        });
+    }
+    function reqClose() {
+        document.documentElement.style.overflow = 'auto';  // firefox, chrome
+        document.body.scroll = "yes";
+        $("#ProposeNewItem").data("kendoWindow").close();
+    }
+    function reqSave() {
+
+        var url = "@Url.Action("SaveNewPlantillaItem", "Maintenance")";
+        var url2 = "@Url.Action("UpdatePlantillaItem", "Maintenance")";
+        var PositionID = document.getElementById("lblPositionID").innerHTML;
+        var EmploymentStatus = $("#ddlEmploymentStatus").val();
+        var AppointmentDate = $("#dpAppointmentDate").val();
+        var DivisionID = $("#ddlOfficeDivision").val();
+        var OfficeID = $("#ddlOffices").val();
+        var PlanYear=$("#PlanYear").val()
+        var HazardPay = 0;
+        var Subsistence= 0;
+        if (document.getElementById("cbHazard").checked == true) {
+            HazardPay =2000;
+        }
+        else {
+            HazardPay = 0;
+        }
+        if (document.getElementById("cbSubsistence").checked == true) {
+            Subsistence = 1650;
+        }
+        else {
+            Subsistence = 0;
+        }
+        if ($("#ddlOfficeDivision").data("kendoDropDownList").dataSource.data().length == 0) {
+            DivisionID = '0';
+        }
+        if (PositionID == "" || EmploymentStatus == "" || AppointmentDate == "" || DivisionID == "") {
+            swal({
+                title: "Notice!",
+                text: "Complete The Fields",
+                type: "info",
+                showCancelButton: false,
+                confirmButtonColor: "#1fa67a",
+                confirmButtonText: "OK!",
+                closeOnConfirm: true,
+            });
+        }
+        else {
+            if (document.getElementById("btnsave").innerHTML == "Update") {
+                $.post(url2, { ProposedItemID:@Model.SeriesID,PositionID: PositionID, AppointmentDate: AppointmentDate, EmploymentStatus: EmploymentStatus, DivisionID:DivisionID,HazardPay:HazardPay,Subsistence:Subsistence }, function (d) {
+                    if (d == 1) {
+                        swal({
+                            title: "Notice!",
+                            text: "Successfuly Updated",
+                            type: "success",
+                            showCancelButton: false,
+                            confirmButtonColor: "#1fa67a",
+                            confirmButtonText: "OK!",
+                            closeOnConfirm: true,
+                        });
+                        $("#grdPlantillaList").data("kendoGrid").dataSource.read();
+                        $("#grdVacantPositions").data("kendoGrid").dataSource.read();
+                        $("#ddlEmploymentStatus").data("kendoDropDownList").value(0);
+                        $("#ddlOfficeDivision").data("kendoDropDownList").value(0);
+                        $("#dpAppointmentDate").data("kendoDatePicker").value(new Date(new Date().getFullYear() + 1, 0, 1));
+                        document.getElementById("lblSalaryGrade").innerHTML = "";
+                        document.getElementById("lblSalary").innerHTML = "";
+                        document.getElementById("lblPosition").innerHTML = "";
+                        document.getElementById("lblPositionID").innerHTML = "";
+                        document.getElementById("btnsave").innerHTML = "Save";
+                        document.documentElement.style.overflow = 'auto';  // firefox, chrome
+                        document.body.scroll = "yes";
+                        $("#ProposeNewCasual").data("kendoWindow").close();
+                    }
+                })
+            }
+            else {
+                $.post(url, { PositionID: PositionID, AppointmentDate: AppointmentDate, EmploymentStatus: EmploymentStatus,DivisionID:DivisionID,OfficeID:OfficeID,HazardPay:HazardPay,Subsistence:Subsistence,PlanYear:PlanYear }, function (d) {
+                    if (d == 1) {
+                        swal({
+                            title: "Notice!",
+                            text: "Successfuly Saved",
+                            type: "success",
+                            showCancelButton: false,
+                            confirmButtonColor: "#1fa67a",
+                            confirmButtonText: "OK!",
+                            closeOnConfirm: true,
+                        });
+                        $("#grdPlantillaList").data("kendoGrid").dataSource.read();
+                        $("#grdVacantPositions").data("kendoGrid").dataSource.read();
+                        $("#ddlEmploymentStatus").data("kendoDropDownList").value(0);
+                        $("#ddlOfficeDivision").data("kendoDropDownList").value(0);
+                        $("#dpAppointmentDate").data("kendoDatePicker").value(new Date(new Date().getFullYear() + 1, 0, 1));
+                        document.getElementById("lblSalaryGrade").innerHTML = "";
+                        document.getElementById("lblSalary").innerHTML = "";
+                        document.getElementById("lblPosition").innerHTML = "";
+                        document.getElementById("lblPositionID").innerHTML = "";
+                        document.getElementById("cbHazard").checked = false;
+                        document.getElementById("cbSubsistence").checked = false;
+                    }
+                })
+            }
+        }
+    }
+    function SearchPosition() {
+
+        var SearchProgramData = $("#SearchAccount").val();
+        var ProgramgGrid = $("#grdVacantPositions").data("kendoGrid").dataSource;
+        ProgramgGrid.filter([
+            {
+                logic: "or",
+                filters: [{
+                    field: "Position",
+                    operator: "contains",
+                    value: SearchProgramData
+                }]
+            }
+        ]);
+    }
+    document.getElementById('SearchAccount').onkeydown = function (event) {
+        if (event.keyCode == 13) {
+            SearchPosition();
+        }
+    }
+    document.getElementById('SearchAccount').onkeyup = function () {
+        if (($(this).val() == '' || $(this).val() == 'Search Position') && $(this).attr('type') != 'hidden') {
+            SearchPosition()
+        }
+    }
+    function GetddlOfficeDivisionParam() {
+        return {
+            OfficeID : $("#ddlOffices").val()
+        }
+    }
+</script>
+<div style="display:inline-block">
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Maintenance.PlantillaModel>()
+        .Name("grdVacantPositions")
+        .Columns(columns =>
+        {
+            columns.Bound(c => c.PositionID).Hidden();
+            columns.Bound(c => c.Position).Title("Positions").Width(200)
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+            columns.Template(t => { }).ClientTemplate(
+                  "<div class='k-button' onclick='LoadPositionData(#=PositionID#)' style='inline-block' title='Select'> <span class='fa fa-edit'></span>Select</div>"
+                  ).Width(50);
+        })
+        .HtmlAttributes(new { style = "height: 300px;" })
+        .Scrollable(s => s.Enabled(true))
+        .Selectable()
+        .DataSource(dataSource => dataSource
+            .Ajax()
+            .Read(read => read.Action("grGetVacantPositions", "Maintenance"))
+        )
+        .ToolBar(toolbar =>
+        {
+           toolbar.Template(@<text>
+            <div style="float: right; height:28px;margin-top:2px;">
+                <link href="~/Content/metroui/css/docs.css" rel="stylesheet" />
+                <div style="background-color:white;border:solid;border-color:whitesmoke;border-width:thin;width:310px;height:30px;float:right;padding:0px;margin-top:-3px;" id="search">
+                    <input type="text" style="width:260px;border-collapse:collapse;border-color:white;margin:0px;margin-left:-10px;height:70%;outline:none;border-left-style:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search Position" id="SearchAccount" name="SearchAccount">
+                    <div class="k-button k-button-icontext" style="height:29px;width:40px;margin-top:0.6px;" onclick="SearchPosition()"><span class="mif-search"></span></div>
+                </div>
+
+            </div>
+        </text>);
+        })
+    )
+    <br />
+    <label style="display:inline-block">
+        Selected Position : <span id="lblPosition"></span>
+    </label>
+    <label style="display:none">
+        Position : <span id="lblPositionID"></span>
+    </label>
+    <br />
+    <label style="display:inline-block">
+        Division : @(Html.Kendo().DropDownList()
+                        .Name("ddlOfficeDivision")
+                        .DataTextField("DivName")
+                        .DataValueField("DivID")
+                        .OptionLabel("Select Division...")
+                        .HtmlAttributes(new { @style = "width: 400px;" })
+                        .DataSource(source => source.Read(read => read.Action("getOfficeDivisions", "Dropdowns").Data("GetddlOfficeDivisionParam")))
+                       // .Events(e => { e.Change("loadRoles"); })
+        )
+    </label>
+    <br />
+    <label style="display:inline-block">
+        Proposed Position Effectivity Date :<br />
+        @(Html.Kendo().DatePicker()
+              .Name("dpAppointmentDate")
+              .Start(CalendarView.Month)
+              .Depth(CalendarView.Month)
+              .Value(@Model.AppointmentDate)
+              .Min(new DateTime(DateTime.Now.Year + 1, 1, 1))
+              .Format("yyyy-MM-dd")
+              .HtmlAttributes(new { style = "width: 242px; height: 100%" })
+        )
+    </label>&nbsp;&nbsp;
+    <label style="display:inline-block">
+        Employment Status :<br />
+        @(Html.Kendo().DropDownList()
+                         .Name("ddlEmploymentStatus")
+                         .DataTextField("EmploymentStatus")
+                         .DataValueField("EmploymentStatusID")
+                         .MinLength(1)
+                         .HtmlAttributes(new { @style = "width: 242px;" })
+                         .DataSource(source => source.Read(read => read.Action("ddlEmploymentStatus", "Dropdowns")))
+        )
+    </label>
+    <br />
+    <label style="display:inline-block">
+        Salary Grade :<span id="lblSalaryGrade"></span>
+    </label>
+    <br />
+    <label style="display:inline-block">
+        Monthly Salary :<span id="lblSalary"></span>
+    </label>
+    <br />
+    <div style="display:none">
+        <div style="display : inline-block; width : 24%;">
+            <input type="checkbox" id="cbHazard" class="k-checkbox">
+            <label class="k-checkbox-label" for="cbHazard">Hazard Pay</label>
+        </div>
+        <div style="display : inline-block; width : 74%;">
+            <input type="checkbox" id="cbSubsistence" class="k-checkbox">
+            <label class="k-checkbox-label" for="cbSubsistence">Subsistence, Laundry and Quarters Allowances</label>
+        </div>
+        <br />
+    </div>
+    <div style="float:right">
+        <div id="btnsave" class="k-button k-button-icontext" style="margin-bottom:5px;display:inline-block;width: 80px;clear:both; margin-top:5px;" onclick="reqSave()">Save</div>
+        <div id="btnclose" class="k-button k-button-icontext" style="margin-bottom:5px;display:inline-block;width: 80px;clear:both; margin-top:5px;" onclick="reqClose()">Close</div>
+    </div>
+    
+    
+</div>
+<script>
+    $(document).ready(function () {
+        if (@Model.SeriesID != 0) {
+            document.getElementById("btnsave").innerHTML = "Update";
+            document.getElementById("lblSalaryGrade").innerHTML = "@Model.sg";
+            document.getElementById("lblSalary").innerHTML = "@Model.strSalary";
+            document.getElementById("lblPosition").innerHTML = "@Model.Position";
+            document.getElementById("lblPositionID").innerHTML = "@Model.PositionID";
+            $("#ddlEmploymentStatus").data("kendoDropDownList").value(@Model.EmploymentStatusID);
+            $("#ddlOfficeDivision").data("kendoDropDownList").value(@Model.DivID);
+            if (@Model.HazardPay == 0) {
+                document.getElementById("cbHazard").checked = false;
+            }
+            else {
+                document.getElementById("cbHazard").checked = true;
+            }
+            if (@Model.Subsistence == 0) {
+                document.getElementById("cbSubsistence").checked = false;
+            }
+            else {
+                document.getElementById("cbSubsistence").checked = true;
+            }
+        }
+    });
+</script>

@@ -1,0 +1,298 @@
+﻿<script>
+    function setGroup() {
+
+        var FormID = $("#ddlFormType").val();
+        var SectionID = $("#ddlSection").val()
+        var url = "@Url.Action("GroupSection", "Maintenance")";
+        if (SectionID == "" || FormID == "") {
+            swal({
+                title: "Something went wrong!",
+                text: "Please Select Section And FormID!",
+                type: "info",
+                timer: 2000,
+                showConfirmButton: false
+            });
+        }
+        else {
+            var url2 = "@Url.Action("CheckMainGroup", "Maintenance")";
+            var FormID = $("#ddlFormType").val();
+            var SectionID = $("#ddlSection").val();
+            $.post(url2, { FormID: FormID }, function (d) {
+                if (d == "No Group") {
+                    $.post(url, { FormID: FormID, SectionID: SectionID }, function (d2) {
+                        if (d2 == 1) {
+                            swal({
+                                title: "Success!",
+                                text: "Group Successfully Updated!",
+                                type: "success",
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                            $("#ddlSection").data("kendoComboBox").value("");
+                            $("#ddlFormType").data("kendoComboBox").value("");
+                        }
+                        else {
+                            swal({
+                                title: "Something went wrong!",
+                                text: d2,
+                                type: "error",
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                        }
+                    })
+                }
+                else {
+                    swal({
+                        title: "Are you sure?",
+                        text: "This Will Overite the Previous group of this form.",
+                        type: "info",
+                        showCancelButton: true,
+                        confirmButtonColor: "#DD6B55",
+                        confirmButtonText: "Yes!",
+                        closeOnConfirm: false
+                    }, function () {
+                        $.post(url, { FormID: FormID, SectionID: SectionID }, function (d2) {
+                            if (d2 == 1) {
+                                swal({
+                                    title: "Success!",
+                                    text: "Group Successfully Updated!",
+                                    type: "success",
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                });
+                                $("#ddlSection").data("kendoComboBox").value("");
+                                $("#ddlFormType").data("kendoComboBox").value("");
+                            }
+                            else {
+                                swal({
+                                    title: "Something went wrong!",
+                                    text: d2,
+                                    type: "error",
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                });
+                            }
+                        })
+                    });
+                }
+            });
+            
+        }
+    }
+    function setOfficeGroup() {
+        var MainOfficeID = $("#ddlMainOffice").val();
+        var SubOfficeID = $("#ddlSubOffice").val()
+        var url = "@Url.Action("GroupOffice", "Maintenance")";
+        if (MainOfficeID == "" || SubOfficeID == "") {
+            swal({
+                title: "Cannot Complete Request!",
+                text: "Please Select Office To Group!",
+                type: "info",
+                timer: 2000,
+                showConfirmButton: false
+            });
+        }
+        else {
+            $.post(url, { MainOfficeID: MainOfficeID, SubOfficeID: SubOfficeID }, function (d) {
+                if (d == 1) {
+                    swal({
+                        title: "Success!",
+                        text: "Group Successfully Updated!",
+                        type: "success",
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    $("#grOfficeGroupingList").data("kendoGrid").dataSource.read();
+                }
+                else if (d == 'EXISTING GROUP') {
+                    swal({
+                        title: "Cannot Complete Request!",
+                        text: "Selected Offices Are Already Grouped!",
+                        type: "info",
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                }
+                else {
+                    swal({
+                        title: "Something went wrong!",
+                        text: d,
+                        type: "error",
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                }
+            })
+        }
+    }
+    function reqRemoveGroup(OfficeGroupingID) {
+        swal({
+            title: "Are you sure?",
+            text: "This Action Will Remove This Office To The Group.",
+            type: "info",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes!",
+            closeOnConfirm: false
+        }, function () {
+            var url = "@Url.Action("RemoveGroup", "Maintenance")";
+            $.post(url, { OfficeGroupingID: OfficeGroupingID }, function (d) {
+                if (d == 1) {
+                    swal({
+                        title: "Success!",
+                        text: "Succesffuly Removed!",
+                        type: "success",
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    $("#grOfficeGroupingList").data("kendoGrid").dataSource.read();
+                }
+                else {
+                    swal({
+                        title: "Something went wrong!",
+                        text: d,
+                        type: "error",
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                }
+            }) 
+        });
+    }
+    function CheckSubFormType() {
+        var url = "@Url.Action("CheckSubFormType", "Maintenance")";
+        var SectionID = $("#ddlSection").val();
+        $.post(url, { SectionID: SectionID }, function (d) {
+            if (d == "No Group") {
+                $("#ddlFormType").data("kendoComboBox").value("");
+            }
+            else {
+                $("#ddlFormType").data("kendoComboBox").value(d);
+            }
+        })
+    }
+    function CheckMainGroup() {
+        var url = "@Url.Action("CheckMainGroup", "Maintenance")";
+        var FormID = $("#ddlFormType").val();
+        var SectionID = $("#ddlSection").val();
+        $.post(url, { FormID: FormID }, function (d) {
+            if (SectionID == "") {
+                if (d == "No Group") {
+                    $("#ddlSection").data("kendoComboBox").value("");
+                }
+                else {
+                    $("#ddlSection").data("kendoComboBox").value(d);
+                }
+            }
+
+        })
+    }
+</script>
+<label style="display:inline-block">
+    Section :
+    @(Html.Kendo().ComboBox()
+                         .Name("ddlSection")
+                         .DataTextField("SectionName")
+                         .DataValueField("SectionID")
+                         .Filter("contains")
+                         .MinLength(1)
+                         .Placeholder("Select Section...")
+                         .HtmlAttributes(new { @style = "width: 250px;" })
+                         .DataSource(source => source.Read(read => read.Action("ddlSections", "Dropdowns")))
+                         .Events(e => e.Change("CheckSubFormType"))
+    )
+</label>
+<div style="width : 100%; margin-top: 0px;border-style: solid; border-color: #1fa67a">
+    <div style="width:100%;height : 25px ; background-color:#1fa67a; color: white">
+        <label class="fa fa-file-text-o fa-lg" style="margin-left: 5px; display:inline-block">  Section Child form</label>
+    </div>
+    <label style="display:inline-block; margin-top:5px; margin-left: 5px;">
+        Form Type :
+        @(Html.Kendo().ComboBox()
+                         .Name("ddlFormType")
+                         .DataTextField("Text")
+                         .DataValueField("Value")
+                         .Filter("contains")
+                         .MinLength(1)
+                         .Placeholder("Select Form Type...")
+                         .HtmlAttributes(new { @style = "width: 350px;" })
+                         .BindTo(new List<SelectListItem>()
+                          {
+                              new SelectListItem() {
+                                Text = "LBP FORM 1 General Fund", Value ="1"
+                              },
+                              new SelectListItem() {
+                                Text = "LBP FORM 1 Economic Enterprise", Value ="2"
+                              },
+                              new SelectListItem() {
+                                Text = "LBP FORM 3 General Fund", Value ="3"
+                              },
+                              new SelectListItem() {
+                                Text = "LBP FORM 3 Economic Enterprise", Value ="4"
+                              }
+                          }).Events(e => e.Change("CheckMainGroup"))
+        )
+    </label>
+    <div style="display:inline-block" class="k-button k-button-icontext" onclick="setGroup()"> <i class="fa fa-exchange"></i> Set </div>
+</div>
+
+<div style="width : 100%; margin-top: 0px;border-style: solid; border-color: #1fa67a">
+    <div style="width:100%;height : 25px ; background-color:#1fa67a; color: white">
+        <label class="fa fa-file-text-o fa-lg" style="margin-left: 5px; display:inline-block">  Office Grouping</label>
+    </div>
+    <label style="display:inline-block; margin-top:5px; margin-left: 5px;">
+        Main Office :
+        @(Html.Kendo().ComboBox()
+                         .Name("ddlMainOffice")
+                         .DataTextField("OfficeName")
+                         .DataValueField("OfficeID")
+                         .Filter("contains")
+                         .MinLength(1)
+                         .Placeholder("Select MainOffice...")
+                         .HtmlAttributes(new { @style = "width: 527px;" })
+                         .DataSource(source => source.Read(read => read.Action("ddlOfficeUP", "User")))
+        )
+    </label>
+    <label style="display:inline-block; margin-top:5px; margin-left: 5px;">
+        Sub Office &nbsp; :
+        @(Html.Kendo().ComboBox()
+                         .Name("ddlSubOffice")
+                         .DataTextField("OfficeName")
+                         .DataValueField("OfficeID")
+                         .Filter("contains")
+                         .MinLength(1)
+                         .Placeholder("Select Sub Office...")
+                         .HtmlAttributes(new { @style = "width: 527px;" })
+                         .DataSource(source => source.Read(read => read.Action("ddlOfficeUP", "User")))
+        )
+    </label>
+    <div style="display:inline-block" class="k-button k-button-icontext" onclick="setOfficeGroup()"> <i class="fa fa-exchange"></i> Group </div>
+    <div style="margin-top:10px">
+        @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.OfficesModel>()
+                .Name("grOfficeGroupingList")
+                .Columns(columns =>
+                {
+                    columns.Bound(c => c.OfficeID).Hidden();
+                    columns.Bound(c => c.OfficeName).Title("Main Office").Hidden()
+                        .ClientGroupHeaderTemplate("<div style='display:inline-block'>#= value #</div>");
+                    columns.Bound(c => c.SubOffice).Title("Office").Width(200)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+                    columns.Template(t => { }).ClientTemplate(
+                                               "<div class='k-button' onclick='reqRemoveGroup(#=OfficeID#)' style='inline-block' title='Remove'> <span class='fa fa-times'></span>Remove</div>"
+                        ).Width(60);
+                })
+                        .HtmlAttributes(new { style = "height: 300px;" })
+                        .Scrollable(s => s.Enabled(true))
+                        .Selectable()
+                        .DataSource(dataSource => dataSource
+                            .Ajax()
+                            .Batch(true)
+                            .ServerOperation(false)
+                            .Read(read => read.Action("ReadOfficeGrouping", "Maintenance"))
+                            .Group(g=> g.Add(c => c.OfficeName))
+                        )
+        )
+    </div>
+    
+</div>

@@ -1,0 +1,117 @@
+﻿
+<script>
+    
+    function FundSummary()
+    {
+        if (document.getElementById('FundSummary').checked) {
+
+            document.getElementById("FundSummary").value = 1;
+
+        } else {
+
+            document.getElementById("FundSummary").value = 0;
+
+        }
+    }
+    
+    function reqPrint() {
+        var fundtypeid = $("#fundtypeid").val();
+        var year= $("#fundyear").val();
+    $
+        $.ajax({
+            async: false,
+            dataType: 'html',
+            success: window.open("../Reports/ReportViewer.aspx?rid=30&Year=" + year + "&fundtypeid=" + fundtypeid + "")
+        });
+
+    }
+
+    var thisculture = kendo.culture();
+    thisculture.numberFormat.currency.symbol = '₱'; // Script For Changing The Currency Sign
+
+   
+</script>
+
+<h2><span class="fa fa-print"></span> Fund Utilization </h2>
+
+<br />
+<div id="fundutilized" style="float: none;clear:both; margin-top: 20px;width:500px">
+        <div style="float:left;margin-left:20px;margin-top:5px;">
+            <label>
+                Fund Type   :
+            </label>
+        </div>
+        <div style="float:left;margin-left:30px;margin-top:2px;width:300px">              
+                        
+                    @(Html.Kendo().DropDownList()
+                    .Name("fundtypeid")
+                    .DataTextField("Text")
+                    .DataValueField("Value")
+                    .AutoBind(true)
+                    @*.Placeholder("Select fund type...")*@
+                    .Filter("contains")
+                    .MinLength(2)
+                    .SelectedIndex(0)
+                    .HtmlAttributes(new { style = "width:100%; height:100%", @class = "form-control autoselect"})
+                    .BindTo(new List<SelectListItem>() {
+                        new SelectListItem() {
+                            Text = "All",
+                            Value = "0"
+                        },
+                        new SelectListItem() {
+                            Text = "General Fund",
+                            Value = "101"
+                        },
+                        new SelectListItem() {
+                            Text = "Special Education Fund",
+                            Value = "201"
+                        },
+                        new SelectListItem() {
+                            Text = "20% Development Fund",
+                            Value = "118"
+                        },
+                        new SelectListItem() {
+                            Text = "Economic Enterprises",
+                            Value = "119"
+                        },
+                        new SelectListItem() {
+                            Text = "Local Disaster Risk Reduction and Management Fund",
+                            Value = "127"
+                        }
+                    })
+                )
+          </div>
+          <div style="float:left;margin-left:64px;margin-top:15px;">
+            <label>
+                Year   :
+            </label>
+          </div>
+          <div style="float:left;margin-left:30px;margin-top:10px;width:300px">              
+            @(Html.Kendo().DropDownList()
+                        .Name("fundyear")
+                        .DataTextField("ProposalYear")
+                        .DataValueField("ProposalYear")
+                        .SelectedIndex(0)
+                        @*.HtmlAttributes(new { @style = "width: 95px;" })*@
+                        .HtmlAttributes(new { style = "width:150px; height:100%", @class = "form-control autoselect"})
+                        .DataSource(source => source.Read(read => read.Action("PPAYear", "PYear")))
+                        )
+          </div>
+       
+</div>
+     
+<div>
+    <input type="text" style="width:20px" name="type_pgo" id="type_pgo" value="1" hidden disabled>
+</div>
+
+<div style="float: none;clear:both; margin-top: 50px>
+    <div id="OptionBox" style="float: none;clear:both; margin-top: 30px">
+        
+        @*<div style="float:left;margin-left:100px;margin-top:10px;">
+
+            <input type='checkbox' class='checkbox' id="FundSummary" name="FundSummary" value="true" onclick=FundSummary() /> <font style="font-size:15px">Summary</font>
+        </div>*@    
+    </div>
+
+    <div id="btnPrint" class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 100px;float:left; margin-top: 30px;margin-left:334px; margin-bottom:0px" onclick="reqPrint()"><span class="mif-printer"></span> PRINT</div>
+</div>

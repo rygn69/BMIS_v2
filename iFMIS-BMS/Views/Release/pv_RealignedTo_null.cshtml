@@ -1,0 +1,787 @@
+﻿
+<script>
+    function ConvertCommasToEmpty_realign(str) {
+        str = str.toString().replace(/,/g, "");
+        parseInt(str, 20);
+        return str;
+    }
+    function fn_closeRealign() {
+        var classtype_GFEE = $("#classtype").val();
+        if (classtype_GFEE == 2) {
+            $("#RealignedToWindow").data("kendoWindow").close();
+        } else if (classtype_GFEE == 3) {
+            $("#RealignedToWindow_EE").data("kendoWindow").close();
+        }
+        else {
+            $("#RealignedToWindow").data("kendoWindow").close();
+        }
+      
+    }
+
+    
+    function fn_ref_acc() {
+
+        document.getElementById("toAmount_null").disabled = false;
+    }
+
+    function fn_History_realign_from() {
+
+        var url = "@Url.Action("Realigned_From", "Release")";
+
+
+        var office_id = $('#office_realigned_to_null').val()
+        var program_id = $('#Program_realigned_to_null').val()
+        //var ooe_id = $('#ooe_id_realigned_to_null').val()
+        var account_id = $('#account_list_realigned_to_null').val()
+       
+        if (office_id == '' || office_id == 0 || office_id == null) {
+            swal({
+                title: "Error!",
+                text: "PLEASE Select Office",
+                timer: 3000,
+                type: "error",
+                showConfirmButton: false
+            })
+        } else {
+
+
+
+            $.get(url, { office_id: office_id, program_id: program_id, account_id: account_id }, function (d) {
+                $('#history_from').html(d);
+            })
+
+            $('#history_from').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Realigned From").center().open();
+        }
+    }
+    function fn_History_realign_to() {
+        var url = "@Url.Action("Realigned_To", "Release")";
+
+
+        var office_id_to = $('#office_realigned_to_null_To').val()
+        var program_id_to = $('#Program_realigned_to_null_To').val()
+       // var ooe_id_to = $('#ooe_id_realigned_to_null_To').val()
+        var account_id_to = $('#account_list_realigned_to_null_To').val()
+
+        if (office_id_to == '' || office_id_to == 0 || office_id_to == null ||
+            program_id_to == '' || program_id_to == 0 || program_id_to == null ||
+           // ooe_id_to == '' || ooe_id_to == 0 || ooe_id_to == null ||
+            account_id_to == '' || account_id_to == 0 || account_id_to == null) {
+            alert("Please Select Account")
+        } else {
+            $.get(url, {}, function (d) {
+                $('#history_to').html(d);
+            })
+
+            $('#history_to').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Realigned To").center().open();
+        }
+    }
+
+    function fn_saverealign_to_null() {
+
+        var url = "@Url.Action("Save_Realign_To_Null", "Release")";
+
+        var office_id_realign = $('#office_realigned_to_null').val()
+        var program_id_realign = $('#Program_realigned_to_null').val()
+       // var ooe_id = $('#ooe_id_realigned_to_null').val()
+        var account_id_realign = $('#account_list_realigned_to_null').val()
+        var amount_to_realign = $('#amounttorealign_null').val()
+        var to_be_realign = $('#toberealign_null').val()
+
+        var office_id_to_realign = $('#office_realigned_to_null_To').val()
+        var program_id_to_realign = $('#Program_realigned_to_null_To').val()
+        //var ooe_id_to = $('#ooe_id_realigned_to_null_To').val()
+        var account_id_to_realign = $('#account_list_realigned_to_null_To').val()
+        var to_Amount = $('#toAmount_null').val()
+        var year_ = $("#ddlYear").val();
+
+        var available_amount = $('#available_amount_null').val()
+        var tobe_realignamount = $('#toberealign_null').val()
+
+        var toAmount_null
+        var account_list_realigned_to_null_To
+
+        //amount_to_realign = Number(parseFloat(ConvertCommasToEmpty_realign(amount_to_realign)).toFixed(2))
+        //alert(amount_to_realign);
+
+        if (amount_to_realign == 0 || amount_to_realign == null || amount_to_realign == '') {
+            amount_to_realign = 0
+        }
+        //alert(amount_to_realign);
+        if (to_Amount == 0 || to_Amount == null || to_Amount == '') {
+            to_Amount = 0
+        }
+
+
+        var difference_ = to_be_realign - amount_to_realign
+
+        if (Number(ConvertCommasToEmpty_realign(tobe_realignamount)) < Number(ConvertCommasToEmpty_realign(to_Amount)))
+        {
+            swal({
+                title: "Ooops!",
+                text: "Sorry! Please check available amount.",
+                timer: 2000,
+                type: "error",
+                showConfirmButton: false
+            })
+        }
+        else if (account_id_to_realign != 0 && to_Amount == 0) {
+            swal({
+                title: "Ooops!",
+                text: "Please enter the re-align amount.",
+                timer: 2000,
+                type: "warning",
+                showConfirmButton: false
+            })
+        }
+        else {
+
+            if (Number(ConvertCommasToEmpty_realign(available_amount)) < Number(ConvertCommasToEmpty_realign(amount_to_realign)))
+            {
+          
+                swal({
+                    title: "Ooops!",
+                    text: "Sorry! Please check available amount.",
+                    timer: 2000,
+                    type: "error",
+                    showConfirmButton: false
+                })
+            } else { 
+                    //amount_to_realign: ConvertCommasToEmpty_realign(amount_to_realign),
+            swal({
+                title: "Are you sure?",
+                text: "This Item will be SAVED!",
+                type: "info",
+                showCancelButton: true,
+                closeOnConfirm: false,
+                confirmButtonColor: "#1fa67a",
+                confirmButtonText: "Yes, Save It!",
+                showLoaderOnConfirm: true,
+            }, function () {
+
+                $.post(url, {
+                    office_id_realign: office_id_realign,
+                    program_id_realign: program_id_realign,
+                    account_id_realign: account_id_realign,
+                    amount_to_realign: Number(parseFloat(ConvertCommasToEmpty_realign(amount_to_realign)).toFixed(2)),
+                    to_be_realign: Number(parseFloat(ConvertCommasToEmpty_realign(to_be_realign)).toFixed(2)),
+                    year_: year_,
+                    office_id_to_realign: office_id_to_realign,
+                    program_id_to_realign: program_id_to_realign,
+                    account_id_to_realign: account_id_to_realign,
+                    to_Amount: Number(parseFloat(ConvertCommasToEmpty_realign(to_Amount)).toFixed(2))
+                }, function (e) {
+               // fn_refreshtext_null();
+                reffff();
+                document.getElementById("amounttorealign_null").value = "";
+                document.getElementById("toAmount_null").value = "";
+
+                if (e == "1") {
+                    swal({
+                        title: "Success!",
+                        text: "New Realignment has been Saved.",
+                        timer: 2000,
+                        type: "success",
+                        showConfirmButton: false
+                    })
+                    $('#GeneralFund_Grid').data('kendoGrid').dataSource.read();
+                } else {
+                    swal({
+                        title: "Error!",
+                        text: "System Error! Please try again.",
+                        timer: 2000,
+                        type: "error",
+                        showConfirmButton: false
+                    })
+                }
+
+
+             });
+            });
+
+            }
+        }
+
+
+    }
+    //}
+
+    //}
+
+    function fn_refresher_realigned_to_null() {
+
+        $("#office_realigned_to_null").val(null);
+        $("#account_list_realigned_to_null").val(null);
+       // $("#ooe_id_realigned_to_null").val(null);
+
+        $("#office_realigned_to_null").data("kendoComboBox").text(null);
+        $("#account_list_realigned_to_null").data("kendoComboBox").text(null);
+       // $("#ooe_id_realigned_to_null").data("kendoDropDownList").text(null);
+
+        $("#Program_realigned_to_null").data("kendoDropDownList").dataSource.read();
+       // $("#ooe_id_realigned_to_null").data("kendoDropDownList").dataSource.read();
+        $("#account_list_realigned_to_null").data("kendoComboBox").dataSource.read();
+
+        $("#office_realigned_to_null_To").val(null);
+        $("#account_list_realigned_to_null_To").val(null);
+       // $("#ooe_id_realigned_to_null_To").val(null);
+
+        $("#office_realigned_to_null_To").data("kendoComboBox").text(null);
+        $("#account_list_realigned_to_null_To").data("kendoComboBox").text(null);
+       // $("#ooe_id_realigned_to_null_To").data("kendoDropDownList").text(null);
+
+        $("#Program_realigned_to_null_To").data("kendoDropDownList").dataSource.read();
+       // $("#ooe_id_realigned_to_null_To").data("kendoDropDownList").dataSource.read();
+        $("#account_list_realigned_to_null_To").data("kendoComboBox").dataSource.read();
+       
+
+    }
+    setTimeout(function () {
+
+        var lru = "@Url.Action("thatass","Release")";
+        var year_ = $("#ddlYear").val();
+        $.post(lru, { year_: year_ }, function (e) {
+            document.getElementById("toberealign_null").value = commaSeparateNumberRealignment(e);
+
+        })
+    }, 1000);
+    function reffff() {
+        setTimeout(function () {
+
+            var lru = "@Url.Action("thatass","Release")";
+            var year_ = $("#ddlYear").val();
+            $.post(lru, { year_: year_ }, function (e) {
+                document.getElementById("toberealign_null").value = commaSeparateNumberRealignment(e);
+
+            })
+        }, 1000);
+
+
+        setTimeout(function () {
+
+            var url = "@Url.Action("datass", "Release")";
+
+
+            var office_id = $('#office_realigned_to_null').val()
+            var program_id = $('#Program_realigned_to_null').val()
+            // var ooe_id = $('#ooe_id_realigned_to_null').val()
+            var account_id = $('#account_list_realigned_to_null').val()
+            var year_ = $("#ddlYear").val();
+
+
+
+            $.post(url, { office_id: office_id, program_id: program_id,  account_id: account_id, year_: year_ }, function (e) {
+                document.getElementById("available_amount_null").value = commaSeparateNumberRealignment(e);
+                document.getElementById("amounttorealign_null").disabled = false;
+
+
+            })
+
+
+            @*document.getElementById("amounttorealign_null").value = e;
+            document.getElementById("amounttorealign_null").value = @
+                .ToBeRealign;*@
+            }, 1000);
+
+
+    }
+    function refresh_acc() {
+        $("#account_list_realigned_to_null").data("kendoComboBox").dataSource.read();
+        
+    }
+    function fn_refreshtext_null() {
+        //var account_id_to = $('#account_list_realigned_to_null').val()
+        //alert(account_id_to)
+        setTimeout(function () {
+        var url = "@Url.Action("datass", "Release")";
+
+
+        var office_id = $('#office_realigned_to_null').val()
+        var program_id = $('#Program_realigned_to_null').val()
+       // var ooe_id = $('#ooe_id_realigned_to_null').val()
+        var account_id = $('#account_list_realigned_to_null').val()
+        var year_ = $("#ddlYear").val();
+
+
+
+        $.post(url, { office_id: office_id, program_id: program_id, account_id: account_id, year_: year_ }, function (e) {
+            if (account_id = 0 || account_id == null || account_id == '') {
+                document.getElementById("available_amount_null").value = '';
+            } else {
+                document.getElementById("available_amount_null").value = commaSeparateNumberRealignment(e);
+            }
+            document.getElementById("amounttorealign_null").disabled = false;
+            if (e <= 0) {
+               
+                document.getElementById("amounttorealign_null").disabled = true;
+
+            }
+            else {
+                
+                document.getElementById("amounttorealign_null").disabled = false;
+            }
+
+
+        })
+
+
+        @*document.getElementById("amounttorealign_null").value = e;
+        document.getElementById("amounttorealign_null").value = @ViewBag.ToBeRealign;*@
+        }, 1000);
+    }
+
+    function fn_dprefresherorb_realigned_to_null() {
+        fn_Offices_realignedto_null();
+        $("#Program_realigned_to_null").data("kendoDropDownList").dataSource.read();
+        //$("#ooe_id_realigned_to_null").data("kendoDropDownList").dataSource.read();
+        $("#account_list_realigned_to_null").data("kendoComboBox").dataSource.read();
+
+
+    }
+    function fn_dprefresherorb_realigned_to_null_To() {
+
+        $("#Program_realigned_to_null_To").data("kendoDropDownList").dataSource.read();
+       // $("#ooe_id_realigned_to_null_To").data("kendoDropDownList").dataSource.read();
+        $("#account_list_realigned_to_null_To").data("kendoComboBox").dataSource.read();
+
+    }
+
+
+    
+    function acc_ref_null() {
+        $("#account_list_realigned_to_null").data("kendoComboBox").dataSource.read();
+    }
+    function acc_ref_to_null() {
+        $("#account_list_realigned_to_null_To").data("kendoComboBox").dataSource.read();
+    }
+
+    function fn_Office_Type() {
+        var classtype_GFEE = $("#classtype").val();
+        return {
+            classtype_GFEE: classtype_GFEE
+        }
+    }
+
+</script>
+
+<div style="float: none;clear:both;">
+    <div style="float: left;margin-right:10px;margin-top:2px;">
+        <label style="float:left;margin-left: 50px;">
+            Office Name :
+        </label>
+    </div>
+    <div style="float: right;margin-right:65px;margin-top:0px;">
+
+
+        @(Html.Kendo().ComboBox()
+                            .Name("office_realigned_to_null")
+                            .DataTextField("OfficeName")
+                            .DataValueField("OfficeID")
+                            .Placeholder("Select office...")
+                            .Filter("contains")
+                            .MinLength(1)
+                            .HtmlAttributes(new { @style = "width: 500px;" })
+                            .Events(e => e.Change("fn_dprefresherorb_realigned_to_null"))
+                            .Value(Session["office_id"].ToString())
+                            .DataSource(source => source.Read(read => read.Action("GetOffice_Dynamic", "Release").Data("fn_Office_Type")))
+        )
+
+
+    </div>
+
+    <div style="height:10px;">
+
+    </div>
+
+    <div id="ProgramAndExpenseClassDiv" style="float: none;clear:both; margin-top: 25px">
+
+        <div style="float: left;margin-right:10px;margin-top:2px;">
+            <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                Program :
+            </label>
+        </div>
+        <div style="float: right;margin-right:65px;margin-top:0px;">
+            <script>
+                function fn_Offices_realignedto_null() {
+
+                  var proyy = $("#ddlYear").val();
+                  var off_id = $("#office_realigned_to_null").val();
+               //   var ooe_id = $("#ooe_id_realigned_to_null").val();
+
+                  return {
+                      propYear: proyy,
+                      office_ID: off_id
+                  }
+              }
+            </script>
+
+            @(Html.Kendo().DropDownList()
+                            .Name("Program_realigned_to_null")
+                            .DataTextField("ProgramDescription  ")
+                            .DataValueField("ProgramID")
+                            .OptionLabel("Select programs...")
+                            .Events(e => e.Change("acc_ref_null"))
+                            .HtmlAttributes(new { @style = "width: 500px;" })
+                            .AutoBind(true)
+                   .DataSource(source => source.Read(read => read.Action("GetPrograms2", "Release").Data("fn_Offices_realignedto_null")))
+            )
+
+        </div>
+
+        @*<div style="float: left;margin-right:10px;margin-top:10px;">
+            <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                Expense Class    :
+            </label>
+        </div>
+        <div style="float: right;margin-right:65px;margin-top: 5px;">
+            @(Html.Kendo().DropDownList()
+                        .Name("ooe_id_realigned_to_null")
+                        .DataTextField("ooe_name")
+                        .DataValueField("ooe_id")
+                        .OptionLabel("Select Expenses...")
+                       
+                        .HtmlAttributes(new { @style = "width: 500px;" })
+                         .Events(e => e.Change("refresh_acc"))
+                        .DataSource(source => source.Read(read => read.Action("ddlOOENonOfficeLevel", "Dropdowns")))
+            )
+        </div>*@
+        <div style="float: left;margin-right:10px;margin-top:10px;">
+            <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                Account    :
+            </label>
+        </div>
+        <div style="float: right;margin-right:65px;margin-top:5px;">
+            <script>
+                    function fn_ForAccount_realignedto_null() {
+                        var office_ID_from = $("#office_realigned_to_null").val();
+                        var prog_id_from = $("#Program_realigned_to_null").val();
+                      //  var ooe_id_from = $("#ooe_id_realigned_to_null").val();
+                        
+                        var year_ = $("#ddlYear").val();
+                        var office_ID_to = $("#office_realigned_to_null_To").val();
+                        var prog_id_to = $("#Program_realigned_to_null_To").val();
+                       // var ooe_id_to = $("#ooe_id_realigned_to_null_To").val();
+                        var account_id_to = $("#account_list_realigned_to_null_To").val();
+                        if (office_ID_to == null || office_ID_to == '') {
+                            office_ID_to = 0;
+                        }
+                        if (prog_id_to == null || prog_id_to == '') {
+                            prog_id_to = 0;
+                        }
+                        
+                        if (account_id_to == null || account_id_to == '') {
+                            account_id_to = 0;
+                        }
+
+                        return {
+                            office_ID_from: office_ID_from,
+                            prog_id_from: prog_id_from,
+                          
+                           
+                            year_: year_,
+                            office_ID_to: office_ID_to,
+                            prog_id_to: prog_id_to,
+                           
+                            account_id_to: account_id_to
+
+                        }
+                    }
+            </script>
+
+            @(Html.Kendo().ComboBox()
+                        .Name("account_list_realigned_to_null")
+                        .DataTextField("account_name")
+                        .DataValueField("account_id")
+                        .Filter("contains")
+                        .MinLength(1)
+                        .Placeholder("Select Account...")
+                        .HtmlAttributes(new { @style = "width: 500px;" })
+                        .AutoBind(true)
+                        .Events(e => e.Change("fn_refreshtext_null"))
+                        .AutoBind(true)
+                        .DataSource(source => source.Read(read => read.Action("Account_Mos_From", "Release").Data("fn_ForAccount_realignedto_null")))
+            )
+        </div>
+
+
+
+
+
+      
+
+        <div style="float: left;margin-right:10px;margin-top:10px;">
+            <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                Available Amount :
+            </label>
+
+        </div>
+        <div style="float: left;margin-left:440px;margin-top:5px;">
+
+            <div class="k-button k-button-icontext" style=" border-radius: 50px; color: #ffffff; background-color: #1FA67A;" onclick="fn_History_realign_from()"><span class='fa fa-tasks' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'></span> History</div>
+         </div>
+            <div style="float: right;margin-right:374px;margin-top:-30px;">
+                <input type="text" style="width:180px;color: #1fca03" name="available_amount_null" id="available_amount_null" onkeyup="commaSeparateNumberversion2('available_amount_null')" step="0.01" disabled>
+            </div>
+
+
+
+
+
+            <div style="float: left;margin-right:10px;margin-top:0px;">
+                <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                    Amount to Realign :
+                </label>
+            </div>
+            <div style="float: right;margin-right:374px;margin-top:0px;">
+                <input type="text" style="width:180px; color: red" name="amounttorealign_null" id="amounttorealign_null" onkeyup="commaSeparateNumberversion2('amounttorealign_null')" disabled>
+            </div>
+
+
+
+
+
+
+            <div style="float: left;margin-right:10px;margin-top:4px;">
+                <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                    Total Amount <br />to Realign :
+                </label>
+            </div>
+            <div style="float: right;margin-right:374px;margin-top:5px;">
+                <input type="text" style="width:180px; color: #0501fa" name="toberealign_null" id="toberealign_null" onkeyup="commaSeparateNumberversion2('toberealign_null')"  disabled>
+            </div>
+
+
+
+
+
+            <div style="float: left;margin-right:10px;margin-top:50px;">
+                <label style="margin-left: 90px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px; color:red">
+                    Aligned To:
+                </label>
+            </div>
+            <div style="float: left;margin-left:-308px;margin-top:106px;">
+                <label style="margin-left: 0px;margin-right: 0px;margin-top: 0px;margin-bottom: 2px;">
+                    Office To :
+                </label>
+            </div>
+            <div style="float: right;margin-right:65px;margin-top:30px;">
+
+
+                @(Html.Kendo().ComboBox()
+                            .Name("office_realigned_to_null_To")
+                            .DataTextField("OfficeName")
+                            .DataValueField("OfficeID")
+                            .Placeholder("Select office...")
+                            .Filter("contains")
+                            .MinLength(1)
+
+                            .HtmlAttributes(new { @style = "width: 500px;" })
+                            .Events(e => e.Change("fn_dprefresherorb_realigned_to_null_To"))
+                       .DataSource(source => source.Read(read => read.Action("GetOffice", "dpOffice")))
+                )
+
+
+            </div>
+
+            <div style="height:10px;">
+
+            </div>
+
+
+
+            <div style="float: left;margin-right:10px;margin-top:69px;">
+                <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                    Program To:
+                </label>
+            </div>
+            <div style="float: right;margin-right:65px;margin-top:5px;">
+                <script>
+                    function fn_Offices_realignedto_null_To() {
+
+                        var proyy = $("#ddlYear").val();
+                        var off_id = $("#office_realigned_to_null_To").val();
+                       // var ooe_id = $("#ooe_id_realigned_to_null").val();
+
+                        return {
+                            propYear: proyy,
+                            office_ID: off_id
+                           
+                        }
+                    }
+                </script>
+
+                @(Html.Kendo().DropDownList()
+                            .Name("Program_realigned_to_null_To")
+                            .DataTextField("ProgramDescription  ")
+                            .DataValueField("ProgramID")
+                            .OptionLabel("Select programs...")
+                            .Events(e => e.Change("acc_ref_to_null"))
+                            .HtmlAttributes(new { @style = "width: 500px;" })
+                   .DataSource(source => source.Read(read => read.Action("GetPrograms2", "Release").Data("fn_Offices_realignedto_null_To")))
+                )
+
+            </div>
+
+            @*<div style="float: left;margin-right:10px;margin-top:10px;">
+                <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                    Expense Class    :
+                </label>
+            </div>
+            <div style="float: right;margin-right:65px;margin-top: 5px;">
+                @(Html.Kendo().DropDownList()
+                        .Name("ooe_id_realigned_to_null_To")
+                        .DataTextField("ooe_name")
+                        .DataValueField("ooe_id")
+                        .OptionLabel("Select Expenses...")
+
+                        .HtmlAttributes(new { @style = "width: 500px;" })
+
+                        .DataSource(source => source.Read(read => read.Action("ddlOOENonOfficeLevel", "Dropdowns")))
+                )
+            </div>*@
+            <div style="float: left;margin-right:10px;margin-top:10px;">
+                <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                    Account To :
+                </label>
+            </div>
+            <div style="float: right;margin-right:65px;margin-top:5px;">
+                <script>
+                    function fn_ForAccount_realignedto_null_To() {
+
+                        var office_ID_from = $("#office_realigned_to_null").val();
+                        var prog_id_from = $("#Program_realigned_to_null").val();
+                       // var ooe_id_from = $("#ooe_id_realigned_to_null").val();
+                        var account_id_from = $("#account_list_realigned_to_null").val();
+                        var year_ = $("#ddlYear").val();
+                        var office_ID_to = $("#office_realigned_to_null_To").val();
+                        var prog_id_to = $("#Program_realigned_to_null_To").val();
+                       // var ooe_id_to = $("#ooe_id_realigned_to_null_To").val();
+                        
+                        if (office_ID_from == null || office_ID_from == '') {
+                            office_ID_from = 0;
+                        }
+                        if (prog_id_from == null || prog_id_from == '') {
+                            prog_id_from = 0;
+                        }
+                        
+                        if (account_id_from == null || account_id_from == '') {
+                            account_id_from = 0;
+                        }
+                        
+                        return {
+                            office_ID_from: office_ID_from,
+                            prog_id_from: prog_id_from,
+                           
+                            account_id_from: account_id_from,
+                            year_: year_,
+                            office_ID_to: office_ID_to,
+                            prog_id_to: prog_id_to
+                           
+                        }
+                    }
+                </script>
+
+                @(Html.Kendo().ComboBox()
+                        .Name("account_list_realigned_to_null_To")
+                        .DataTextField("account_name")
+                        .DataValueField("account_id")
+                        .Filter("contains")
+                        .MinLength(1)
+                        .Placeholder("Select Account...")
+                        .Events(e => e.Change("fn_ref_acc"))
+                        .HtmlAttributes(new { @style = "width: 500px;" })
+
+                                .DataSource(source => source.Read(read => read.Action("Account_Mos_To", "Release").Data("fn_ForAccount_realignedto_null_To")))
+                )
+            </div>
+
+
+
+
+
+            <div style="float: left;margin-right:10px;margin-top:10px;">
+                <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                    Realign Amount :
+                </label>
+            </div>
+            <div style="float: right;margin-right:374px;margin-top:5px;">
+                <input type="text" style="width:180px; color: red" name="toAmount_null=" id="toAmount_null" value="0.00" onkeyup="commaSeparateNumberversion2('toAmount_null')" disabled>
+            </div>
+
+
+            <div style="float: right;margin-right:-499px;margin-top:5px;">
+
+                @*<div class="k-button k-button-icontext" style=" border-radius: 50px; color: #ffffff; background-color: #808080;" onclick="fn_History_realign_to()"><span class='fa fa-tasks' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'></span> View</div>*@
+            </div>
+
+        </div>
+    <div class="k-button k-button-icontext" style="position: absolute; bottom: 15px; right: 20px;width: 80px; border-radius:50px;color:#ffffff;background-color:#DE5555;" onclick="fn_closeRealign()"><span class='fa fa-times' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'></span> Close</div>
+    <div class="k-button k-button-icontext" style="position: absolute; bottom: 15px; right: 120px;width: 80px; border-radius:50px;color:#ffffff;background-color:cornflowerblue;color:white" onclick="fn_saverealign_to_null()"><span class='fa fa-plus-circle' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'></span> Save</div>
+
+</div>
+
+
+@(Html.Kendo().Window()
+        .Name("history_from")
+        .Title("New Entry")
+        .Width(980)
+        .Height(515)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+                .Actions(a => { a.Close(); })
+)
+
+@(Html.Kendo().Window()
+        .Name("history_to")
+        .Title("New Entry")
+        .Width(780)
+        .Height(480)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+
+        .Animation(a => 
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+                .Actions(a => { a.Close(); })
+)
+
+
+<script>
+
+    $(document).ready(function () {
+        var ITIYIDMXPLCKOWE = $('#Progss').val()
+        $("#Program_realigned_to_null").data("kendoDropDownList").value(ITIYIDMXPLCKOWE);
+    }, 1000);
+    $(document).ready(function () {
+        var UYIRKKSKALZQWESX = $('#account_list').val()
+        $("#account_list_realigned_to_null").data("kendoComboBox").value(UYIRKKSKALZQWESX);
+        setTimeout(function () {
+            $("#account_list_realigned_to_null").data("kendoComboBox").dataSource.read();
+           
+        }, 1000);
+        fn_refreshtext_null();
+    }, 1000);
+    setTimeout(function () {
+        $("#account_list_realigned_to_null").data("kendoComboBox").dataSource.read();
+
+    }, 1000);
+</script>

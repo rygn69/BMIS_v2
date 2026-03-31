@@ -1,0 +1,279 @@
+﻿
+<script>
+
+    function ProgramReceive() {
+        var OfficeID = $("#office_id").val();
+        var YearOf = $("#datepicker").val();
+        return {
+            OfficeID: OfficeID,
+            YearOf: YearOf
+        }
+    }
+
+    function reqSave() {
+        var url = "@Url.Action("SaveNewProgram","Maintenance")";
+        var frmData = $('#formProgram').serialize();
+        if ($("#btnSpinner").attr("class") != 'fa fa-spinner fa-spin') {
+            $("#btnSpinner").attr('class', 'fa fa-spinner fa-spin');
+            $.post(url, frmData, function (d) {
+                if (d == "Success") {
+                    $.Notify({
+                        caption: 'Success',
+                        content: 'Program has been Added',
+                        icon: "<i class='fa fa-check'></i>",
+                        shadow: true,
+                        type: 'success'
+                    });
+                    document.getElementById("program_desc").value = "";
+                    document.getElementById("program_id").value = "";
+
+                    $("#fund_id").data("kendoComboBox").value("");
+                    $("#orderBy").data("kendoComboBox").value("");
+                    $("#grd_ApprovedBudget").data("kendoGrid").dataSource.read();
+                    $("#btnSpinner").removeClass('fa fa-spinner fa-spin');
+
+                } else if (d == "Update Success") {
+                    $.Notify({
+                        caption: 'Success',
+                        content: 'Program has been Updated',
+                        icon: "<i class='fa fa-check'></i>",
+                        shadow: true,
+                        type: 'success'
+                    });
+                    document.getElementById("program_desc").value = "";
+                    document.getElementById("program_id").value = "";
+                    $("#office_id").data("kendoComboBox").value("");
+                    $("#fund_id").data("kendoComboBox").value("");
+                    $("#orderBy").data("kendoComboBox").value("");
+                    $("#grd_ApprovedBudget").data("kendoGrid").dataSource.read();
+                    $("#btnSpinner").removeClass('fa fa-spinner fa-spin');
+                } else {
+                    swal("Error!", d, "error")
+                    $("#btnSpinner").removeClass('fa fa-spinner fa-spin');
+                }
+            })
+        }
+    }
+    function onClick() {
+        var entityGrid = $("#grd_ApprovedBudget").data("kendoGrid");
+        var selectedItem = entityGrid.dataItem(entityGrid.select());
+        document.getElementById("mode-status").innerHTML = "Update Program";
+        document.getElementById("button-status").innerHTML = "Update Program";
+        document.getElementById("program_desc").value = selectedItem.program_name;
+        document.getElementById("program_id").value = selectedItem.program_id;
+        $("#fund_id").data("kendoComboBox").value(selectedItem.fund_id);
+        $("#orderBy").data("kendoComboBox").value(selectedItem.orderBY);
+        $.Notify({
+            caption: 'Mode has change to',
+            content: 'Update Program',
+            icon: "<i class='fa fa-exclamation-triangle'></i>",
+            shadow: true,
+            timeout: 5000,
+            type: 'warning'
+        });
+    }
+    function ClearFields()
+    {
+        document.getElementById("program_desc").value = "";
+        document.getElementById("program_id").value = "";
+        $("#office_id").data("kendoComboBox").value("");
+        $("#fund_id").data("kendoComboBox").value("");
+        $("#orderBy").data("kendoComboBox").value("");
+        document.getElementById("button - status").innerHTML = "Create Program";
+        document.getElementById("mode-status").innerHTML = "New Program";
+    }
+    function deleteprogram(id) {
+        var year = $("#datepicker").val();
+       
+        swal({
+            title: "Delete Program?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes",
+            closeOnConfirm: false,
+            showLoaderOnConfirm: true
+        },
+            function () {
+                var url = "@Url.Action("deleteprogramdesc", "Maintenance")";
+                $.get(url, { id: id,year:year }, function (e) {
+                    if (e =='success'){
+                        swal("Success", "Program description has been deleted successfully.", "success")
+                        $("#grd_ApprovedBudget").data("kendoGrid").dataSource.read()
+                    }
+                    else{
+                        swal("Error",e,"error")
+                    }
+                })
+            })
+    }
+</script>
+
+
+
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Maintenance.programs>()
+    .Name("grd_ApprovedBudget")
+    .Columns(col =>
+    {
+        col.Bound(m => m.program_name).Title("Program");
+        col.Bound(m => m.fund_id).Title("Fund ID").Hidden();
+        col.Bound(m => m.program_id).Title("Program ID").Hidden();
+        col.Bound(m => m.orderBY).Title("Order By").Hidden();
+        col.Bound(m => m.OfficeProgramID).Title("Office Program ID").Hidden();
+        col.Template(@<text></text>)
+                .HeaderTemplate(@<text></text>)
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:10px;color:beige;" })
+                .ClientTemplate(
+                    //"<div class='k-button k-button-icontext' id='deleteid#=wfpid#' style='border-radius:50px;color:\\#ffffff;background-color:\\#DE5555;' onclick='deletewfp(#=wfpid#)'><span class='fa fa-trash' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'> </span></div>")
+                    "<div id='deleteid#=OfficeProgramID#' style='border-radius:50px;' onclick='deleteprogram(#=OfficeProgramID#)'><span class='fa fa-trash' title='Click to delete program description!' style='font-size: 16px;margin: 1px;margin-top: -1px;margin-left: 2px;margin-right: 2px;color:red;cursor:pointer'> </span></div> ")
+                .HtmlAttributes(new { style = "vertical-align: top;text-align:center" })
+                .Width(30);
+
+    })
+    .ToolBar(t => t.Template(@<text>
+
+
+        <div style="float: left; width: 0; margin-top:-3px;margin-bottom:-100px;margin-left:-3px; height: 0; border-right: 0px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;">
+            <div style="float: left; width: 0; margin-top:0px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 37px solid #EEE; ">
+
+                <div style="float: left; height:28px; margin-left:-59px; margin-top: 5px;">
+                    <i class="fa fa-tasks fa-2x fg-white"></i>
+
+                </div>
+
+            </div>
+        </div>
+
+        <div style="float: right; height:28px;margin-top:2px;">
+            <link href="~/Content/metroui/css/docs.css" rel="stylesheet" />
+ 
+        </div>
+    </text>)).AutoBind(false)
+    .Pageable(page => page.Refresh(true)
+    .Enabled(true)
+    .ButtonCount(4)
+    .PreviousNext(true)
+    )
+       .Selectable(selectable => selectable.Mode(GridSelectionMode.Single))
+       .Events(e =>
+          {
+             e.Change("onClick");
+          })
+       .DataSource(d => d
+       .Ajax()
+       .PageSize(10).ServerOperation(false)
+       .Model(m => m.Id(i => i.program_name))
+       .Read(read => read.Action("ProgramData", "Maintenance").Data("ProgramReceive"))
+       )
+       
+    )
+
+<hr style="margin-top:20px;" />
+<h2 style="color:#000000;font-style:normal;text-shadow:none;">Mode : <span style="color:#ff0000" id="mode-status"> New Program</span></h2>
+<hr />    
+    <form id="formProgram" method="post">
+        <input type="text" name="program_id" id="program_id" value="" hidden="hidden" />
+        
+        <div style="margin-top:20px;">
+            <label>FMIS Office</label>
+            <script>
+                function onSelect() {
+                    $("#grd_ApprovedBudget").data("kendoGrid").dataSource.read();
+                    var get_office_id = $("#office_id").val();
+                    document.getElementById("text_office_id").value = get_office_id;
+                }
+            </script>
+            
+            @(Html.Kendo().ComboBox()
+                                    .Name("office_id")
+                                    .DataTextField("office_name")
+                                    .Placeholder("Select Office . .")
+                                    .Filter("contains")
+                                    .MinLength(2)
+                                    .DataValueField("office_id")
+                                    .HtmlAttributes(new { @style = "width: 80%;" }).Events(e =>
+                                                    {
+                                                        e.Change("onSelect");
+                                                        
+                                                    })
+                                                    .DataSource(source => source.Read(read => read.Action("ddlOffice", "Dropdowns")))
+
+            )
+            <input type="text" name="text_office_id" id="text_office_id" value="" hidden="hidden" />
+        </div>
+        <div style="margin-top:20px;">
+            <label>Program Description</label>
+            <input type="text" class="k-textbox" style="width: 80%;" id="program_desc" name="program_desc" />
+        </div>
+        <div style="margin-top:20px;">
+            <label>Fund Type</label>
+            @(Html.Kendo().ComboBox()
+                   
+                                    .Name("fund_id")
+                                    .DataTextField("fund_name")
+                                    .DataValueField("fund_id")
+                                    .Placeholder("Select Type...")
+                                    .Filter("contains")
+                                    .MinLength(2)
+                                    .HtmlAttributes(new { @style = "width: 80%;" })
+                                    .DataSource(source => source.Read(read => read.Action("ddlFund", "Dropdowns")))
+
+            )
+
+        </div>
+       
+        <div style="margin-top:20px;">
+            
+                <div style="display:inline-block;margin-right:30px;">
+                    <label>Year of Transaction</label>
+                    <input id="datepicker" name="datepicker" />
+                    <script>
+
+                        $("#datepicker").kendoDatePicker({
+                            depth: "decade",
+                            start: "decade",
+                            format: "yyyy",
+                            footer: false,
+                            value: new Date()
+                        });
+                    </script>
+                </div>
+                <div style="display:inline-block">
+                    <label>Order #</label>
+                    @(Html.Kendo().ComboBox()
+                  .Name("orderBy")
+                  .Filter("contains")
+                  .MinLength(1)
+                  .Placeholder("Select order by")
+                  .DataTextField("x")
+                  .DataValueField("x")
+                  .DataSource(source => source.Read(read => read.Action("ddlOrderby", "Dropdowns")).ServerFiltering(false))
+                    )
+                </div>
+           
+        </div>
+        
+    </form>
+    <div style="width:100%;display:block;">
+    <hr />
+    <div class="k-button k-button-icontext" onclick="reqSave()" style="padding:10px;margin-top:30px;margin-right:20px;position:relative;right:0;"><span id="button-status"><span id="btnSpinner"></span> Create Program</span></div>
+        <div class="k-button k-button-icontext" onclick="ClearFields()" style="padding:10px;margin-top:30px;margin-right:20px;position:relative;right:0;"><span>Clear Fields</span></div>
+    </div>
+    <script>
+      $(document).ready(function () {
+          var url = "@Url.Action("CheckUserStatus", "Maintenance")";
+          var checkData = "CheckUser";
+          $.post(url, checkData, function (d) {
+              if (d != 0) {
+                  // alert(d);           
+                  $("#office_id").data("kendoComboBox").value(d);         
+                  document.getElementById("text_office_id").value = d;
+                  $("#grd_ApprovedBudget").data("kendoGrid").dataSource.read();
+                  //document.getElementById("office_id").disabled;
+                  $("#office_id").data("kendoComboBox").enable(false);
+              }
+              //alert(d);
+
+          })
+      });
+</script>

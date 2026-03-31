@@ -1,0 +1,16 @@
+﻿
+@(Html.Kendo().TabStrip()
+          .Name("tobstrip")
+          .Navigatable(false)
+          .Animation(animation =>
+              animation.Open(effect =>
+              effect.Fade(FadeDirection.In)))
+          .Items(tabstrip =>
+          {
+              tabstrip.Add().Text("Subsidy").Selected(true).LoadContentFrom("Annual_Subsidy", "Release");
+              tabstrip.Add().Text("Income").LoadContentFrom("Annual_Income", "Release");
+              //tabstrip.Add().Text("Declined").LoadContentFrom("pv_Budget_CancelledTab", "Home");
+          })
+          //.Events(e => e.Activate("fn_refresher"))
+
+) 

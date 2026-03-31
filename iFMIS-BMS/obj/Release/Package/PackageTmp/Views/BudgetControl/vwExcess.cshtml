@@ -1,0 +1,235 @@
+﻿<script src="~/Scripts/BMS/accounting.js"></script>
+<script src="~/Scripts/BMS/BudgetControl/OBRLogger.js"></script>
+
+<h2>Transaction Date: <b><span id="TransactionYear"></span></b></h2>
+
+<div style="width : 100%; margin-top: 20px;border-style: solid; border-color: #1fa67a">
+
+    <div style="width:100%;height : 35px ; background-color:#1fa67a; color: white">
+        <h2 style="margin-left: 5px;color:white"><i class="fa fa-sliders"></i> List of Excess Control</h2>
+    </div>
+    <div style="padding:5px;">
+        <div style="margin-top:20px;"></div>
+        <script>
+        $('title').html('IFMIS-BMS (Excess)');
+        var thisculture = kendo.culture();
+        thisculture.numberFormat.currency.symbol = '₱';
+
+        function searchOBR() {
+
+            var $filter = new Array();
+            $filter = [];
+
+            if ($('#SearchData').val().length > 0) {
+                $filter.push({ field: "grOBRNo", operator: "contains", value: $('#SearchData').val() }),
+                $filter.push({ field: "grDescription", operator: "contains", value: $('#SearchData').val() }),
+                $filter.push({ field: "username", operator: "contains", value: $('#SearchData').val() }),
+                $filter.push({ field: "seriesno", operator:"contains", value: $('#SearchData').val() });
+            }
+
+            $('#grPastObligated').data('kendoGrid').dataSource.filter({
+                logic: "or",
+                filters: $filter
+            });
+
+        
+        }
+
+        $(function () {
+            $("#SearchData").keypress(function (e) {
+                if (e.keyCode == 13) {
+                    searchOBR();
+                }
+            });
+        });
+
+
+        function UserParam()
+        {
+            var User = "@Account.UserInfo.UserTypeDesc";
+            var Office = @Account.UserInfo.Department;
+            return {
+                User: User,
+                Office: Office
+            }
+        }
+
+        function AddNewTransaction() {
+
+                $(window).scrollTop(0);
+
+                var url = "@Url.Action("AddNewOBR", "BudgetControl")";
+                $.get(url, function (d) {
+                    //document.documentElement.style.overflow = 'hidden';  // firefox, chrome
+                    //document.body.scroll = "no";
+                    $('#AddNewOBR').html(d);
+                });
+                $('#AddNewOBR').data('kendoWindow').title("<i class='fa fa-clock-o'> </i> OBR Logger").center().open();
+
+            }
+
+
+        </script>
+
+        @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.BudgetControl.ExcessModel>()
+        .HtmlAttributes(new { style = "height:510px" })
+        .Name("grPastObligated")
+        .Scrollable()
+        .Columns(col =>
+        {
+            col.Bound(m => m.seriesno).Title("#").Width(150).Locked(true).Width(55);
+            col.Bound(m => m.grOBRNo).Title("ObR No.").Width(170).Locked(true).Lockable(false);//.Hidden();
+            col.Bound(m => m.grDescription).Title("Description").Width(250);
+            col.Bound(m => m.grAmount).Title("Amount").Width(120).ClientTemplate("<div> <span style='text-align:right'> #=kendo.toString(grAmount, 'c2')# </span> </div>");
+            col.Bound(m => m.username).Title("Entered By").Width(170);
+            col.Template(t => { }).Title("").Width(90).ClientTemplate(
+            "<div class='k-button' onclick='ExcessEdit(#=grTrnnoID#,#=transno#)'><span class='fa fa-edit'></span> Edit </div>");
+            col.Template(t => { }).Title("").Width(95).ClientTemplate(
+            "<div class='k-button' onclick='ExcessDelete(#=grTrnnoID#,\"#=grOBRNo#\")'><span class='fa fa-trash'></span> Delete </div>");
+        })
+        .ToolBar(t => t.Template(@<text>
+
+            <div style="float: left; width: 0; margin-top:-3px;margin-bottom:-100px;margin-left:-3px; height: 0; border-right: 0px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;">
+                <div style="float: left; width: 0; margin-top:0px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 37px solid #EEE; ">
+
+                    <div style="float: left; height:28px; margin-left:-59px; margin-top: 5px;">
+                        <i class="fa fa-tasks fa-2x fg-white"></i>
+                    </div>
+                </div>
+            </div>
+            <div style="float: right; height:28px;margin-top:2px;">
+                <link href="~/Content/metroui/css/docs.css" rel="stylesheet" />
+
+                <div class="k-button" style="margin-right:5px;float:left;display:none" id="ExcessRegistryBTN" onclick="ExcessRegistry()"><span class="fa fa-plus"></span> Excess Registry</div>
+                <div class="k-button" style="margin-right:5px;float:left" onclick="ExcessControl()"><span class="fa fa-refresh"></span> Excess Control</div>
+                <div style="float: left;">
+                    @(Html.Kendo().DropDownList()
+                        .Name("Years")
+                        .DataTextField("YearOf")
+                        .DataValueField("YearOf")
+                        .OptionLabel("Year")
+                        .Events(e => e.Change("RefreshGrid"))
+                        .SelectedIndex(1)
+                        .HtmlAttributes(new { @style = "width: 80px;text-align:left;margin-right:5px;" })
+                        .DataSource(source => source.Read(read => read.Action("ExcessYears", "Dropdowns")))
+
+                    )
+                </div>
+                <div style="background-color:white;border:solid;border-color:whitesmoke;border-width:thin;width:250px;height:33px;float:right;padding:0px;margin-top:-3px;" id="search">
+                    <input type="text" style="width:200px;border-collapse:collapse;border-color:white;margin:0px;margin-left:0px;height:70%;outline:none;border-left-style:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search..." id="SearchData" name="SearchData">
+                    <div class="k-button k-button-icontext" style="height:33px;width:40px;" onclick="searchOBR()"><span class="mif-search"></span></div>
+                </div>
+            </div>
+
+        </text>))
+
+                    .Pageable(page => page.Refresh(true)
+                    .Enabled(true)
+                    .ButtonCount(4)
+                    .PreviousNext(true)
+                    )
+                        .Selectable(selectable => selectable.Mode(GridSelectionMode.Single))
+                        .AutoBind(false)
+                        .DataSource(d => d
+                        .Ajax()
+                        .ServerOperation(false)
+                        .PageSize(10)
+                        .Model(m => m.Id(i => i.grTrnnoID))
+                        .Read(read => read.Action("grExcessControl", "BudgetControl").Data("GridParam"))
+                        )
+        )
+    </div>
+
+
+</div>
+
+<script>
+
+    function CurrentDateUrl(){
+        return '@Url.Action("CurrentDate", "Global")';
+    }
+    function ExcessRegistryUrl(){
+        return '@Url.Action("ExcessRegistry", "BudgetControl")';
+    }
+    function ExSelYear()
+    {
+        return '{ YearOf:' + $("#Years").val() + '}';
+    }
+    function ExcessControlURL(){
+        return '@Url.Action("ExcessControl", "BudgetControl")';
+    }
+    function ExcessEditURL(){
+        return '@Url.Action("ExcessEdit", "BudgetControl")';
+    }
+    function DeleteExcessControlURL(){
+        return '@Url.Action("DeleteExcessControl", "BudgetControl")';
+    }
+    function SearchTrnnoURL() {
+        return '@Url.Action("SearchTrnno", "BudgetControl")';
+    }
+    function SearchOBRNoURL() {
+        return '@Url.Action("SearchOBRNo", "BudgetControl")';
+    }
+    $(document).ready(function () {
+        var returnDate = CurrentDate();
+        $("#TransactionYear").text(returnDate);
+
+        setTimeout(function (){
+            $("#grPastObligated").data("kendoGrid").dataSource.read();
+        }, 1000);
+        if(@Account.UserInfo.UserTypeID != 1){
+            $("#ExcessRegistryBTN").show();
+        }
+       if (@Account.UserInfo.Department == 1 || @Account.UserInfo.Department == 43 || @Account.UserInfo.Department == 19){
+           $("#ExcessRegistryBTN").hide();
+        }
+        else{
+            $("#ExcessRegistryBTN").show();
+        }
+
+
+    });
+
+</script>
+
+<script src="~/Scripts/BMS/BudgetControl/excess.js"></script>
+
+@(Html.Kendo().Window()
+    .Name("ExcessControl")
+    .Title("Excess Control")
+    .Width(810)
+    .Height(605)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(true)
+    .AutoFocus(true)
+        //.Events(e => e.Close("onClose"))
+    .Animation(a =>
+        {
+            a.Open(o => o.Fade(FadeDirection.In));
+            a.Close(c =>
+            {
+                c.Fade(FadeDirection.In);
+                c.Reverse(true);
+            });
+        }).Actions(a => { a.Close(); }))
+
+@(Html.Kendo().Window()
+    .Name("ExcessRegistry")
+    .Title("Excess Registry")
+    .Width(600)
+    .Height(515)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(true)
+    .AutoFocus(true)
+        //.Events(e => e.Close("onClose"))
+    .Animation(a =>
+        {
+            a.Open(o => o.Fade(FadeDirection.In));
+            a.Close(c =>
+            {
+                c.Fade(FadeDirection.In);
+                c.Reverse(true);
+            });
+        }).Actions(a => { a.Close(); }))

@@ -1,0 +1,89 @@
+﻿<script>
+    function getGridParam() {
+        var OfficeID = 0;
+        var Year = 0;
+            OfficeID = '@Session["selectedOfficeID"]';
+            Year = $("#propsYears").val();
+        return {
+            ProposalYear: Year,
+            officeID: OfficeID,
+            AccountID : '@ViewBag.AccountID'
+        }
+    }
+    function reqCloseFormulaDetails() {
+        document.documentElement.style.overflow = 'auto';  // firefox, chrome
+        document.body.scroll = "yes";
+        $("#ForFundingDetail").data("kendoWindow").close();
+    }
+</script>
+
+@(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.ForFundingModel>()
+        .Name("grdForfundingDetail")
+        .Columns(columns =>
+        {
+            columns.Bound(c => c.GroupBY).Title("Group").Hidden()
+                .ClientGroupHeaderTemplate("<div style='display:inline-block'>#= value #</div>");
+            columns.Bound(c => c.Position).Title("Position Proposed").Width(150).Locked().Lockable(false) 
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                .ClientFooterTemplate("<div style='text-align:center;color:darkgreen'><label>Total No. of Proposed #=count# </label></div>");
+            //    columns.Bound(c => c.Salary).Title("Monthly Salary").Width(150)
+            //        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+            columns.Bound(c => c.yearlySalary).Title("Yearly Salary").Width(95)
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+            columns.Bound(c => c.pera).Title("PERA").Width(95)
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+            columns.Bound(c => c.clothing).Title("Clothing Allowance").Width(95)
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+            columns.Bound(c => c.cashgift).Title("Cash Gift").Width(95)
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+            columns.Bound(c => c.liferetirement).Title("Life & Retirement").Width(95)
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+            columns.Bound(c => c.pagibig).Title("Pag-ibig").Width(95)
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+            columns.Bound(c => c.philhealth).Title("Philhealth").Width(95)
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+            columns.Bound(c => c.eccContributions).Title("ECC Contributions").Width(95)
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+            columns.Bound(c => c.yearendbonus).Title("Year End Bonus").Width(95)
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+            columns.Bound(c => c.PersonalityBasedBonus).Title("PBB").Width(95)
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+            columns.Bound(c => c.HazardPay).Title("Hazard Pay").Width(95)
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+            columns.Bound(c => c.Subsistence).Title("Subsistence").Width(95)
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+            columns.Bound(c => c.PEI).Title("PEI").Width(95)
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+                columns.Bound(c => c.RepresentationAllowance).Title("RA").Width(95)
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+                columns.Bound(c => c.TransportationAllowance).Title("TA").Width(95)
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+            columns.Bound(c => c.Total).Title("Total").Width(130)
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                .ClientFooterTemplate("<div style='text-align:center;color:darkgreen'><label>#=kendo.toString(sum, 'c2')# </label></div>");
+            columns.Bound(c => c.ProposedItemID);
+            
+            //columns.Template(t => { }).ClientTemplate(
+            //    "<div class='k-button' onclick='ViewHistory(#=ProposalID#)' style='inline-block' title='View Slashing History Amounts (?)'> <span class='fa fa-history'></span> History</div>")
+            //    .Width(170);
+        })
+        .HtmlAttributes(new { style = "height: 500px;" })
+        .Scrollable(s => s.Enabled(true))
+        .Selectable()
+        .DataSource(dataSource => dataSource
+            .Ajax()
+            .Batch(true)
+            .ServerOperation(false)
+            .Aggregates(a =>
+            {
+                a.Add(c => c.Total).Sum();
+                a.Add(c => c.Position).Count();
+            })
+            .Read(read => read.Action("grGetForFundingDetails", "BudgetPreparation").Data("getGridParam"))
+            .Group(g => g.Add(c => c.GroupBY))
+        )
+)
+
+<div style="display:inline-block; float: right">
+    <div id="btncloseComputationDetail" class="k-button k-button-icontext" style="margin-right:5px;display:inline-block;width: 80px;clear:both; margin-top: 10px" onclick="reqCloseFormulaDetails()">Close</div>
+</div>

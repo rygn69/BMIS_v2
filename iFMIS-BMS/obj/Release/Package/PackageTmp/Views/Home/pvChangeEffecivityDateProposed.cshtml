@@ -1,0 +1,57 @@
+﻿@model iFMIS_BMS.BusinessLayer.Models.ForFundingModel
+
+
+<script>
+    function ReqCloseEffectivityDateWindow() {
+        document.documentElement.style.overflow = 'auto';  // firefox, chrome
+        document.body.scroll = "yes";
+        $("#ChangeEffectivityDateWindow").data("kendoWindow").close();
+    }
+    function reqUpdateEffectivityDate() {
+        var DateValue = $("#dpEffectivityDate").val();
+        var SeriesID = @Model.ProposedItemID;
+        var OfficeID = 0;
+        var url2 = "@Url.Action("UpdateProposedDate", "Home")";
+        $.post(url2 ,{DateValue:DateValue,SeriesID:SeriesID,OfficeID:OfficeID}, function (d) {
+            if (d == 1) {
+                swal({
+                    title: "Success!",
+                    text: "Succesffuly Updated.",
+                    type: "success",
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+                document.documentElement.style.overflow = 'auto';  // firefox, chrome
+                document.body.scroll = "yes";
+                $("#ChangeEffectivityDateWindow").data("kendoWindow").close();
+                $("#grdProposedPositions").data("kendoGrid").dataSource.read();
+            }
+            else {
+                swal({
+                    title: "Error!",
+                    text: d,
+                    type: "error",
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            }
+        })
+    }
+</script>
+<label style="display:inline-block">
+    Salary Effectivity Date :<br />
+    @(Html.Kendo().DatePicker()
+              .Name("dpEffectivityDate")
+              .Start(CalendarView.Month)
+              .Depth(CalendarView.Month)
+              .Value(Model.SalaryEffectivityDate)
+              .Min(new DateTime(DateTime.Now.Year + 1, 1, 1))
+              .Max(new DateTime(DateTime.Now.Year + 1, 12, 1))
+              .HtmlAttributes(new { style = "width: 242px; height: 100%" })
+    )
+</label>
+<div style="display:inline-block; float: right">
+    <div id="btnUpdateEffectivity" class="k-button k-button-icontext" style="margin-bottom:5px;display:inline-block;width: 80px;clear:both; margin-top:5px;" onclick="reqUpdateEffectivityDate()">Update</div>
+    <div id="btnCloseWindowEffectivity" class="k-button k-button-icontext" style="margin-bottom:5px;display:inline-block;width: 80px;clear:both; margin-top:5px;" onclick="ReqCloseEffectivityDateWindow()">Close</div>
+</div>
+

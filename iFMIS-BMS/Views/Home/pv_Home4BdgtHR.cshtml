@@ -1,0 +1,720 @@
+﻿<script>
+
+    //$('#viewSummary').closest(".k-window").css({
+    //    //position: 'fixed',
+    //    margin: '0%',
+    //    left:'0px',
+    //    overflow: scroll,
+    //    top: '0%'
+    //});
+
+    function reqHistory(e) {
+        var url = "@Url.Action("pvbudgetHistory", "Home")";
+        ProgramID = e;
+        $.get(url, { ProgramID: e }, function (d) {
+            $('#editPorgram').html(d);
+        })
+        $('#editPorgram').data('kendoWindow').title("History").center().open();
+    }
+    function GetExpenseClassParam() {
+        var YearOf = $("#ddlYear").val();
+        var OfficeID = $("#offs").val();
+        var ProgramID = $("#Progss").val();
+        return {
+            OfficeID: OfficeID,
+            ProgramID: ProgramID,
+            YearOf: YearOf
+        }
+    }
+    function reqSave() {
+        var grid = $("#grd_BudgetApprovalBudget");
+        var dataSource = grid.data("kendoGrid").dataSource;
+        var colCount = grid.find('.k-grid-header colgroup > col').length;
+
+        if (dataSource._view.length == 0) {
+            swal(
+           "Error!", "No Data to save", "warning");
+        } else {
+            setTimeout(function () {
+                if ($("#ddlYear").val() == "" ||
+                    $("#offs").val() == "" ||
+                    $("#ooe_id").val() == "" ||
+                    $("#Progss").val() == "") {
+
+                }
+                else {
+                    $("#grd_BudgetApprovalBudget").data("kendoGrid").dataSource.read();
+                }
+            }, 500);
+        }
+        //$("#grd_BudgetApprovalBudget").data("kendoGrid").dataSource.read();
+    }
+
+    function fn_FunctionAccountBudget() {
+        $('#siteContent').html('<div style="width: 100%;height:100%;"><img src="@Url.Content("~/Content/MyTheme/loading_2x.gif")" alt="Loading..." style="position: absolute;top: 40%;left: 60%;margin-top: -16px;margin-left: -16px;" /></div>');
+        $('#webTitle').html("Approved Budget");
+        var url = "@Url.Action("pv_AccountBudget", "Home")";
+        $.get(url, function (d) {
+            $('#siteContent').html(d);
+        })
+    }
+
+    function reqEdit(e) {
+        var url = "@Url.Action("_update", "BG")";
+        $.get(url, { ID: e }, function (d) {
+            $('#siteContent').html(d);
+        })
+
+    }
+
+
+    function LoadChart() {
+        setTimeout(function () {
+            var officeID;
+            var chartYear;
+            officeID = $("#offs").val();
+            chartYear = $("#ddlYear").val();
+
+            var url = "@Url.Action("TabChart", "Home")";
+            $.get(url, { OfficeID: officeID, ChartYear: chartYear }, function (d) {
+                $("#chartByOffice").html(d);
+            })
+        }, 500);
+    }
+    function utizationsummary() {
+        var officeid = $("#offs").val();
+        var proyear = $("#ddlYear").val();
+        var url = "@Url.Action("utilization_summary", "Home")";
+        if (document.getElementById("utisumm").checked == true) {
+            document.getElementById("utisumm").value="1"
+        }
+        else{
+            document.getElementById("utisumm").value="0"
+        }
+        if ($("#utisumm").val() == 1 && $("#offs").val() > 0 && $("#offs").length < 5) {
+            $.get(url, { officeid: officeid, proyear: proyear }, function (d) {
+                $('#viewutilization').html(d);
+            })
+            $('#viewutilization').data('kendoWindow').center().open();
+            $('#viewutilization').data('kendoWindow').title($("#offs").data("kendoComboBox").text());
+        }
+        else if( $("#utisumm").val() == 1 && $("#offs").val() == 0){
+            swal("Warning", "Please select office!", "")
+            document.getElementById("utisumm").checked = false
+            document.getElementById("utisumm").value = "0"
+        }
+    }
+    function regularaip_click() {
+        var year_of = $("#ddlYear").val();
+        if (document.getElementById("regularaipid").checked) {
+            document.getElementById("regularaipid").value = "1";
+            document.getElementById("supplementalaipid").value = "0";
+            $("#supplementalaipid").attr("checked", false)
+            $("#grd_BudgetApprovalBudget").data("kendoGrid").dataSource.read()
+        }
+        $("#offs").data("kendoComboBox").dataSource.read();
+        document.getElementById("proposedYearApprovalBudget").innerHTML = "<br/>" + year_of + "<br/> (Proposed)";
+        document.getElementById("proposedYearApprovedBudget").innerHTML = "<br/>" + year_of + "<br/> (Proposed)";
+
+    }
+    function supplementalaip_click() {
+        var year_of = $("#ddlYear").val();
+        if (document.getElementById("supplementalaipid").checked) {
+            document.getElementById("supplementalaipid").value = "1";
+            document.getElementById("regularaipid").value = "0";
+            $("#regularaipid").attr("checked", false)
+            $("#grd_BudgetApprovalBudget").data("kendoGrid").dataSource.read()
+        }
+        $("#offs").data("kendoComboBox").dataSource.read();
+        document.getElementById("proposedYearApprovalBudget").innerHTML = "<br/>" + year_of + "<br/> (Approved)";
+        document.getElementById("proposedYearApprovedBudget").innerHTML = "<br/>" + year_of + "<br/> (Approved)";
+    }
+   
+</script>
+<div style="float:left;margin-left:75px;margin-top:0px;margin-bottom:5px">
+    <label style="font-size:13px;margin-bottom:5px;margin-left:-20px;"><u>AIP Version</u></label>
+    <div style="display:inline-block">
+        <input type="radio" id="regularaipid" style="width:10px;zoom:1.2" value="1" checked onclick="regularaip_click()" />
+        <label style="display:inline-block;font-size:12px;">Annual Budget</label>
+        <input type="radio" id="supplementalaipid" style="width:10px;margin-left:10px;zoom:1.2" value="0" onclick="supplementalaip_click()" />
+        <label style="display:inline-block;font-size:12px;">Supplemental Budget</label>
+    </div>
+</div>
+<div style="float: none;clear:both;">
+    <div style="float: left;margin-left:188px;margin-top:-10px;">
+            <input type="checkbox" id="summary" class="k-checkbox">
+        <label class="k-checkbox-label" style="font-size:12px;" for="summary">Proposal Summary</label>
+    </div>
+    <div style="float:left;margin-left:65px;margin-top:-10px;display:none">
+        <input type="checkbox" id="utisumm" value="0" onclick="utizationsummary()" class="k-checkbox">
+        <label class="k-checkbox-label" for="utisumm">Utilization Summary</label>
+    </div>
+    <br />
+    @*<div style="float: left;margin-left:-479px;margin-top:20px;">*@
+    <div style="float: left;margin-left:-191px;margin-top:20px;">
+        @*<label style="margin-left: 70px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px;">*@
+        <label style="font-size:12px;">
+            Office    :
+        </label>
+    </div>
+    <div style="float: right;margin-right:70px;margin-top:0px;">
+        <script>
+            function loadSummary() {
+                var url = "@Url.Action("SummaryPerOffice", "Utility")"; 
+                var office_id = $("#offs").val();
+                var year_of = $("#ddlYear").val();
+                var offname=$("#offs").data('kendoComboBox').text();
+                //alert(offname);
+                if (document.getElementById("summary").checked == true) {
+
+                    $.get(url, { office_id: office_id, year_of: year_of }, function (d) {
+                        $('#viewSummary').html(d);
+                    })
+                    $('#viewSummary').data('kendoWindow').center().open();
+                    $('#viewSummary').data('kendoWindow').title(offname);
+                }
+            }
+            function fn_dprefresher(e) {
+                loadSummary();
+                if ($("#ddlYear").val() == "" ||$("#offs").val() == "") {
+
+                }
+                else {
+                    $("#Progss").data("kendoDropDownList").dataSource.read();
+                    $("#ooe_id").data("kendoDropDownList").value(0);
+                }
+                
+                //alert(index);
+                //if (text == "For Approval") {
+                if ($("#ddlYear").val() == "" ||
+                    $("#offs").val() == "" ||
+                    $("#ooe_id").val() == "" ||
+                    $("#Progss").val() == "") {
+
+                }
+                else {
+                    
+                    $("#grd_BudgetApprovalBudget").data("kendoGrid").dataSource.read();
+                    $("#grd_BudgetApprovedBudget").data("kendoGrid").dataSource.read();
+                }
+               // $("#grd_Program").data("kendoGrid").dataSource.read();
+                //LoadChart();
+            }
+            function ExpenseClassOnChange() {
+            
+                if ($("#ddlYear").val() == "" ||
+                    $("#offs").val() == "" ||
+                    $("#ooe_id").val() == "" ||
+                    $("#Progss").val() == "") {
+
+                }
+                else {
+
+                    if ($("#ooe_id").val() == 1) {
+                        UpdateDocumentTitle("PS");
+                    } else if ($("#ooe_id").val() == 2)
+                    {
+                        UpdateDocumentTitle("MOOE");
+
+                    } else if ($("#ooe_id").val() == 3) {
+                        UpdateDocumentTitle("CO");
+                    }
+                    else {
+                        UpdateDocumentTitle("IFMIS-BMS");
+                    }
+                    
+                    $("#grd_BudgetApprovalBudget").data("kendoGrid").dataSource.read();
+               //     $("#grd_BudgetApprovedBudget").data("kendoGrid").dataSource.read(); //hide on 6/22/2022 - xXx - not to load when selecting expense class
+                }
+                //HideComputationCollumn();
+            }
+            function ddlProgramsOnChange() {
+                if ($("#Progss").val() == "" ||$("#offs").val() == "" ||$("#ddlYear").val() == "") {
+
+                }
+                else {
+                    $("#ooe_id").data("kendoDropDownList").dataSource.read();
+                }
+                
+            }
+
+
+        </script>
+        <div style="float : left; margin-right:100px; margin-top:10px">
+            @(Html.Kendo().ComboBox()
+                            .Name("offs")
+                            .DataTextField("OfficeName")
+                            .DataValueField("OfficeID")
+                            .Placeholder("Select office...")
+                            .Filter("contains")
+                            .MinLength(1)
+                            .HtmlAttributes(new { @style = "width: 400px;" })
+                            .Events(e => e.Change("fn_dprefresher"))
+                       .DataSource(source => source.Read(read => read.Action("GetOffice_AIPVerse", "dpOffice").Data("getaipversion")))
+            )
+            @*<div style="float : right; margin-right:-170px;margin-top:-15px">
+                 <input type="checkbox" id="summary" class="k-checkbox">
+                <label class="k-checkbox-label" for="summary">Proposal Summary</label>
+            </div>*@
+        </div>
+        <div id="resetid" style="display:inline-block;margin-left:-95px;margin-top:18px">
+            <input type="checkbox" id="resetrecord" value="0" onclick="reset_temptable()" title="Tick the checkbox to reset record!"/>
+            <label style="display:inline-block;font-size:12px">Reset</label>
+        </div>
+    </div>
+
+    <div style="height:10px;">
+
+    </div>
+    @*<div id="ProgramAndExpenseClassDiv">*@
+    <div id="ProgramAndExpenseClassDiv" style="float: none;clear:both; margin-top: 10px">
+    @*<div id="ProgramAndExpenseClassDiv" style="float: right;margin-right:70px;margin-top:0px;">*@
+        <div style="float: left;margin-left:34px;margin-top:15px;">
+            <label style="margin-left: 70px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;font-size:12px;">
+                Program :
+            </label>
+        </div>
+         <div style="float: right;margin-right:70px;margin-top:7px;">
+                <script>
+            $(document).ready(function () {
+                function refreshGRDBAB() {
+                    if ($("#ddlYear").val() == "" ||
+                    $("#offs").val() == "" ||
+                    $("#ooe_id").val() == "" ||
+                    $("#Progss").val() == "") {
+
+                    }
+                    else {
+                        $("#grd_BudgetApprovalBudget").data("kendoGrid").dataSource.read();
+                        $("#grd_BudgetApprovedBudget").data("kendoGrid").dataSource.read();
+                    }
+                }
+            });
+                    function fn_refresher(e) {
+                        var SelectedTabIndex = $("#tabstrip").data("kendoTabStrip").select().index();
+                        var regularaipid = $("#regularaipid").val();
+                        //var text = $(e.item).find("> .k-link").text();
+                        //alert(SelectedTabIndex);
+
+                        if (SelectedTabIndex == 0) {
+                            if ($("#ddlYear").val() == "" ||
+                    $("#offs").val() == "" ||
+                    $("#ooe_id").val() == "" ||
+                    $("#Progss").val() == "") {
+
+                            }
+                            else {
+                                $("#grd_BudgetApprovalBudget").data("kendoGrid").dataSource.read();
+                                $("#grd_BudgetApprovedBudget").data("kendoGrid").dataSource.read();
+                            }
+                            if ($("#ddlYear").val() == "" || $("#offs").val() == "") {
+
+                            }
+                            else {
+                                $("#Progss").data("kendoDropDownList").dataSource.read();
+                            }
+                            var BudgetYear = $("#ddlYear").val();
+                            var PastYear = BudgetYear - 2;
+                            var CurrentYear = BudgetYear - 1;
+                            if ("@Account.UserInfo.UserTypeDesc" == "Budget Committee / Local Finance Committee") {
+                                document.getElementById("proposedYearApproveBudget").innerHTML = BudgetYear;
+                            }
+                            document.getElementById("actualYearApprovalBudget").innerHTML = PastYear;
+                            document.getElementById("estimatesYearApprovalBudget").innerHTML = CurrentYear;
+                            if (regularaipid == 1) {
+                                document.getElementById("proposedYearApprovalBudget").innerHTML = "<br/>" + BudgetYear + "<br/> (Proposed)";
+                            }
+                            else {
+                                document.getElementById("proposedYearApprovalBudget").innerHTML = "<br/>" + BudgetYear + "<br/> (Apporoved)";
+                            }
+                        }
+                        else if (SelectedTabIndex == 1) {
+                            var BudgetYear = $("#ddlYear").val();
+                            var PastYear = BudgetYear - 2;
+                            var CurrentYear = BudgetYear - 1;
+                            document.getElementById("proposedYearBudgetApproved").innerHTML = BudgetYear;
+                            document.getElementById("actualYearApprovedBudget").innerHTML = PastYear;
+                            document.getElementById("estimatesYearApprovedBudget").innerHTML = CurrentYear;
+                            if (regularaipid == 1) {
+                                document.getElementById("proposedYearApprovedBudget").innerHTML = "<br/>" + BudgetYear + "<br/> (Proposed)";//BudgetYear;
+                            }
+                            else {
+                                document.getElementById("proposedYearApprovalBudget").innerHTML = "<br/>" + BudgetYear + "<br/> (Apporoved)";
+                            }
+                            $("#grd_BudgetApprovedBudget").data("kendoGrid").dataSource.read();
+                        }
+                        //LoadChart();
+
+                    }
+
+                    function fn_Offices() {
+                        var proyy = $("#ddlYear").val();
+                        var off_id = $("#offs").val();
+                        var ooe_id = $("#ooe_id").val();
+
+                        return {
+                            propYear: proyy,
+                            office_ID: off_id,
+                            ooe_id: ooe_id
+                        }
+                    }
+                </script>
+
+                @(Html.Kendo().DropDownList()
+                            .Name("Progss")
+                            .DataTextField("ProgramDescription  ")
+                            .DataValueField("ProgramID")
+                            .OptionLabel("Select programs...")
+                            .HtmlAttributes(new { @style = "width: 500px;" })
+                            .AutoBind(false)
+                            .Events(e => e.Change("ddlProgramsOnChange"))
+                            .DataSource(source => source.Read(read => read.Action("ProgramsLFC", "Dropdowns").Data("fn_Offices")))
+                )
+
+            </div>
+
+        <div style="float: right;margin-right:600px;margin-top:14px;">
+            <label style="margin-left: -20px;margin-top: 0px;margin-bottom: 2px;font-size:12px;">
+                Expense Class    :
+            </label>
+        </div>
+        <div style="float: right;margin-right:19px;margin-top:-29px;margin-bottom:10px">
+            @(Html.Kendo().DropDownList()
+                        .Name("ooe_id")
+                        .DataTextField("ooe_name")
+                        .DataValueField("ooe_id")
+                        .OptionLabel("Select Expenses...")
+                        .HtmlAttributes(new { @style = "width: 500px;" })
+                        .AutoBind(false)
+                        .Events(e => e.Change("ExpenseClassOnChange"))
+                        .DataSource(source => source.Read(read => read.Action("ExpenseClassLFC", "Dropdowns").Data("GetExpenseClassParam")))
+            )
+            <div id="resetooeid" style="display:inline-block;">
+                <input type="checkbox" id="resetooerecord" value="0" onclick="resetooe_temptable()" title="Tick the checkbox to reset record per expense class!" />
+                <label style="display:inline-block;font-size:12px">Reset</label>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@*</div>*@
+<div style="border: outset;clear:both;border-width:1px;border-color:#1fa67a; width: 749px; padding-left:0px;padding-right:0px;padding-top:0px;padding-bottom:7px;margin-top: 10px;">
+    <div style=" width: 0;height: 0; border-right: 5px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;margin-top: -1px; ">
+        <div style="float: left; width: 678px; margin-top:1px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 36px solid #1fa67a; ">
+
+            <div style="float: left; height:28px; margin-left:-59px; margin-top: 5px;">
+                <i class="fa fa-tasks fa-2x fg-white"></i>
+
+            </div>
+            <div style="text-align: right;float: right;margin-right:10px;margin-top:2px;">
+
+
+                @(Html.Kendo().DropDownList()
+                        .Name("ddlYear")
+                        .DataTextField("ProposalYear")
+                        .DataValueField("ProposalYear")
+                        .SelectedIndex(0)
+                        .HtmlAttributes(new { @style = "width: 70px;" })
+                        .Events(e => e.Change("fn_refresher"))
+                        .DataSource(source => source.Read(read => read.Action("GetProposalYear", "PYear")))
+                )
+
+
+
+
+            </div>
+            <div style="float: right;margin-right:10px;margin-top:2px;">
+                <i class="fa fa-calendar fa-2x #33333"></i>
+            </div>
+                <script>
+                function onChangePercent() {
+                    if ($("#ddlYear").val() == "" ||
+                    $("#offs").val() == "" ||
+                    $("#ooe_id").val() == "" ||
+                    $("#Progss").val() == "") {
+
+                    }
+                    else {
+                        $("#grd_BudgetApprovalBudget").data("kendoGrid").dataSource.read();
+                        $("#grd_BudgetApprovedBudget").data("kendoGrid").dataSource.read();
+                    }
+                }
+                </script>
+            <div style="float: right;margin-right:10px;margin-top:2px;">
+                @(Html.Kendo().DropDownList()
+                  .Name("PercentageIncreaseRate")
+                  .DataTextField("Text")
+                  .DataValueField("Value")
+                        //.Events(e => e.Change("onchangePercent"))
+                  .BindTo(new List<SelectListItem>() {
+                      new SelectListItem() {
+                          Text = "0%",
+                          Value = "1"
+                      },
+                      new SelectListItem() {
+                          Text = "5%",
+                          Value = "1.05"
+                      },
+                      new SelectListItem() {
+                          Text = "10%",
+                          Value = "1.10"
+                      },
+                      new SelectListItem() {
+                          Text = "15%",
+                          Value = "1.15"
+                      },
+                      new SelectListItem() {
+                          Text = "20%",
+                          Value = "1.20"
+                      },
+                      new SelectListItem() {
+                          Text = "25%",
+                          Value = "1.25"
+                      },
+                      new SelectListItem() {
+                          Text = "30%",
+                          Value = "1.35"
+                      },
+                      new SelectListItem() {
+                          Text = "40%",
+                          Value = "1.40"
+                      },
+                      new SelectListItem() {
+                          Text = "45%",
+                          Value = "1.45"
+                      },
+                      new SelectListItem() {
+                          Text = "50%",
+                          Value = "1.50"
+                      },
+                      new SelectListItem() {
+                          Text = "55%",
+                          Value = "1.45"
+                      },
+                      new SelectListItem() {
+                          Text = "60%",
+                          Value = "1.60"
+                      },
+                      new SelectListItem() {
+                          Text = "65%",
+                          Value = "1.65"
+                      },
+                      new SelectListItem() {
+                          Text = "70%",
+                          Value = "1.70"
+                      },
+                      new SelectListItem() {
+                          Text = "75%",
+                          Value = "1.75"
+                      },
+                      new SelectListItem() {
+                          Text = "80%",
+                          Value = "1.80"
+                      },
+                      new SelectListItem() {
+                          Text = "85%",
+                          Value = "1.85"
+                      },
+                      new SelectListItem() {
+                          Text = "90%",
+                          Value = "1.90"
+                      },
+                      new SelectListItem() {
+                          Text = "95%",
+                          Value = "1.95"
+                      },
+                      new SelectListItem() {
+                          Text = "100%",
+                          Value = "2"
+                      },
+                  })
+                  .Value("0")
+                  .Events(e => e.Change("onChangePercent"))
+                  .HtmlAttributes(new { style = "width: 100%" })
+                )
+            </div>
+            <div style="float: right;margin-right:10px;margin-top:8px;">
+               <span style="font-size:14px;color:#ffffff">Percentage % Increase:</span>
+            </div>
+
+        </div>
+    </div>
+    <script>
+        function fn_Program() {
+            var regularaipid = $("#regularaipid").val()
+            if ("@Account.UserInfo.UserTypeDesc" == "HRMO In-Charge") {
+                ooe_id = 0;
+                var pro_id = 0;
+                var proYear = $("#ddlYear").val();
+                var off_id = $("#offs").val();
+                var ooe_id = 0;
+                var percent = 0;
+            }
+            else {
+                var pro_id = $("#Progss").val();
+                var proYear = $("#ddlYear").val();
+                var off_id = $("#offs").val();
+                var ooe_id = $("#ooe_id").val();
+         
+                var percent = $("#PercentageIncreaseRate").val();
+            }
+            return {
+                prog_ID: pro_id,
+                office_ID: off_id,
+                proy_ID: proYear,
+                ooe_id: ooe_id,
+                percent: percent,
+                regularaipid: regularaipid
+            }
+        }
+    </script>
+    <div class="demo-section k-content" style=" float:right;margin-top: 7px;margin-right:7px ">
+
+    </div>
+    <div class="demo-section k-content">
+        @(Html.Kendo().TabStrip()
+          .Name("tabstrip")
+          .Navigatable(false)
+          .Animation(animation =>
+              animation.Open(effect =>
+              effect.Fade(FadeDirection.In)))
+          .Items(tabstrip =>
+          {
+              tabstrip.Add().Text("For Approval").Selected(true).LoadContentFrom("pv_Budget_ApprovalTab", "Home");
+              tabstrip.Add().Text("Approved").LoadContentFrom("pv_Budget_ApprovedTab", "Home");
+              //tabstrip.Add().Text("Declined").LoadContentFrom("pv_Budget_CancelledTab", "Home");
+          })
+          .Events(e => e.Activate("fn_refresher"))
+
+        )
+    </div>
+
+</div>
+
+
+
+@(Html.Kendo().Window().Name("editPorgram").Title("New Entry").Width(900).Height(500).Visible(false).Modal(true).Draggable(true).AutoFocus(true).Animation(a => { a.Open(o => o.SlideIn(SlideDirection.Down)); a.Close(c => { c.SlideIn(SlideDirection.Down); c.Reverse(true); }); }).Actions(a => { a.Close(); }))
+@*@(Html.Kendo().Window().Name("viewSummary").Title("Office Proposal").Width(1200).Height(1200).Visible(false).Modal(true).Scrollable(true).Draggable(true).AutoFocus(true).Animation(a => { a.Open(o => o.SlideIn(SlideDirection.Down)); a.Close(c => { c.SlideIn(SlideDirection.Down); c.Reverse(true); }); }).Actions(a => { a.Close(); }))*@
+
+@(Html.Kendo().Window()
+    .Name("viewSummary")
+    @*.Title("$("#offs").data('kendoComboBox').text()")*@
+    @*.HtmlAttributes(new { style = "height:550px" })*@
+    .Modal(true)
+    .AutoFocus(true)
+    .Draggable(true)
+   // .Height(550)
+    .Animation(a => { a.Open(o => o.SlideIn(SlideDirection.Down)); a.Close(c => { c.SlideIn(SlideDirection.Down); c.Reverse(true); }); }).Actions(a => { a.Close(); })
+   // .Width(1200)
+    .Scrollable(true)
+    .Visible(false)
+    .Actions(actions => actions.Close())
+
+    )
+@*@(Html.Kendo().Window()
+    .Name("viewutilization")
+    .Modal(true)
+    .AutoFocus(true)
+    .Draggable(true)
+    // .Height(550)
+    .Animation(a => { a.Open(o => o.SlideIn(SlideDirection.Down)); a.Close(c => { c.SlideIn(SlideDirection.Down); c.Reverse(true); }); }).Actions(a => { a.Close(); })
+    // .Width(1200)
+    .Scrollable(true)
+    .Visible(false)
+    .Actions(actions => actions.Close())
+
+)*@
+
+@(Html.Kendo().Window()
+    .Name("viewutilization")
+    //.Title("Account Linkage")
+    .Width(1000)
+    .Height(430)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(true)
+    .AutoFocus(true)
+    .Animation(a =>
+    {
+        a.Open(o => o.SlideIn(SlideDirection.Down));
+        a.Close(c =>
+        {
+            c.SlideIn(SlideDirection.Down);
+            c.Reverse(true);
+        });
+    }).Actions(a => { a.Close(); }))
+
+
+<script>
+    @*if ("@Account.UserInfo.eid" == "HRMO In-Charge") {
+        document.getElementById('ProgramAndExpenseClassDiv').style.display = "none";
+    }
+    else {
+        document.getElementById('ProgramAndExpenseClassDiv').style.display = "inline-block";
+        //document.getElementById('ProgramAndExpenseClassDiv').style.display = "block";
+    }*@
+    function getaipversion() {
+        var regularaipid = $("#regularaipid").val()
+        return {
+            regularaipid: regularaipid,
+            yearof: $("#ddlYear").val()
+        }
+    }
+    function reset_temptable() {
+        var officeid = $("#offs").val()
+        var yearof = $("#ddlYear").val()
+
+        if (document.getElementById("resetrecord").checked) {
+            document.getElementById("resetrecord").value = 1
+            if (officeid != 0) {
+                var url = "@Url.Action("resetproposerecord", "Home")";
+                $.get(url, { officeid: officeid, yearof: yearof }, function (d) {
+                    if (d == "success") {
+                        swal("Success", "Record successfully reset for this particular office!", "success")
+                    }
+                })
+            }
+            else {
+                swal("Warning", "Please select an office from the dropdown list!", "warning")
+                document.getElementById("resetrecord").checked = false
+                document.getElementById("resetrecord").value = 0
+            }
+        }
+        else {
+            document.getElementById("resetrecord").value = 0
+        }
+
+    }
+    function resetooe_temptable() {
+        var officeid = $("#offs").val()
+        var yearof = $("#ddlYear").val()
+        var programid = $("#Progss").val()
+
+        if (document.getElementById("resetooerecord").checked) {
+            document.getElementById("resetooerecord").value = 1
+            if (officeid != 0 && $("#ooe_id").val() != 0 && programid != 0) {
+                var url = "@Url.Action("resetooerecord", "Home")";
+                $.get(url, { officeid: officeid, yearof: yearof, ooe: $("#ooe_id").val(), programid: programid }, function (d) {
+                    if (d == "success") {
+                        swal("Success", "Record successfully reset for this paticular expense class!", "success")
+                        document.getElementById("resetooerecord").checked = false;
+                        ExpenseClassOnChange()
+                    }
+                    else {
+                        swal("Error",d,"error")
+                    }
+                })
+            }
+            else {
+                swal("Warning", "Please select an office, program and expense class respectively from the dropdown list!", "warning")
+                document.getElementById("resetooerecord").checked = false
+                document.getElementById("resetooerecord").value = 0
+            }
+        }
+        else {
+            document.getElementById("resetooerecord").value = 0
+        }
+    }
+</script>
+

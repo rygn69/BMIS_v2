@@ -1,0 +1,121 @@
+﻿<script>
+    function mafgridpar_posting() {
+        return {
+            modeid: $("#realignid").val(),
+            year: $("#ddlYear").val() == "" ? CurrentYear() : $("#ddlYear").val(),
+            statusid: 2,
+            officeid:0
+        }
+    }
+    function frmPreview(docid) {
+       
+        success: window.open(" https://pgas.ph/dgsign/blank/keuitughhjugjugah?doc_id=" + docid + "") //with signature status
+        //}
+    }
+    function searchforapproval() {
+        var $filter = new Array();
+        $filter = [];
+
+        if ($('#Searchmafposted').val().length > 0) {
+            $filter.push({ field: "officename", operator: "contains", value: $('#Searchmafposted').val() }),
+            $filter.push({ field: "mafno", operator: "contains", value: $('#Searchmafposted').val() });
+        }
+
+        $('#grd_mafreview_posted').data('kendoGrid').dataSource.filter({
+            logic: "or",
+            filters: $filter
+        });
+
+    }
+
+    $(function () {
+        $("#Searchmafposted").keypress(function (e) {
+            if (e.keyCode == 13) {
+                searchforapproval();
+            }
+        });
+    });
+</script>
+<div id="searchAccountid" style="float:right;height: 30px; margin-top: -5px;">
+    <input type="text" style="width:271.5px;border-collapse:collapse;margin:0px;border-style:solid;margin-left:0px;height:70%;outline:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;font-size:14px" placeholder="Search..." id="Searchmafposted" name="Searchmafposted">
+    <div class="k-button k-button-icontext" style="height:30px;width:40px;border-style:solid;" onclick="searchforapproval()"><span class="mif-search"></span></div>
+</div>
+<div style="display:inline-block">
+@(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Monthly_DD_Model>()
+    .Name("grd_mafreview_posted")
+    // .Scrollable()
+    .Columns(col =>
+    {
+ 
+    col.Template(@<text></text>).HtmlAttributes(new { style = "text-align:  left;height:30px;font-size:10px;" })
+                        .HeaderTemplate(@<text><div style="font-weight:200;text-align:center;font-size:11px; vertical-align: middle; overflow: visible; white-space: normal;">Trnno</div></text>)
+                        .Width(50)
+                        .ClientTemplate("<div>#=trnno# </div>")
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal", @class = "metro-header" });
+    col.Template(@<text></text>).HtmlAttributes(new { style = "text-align:  left;height:30px;font-size:10px;" })
+                        .HeaderTemplate(@<text><div style="font-weight:200;text-align:center;font-size:11px; vertical-align: middle; overflow: visible; white-space: normal;">Office</div></text>)
+                .Width(120)
+                .ClientTemplate("<div>#=officename# </div>")
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal", @class = "metro-header" });
+    col.Bound(m => m.Amount)
+                .HtmlAttributes(new { style = "text-align:right;height:30px;font-size:10px;" })
+                .HeaderTemplate(@<text><div style="font-weight:200;text-align:center;font-size:11px; vertical-align: middle; overflow: visible; white-space: normal;color:white">Amount</div></text>)
+                        .Width(100)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal", @class = "metro-header" })
+                        .ClientTemplate("<div>#=kendo.toString(Amount,'c2')# </div>");
+    col.Template(@<text></text>)
+                        .HtmlAttributes(new { style = "text-align:right;height:30px;font-size:10px;" })
+                        .HeaderTemplate(@<text><div style="font-weight:200;text-align:center;font-size:11px; vertical-align: middle; overflow: visible; white-space: normal;">Date and Time Reviewed</div></text>)
+            .Width(120)
+            .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal", @class = "metro-header" })
+            .ClientTemplate("<div>#=datetimesubmit# </div>");
+
+    col.Template(@<text></text>)
+                .HtmlAttributes(new { style = "text-align:center;height:30px;font-size:10px;" })
+                .HeaderTemplate(@<text><div style="font-weight:200;text-align:center;font-size:11px; vertical-align: middle; overflow: visible; white-space: normal;color:white">MAF No.</div></text>)
+                        .Width(100)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal", @class = "metro-header" })
+                        .ClientTemplate("<div>#=mafno# </div>");
+        col.Template(t => { }).ClientTemplate(
+                "<div  style='color:\\#ffffff;background-color:\\cornflowerblue;width:25px;text-align:center;display:inline-block;' onclick='frmPreview(#=docid#)'><span class='fa fa-search' style='font-size:10pt;margin:1px;margin-top:-1px;margin-left:1px;margin-right:1px;;cursor:pointer'> </span></div> "
+
+                )
+            .HtmlAttributes(new { style = "vertical-align: middle;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal", @class = "metro-header" })
+            .Width(30);
+
+
+    })
+        .Editable(editable => editable.Mode(GridEditMode.InCell))
+        .Navigatable()
+        .Sortable()
+        //.ClientDetailTemplateId("templateforsub")
+        .Resizable(e => e.Columns(true))
+        .Scrollable()
+        .Selectable(selectable => selectable
+        .Mode(GridSelectionMode.Single)
+        .Type(GridSelectionType.Row))
+        .AutoBind(false)
+        //    .Events(e => e.Change("WFPgrid"))
+        .HtmlAttributes(new { style = "height:600px;overflow-y:hidden;" })
+        .Pageable(pageable => pageable
+            .Refresh(true)
+            .ButtonCount(2))
+        .DataSource(d => d
+        .Ajax()
+         .Aggregates(a =>
+         {
+             a.Add(c => c.Amount).Sum();
+             a.Add(c => c.Amountfrom).Sum();
+         })
+        .PageSize(1000)
+        .Model(m => m.Id(i => i.supplementalbudget_id))
+        .Read(read => read.Action("Load_Realign_ForPosting", "Release").Data("mafgridpar_posting")))
+)
+</div>
+<script>
+    $(document).ready(function () {
+        $("#grd_mafreview_posted").data("kendoGrid").dataSource.read();
+    })
+    
+</script>

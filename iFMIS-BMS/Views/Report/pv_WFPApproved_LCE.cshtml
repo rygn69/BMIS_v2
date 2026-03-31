@@ -1,0 +1,291 @@
+﻿<script>
+    function getParam_lce() {
+        return {
+            office: $("#officestatus_approved").val() == "" ? '@Session["office"]' : $("#officestatus_approved").val() ,
+            year: '@Session["tyear"]',
+            fundid: '@Session["fundid"]',
+            mode_trans: '@Session["mode_trans"]'
+        }
+    }
+
+    function searchApprove() {
+        var $filter = new Array();
+        $filter = [];
+
+        if ($('#SearchDataApprove').val().length > 0) {
+            $filter.push({ field: "office", operator: "contains", value: $('#SearchDataApprove').val() }),
+            $filter.push({ field: "accountname", operator: "contains", value: $('#SearchDataApprove').val() }),
+            $filter.push({ field: "wfpno", operator: "contains", value: $('#SearchDataApprove').val() });
+        }
+
+        $('#WFPGridApproved_lce').data('kendoGrid').dataSource.filter({
+            logic: "or",
+            filters: $filter
+        });
+
+    }
+
+    $(function () {
+        $("#SearchDataApprove").keypress(function (e) {
+            if (e.keyCode == 13) {
+                searchApprove();
+            }
+        });
+    });
+    function onGridEdit(arg) {
+        var gridName = $('#WFPGridApproved_lce').data('kendoGrid');
+        var dataRows = gridName.items();
+        var rowIndex = dataRows.index(gridName.select());
+        var ds = gridName.dataSource.view();
+
+        if (arg.container.find("input[name=totalamount]").length > 0) {
+            $("#WFPGridApproved_lce").data("kendoGrid").closeCell(arg.container)
+        }
+
+    }
+    function returnwfp(id) {
+        var gview = $("#WFPGridApproved_lce").data("kendoGrid");
+        var selectedItem = gview.dataItem(gview.select());
+        var remarks = selectedItem.remarks == '' ? '' : selectedItem.remarks;
+
+        if (remarks == ""){
+            swal("Warning!", "Please enter remarks!", "warning");
+        }
+        else {
+
+            swal({
+                title: "W A R N I N G!",
+                text: "Return this WFP?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                closeOnConfirm: false
+            }, function () {
+                var url = "@Url.Action("returnwfp", "Report")";
+                $.get(url, { trnno: id, remarks: remarks }, function (e) {
+                    if (e == "success") {
+                        swal("Success!", "WFP successfully returned!", "success");
+                        $("#WFPGridApproved_lce").data("kendoGrid").dataSource.read();
+                    } else {
+                        swal("Error!", e, "error");
+                        $("#WFPGridApproved_lce").data("kendoGrid").dataSource.read();
+                    }
+                });
+            });
+        }
+    }
+    function onDataBound(e) {
+        $(".k-hierarchy-cell").hide();
+        $(".k-hierarchy-col").hide();
+        var grid = $("#WFPGridApproved_lce").data("kendoGrid")
+        var ds = grid.dataSource.view();
+        var rows = e.sender.tbody.children();
+
+        for (var i = 0; i < ds.length; i++) {
+            trnno = ds[i].wfpid;
+            firstmon_release=ds[i].firstmonth_rel
+            secondmon_release=ds[i].secondmonth_rel
+            thirdmon_release=ds[i].thirdmonth_rel
+            isPPMP = ds[i].isPPMP;
+
+            var row = $(rows[i]);
+            if (@Account.UserInfo.UserTypeID ==4) {
+                $('#disapproveid' + trnno + '').css("display", "normal");
+            }
+            else {
+                $('#disapproveid' + trnno + '').css("display", "none");
+                //grid.hideColumn('deleteid' + trnno + '');
+                grid.hideColumn('remarks');
+            }
+            if (isPPMP == 1) {
+                row.addClass("ChangeBackColor");
+            }
+        }
+    }
+    function btnApprove_lce(){
+        $('#SpanOnApproveProgress').css("display", "auto");
+        $('#spanthumbsup').css("display", "none");
+        var url = "@Url.Action("ApproveWFP_posting", "Report")";
+        var idsToSend = [];
+        var AmountsToSend = [];
+        var BudgetToSend = [];
+        var grid = $("#WFPGridApproved_lce").data("kendoGrid")
+        var ds = grid.dataSource.view();
+   //     var balapp = covert_empty($("#appbalance").val());
+        var yearof = $("#wfpyear").val()
+        var programid = $("#ooe").val()
+        var accountid = $("#account").val()
+        var ooeclass = $("#ooeclass").val()
+
+        for (var i = 0; i < ds.length; i++) {
+            var row = grid.table.find("tr[data-uid='" + ds[i].uid + "']");
+            var checkbox = $(row).find(".checkbox");
+            if (checkbox.is(":checked")) {
+                idsToSend.push(ds[i].wfpid); //loops
+            }
+        }
+        if (idsToSend == "") {
+            swal({ title: "Warning!", text: "Please ticked the checkbox first!", timer: 2500, showConfirmButton: false, type: "warning" });
+            $('#SpanOnApproveProgress').css("display", "none");
+            $('#spanthumbsup').css("display", "auto");
+        }
+        //else if (Number(balapp) < 0) {
+        //    swal("Warning", "Insufficient balance, please check the appropriation details!", "warning")
+        //    $('#SpanOnApproveProgress').css("display", "none");
+        //    $('#spanthumbsup').css("display", "auto");
+        //}
+        else {
+            $.post(url, { transno: idsToSend, yearof: yearof, programid: programid, accountid: accountid, ooeclass: ooeclass }, function (d) {
+                if (d == 1) {
+                    swal({ title: "Success!", text: "Selected item/activity has been approved!", timer: 1500, showConfirmButton: false, type: "success" });
+                    $("#WFPGridApproved_lce").data("kendoGrid").dataSource.read();
+                    //$("#wfpconsol").data("kendoGrid").dataSource.read();
+                    $('#SpanOnApproveProgress').css("display", "none");
+                    $('#spanthumbsup').css("display", "auto");
+                }
+                else {
+                    swal("Something Went Wrong!", d, "error");
+                    $('#SpanOnApproveProgress').css("display", "none");
+                    $('#spanthumbsup').css("display", "auto");
+                }
+            })
+        }
+    }
+    function fnofficeapproved() {
+        return{
+            officeid : '@Account.UserInfo.Department'
+        }
+    }
+    function fnOffice_approve_sel(){
+        $("#WFPGridApproved_lce").data("kendoGrid").dataSource.read()
+    }
+</script>
+<label style="display:inline-block;margin-left:10px;margin-top:10px;">
+    Office
+</label>
+<div style="margin-left:10px;width:500px;">
+    @(Html.Kendo().ComboBox()
+            .Name("officestatus_approved")
+            .DataTextField("offname")
+            .DataValueField("OfficeID")
+            .AutoBind(true)
+            .Placeholder("Select Office...")
+            .Filter("contains")
+            .MinLength(3)
+            .Events(e => e.Change("fnOffice_approve_sel"))
+            .SelectedIndex(-1)
+            .HtmlAttributes(new { style = "width:70%; height:100%", @class = "form-control autoselect" })
+            .DataSource(source =>
+            {
+                source.Read(read =>
+                {
+                    read.Action("GetOfficeWFP", "Report").Data("fnofficeapproved");
+                })
+            .ServerFiltering(false);
+            })
+    )
+
+</div>
+<div id="searchAccountid" style="height: 30px; margin-top:-27px; float: right; margin-left:200px;">
+    <input type="text" style="width:310px;border-collapse:collapse;margin:0px;border-style:solid;margin-left:0px;height:70%;outline:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search..." id="SearchDataApprove" name="SearchDataApprove">
+    <div class="k-button k-button-icontext" style="height:30px;width:40px;border-style:solid;" onclick="searchApprove()"><span class="mif-search"></span></div>
+</div>
+<div>
+    <div style="width:100%;float:left;margin-top:-3px;margin-bottom:5px;">
+        @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.WFPrepare>()
+        .Name("WFPGridApproved_lce")
+        .HtmlAttributes(new { style = "height:450.5px;" })
+        .Scrollable()
+        .Columns(col =>
+        {
+        col.Template(@<text></text>)
+                .HeaderTemplate(@<text>Office</text>)
+                .Width(150)
+                .HtmlAttributes(new { style = "text-align:left;" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                .ClientTemplate("<div>#=office# </div>");
+        col.Template(@<text></text>)
+                .HeaderTemplate(@<text>Account</text>)
+                .Width(350)
+                .HtmlAttributes(new { style = "text-align:left;" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                .ClientTemplate("<div>#=accountname# </div>");
+        col.Template(@<text></text>)
+                .HeaderTemplate(@<text>WFP No.</text>)
+                .Width(120)
+                .HtmlAttributes(new { style = "text-align:center;" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                .ClientTemplate("<div>#=wfpno# </div>");
+        col.Template(@<text></text>)
+                .HeaderTemplate(@<text>Status</text>)
+                .Width(80)
+                .HtmlAttributes(new { style = "text-align:center;" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                .ClientTemplate("<div>#=status# </div>");
+        col.Template(@<text></text>)
+            .HeaderTemplate(@<text></text>)
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:10px;color:beige;" })
+            .ClientTemplate(
+                "<div id='printwfpid#=accountid#' style='color:red;cursor:pointer' onclick='rtpwfp(#=docid#)'><span class='fa fa-print' title='Click to print WFP!' style='font-size: 16px;margin: 1px;margin-top: -1px;margin-left: 2px;margin-right:2px;width:25px;text-align:center;cursor:pointer;'></span>WFP</div> ")
+            .HtmlAttributes(new { style = "vertical-align: middle;text-align:center" })
+            .Width(65);
+
+        })
+            .Editable(editable => editable.Mode(GridEditMode.InCell))
+            .Resizable(e => e.Columns(true))
+            //.AutoBind(false)
+            .Pageable(pageable => pageable
+            .Refresh(true)
+
+            //.ButtonCount()
+            )
+            .Resizable(s => s.Columns(true))
+            .Selectable()
+            .Events(e => e.DataBound("onDataBound").Edit("onGridEdit"))
+            .DataSource(dataSource => dataSource
+            .Ajax()
+            .Batch(true)
+            .Model(m => m.Id(i => i.wfpid))
+            .ServerOperation(false)
+
+            .Aggregates(a =>
+            {
+                a.Add(c => c.totalamount).Sum();
+            })
+            .PageSize(1000)
+            .Read(read => read.Action("GetWFPApprove", "Report").Data("getParam_lce"))
+            )
+        )
+
+    </div>
+</div>
+<div>
+    <div class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 100px;float:left; margin-top: 10px; margin-left:505px;border-radius:50px;background-color:indianred;color:white; margin-bottom:0px" onclick="reqClose_lce()"><span class="fa fa-close"></span> Close</div>
+    @*<div id="btnPrintSubmitted" class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 100px;float:right; margin-top:10px; margin-right:75px;border-radius:50px;margin-bottom:0px" onclick="reqPrintApproved()"><span class="mif-printer"></span> Preview</div>*@
+</div>
+<script>
+    function rtpwfp(docid){
+        success: window.open("https://pgas.ph/dgsign/blank/getPDF_digital_only?pdfData=application/pdf&FormID="+ docid +"")
+    }
+</script>
+<style>
+    .ChangeBackColor {
+        background-color: #FFFF80;
+    }
+
+    .ChangeApprovedColor {
+        background-color: #00ff21;
+    }
+
+    .k-dropdown-wrap.k-state-default {
+        border-left-style: solid;
+    }
+</style>
+<script>
+    
+    function reqClose_lce(){
+        $("#vwApproved_lce").data("kendoWindow").close()
+    }
+    
+</script>

@@ -1,0 +1,191 @@
+﻿<style>
+    .dialog-overlay {
+        background-color: #000000;
+        opacity: 0.4;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        min-height: 100%;
+        min-width: 100%;
+        z-index: 1049;
+    }
+
+    .dialog {
+        position: fixed;
+        display: block;
+        width: 500px;
+        height: 300px;
+        float: left;
+        background-color: #ffffff;
+        color: #1d1d1d;
+        z-index: 1050;
+        box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3);
+    }
+
+        .dialog .dialog-close-button {
+            position: absolute;
+            height: 1.5rem;
+            width: 1.5rem;
+            min-height: 1.5rem;
+            text-align: center;
+            vertical-align: middle;
+            font-size: 1rem;
+            font-weight: normal;
+            padding: .125rem 0 .625rem 0;
+            z-index: 3;
+            outline: none;
+            cursor: pointer;
+            background-color: #ffffff;
+            color: #777777;
+            top: .25rem;
+            right: .25rem;
+        }
+
+            .dialog .dialog-close-button:hover {
+                background-color: #cde6f7;
+                color: #2a8dd4;
+            }
+
+                .dialog .dialog-close-button:hover:after {
+                    border-color: #2a8dd4;
+                }
+
+            .dialog .dialog-close-button:active {
+                background-color: #92c0e0;
+                color: #ffffff;
+            }
+
+            .dialog .dialog-close-button:after {
+                border-color: #777777;
+                content: '\D7';
+                line-height: 1;
+            }
+</style>
+<div data-role="dialog" data-overlay="true" data-close-button="false" data-width="350px" data-height="150px" id="dialog" class="dialog">
+    <div>
+        <h2 style="text-shadow:none;padding-left:20px;padding-top:30px;">Please wait. . . <i class="fa fa-refresh fa-spin fa-3x" style="font-size:30px;"></i> </h2>
+    </div>
+</div>
+<script>
+    var thisculture = kendo.culture();
+    thisculture.numberFormat.currency.symbol = '₱';
+
+    function LoadPrograms() {
+        $("#grd_EmployeeSalary").data("kendoGrid").dataSource.read();
+    }
+    function GridParamData() {
+        var OfficeID = $("#ddlOffice").val();
+        var BudgetYear = $("#ddlBudgetYear").val();
+        return {
+            OfficeID: OfficeID,
+            BudgetYear: BudgetYear
+        }
+    }
+    function CopyStepIncrement(id)
+    {
+        var dialog = $(id).data('dialog');
+        dialog.open();
+
+        var url = "@Url.Action("SaveCopyStepIncrement", "Maintenance")";
+        $.post(url, function (e) {
+            if(e == "success"){
+                dialog.close();
+                swal("Success", "Salaries Successfully Copied", "success")
+            } else {
+                dialog.close();
+                swal("Error", e, "error")
+            }
+        });
+    }
+</script>
+<div style="width : 100%; margin-top: 10px;margin-left:-5px;border-style: solid; border-color: #1fa67a">
+    <div style="width:100%;height : 35px ; background-color:#1fa67a; color: white">
+        <h2 style="margin-left: 5px;color:white"><i class="fa fa-copy"></i> Copy Step Increment Data</h2>
+    </div>
+    <div style="padding:5px;margin-bottom:50px;">
+        <div style="margin-top:20px;margin-left:5px;">
+            <!-- Do Something -->
+            <label style="color:#ff0000">
+                *This action may take a few more minutes. Please be patient and drink some coffee :)
+            </label>
+        </div>
+        <div style="margin-top:20px;margin-left:5px;">
+            <div class="k-button k-state-active" style="padding:15px;" onclick="CopyStepIncrement('#dialog')">
+                <label>Copy Step Increment</label>
+            </div>
+        </div>
+        <hr style="margin-top:15px;margin-bottom:15px;" />
+        <div style="margin-top:20px;margin-left:5px;">
+            <label>
+                Office : &nbsp;&nbsp;&nbsp;
+                @(Html.Kendo().ComboBox()
+                                    .Name("ddlOffice")
+                                    .DataTextField("office_name")
+                                    .Placeholder("Select Office . .")
+                                    .Filter("contains")
+                                    .MinLength(2)
+                                    .DataValueField("office_id")
+                                    .HtmlAttributes(new { @style = "width: 80%;" })
+                                    .Events(e => e.Change("LoadPrograms"))
+                                    .DataSource(source => source.Read(read => read.Action("ddlOffice", "Dropdowns")))
+
+                )
+            </label>
+        </div>
+        <div style="margin-top:15px;">
+        @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Maintenance.RGEmployeeSalary>()
+        .Name("grd_EmployeeSalary")
+        .Columns(col =>
+        {
+            col.Template(@<text></text>)
+                            .HeaderTemplate(@<text><div style="font-weight:600;">Employee Name</div></text>)
+                            .Width(230)
+                            .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                            .HeaderHtmlAttributes(new { style = "text-align:center" })
+                            .ClientTemplate("<div onclick=onGridClick()>#=EmployeeName# </div>");
+            col.Template(@<text></text>)
+                            .HeaderTemplate(@<text><div style="font-weight:600;">Budget Salary</div></text>)
+                            .Width(230)
+                            .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                            .HeaderHtmlAttributes(new { style = "text-align:center" })
+                            .ClientTemplate("<div> #=kendo.toString(BudgetSalary, 'c2')# </div>");
+            col.Template(@<text></text>)
+                            .HeaderTemplate(@<text><div style="font-weight:600;">Appoinment Salary</div></text>)
+                            .Width(50)
+                            .HtmlAttributes(new { style = "text-align:center;height:30px" })
+                            .HeaderHtmlAttributes(new { style = "text-align:center" })
+                            .ClientTemplate("<div> #=kendo.toString(AppointmentSalary, 'c2')# </div>");
+        })
+        .ToolBar(toolbar =>
+        {
+        toolbar.Template(@<text>
+                <div style="float: right; height:28px;margin-top:2px;">
+                    Budget Year :
+                    @(Html.Kendo().DropDownList()
+                        .Name("ddlBudgetYear")
+                        .DataTextField("ProposalYear")
+                        .DataValueField("ProposalYear")
+                        .SelectedIndex(0)
+                        .HtmlAttributes(new { @style = "width: 70px;" })
+                        .DataSource(source => source.Read(read => read.Action("GetPropYear", "PYear")))
+                        .Events(e => e.Change("LoadPrograms"))
+                    )                    
+                </div>
+        </text>);
+        })
+        .AutoBind(false)
+        .Pageable(page => page.Refresh(true)
+              .Enabled(true)
+              .ButtonCount(4)
+              .PreviousNext(true))
+        .Selectable() 
+        .DataSource(d => d
+              .Ajax()
+              .Model(m => m.Id(i => i.EmployeeID))
+              .Read(read => read.Action("getEmployeeSalary", "Maintenance").Data("GridParamData")))
+        )
+        </div>
+    </div>
+</div>

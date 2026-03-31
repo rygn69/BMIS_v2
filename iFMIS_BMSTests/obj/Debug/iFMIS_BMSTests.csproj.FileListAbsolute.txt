@@ -1,0 +1,222 @@
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\iFMIS_BMSTests.dll.config
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\iFMIS_BMSTests.dll
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\iFMIS_BMSTests.pdb
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Elmah.dll
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Elmah.Mvc.dll
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\iFMIS_BMS.dll
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\System.Web.Mvc.dll
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\System.Web.Optimization.dll
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Telerik.Reporting.dll
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Telerik.ReportViewer.WebForms.dll
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Kendo.Mvc.dll
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\System.Web.Razor.dll
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\System.Web.WebPages.Razor.dll
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\System.Web.WebPages.dll
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Microsoft.Web.Infrastructure.dll
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\System.Web.WebPages.Deployment.dll
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\iFMIS_BMS.pdb
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\System.Web.Mvc.xml
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.xml
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Telerik.Reporting.pdb
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Telerik.Reporting.xml
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Telerik.ReportViewer.WebForms.pdb
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Telerik.ReportViewer.WebForms.xml
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMS\iFMIS_BMSTests\obj\Debug\iFMIS_BMSTests.csprojResolveAssemblyReference.cache
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMS\iFMIS_BMSTests\obj\Debug\iFMIS_BMSTests.dll
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMS\iFMIS_BMSTests\obj\Debug\iFMIS_BMSTests.pdb
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMS v3\iFMIS_BMSTests\bin\Debug\iFMIS_BMSTests.dll.config
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMS v3\iFMIS_BMSTests\bin\Debug\iFMIS_BMSTests.dll
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMS v3\iFMIS_BMSTests\bin\Debug\iFMIS_BMSTests.pdb
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMS v3\iFMIS_BMSTests\bin\Debug\Elmah.dll
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMS v3\iFMIS_BMSTests\bin\Debug\Elmah.Mvc.dll
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMS v3\iFMIS_BMSTests\bin\Debug\iFMIS_BMS.dll
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMS v3\iFMIS_BMSTests\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMS v3\iFMIS_BMSTests\bin\Debug\System.Web.Mvc.dll
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMS v3\iFMIS_BMSTests\bin\Debug\System.Web.Optimization.dll
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMS v3\iFMIS_BMSTests\bin\Debug\Telerik.Reporting.dll
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMS v3\iFMIS_BMSTests\bin\Debug\Telerik.ReportViewer.WebForms.dll
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMS v3\iFMIS_BMSTests\bin\Debug\Kendo.Mvc.dll
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMS v3\iFMIS_BMSTests\bin\Debug\System.Web.Razor.dll
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMS v3\iFMIS_BMSTests\bin\Debug\System.Web.WebPages.Razor.dll
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMS v3\iFMIS_BMSTests\bin\Debug\System.Web.WebPages.dll
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMS v3\iFMIS_BMSTests\bin\Debug\Microsoft.Web.Infrastructure.dll
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMS v3\iFMIS_BMSTests\bin\Debug\System.Web.WebPages.Deployment.dll
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMS v3\iFMIS_BMSTests\bin\Debug\iFMIS_BMS.pdb
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMS v3\iFMIS_BMSTests\bin\Debug\System.Web.Mvc.xml
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMS v3\iFMIS_BMSTests\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.xml
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMS v3\iFMIS_BMSTests\bin\Debug\Telerik.Reporting.pdb
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMS v3\iFMIS_BMSTests\bin\Debug\Telerik.Reporting.xml
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMS v3\iFMIS_BMSTests\bin\Debug\Telerik.ReportViewer.WebForms.pdb
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMS v3\iFMIS_BMSTests\bin\Debug\Telerik.ReportViewer.WebForms.xml
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMS v3\iFMIS_BMSTests\obj\Debug\iFMIS_BMSTests.csprojResolveAssemblyReference.cache
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMS v3\iFMIS_BMSTests\obj\Debug\iFMIS_BMSTests.dll
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMS v3\iFMIS_BMSTests\obj\Debug\iFMIS_BMSTests.pdb
+D:\xXx\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\iFMIS_BMSTests.dll.config
+D:\xXx\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\iFMIS_BMSTests.dll
+D:\xXx\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\iFMIS_BMSTests.pdb
+D:\xXx\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Elmah.dll
+D:\xXx\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Elmah.Mvc.dll
+D:\xXx\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\iFMIS_BMS.dll
+D:\xXx\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll
+D:\xXx\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\System.Web.Mvc.dll
+D:\xXx\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\System.Web.Optimization.dll
+D:\xXx\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Telerik.Reporting.dll
+D:\xXx\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Telerik.ReportViewer.WebForms.dll
+D:\xXx\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Kendo.Mvc.dll
+D:\xXx\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\System.Web.Razor.dll
+D:\xXx\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\System.Web.WebPages.Razor.dll
+D:\xXx\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\System.Web.WebPages.dll
+D:\xXx\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Microsoft.Web.Infrastructure.dll
+D:\xXx\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\System.Web.WebPages.Deployment.dll
+D:\xXx\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\iFMIS_BMS.pdb
+D:\xXx\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\System.Web.Mvc.xml
+D:\xXx\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.xml
+D:\xXx\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Telerik.Reporting.pdb
+D:\xXx\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Telerik.Reporting.xml
+D:\xXx\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Telerik.ReportViewer.WebForms.pdb
+D:\xXx\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Telerik.ReportViewer.WebForms.xml
+D:\xXx\iFMIS-BMS\iFMIS_BMSTests\obj\Debug\iFMIS_BMSTests.csprojResolveAssemblyReference.cache
+D:\xXx\iFMIS-BMS\iFMIS_BMSTests\obj\Debug\iFMIS_BMSTests.dll
+D:\xXx\iFMIS-BMS\iFMIS_BMSTests\obj\Debug\iFMIS_BMSTests.pdb
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMSv3\iFMIS_BMSTests\bin\Debug\iFMIS_BMSTests.dll.config
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMSv3\iFMIS_BMSTests\bin\Debug\iFMIS_BMSTests.dll
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMSv3\iFMIS_BMSTests\bin\Debug\iFMIS_BMSTests.pdb
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMSv3\iFMIS_BMSTests\bin\Debug\Elmah.dll
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMSv3\iFMIS_BMSTests\bin\Debug\Elmah.Mvc.dll
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMSv3\iFMIS_BMSTests\bin\Debug\iFMIS_BMS.dll
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMSv3\iFMIS_BMSTests\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMSv3\iFMIS_BMSTests\bin\Debug\System.Web.Mvc.dll
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMSv3\iFMIS_BMSTests\bin\Debug\System.Web.Optimization.dll
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMSv3\iFMIS_BMSTests\bin\Debug\Telerik.Reporting.dll
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMSv3\iFMIS_BMSTests\bin\Debug\Telerik.ReportViewer.WebForms.dll
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMSv3\iFMIS_BMSTests\bin\Debug\Kendo.Mvc.dll
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMSv3\iFMIS_BMSTests\bin\Debug\System.Web.Razor.dll
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMSv3\iFMIS_BMSTests\bin\Debug\System.Web.WebPages.Razor.dll
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMSv3\iFMIS_BMSTests\bin\Debug\System.Web.WebPages.dll
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMSv3\iFMIS_BMSTests\bin\Debug\Microsoft.Web.Infrastructure.dll
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMSv3\iFMIS_BMSTests\bin\Debug\System.Web.WebPages.Deployment.dll
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMSv3\iFMIS_BMSTests\bin\Debug\iFMIS_BMS.pdb
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMSv3\iFMIS_BMSTests\bin\Debug\System.Web.Mvc.xml
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMSv3\iFMIS_BMSTests\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.xml
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMSv3\iFMIS_BMSTests\bin\Debug\Telerik.Reporting.pdb
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMSv3\iFMIS_BMSTests\bin\Debug\Telerik.Reporting.xml
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMSv3\iFMIS_BMSTests\bin\Debug\Telerik.ReportViewer.WebForms.pdb
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMSv3\iFMIS_BMSTests\bin\Debug\Telerik.ReportViewer.WebForms.xml
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMSv3\iFMIS_BMSTests\obj\Debug\iFMIS_BMSTests.csprojResolveAssemblyReference.cache
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMSv3\iFMIS_BMSTests\obj\Debug\iFMIS_BMSTests.dll
+C:\Users\rhayan.gubalane\Documents\System\iFMIS-BMSv3\iFMIS_BMSTests\obj\Debug\iFMIS_BMSTests.pdb
+E:\system\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\iFMIS_BMSTests.dll.config
+E:\system\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\iFMIS_BMSTests.dll
+E:\system\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\iFMIS_BMSTests.pdb
+E:\system\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Elmah.dll
+E:\system\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Elmah.Mvc.dll
+E:\system\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\iFMIS_BMS.dll
+E:\system\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll
+E:\system\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\System.Web.Mvc.dll
+E:\system\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\System.Web.Optimization.dll
+E:\system\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Telerik.Reporting.dll
+E:\system\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Telerik.ReportViewer.WebForms.dll
+E:\system\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Kendo.Mvc.dll
+E:\system\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\System.Web.Razor.dll
+E:\system\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\System.Web.WebPages.Razor.dll
+E:\system\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\System.Web.WebPages.dll
+E:\system\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Microsoft.Web.Infrastructure.dll
+E:\system\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\System.Web.WebPages.Deployment.dll
+E:\system\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\iFMIS_BMS.pdb
+E:\system\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\System.Web.Mvc.xml
+E:\system\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Telerik.Reporting.pdb
+E:\system\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Telerik.Reporting.xml
+E:\system\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Telerik.ReportViewer.WebForms.pdb
+E:\system\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Telerik.ReportViewer.WebForms.xml
+E:\system\iFMIS-BMS\iFMIS_BMSTests\obj\Debug\iFMIS_BMSTests.csprojResolveAssemblyReference.cache
+E:\system\iFMIS-BMS\iFMIS_BMSTests\obj\Debug\iFMIS_BMSTests.dll
+E:\system\iFMIS-BMS\iFMIS_BMSTests\obj\Debug\iFMIS_BMSTests.pdb
+C:\Users\rhayangubalane\Documents\IS\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\iFMIS_BMSTests.dll.config
+C:\Users\rhayangubalane\Documents\IS\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\iFMIS_BMSTests.dll
+C:\Users\rhayangubalane\Documents\IS\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\iFMIS_BMSTests.pdb
+C:\Users\rhayangubalane\Documents\IS\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Elmah.dll
+C:\Users\rhayangubalane\Documents\IS\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Elmah.Mvc.dll
+C:\Users\rhayangubalane\Documents\IS\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\iFMIS_BMS.dll
+C:\Users\rhayangubalane\Documents\IS\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll
+C:\Users\rhayangubalane\Documents\IS\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\System.Web.Mvc.dll
+C:\Users\rhayangubalane\Documents\IS\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Telerik.Reporting.dll
+C:\Users\rhayangubalane\Documents\IS\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Npgsql.dll
+C:\Users\rhayangubalane\Documents\IS\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\System.Web.Optimization.dll
+C:\Users\rhayangubalane\Documents\IS\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Telerik.ReportViewer.WebForms.dll
+C:\Users\rhayangubalane\Documents\IS\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Kendo.Mvc.dll
+C:\Users\rhayangubalane\Documents\IS\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\System.Web.Razor.dll
+C:\Users\rhayangubalane\Documents\IS\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\System.Web.WebPages.Razor.dll
+C:\Users\rhayangubalane\Documents\IS\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\System.Web.WebPages.dll
+C:\Users\rhayangubalane\Documents\IS\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Microsoft.Web.Infrastructure.dll
+C:\Users\rhayangubalane\Documents\IS\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Mono.Security.dll
+C:\Users\rhayangubalane\Documents\IS\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\System.Web.WebPages.Deployment.dll
+C:\Users\rhayangubalane\Documents\IS\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\iFMIS_BMS.pdb
+C:\Users\rhayangubalane\Documents\IS\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\System.Web.Mvc.xml
+C:\Users\rhayangubalane\Documents\IS\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.xml
+C:\Users\rhayangubalane\Documents\IS\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Telerik.Reporting.pdb
+C:\Users\rhayangubalane\Documents\IS\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Telerik.Reporting.xml
+C:\Users\rhayangubalane\Documents\IS\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Telerik.ReportViewer.WebForms.pdb
+C:\Users\rhayangubalane\Documents\IS\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Telerik.ReportViewer.WebForms.xml
+C:\Users\rhayangubalane\Documents\IS\iFMIS-BMS\iFMIS_BMSTests\obj\Debug\iFMIS_BMSTests.csprojResolveAssemblyReference.cache
+C:\Users\rhayangubalane\Documents\IS\iFMIS-BMS\iFMIS_BMSTests\obj\Debug\iFMIS_BMSTests.dll
+C:\Users\rhayangubalane\Documents\IS\iFMIS-BMS\iFMIS_BMSTests\obj\Debug\iFMIS_BMSTests.pdb
+D:\xXx Files\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\iFMIS_BMSTests.dll.config
+D:\xXx Files\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\iFMIS_BMSTests.dll
+D:\xXx Files\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\iFMIS_BMSTests.pdb
+D:\xXx Files\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Elmah.dll
+D:\xXx Files\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Elmah.Mvc.dll
+D:\xXx Files\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\iFMIS_BMS.dll
+D:\xXx Files\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll
+D:\xXx Files\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\System.Web.Mvc.dll
+D:\xXx Files\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Telerik.Reporting.dll
+D:\xXx Files\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Npgsql.dll
+D:\xXx Files\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\System.Web.Optimization.dll
+D:\xXx Files\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Telerik.ReportViewer.WebForms.dll
+D:\xXx Files\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Kendo.Mvc.dll
+D:\xXx Files\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\System.Web.Razor.dll
+D:\xXx Files\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\System.Web.WebPages.Razor.dll
+D:\xXx Files\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\System.Web.WebPages.dll
+D:\xXx Files\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Microsoft.Web.Infrastructure.dll
+D:\xXx Files\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Mono.Security.dll
+D:\xXx Files\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\System.Web.WebPages.Deployment.dll
+D:\xXx Files\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\iFMIS_BMS.pdb
+D:\xXx Files\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\System.Web.Mvc.xml
+D:\xXx Files\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.xml
+D:\xXx Files\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Telerik.Reporting.pdb
+D:\xXx Files\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Telerik.Reporting.xml
+D:\xXx Files\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Telerik.ReportViewer.WebForms.pdb
+D:\xXx Files\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Telerik.ReportViewer.WebForms.xml
+D:\xXx Files\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Microsoft.Web.Infrastructure.xml
+D:\xXx Files\iFMIS-BMS\iFMIS_BMSTests\obj\Debug\iFMIS_BMSTests.csprojResolveAssemblyReference.cache
+D:\xXx Files\iFMIS-BMS\iFMIS_BMSTests\obj\Debug\iFMIS_BMSTests.dll
+D:\xXx Files\iFMIS-BMS\iFMIS_BMSTests\obj\Debug\iFMIS_BMSTests.pdb
+R:\IS\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\iFMIS_BMSTests.dll.config
+R:\IS\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\iFMIS_BMSTests.dll
+R:\IS\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\iFMIS_BMSTests.pdb
+R:\IS\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Elmah.dll
+R:\IS\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Elmah.Mvc.dll
+R:\IS\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\iFMIS_BMS.dll
+R:\IS\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll
+R:\IS\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\System.Web.Mvc.dll
+R:\IS\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Telerik.Reporting.dll
+R:\IS\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Npgsql.dll
+R:\IS\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\System.Web.Optimization.dll
+R:\IS\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Telerik.ReportViewer.WebForms.dll
+R:\IS\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Kendo.Mvc.dll
+R:\IS\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\System.Web.Razor.dll
+R:\IS\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\System.Web.WebPages.Razor.dll
+R:\IS\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\System.Web.WebPages.dll
+R:\IS\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Microsoft.Web.Infrastructure.dll
+R:\IS\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Mono.Security.dll
+R:\IS\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\System.Web.WebPages.Deployment.dll
+R:\IS\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\iFMIS_BMS.pdb
+R:\IS\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\System.Web.Mvc.xml
+R:\IS\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.xml
+R:\IS\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Telerik.Reporting.pdb
+R:\IS\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Telerik.Reporting.xml
+R:\IS\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Telerik.ReportViewer.WebForms.pdb
+R:\IS\iFMIS-BMS\iFMIS_BMSTests\bin\Debug\Telerik.ReportViewer.WebForms.xml
+R:\IS\iFMIS-BMS\iFMIS_BMSTests\obj\Debug\iFMIS_BMSTests.csprojResolveAssemblyReference.cache
+R:\IS\iFMIS-BMS\iFMIS_BMSTests\obj\Debug\iFMIS_BMSTests.dll
+R:\IS\iFMIS-BMS\iFMIS_BMSTests\obj\Debug\iFMIS_BMSTests.pdb

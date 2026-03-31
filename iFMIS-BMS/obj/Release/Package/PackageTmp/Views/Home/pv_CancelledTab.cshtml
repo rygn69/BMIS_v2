@@ -1,0 +1,156 @@
+﻿<style>
+    .btn-delete a {
+        color: #000000;
+        background-color: #ffffff;
+        border-style: solid;
+        border-color: #333333;
+        border-width: 1px;
+        height: auto;
+        width: auto;
+        padding: 3px;
+        padding-left: 5px;
+        padding-right: 5px;
+        cursor: pointer;
+        margin: auto;
+    }
+
+        .btn-delete a:hover {
+            color: #ffffff;
+            background-color: #000000;
+            border-style: solid;
+            border-color: #333333;
+            height: auto;
+            width: auto;
+        }
+</style>
+
+<script type="text/javascript">
+    function ViewDetails() {
+        $(window).scrollTop(0);
+        var url = "@Url.Action("ViewDetails", "Home")";
+        
+        var gridName = $('#grd_CancelledBudget').data('kendoGrid');
+        var dataRows = gridName.items();
+        var rowIndex = dataRows.index(gridName.select());
+        var ds = gridName.dataSource.view();
+        var AccountName = ds[rowIndex].AccountName;
+        var ProposalYear = ds[rowIndex].ProposalYear;
+        var ProposalAmount = ds[rowIndex].ProposalAmount;
+        var OfficeName = ds[rowIndex].OfficeName;
+        var OfficeLevel = ds[rowIndex].OfficeLevel;
+        var OOE = ds[rowIndex].OOE;
+        var Remarks = ds[rowIndex].Remarks;
+        var EmpName = ds[rowIndex].EmpName;
+        var ProposalID = ds[rowIndex].ProposalID;
+        var ProgramID = ds[rowIndex].ProgramID;
+        var AccountID = ds[rowIndex].AccountID;
+        var ProposalDenominationCode = ds[rowIndex].ProposalDenominationCode;
+       
+        //ProgramID = e;
+        $.get(url, { ProposalYear: ProposalYear, ProposalAmount: ProposalAmount, Remarks: Remarks, AccountName: AccountName, OOE: OOE, OfficeLevel: OfficeLevel, OfficeName: OfficeName, EmpName: EmpName, ProposalID: ProposalID, ProgramID: ProgramID, AccountID: AccountID, ProposalDenominationCode: ProposalDenominationCode }, function (d) {
+            //alert(ProgramID);
+            document.documentElement.style.overflow = 'hidden';  // firefox, chrome
+            document.body.scroll = "no";
+            $('#CancelledDetails').html(d);
+        })
+        $('#CancelledDetails').data('kendoWindow').title("<i class='fa fa-navicon'> </i>").center().open();
+    }
+    function errorHandler(e) {
+        if (e.errors) {
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "\n";
+                    });
+                }
+            });
+            alert(message);
+        }
+    }
+
+    function onGridEdit(arg) {
+        if (arg.container.find("input[name=ProposalAllotedAmount]").length > 0) {
+            $("#grd_CancelledBudget").data("kendoGrid").closeCell(arg.container)
+        }
+    }
+</script>
+
+@(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Budget_Preparation.Cancelled>()
+        .Name("grd_CancelledBudget")
+        .HtmlAttributes(new { style = "height:550px" })
+        .Scrollable()
+    .Columns(col =>
+    {
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:900;">Accounts</div></text>)
+                        .Width(150)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center" })
+                        .ClientTemplate("<div>#=AccountName# </div>").Width(120);
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;">Year</div></text>)
+                        .Width(150)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center" })
+                        .ClientTemplate("<div>#=ProposalYear# </div>").Width(30);
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;">OOE</div></text>)
+                        .Width(150)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center" })
+                        .ClientTemplate("<div>#=OOE# </div>").Width(30);
+        col.Bound(m => m.ProposalAmount).HtmlAttributes(new { style = "text-align:left;height:30px" }).Title("Amounts")
+            .HeaderHtmlAttributes(new { style = "text-align:center" }).Width(70);
+        col.Bound(m => m.OfficeName).Hidden();
+        col.Bound(m => m.OfficeLevel).Hidden();
+        col.Bound(m => m.OOE).Hidden();
+        col.Bound(m => m.Remarks).Hidden();
+        col.Bound(m => m.EmpName).Hidden();
+        col.Bound(m => m.ProposalID).Hidden();
+        col.Bound(m => m.ProgramID).Hidden();
+        col.Bound(m => m.AccountID).Hidden();
+        col.Bound(m => m.ProposalDenominationCode).Hidden();
+
+
+        col.Template(t => { }).ClientTemplate(
+ "<div class='k-button' onclick='ViewDetails()' title='View Details (?)'> <span class='fa fa-question-circle' style='font-size: 12pt;'></span> View Details</div>"
+ ).HtmlAttributes(new { style = "margin-left:5px;" }).Width(65);
+
+
+    })
+                                                                       .AutoBind(false)
+                                                                        .Pageable(page => page.Refresh(true)
+                                                                        .Enabled(true)
+                                                                        .ButtonCount(4)
+                                                                        .PreviousNext(true)
+                                                                        )
+                                                                        .Events(e => e.Edit("onGridEdit"))
+                                                                        .Selectable()
+                                                                        .DataSource(d => d
+                                                                        .Ajax()
+                                                                        .Batch(true)
+                                                                        .PageSize(10)
+                                                                        .Model(m => m.Id(i => i.ProposalID))
+                                                                            .Read(read => read.Action("Accounts_read_Cancelled", "Home").Data("fn_Program"))
+                                                                        )
+)
+
+@(Html.Kendo().Window()
+    .Name("CancelledDetails")
+    .Title("Cancelled Account Details")
+    .Width(600)
+    .Height(550)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(false)
+    .AutoFocus(true)
+    .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        }).Actions(a => { a.Clear(); }))

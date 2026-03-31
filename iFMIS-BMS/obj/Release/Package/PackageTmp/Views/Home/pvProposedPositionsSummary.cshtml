@@ -1,0 +1,290 @@
+﻿
+<script>
+    function GetProposedPositionsGridParam() {
+        return {
+            YearOf:  $("#ddlYear").val()
+        }
+    }
+    function reqCloseProposedPositions() {
+        document.documentElement.style.overflow = 'auto';  // firefox, chrome
+        document.body.scroll = "yes";
+        $("#PlantillaSummaryWindow").data("kendoWindow").close();
+    }
+    function SearchOfficeProposedPositions() {
+
+        var SearchProgramData = $("#SearchOfficeProposedPositions").val();
+        var ProgramgGrid = $("#grdProposedPositions").data("kendoGrid").dataSource;
+        ProgramgGrid.filter([
+            {
+                logic: "or",
+                filters: [{
+                    field: "OfficeName",
+                    operator: "contains",
+                    value: SearchProgramData
+                }]
+            }
+        ]);
+    }
+    document.getElementById('SearchOfficeProposedPositions').onkeydown = function (event) {
+        if (event.keyCode == 13) {
+            SearchOfficeProposedPositions();
+        }
+    }
+    document.getElementById('SearchOfficeProposedPositions').onkeyup = function () {
+        if (($(this).val() == '' || $(this).val() == 'Search Office') && $(this).attr('type') != 'hidden') {
+            SearchOfficeProposedPositions()
+        }
+    }
+    function onGridDatabound(e) {
+        if ($("#SearchOfficeProposedPositions").val() == "") {
+            var grid = $("#grdProposedPositions").data("kendoGrid");
+            $(".k-grouping-row:contains( No. of Proposed )").each(function () {
+                grid.collapseGroup(this);
+            });
+        }
+    }
+    function ReqChangeDateProposed(SeriesID) {
+        var url2 = "@Url.Action("ReqChangeEffectivityDate", "Home")";
+        $.post(url2, { ProposedItemID: SeriesID }, function (d) {
+            $(window).scrollTop(0);
+            $('#ChangeEffectivityDateWindow').html(d);
+            $('#ChangeEffectivityDateWindow').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Change Effectivity Date").center().open();
+        })
+    }
+    function ReqRemove(SeriesID) {
+        swal({
+            title: "Are you sure?",
+            text: "Remove The Selected item from the Proposal.",
+            type: "info",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes!",
+            closeOnConfirm: false
+        }, function () {
+            var url = "@Url.Action("MarkRemove", "Home")";
+            $.get(url, { ProposedItemID: SeriesID }, function (d) {
+                if (d == 1) {
+                    swal({
+                        title: "Success!",
+                        text: "Succesffuly Removed.",
+                        type: "success",
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    $("#grdProposedPositions").data("kendoGrid").dataSource.read();
+                }
+                else {
+                    swal({
+                        title: "Error!",
+                        text: d,
+                        type: "error",
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                }
+            });
+        });
+    }
+</script>
+
+<div style="display:inline-block">
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.ProposedPositionsSummaryModel>()
+        .Name("grdProposedPositions")
+        .Columns(columns =>
+        {
+            columns.Bound(c => c.SeriesID).Hidden();
+            columns.Bound(c => c.FundType).Hidden()
+                .ClientGroupHeaderTemplate("<div style='display:inline-block'>#= value #</div>");
+            columns.Bound(c => c.OfficeName).Hidden()
+                .ClientGroupHeaderTemplate("<div style='display:inline-block'>#= value # No. of Proposed (#= count #)</div>");
+            columns.Bound(c => c.Position).Title("Position").Width(200)
+                .ClientGroupFooterTemplate("<div style='text-align:center;color:darkgreen;font-weight:8px'><label> No of Proposed : #=count#</label></div>")
+                .ClientFooterTemplate("<div style='text-align:center;color:darkgreen'><label> No of Proposed : #=count#</label></div>")
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+            columns.Bound(c => c.SalaryGrade).Title("SG").Width(50)
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                .HtmlAttributes(new { style = "text-align:center;" });
+            columns.Template(@<text></text>).Title("Effectivity Date").Width(90)
+                .ClientGroupFooterTemplate("<div style='text-align:right;color:darkgreen'><label>Sub Total</label></div>")
+                .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label>Total</label></div>")
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                .HtmlAttributes(new { style = "text-align:center;" })
+                .ClientTemplate("# if(SeriesID == 0) { #" +
+                                               "#=StartDate#" +
+                                               "# } else { #" +
+                                               "<div class='k-button' onclick='ReqChangeDateProposed(#=SeriesID#)' style='inline-block' title='Change Effectivity Date'>#=StartDate#</div>"+
+                                               "# }#"
+                        );
+            columns.Bound(c => c.YearlySalary).Title("Annual Salary").Width(120)
+                .ClientGroupFooterTemplate("<div style='text-align:right;color:darkgreen'><label>#=kendo.toString(sum,'c2')#</label></div>")
+                .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> #=kendo.toString(sum,'c2')#</label></div>")
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                .HtmlAttributes(new { style = "text-align:right;" });
+            columns.Bound(c => c.YearEndBonus).Title("Year End Bonus").Width(120)
+                .ClientGroupFooterTemplate("<div style='text-align:right;color:darkgreen'><label>#=kendo.toString(sum,'c2')#</label></div>")
+                .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> #=kendo.toString(sum,'c2')#</label></div>")
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                .HtmlAttributes(new { style = "text-align:right;" });
+            columns.Bound(c => c.MidYearBonus).Title("Mid Year Bonus").Width(120)
+                .ClientGroupFooterTemplate("<div style='text-align:right;color:darkgreen'><label>#=kendo.toString(sum,'c2')#</label></div>")
+                .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> #=kendo.toString(sum,'c2')#</label></div>")
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                .HtmlAttributes(new { style = "text-align:right;" });
+            columns.Bound(c => c.Philhealth).Title("PHILHEALTH").Width(120)
+                .ClientGroupFooterTemplate("<div style='text-align:right;color:darkgreen'><label>#=kendo.toString(sum,'c2')#</label></div>")
+                .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> #=kendo.toString(sum,'c2')#</label></div>")
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                .HtmlAttributes(new { style = "text-align:right;" });
+            columns.Bound(c => c.ecc).Title("ECC Contributions").Width(120)
+                .ClientGroupFooterTemplate("<div style='text-align:right;color:darkgreen'><label>#=kendo.toString(sum,'c2')#</label></div>")
+                .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> #=kendo.toString(sum,'c2')#</label></div>")
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                .HtmlAttributes(new { style = "text-align:right;" });
+            columns.Bound(c => c.GSIS).Title("Life & Retirement").Width(120)
+                .ClientGroupFooterTemplate("<div style='text-align:right;color:darkgreen'><label>#=kendo.toString(sum,'c2')#</label></div>")
+                .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> #=kendo.toString(sum,'c2')#</label></div>")
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                .HtmlAttributes(new { style = "text-align:right;" });
+            columns.Bound(c => c.PERA).Title("PERA").Width(120)
+                .ClientGroupFooterTemplate("<div style='text-align:right;color:darkgreen'><label>#=kendo.toString(sum,'c2')#</label></div>")
+                .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> #=kendo.toString(sum,'c2')#</label></div>")
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                .HtmlAttributes(new { style = "text-align:right;" });
+            columns.Bound(c => c.PagIbig).Title("Pag-Ibig Contributions").Width(120)
+                .ClientGroupFooterTemplate("<div style='text-align:right;color:darkgreen'><label>#=kendo.toString(sum,'c2')#</label></div>")
+                .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> #=kendo.toString(sum,'c2')#</label></div>")
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                .HtmlAttributes(new { style = "text-align:right;" });
+            columns.Bound(c => c.Clothing).Title("Clothing").Width(120)
+                .ClientGroupFooterTemplate("<div style='text-align:right;color:darkgreen'><label>#=kendo.toString(sum,'c2')#</label></div>")
+                .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> #=kendo.toString(sum,'c2')#</label></div>")
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                .HtmlAttributes(new { style = "text-align:right;" });
+            columns.Bound(c => c.CashGift).Title("Cash Gift").Width(120)
+                .ClientGroupFooterTemplate("<div style='text-align:right;color:darkgreen'><label>#=kendo.toString(sum,'c2')#</label></div>")
+                .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> #=kendo.toString(sum,'c2')#</label></div>")
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                .HtmlAttributes(new { style = "text-align:right;" });
+            columns.Bound(c => c.RepresentationAllowance).Title("RA").Width(120)
+            .ClientGroupFooterTemplate("<div style='text-align:right;color:darkgreen'><label>#=kendo.toString(sum,'c2')#</label></div>")
+            .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> #=kendo.toString(sum,'c2')#</label></div>")
+            .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+            .HtmlAttributes(new { style = "text-align:right;" });
+            columns.Bound(c => c.TransportationAllowance).Title("TA").Width(120)
+                .ClientGroupFooterTemplate("<div style='text-align:right;color:darkgreen'><label>#=kendo.toString(sum,'c2')#</label></div>")
+                .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> #=kendo.toString(sum,'c2')#</label></div>")
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                .HtmlAttributes(new { style = "text-align:right;" });
+            columns.Bound(c => c.Subsistence).Title("Subsistence").Width(120)
+                .ClientGroupFooterTemplate("<div style='text-align:right;color:darkgreen'><label>#=kendo.toString(sum,'c2')#</label></div>")
+                .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> #=kendo.toString(sum,'c2')#</label></div>")
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                .HtmlAttributes(new { style = "text-align:right;" });
+            columns.Bound(c => c.Hazard).Title("Hazard").Width(120)
+                .ClientGroupFooterTemplate("<div style='text-align:right;color:darkgreen'><label>#=kendo.toString(sum,'c2')#</label></div>")
+                .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> #=kendo.toString(sum,'c2')#</label></div>")
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                .HtmlAttributes(new { style = "text-align:right;" });
+            columns.Bound(c => c.PBB).Title("PBB").Width(120)
+                .ClientGroupFooterTemplate("<div style='text-align:right;color:darkgreen'><label>#=kendo.toString(sum,'c2')#</label></div>")
+                .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> #=kendo.toString(sum,'c2')#</label></div>")
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                .HtmlAttributes(new { style = "text-align:right;" });
+            columns.Bound(c => c.PEI).Title("PEI").Width(120)
+                .ClientGroupFooterTemplate("<div style='text-align:right;color:darkgreen'><label>#=kendo.toString(sum,'c2')#</label></div>")
+                .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> #=kendo.toString(sum,'c2')#</label></div>")
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                .HtmlAttributes(new { style = "text-align:right;" });
+            columns.Bound(c => c.Total).Title("Total").Width(120)
+                .ClientGroupFooterTemplate("<div style='text-align:right;color:darkgreen'><label>#=kendo.toString(sum,'c2')#</label></div>")
+                .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> #=kendo.toString(sum,'c2')#</label></div>")
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                .HtmlAttributes(new { style = "text-align:right;" });
+            columns.Template(t => { }).ClientTemplate("# if(SeriesID == 0) { #" +
+                                               "" +
+                                               "# } else { #" +
+                                               "<div class='k-button' onclick='ReqRemove(#=SeriesID#)' style='inline-block' title='Remove'>Remove</div>" +
+                                               "# }#"
+              ).Width(100);
+
+
+        })
+        .HtmlAttributes(new { style = "height: 480px; width:900px" })
+        .Scrollable(s => s.Enabled(true))
+        .Selectable()
+        .Events(e => e.DataBound("onGridDatabound"))
+        .DataSource(dataSource => dataSource
+            .Ajax().Sort(a =>
+            {
+                a.Add("OfficeName").Ascending();
+                a.Add("SalaryGrade").Descending();
+            })
+            .Read(read => read.Action("getProposedPositionSummary", "Home").Data("GetProposedPositionsGridParam"))
+            .Batch(true)
+            .ServerOperation(false)
+            .Model(m => m.Id(i => i.SeriesID))
+            .Group(g =>
+            {
+                g.Add(c => c.FundType);
+                g.Add(c => c.OfficeName);
+            })
+            .Aggregates(g =>
+            {
+                g.Add(c => c.YearlySalary).Sum();
+                g.Add(c => c.YearEndBonus).Sum();
+                g.Add(c => c.MidYearBonus).Sum();
+                g.Add(c => c.Philhealth).Sum();
+                g.Add(c => c.ecc).Sum();
+                g.Add(c => c.GSIS).Sum();
+                g.Add(c => c.PERA).Sum();
+                g.Add(c => c.PagIbig).Sum();
+                g.Add(c => c.Clothing).Sum();
+                g.Add(c => c.CashGift).Sum();
+                g.Add(c => c.Subsistence).Sum();
+                g.Add(c => c.Hazard).Sum();
+                g.Add(c => c.PBB).Sum();
+                g.Add(c => c.PEI).Sum();
+                g.Add(c => c.RepresentationAllowance).Sum();
+                g.Add(c => c.TransportationAllowance).Sum();
+                g.Add(c => c.Total).Sum();
+                g.Add(c => c.Position).Count();
+                g.Add(c => c.OfficeName).Count();
+            })
+        )
+        .ToolBar(toolbar =>
+        {
+            toolbar.Template(@<text>
+                <div style="float: right; height:28px;margin-top:2px;">
+                    <link href="~/Content/metroui/css/docs.css" rel="stylesheet" />
+                    <div style="background-color:white;border:solid;border-color:whitesmoke;border-width:thin;width:310px;height:30px;float:right;padding:0px;margin-top:-3px;" id="search">
+                        <input type="text" style="width:260px;border-collapse:collapse;border-color:white;margin:0px;margin-left:-10px;height:70%;outline:none;border-left-style:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search Office" id="SearchOfficeProposedPositions" name="SearchOfficeProposedPositions">
+                        <div class="k-button k-button-icontext" style="height:29px;width:40px;margin-top:0.6px;" onclick="SearchOfficeProposedPositions()"><span class="mif-search"></span></div>
+                    </div>
+
+                </div>
+            </text>);
+        })
+    )
+    <div style="display:inline-block; float: right">
+        <div id="btnCloseProposedPositions" class="k-button k-button-icontext" style="margin-right:5px;display:inline-block;width: 80px;clear:both; margin-top: 10px" onclick="reqCloseProposedPositions()">Close</div>
+    </div>
+</div>
+
+@(Html.Kendo().Window()
+    .Name("ChangeEffectivityDateWindow")
+    .Title("Change Proposed Effectivity Date")
+    .Width(300)
+    .Height(120)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(true)
+    .AutoFocus(true)
+    .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        }).Actions(a => { a.Close(); }))

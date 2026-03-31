@@ -1,0 +1,249 @@
+﻿<script>
+    function fnofficestatus() {
+        officeid = @Account.UserInfo.Department;
+    }
+
+    function getwfparrevise() {
+        
+        var officeid= $("#officesrev").val() ==""? 0 : $("#officesrev").val()
+        var fundid = $("#gfid").val() == 1 ? 0 : 1
+        
+        return {
+            year: $("#wfpyear").val(),
+            officeid:officeid,
+            fundid:fundid
+        }
+    }
+    function btn_review_special_co() {
+        if (document.getElementById("checkshowspco_review").checked == true) {
+            $("#checkshowspco_review").val(1)
+        }
+        else {
+            $("#checkshowspco_review").val(0)
+        }
+        $("#grid_wfpstatusrevision").data("kendoGrid").dataSource.read()
+    }
+    function fnOffice_rev_sel(){
+        $("#grid_wfpstatusrevision").data("kendoGrid").dataSource.read()
+    }
+    function searchAccountRev() {
+        var $filter = new Array();
+        $filter = [];
+
+        if ($('#SearchData_Revise').val().length > 0) {
+            $filter.push({ field: "office", operator: "contains", value: $('#SearchData_Revise').val() }),
+            $filter.push({ field: "accountname", operator: "contains", value: $('#SearchData_Revise').val() }),
+            $filter.push({ field: "remarks", operator: "contains", value: $('#SearchData_Revise').val() }),
+            $filter.push({ field: "status", operator: "contains", value: $('#SearchData_Revise').val() });
+        }
+
+        $('#grid_wfpstatusrevision').data('kendoGrid').dataSource.filter({
+            logic: "or",
+            filters: $filter
+        });
+
+    }
+
+    $(function () {
+        $("#SearchData_Revise").keypress(function (e) {
+            if (e.keyCode == 13) {
+                searchAccountRev();
+            }
+        });
+    });
+    function rtpwfp(status,docid,gov_sig){
+        //if (status == "Ready To Print" && gov_sig == 344880){
+            //success: window.open("https://pgas.ph/bmsattachment/" + reportpdf)
+        //success: window.open("https://pgas.ph/dgsign/blank/getPDF_View?pdfData=application/pdf&FormID="+ docid )
+        success: window.open("https://pgas.ph/dgsign/blank/getPDF_digital_only?pdfData=application/pdf&FormID="+ docid +"")
+        //}
+    }
+    function onDataBoundWFP(e) {
+        //$(".k-hierarchy-cell").hide();
+        //$(".k-hierarchy-col").hide();
+        //var grid = $("#grid_wfpstatusrevision").data("kendoGrid")
+        //var ds = grid.dataSource.view();
+        //var rows = e.sender.tbody.children();
+        //var status = "";
+        //var accountid=0;
+        //var gov_sig
+        //for (var i = 0; i < ds.length; i++) {
+        //    status = ds[i].status;
+        //    accountid=ds[i].accountid;
+        //    gov_sig=ds[i].gov_sig;
+        //    var row = $(rows[i]);
+        //    if (status == "Ready To Print" && gov_sig == 344880) {
+        //        $('#printwfpid' + accountid + '').css("display", "normal");
+        //    }
+        //    else{
+        //        $('#printwfpid' + accountid + '').css("display", "normal");
+        //    }
+        //}
+    }
+</script>
+<label style="display:inline-block;margin-left:10px;margin-top:10px;">
+    Office 
+</label>
+<div style="margin-left:10px;width:500px;">
+    @(Html.Kendo().ComboBox()
+            .Name("officesrev")
+            .DataTextField("offname")
+            .DataValueField("OfficeID")
+            .AutoBind(true)
+            .Placeholder("Select Office...")
+            .Filter("contains")
+            .MinLength(3)
+            .Events(e => e.Change("fnOffice_rev_sel"))
+            .SelectedIndex(-1)
+            .HtmlAttributes(new { style = "width:75%; height:100%", @class = "form-control autoselect" })
+            .DataSource(source =>
+            {
+                source.Read(read =>
+                {
+                    read.Action("GetOfficeWFP", "Report").Data("fnofficestatus");
+                })
+            .ServerFiltering(false);
+            })
+    )
+
+</div>
+<div id="searchAccountid" style="height: 30px; margin-top: -27px; float: right;">
+    <input type="text" style="width:150px;border-collapse:collapse;margin:0px;border-style:solid;margin-left:0px;height:70%;outline:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search..." id="SearchData_Revise" name="SearchData_Revise">
+    <div class="k-button k-button-icontext" style="height:30px;width:40px;border-style:solid;" onclick="searchAccountRev()"><span class="mif-search"></span></div>
+</div>
+<div style="display:inline-block;width:100%;margin-top:-3px;">
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.WFPrepare>()
+            .Name("grid_wfpstatusrevision")
+            .HtmlAttributes(new { style = "" })
+            .Scrollable()
+            .Columns(col =>
+            {
+                col.Template(@<text></text>)
+            .HeaderTemplate(@<text>Office</text>)
+            .Width(50)
+            .HtmlAttributes(new { style = "text-align:left;;font-size:12px" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=office# </div>");
+                col.Template(@<text></text>)
+            .HeaderTemplate(@<text>office id</text>)
+            .Width(0)
+            .Hidden()
+            .HtmlAttributes(new { style = "text-align:left;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=officeid# </div>");
+                col.Template(@<text></text>)
+            .HeaderTemplate(@<text>account id</text>)
+            .Width(0)
+            .Hidden()
+            .HtmlAttributes(new { style = "text-align:left;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=accountid# </div>");
+                col.Template(@<text></text>)
+            .HeaderTemplate(@<text>Account</text>)
+            .Width(170)
+            .HtmlAttributes(new { style = "text-align:left;;font-size:12px" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=accountname# </div>");
+                //col.Bound(e => e.revno)
+                 col.Template(@<text></text>)
+            .HeaderTemplate(@<text>No. of Revision</text>)
+            .Width(70)
+            .HtmlAttributes(new { style = "text-align:center;;font-size:12px" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=revno# </div>");
+                col.Template(@<text></text>)
+            .HeaderTemplate(@<text>Year</text>)
+            .Width(0)
+            .Hidden()
+            .HtmlAttributes(new { style = "text-align:left;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=yearof# </div>");
+            })
+            .Sortable()
+            .Editable(editable => editable.Mode(GridEditMode.InCell))
+            .Resizable(e => e.Columns(true))
+            .Pageable(pageable => pageable
+            .Refresh(true)
+            .ButtonCount(5))
+            //.HtmlAttributes(new { @class = "table-responsive", style = "height:410px;" })
+            .HtmlAttributes(new { @class = "table-responsive", style = "height:490px;" })
+            .ClientDetailTemplateId("templaterevised")
+            .Selectable()
+          //  .Events(e => e.DataBound("onDataBoundWFP"))
+            .DataSource(dataSource => dataSource
+            .Ajax()
+            .Batch(true)
+            .Model(m => m.Id(i => i.locationid))
+            .ServerOperation(false)
+            .PageSize(2050)
+            .Read(read => read.Action("GetWFPStatus_revision", "Report").Data("getwfparrevise"))
+            )
+)
+
+    <script id="templaterevised" type="text/kendo-tmpl">
+        @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.WFPrepare>()
+            .Name("grid_wfpstatusrevision#=officeid#")
+            // .Scrollable()
+            .Columns(col =>
+            {
+                col.Template(@<text></text>)
+            .HeaderTemplate(@<text>Account</text>)
+            .Width(170)
+            .HtmlAttributes(new { style = "text-align:left;;font-size:12px" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:\\#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>\\#=accountname\\# </div>");
+                col.Template(@<text></text>)
+            .HeaderTemplate(@<text>WFP No.</text>)
+            .Width(70)
+            .HtmlAttributes(new { style = "text-align:left;;font-size:12px" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:\\#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>\\#=wfpno\\# </div>");
+                col.Template(@<text></text>)
+            .HeaderTemplate(@<text>WFP No.</text>)
+            .Width(70)
+            .HtmlAttributes(new { style = "text-align:left;;font-size:12px" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:\\#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>\\#=wfpno\\# </div>");
+                col.Template(@<text></text>)
+            .HeaderTemplate(@<text>Date/Time Entered</text>)
+            .Width(70)
+            .HtmlAttributes(new { style = "text-align:left;;font-size:12px" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:\\#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>\\#=datetimeentered\\# </div>");
+                col.Template(@<text></text>)
+            .HeaderTemplate(@<text>Doc ID</text>)
+            .Hidden()
+            .HtmlAttributes(new { style = "text-align:left;;font-size:12px" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:\\#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>\\#=docid\\# </div>");
+            })
+                .Sortable()
+                .Scrollable()
+                .Resizable(e => e.Columns(true))
+                .HtmlAttributes(new { style = "height:350px;" })
+                .Pageable(pageable => pageable
+                .Refresh(true)
+                .ButtonCount(2))
+                .Selectable()
+                .DataSource(d => d
+                .Ajax()
+                .ServerOperation(false)
+                .PageSize(1000)
+                .Model(m => m.Id(i => i.officeid))
+                .Read(read => read.Action("GetWFPStatus_revision_dtls", "Report", new { year = "#=yearof#", officeid = "#=officeid#", fundid = 0, accountid = "#=accountid#" }))
+                )
+                .Pageable()
+                .ToClientTemplate()
+        )
+    </script>
+
+</div>
+
+
+    <br />
+    <div class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 100px;float:left; margin-top: 10px; margin-left:555px;border-radius:50px;background-color:indianred;color:white; margin-bottom:0px" onclick="reqReviseClose()"><span class="fa fa-close"></span> Close</div>
+    <script>
+        function reqReviseClose(){
+            $("#wfprevision").data("kendoWindow").close()
+        }
+    </script>

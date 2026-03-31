@@ -1,0 +1,135 @@
+﻿<script>
+    function GetGridParam() {
+        return {
+            YearOf:  $("#ddlYear").val()
+        }
+    }
+    function reqClosePlantillaSummary() {
+        document.documentElement.style.overflow = 'auto';  // firefox, chrome
+        document.body.scroll = "yes";
+        $("#PlantillaSummaryWindow").data("kendoWindow").close();
+    }
+    function SearchOffice() {
+
+        var SearchProgramData = $("#SearchOffice").val();
+        var ProgramgGrid = $("#grdPlantillaSummary").data("kendoGrid").dataSource;
+        ProgramgGrid.filter([
+            {
+                logic: "or",
+                filters: [{
+                    field: "OfficeName",
+                    operator: "contains",
+                    value: SearchProgramData
+                }]
+            }
+        ]);
+    }
+    document.getElementById('SearchOffice').onkeydown = function (event) {
+        if (event.keyCode == 13) {
+            SearchOffice();
+        }
+    }
+    document.getElementById('SearchOffice').onkeyup = function () {
+        if (($(this).val() == '' || $(this).val() == 'Search Office') && $(this).attr('type') != 'hidden') {
+            SearchOffice()
+        }
+    }
+    function dataBound(e) {
+        var grid = $("#grdPlantillaSummary").data("kendoGrid");
+        $(".k-grouping-row:contains( - Filled )").each(function () {
+            grid.collapseGroup(this);
+        });
+    }
+</script>
+
+<div style="display:inline-block">
+        @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.PlantillaSummaryModel>()
+        .Name("grdPlantillaSummary")
+        .Columns(columns =>
+        {
+            columns.Bound(c => c.OfficeID).Hidden();
+            columns.Bound(c => c.FundType).Hidden()
+                .ClientGroupHeaderTemplate("<div style='display:inline-block'>#= value #</div>");
+            columns.Bound(c => c.OfficeName).Hidden()
+                .ClientGroupHeaderTemplate("<div style='display:inline-block'>#= value #</div>");
+            columns.Bound(c => c.PSComponent).Title("PS Component").Width(200)
+                .ClientGroupFooterTemplate("<div style='text-align:center;color:darkgreen;font-weight:8px'><label> Sub Total :</label></div>")
+                .ClientFooterTemplate("<div style='text-align:center;color:darkgreen'><label> Total :</label></div>")
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+            columns.Bound(c => c.FilledAmount).Title("Filled").Width(90)
+                .ClientGroupFooterTemplate("<div style='text-align:right;color:darkgreen'><label>#=kendo.toString(sum,'c2')#</label></div>")
+                .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> #=kendo.toString(sum,'c2')#</label></div>")
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                .HtmlAttributes(new { style = "text-align:right;" });
+            columns.Bound(c => c.VacantAmount).Title("Vacant").Width(90)
+                .ClientGroupFooterTemplate("<div style='text-align:right;color:darkgreen'><label>#=kendo.toString(sum,'c2')#</label></div>")
+                .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> #=kendo.toString(sum,'c2')#</label></div>")
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                .HtmlAttributes(new { style = "text-align:right;" });
+            columns.Bound(c => c.CasualAmount).Title("Casual").Width(90)
+                .ClientGroupFooterTemplate("<div style='text-align:right;color:darkgreen'><label>#=kendo.toString(sum,'c2')#</label></div>")
+                .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> #=kendo.toString(sum,'c2')#</label></div>")
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                .HtmlAttributes(new { style = "text-align:right;" });
+            columns.Bound(c => c.Filled).Title("No Of Filled").Width(50)
+                .ClientGroupFooterTemplate("<div style='text-align:center;color:darkgreen'><label>#=sum#</label></div>")
+                .ClientFooterTemplate("<div style='text-align:center;color:darkgreen'><label> #=sum#</label></div>")
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size:15px" })
+                .HtmlAttributes(new { style = "text-align:center;display:none" });
+            columns.Bound(c => c.Vacant).Title("No. Of Vacant").Width(50)
+                .ClientGroupFooterTemplate("<div style='text-align:center;color:darkgreen'><label>#=sum#</label></div>")
+                .ClientFooterTemplate("<div style='text-align:center;color:darkgreen'><label> #=sum#</label></div>")
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size:15px" })
+                .HtmlAttributes(new { style = "text-align:center;display:none" });
+            columns.Bound(c => c.Casual).Title("No. Of Casual").Width(50)
+                .ClientGroupFooterTemplate("<div style='text-align:center;color:darkgreen'><label>#=sum#</label></div>")
+                .ClientFooterTemplate("<div style='text-align:center;color:darkgreen'><label> #=sum#</label></div>")
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size:15px" })
+                .HtmlAttributes(new { style = "text-align:center;display:none" });
+            
+            
+        })
+        .HtmlAttributes(new { style = "height: 480px;" })
+        .Scrollable(s => s.Enabled(true))
+        .Selectable()
+        .Events(e => e.DataBound("dataBound"))
+        .DataSource(dataSource => dataSource
+            .Ajax().Sort(a => {
+                a.Add("OfficeName").Ascending();
+                a.Add("PSComponent").Ascending();
+            })
+            .Read(read => read.Action("getPlantillaSummary", "Home").Data("GetGridParam"))
+            .Batch(true)
+            .ServerOperation(false)
+            .Model(m => m.Id(i => i.OfficeID))
+            .Group(g => {
+                g.Add(c => c.FundType);
+                g.Add(c => c.OfficeName);
+            })
+            .Aggregates(g =>{
+                g.Add(c => c.Filled).Sum();
+                g.Add(c => c.Vacant).Sum();
+                g.Add(c => c.Casual).Sum();
+                g.Add(c => c.FilledAmount).Sum();
+                g.Add(c => c.VacantAmount).Sum();
+                g.Add(c => c.CasualAmount).Sum();
+            })
+        )
+        .ToolBar(toolbar =>
+        {
+            toolbar.Template(@<text>
+                <div style="float: right; height:28px;margin-top:2px;">
+                    <link href="~/Content/metroui/css/docs.css" rel="stylesheet" />
+                    <div style="background-color:white;border:solid;border-color:whitesmoke;border-width:thin;width:310px;height:30px;float:right;padding:0px;margin-top:-3px;" id="search">
+                        <input type="text" style="width:260px;border-collapse:collapse;border-color:white;margin:0px;margin-left:-10px;height:70%;outline:none;border-left-style:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search Office" id="SearchOffice" name="SearchOffice">
+                        <div class="k-button k-button-icontext" style="height:29px;width:40px;margin-top:0.6px;" onclick="SearchOffice()"><span class="mif-search"></span></div>
+                    </div>
+
+                </div>
+            </text>);
+        })
+        )
+    <div style="display:inline-block; float: right">
+        <div id="btnClosePlantillaSummary" class="k-button k-button-icontext" style="margin-right:5px;display:inline-block;width: 80px;clear:both; margin-top: 10px" onclick="reqClosePlantillaSummary()">Close</div>
+    </div>
+</div>

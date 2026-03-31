@@ -1,0 +1,702 @@
+﻿<script>
+    function getParam() {
+        return {
+            office: '@Session["office"]',
+            program: '@Session["program"]',
+            account: '@Session["account"]',
+            year: '@Session["tyear"]',
+            id:2,
+            fundid: '@Session["fundid"]',//approved status
+            mode_trans: '@Session["mode_trans"]',
+            applied80per: $("#applied80per").val(),
+            supplemetal : $("#showsupplemental").val(),
+            wfpsummaryid: $("#wfpsummaryid").val()
+        }
+    }
+    function CheckAll_lce(e) {
+        $("#WFPGridApproved tbody input:checkbox").prop("checked", e.checked);
+    }
+    function searchApprove() {
+        var $filter = new Array();
+        $filter = [];
+
+        if ($('#SearchDataApprove_Review').val().length > 0) {
+            $filter.push({ field: "accountname", operator: "contains", value: $('#SearchDataApprove_Review').val() }),
+            $filter.push({ field: "activityname", operator: "contains", value: $('#SearchDataApprove_Review').val() }),
+            $filter.push({ field: "specificactivity", operator: "contains", value: $('#SearchDataApprove_Review').val() }),
+            $filter.push({ field: "particular", operator: "contains", value: $('#SearchDataApprove_Review').val() }),
+            $filter.push({ field: "wfpno", operator: "contains", value: $('#SearchDataApprove_Review').val() }),
+            $filter.push({ field: "prepareuser", operator: "contains", value: $('#SearchDataApprove_Review').val() })
+
+        }
+
+        $('#WFPGridApproved').data('kendoGrid').dataSource.filter({
+            logic: "or",
+            filters: $filter
+        });
+
+    }
+
+    $(function () {
+        $("#SearchDataApprove_Review").keypress(function (e) {
+            if (e.keyCode == 13) {
+                searchApprove();
+            }
+        });
+    });
+    function onGridEdit(arg) {
+        var gridName = $('#WFPGridApproved').data('kendoGrid');
+        var dataRows = gridName.items();
+        var rowIndex = dataRows.index(gridName.select());
+        var ds = gridName.dataSource.view();
+
+        if (arg.container.find("input[name=totalamount]").length > 0) {
+            $("#WFPGridApproved").data("kendoGrid").closeCell(arg.container)
+        }
+
+    }
+    function returnwfp(id) {
+        var gview = $("#WFPGridApproved").data("kendoGrid");
+        var selectedItem = gview.dataItem(gview.select());
+        var remarks = selectedItem.remarks == '' ? '' : selectedItem.remarks;
+
+        if (remarks == ""){
+            swal("Warning!", "Please enter remarks!", "warning");
+        }
+        else {
+
+            swal({
+                title: "W A R N I N G!",
+                text: "Return this WFP?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                closeOnConfirm: false
+            }, function () {
+                var url = "@Url.Action("returnwfp", "Report")";
+                $.get(url, { trnno: id, remarks: remarks }, function (e) {
+                    if (e == "success") {
+                        swal("Success!", "WFP successfully returned!", "success");
+                        $("#WFPGridApproved").data("kendoGrid").dataSource.read();
+                    } else {
+                        swal("Error!", e, "error");
+                        $("#WFPGridApproved").data("kendoGrid").dataSource.read();
+                    }
+                });
+            });
+        }
+    }
+    function onDataBound(e) {
+        $(".k-hierarchy-cell").hide();
+        $(".k-hierarchy-col").hide();
+        var grid = $("#WFPGridApproved").data("kendoGrid")
+        var ds = grid.dataSource.view();
+        var rows = e.sender.tbody.children();
+        var withpr=0;
+        for (var i = 0; i < ds.length; i++) {
+            trnno = ds[i].wfpid;
+            firstmon_release=ds[i].firstmonth_rel
+            secondmon_release=ds[i].secondmonth_rel
+            thirdmon_release=ds[i].thirdmonth_rel
+            isPPMP = ds[i].isPPMP;
+            withpr=ds[i].withpr;
+            isSubppa=ds[i].subppaid
+            trnno = ds[i].wfpid;
+            pullitem = ds[i].pullitem;
+            isupplemental=ds[i].isupplemental;
+            withad= ds[i].withad;
+            var row = $(rows[i]);
+            if (@Account.UserInfo.UserTypeID ==4) {
+                $('#disapproveid' + trnno + '').css("display", "normal");
+            }
+            else {
+                $('#disapproveid' + trnno + '').css("display", "none");
+                //grid.hideColumn('deleteid' + trnno + '');
+                grid.hideColumn('remarks');
+            }
+            if (isPPMP == 1 && pullitem ==0) {
+                row.addClass("ChangeBackColor");
+            }
+            else if (pullitem == 1 && isupplemental==0 ){
+                row.addClass("ChangePullitemColor");
+                $(this).css('color', 'white');
+            }
+            if (withpr == 1){
+                row.addClass("PR_ChangeBackColor");
+            }
+        }
+    }
+
+    function btnReturnAccount(){
+        var grid = $("#WFPGridApproved").data("kendoGrid");
+        var yearof = $("#wfpyear").val()
+        var programid = $("#ooe").val()
+        var accountid = $("#account").val()
+        var ooeclass = $("#ooeclass").val()
+        var fundid = $("#gfid").val() == 1 ? 0 : 1
+        var mode_trans= $("#gf_currentid").val()
+        var idsToSend = [];
+        var wfpno=[];
+        var ds = grid.dataSource.view();
+        var url = "@Url.Action("ReturnWFP_reviewed", "Report")";
+        for (var i = 0; i < ds.length; i++) {
+            var row = grid.table.find("tr[data-uid='" + ds[i].uid + "']");
+            var checkbox = $(row).find(".checkbox");
+            if (checkbox.is(":checked")) {
+                idsToSend.push(ds[i].wfpid); //loops
+                wfpno.push(ds[i].wfpno)
+            }
+        }
+        if (idsToSend == "") {
+            swal({ title: "Error!", text: "Please tick the box first!", timer: 2500, showConfirmButton: false, type: "error" });
+            $('#SpanOnApproveProgress').css("display", "none");
+            $('#spanthumbsup').css("display", "auto");
+        }
+        else if (@Account.UserInfo.UserTypeID == 1)
+            swal({ title: "Warning!", text: "Sorry! You're not allowed to access this particular program.", timer: 2500, showConfirmButton: false, type: "warning" });
+        else{
+            swal({
+                title: "W A R N I N G!",
+                text: "Return selected ITEMS?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                closeOnConfirm: false
+            }, function () {
+                $.post(url, { transno: idsToSend,wfpno:wfpno, yearof: yearof, programid: programid, accountid: accountid, ooeclass: ooeclass,fundid:fundid,mode_trans:mode_trans }, function (e) {
+                    if (e == "success") {
+                        swal("Success!", "Selected items successfully returned!", "success");
+                        $("#WFPGridApproved").data("kendoGrid").dataSource.read();
+                        $("#wfpconsol").data("kendoGrid").dataSource.read();
+                    } else {
+                        swal("Error!", e, "error");
+                        $("#WFPGridApproved").data("kendoGrid").dataSource.read();
+                        $("#wfpconsol").data("kendoGrid").dataSource.read();
+                    }
+                });
+            });
+        }
+    }
+
+    function btnApprove_lce(){
+        $('#SpanOnApproveProgress').css("display", "auto");
+        $('#spanthumbsup').css("display", "none");
+        var url = "@Url.Action("ApproveWFP_posting", "Report")";
+        var idsToSend = [];
+        var AmountsToSend = [];
+        var BudgetToSend = [];
+        var grid = $("#WFPGridApproved").data("kendoGrid")
+        var ds = grid.dataSource.view();
+   //     var balapp = covert_empty($("#appbalance").val());
+        var yearof = $("#wfpyear").val()
+        var programid = $("#ooe").val()
+        var accountid = $("#account").val()
+        var ooeclass = $("#ooeclass").val()
+
+        for (var i = 0; i < ds.length; i++) {
+            var row = grid.table.find("tr[data-uid='" + ds[i].uid + "']");
+            var checkbox = $(row).find(".checkbox");
+            if (checkbox.is(":checked")) {
+                idsToSend.push(ds[i].wfpid); //loops
+            }
+        }
+        if (idsToSend == "") {
+            swal({ title: "Warning!", text: "Please tick the box first!", timer: 2500, showConfirmButton: false, type: "warning" });
+            $('#SpanOnApproveProgress').css("display", "none");
+            $('#spanthumbsup').css("display", "auto");
+        }
+        //else if (Number(balapp) < 0) {
+        //    swal("Warning", "Insufficient balance, please check the appropriation details!", "warning")
+        //    $('#SpanOnApproveProgress').css("display", "none");
+        //    $('#spanthumbsup').css("display", "auto");
+        //}
+        else {
+            $.post(url, { transno: idsToSend, yearof: yearof, programid: programid, accountid: accountid, ooeclass: ooeclass }, function (d) {
+                if (d == 1) {
+                    swal({ title: "Success!", text: "Selected item/activity has been approved!", timer: 1500, showConfirmButton: false, type: "success" });
+                    $("#WFPGridApproved").data("kendoGrid").dataSource.read();
+                    //$("#wfpconsol").data("kendoGrid").dataSource.read();
+                    $('#SpanOnApproveProgress').css("display", "none");
+                    $('#spanthumbsup').css("display", "auto");
+                }
+                else {
+                    swal("Something Went Wrong!", d, "error");
+                    $('#SpanOnApproveProgress').css("display", "none");
+                    $('#spanthumbsup').css("display", "auto");
+                }
+            })
+        }
+    }
+    function fnactivity_review() {
+        return {
+            officeid: $("#office").val(),
+            tyear: $("#wfpyear").val()
+        }
+    }
+
+    function btnShowdetail() {
+        var grid = $('#WFPGridApproved').data('kendoGrid');
+        if (document.getElementById("btnreviewdetails_id").text == " Show Detail") {
+            $("#btnreviewdetails_id").html("<span class='fa fa-info-circle'></span> Hide Detail");
+            grid.showColumn('m1');
+            grid.showColumn('m2');
+            grid.showColumn('m3');
+            grid.showColumn('m4');
+            grid.showColumn('m5');
+            grid.showColumn('m6');
+            grid.showColumn('m7');
+            grid.showColumn('m8');
+            grid.showColumn('m9');
+            grid.showColumn('m10');
+            grid.showColumn('m11');
+            grid.showColumn('m12');
+        }
+        else {
+            $("#btnreviewdetails_id").html("<span class='fa fa-info-circle'></span> Show Detail");
+            grid.hideColumn('m1');
+            grid.hideColumn('m2');
+            grid.hideColumn('m3');
+            grid.hideColumn('m4');
+            grid.hideColumn('m5');
+            grid.hideColumn('m6');
+            grid.hideColumn('m7');
+            grid.hideColumn('m8');
+            grid.hideColumn('m9');
+            grid.hideColumn('m10');
+            grid.hideColumn('m11');
+            grid.hideColumn('m12');
+        }
+    }
+</script>
+<div id="searchAccountid" style="height: 30px; margin-top:0px; float: right; margin-left:200px;">
+    <input type="text" style="width:310px;border-collapse:collapse;margin:0px;border-style:solid;margin-left:0px;height:70%;outline:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search..." id="SearchDataApprove_Review" name="SearchDataApprove_Review">
+    <div class="k-button k-button-icontext" style="height:30px;width:40px;border-style:solid;" onclick="searchApprove()"><span class="mif-search"></span></div>
+</div>
+<div>
+    <div style="width:100%;float:left;margin-top:-3px;margin-bottom:5px;">
+        @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.WFPrepare>()
+        .Name("WFPGridApproved")
+        .HtmlAttributes(new { style = "height:450.5px;" })
+        .Scrollable()
+        .Columns(col =>
+        {
+        col.Template(@<text></text>)
+                .HeaderTemplate(@<text>No.</text>)
+                .Hidden()
+                .HtmlAttributes(new { style = "text-align:center;" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                @*.HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal"})*@
+                .ClientTemplate("<div>#=wfpid# </div>");
+
+        col.Template(@<text></text>)
+            .ClientTemplate("<input id='check_app#=wfpid#' type='checkbox' style='zoom:1.2'  title='Tick checkbox to set as Approved!'  class='checkbox'/>")
+            .Title("<input onclick=CheckAll_lce(this) type='checkbox' title='Ticked checkbox to set as reviewed!' class='checkbox'/> <span style='text - align:center; vertical - align:middle; height: 30px; background - color:#ff6a00;font-size:14px;color:beige;font-weight:100;'></span> ")
+            .Width(32)
+            //.Hidden()
+            //.HeaderTemplate(@<text>For Review</text>)
+            .HtmlAttributes(new { style = "text-align:center;height:30px" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" });
+        col.Template(@<text></text>)
+                .HeaderTemplate(@<text>Account</text>)
+                .Width(280)
+                .Hidden()
+                .HtmlAttributes(new { style = "text-align:left;" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                .ClientTemplate("<div>#=accountname# </div>")
+                .ClientFooterTemplate("<div style='text-align:center;color:darkgreen;width:170px'><label>Total :</label></div>");
+        col.Template(@<text></text>)
+                .HeaderTemplate(@<text>Activity</text>)
+                .Width(180)
+                .HtmlAttributes(new { style = "text-align:left;" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                .ClientTemplate("<div>#=activityname# </div>");
+        col.Template(@<text></text>)
+                .HeaderTemplate(@<text>Specific Activity</text>)
+                .Width(180)
+                .HtmlAttributes(new { style = "text-align:left;" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                .ClientTemplate("<div>#=specificactivity# </div>");
+        col.Template(@<text></text>)
+                .HeaderTemplate(@<text>Item Name</text>)
+                .Width(280)
+                .HtmlAttributes(new { style = "text-align:left;" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                .ClientTemplate("<div>#=particular# </div>");
+        col.Template(@<text></text>)
+                .HeaderTemplate(@<text>Unit</text>)
+                .Width(55)
+                .HtmlAttributes(new { style = "text-align:left;" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                .ClientTemplate("<div>#=unit# </div>");
+        col.Bound(c => c.m1)
+                .HeaderTemplate(@<text>Jan</text>)
+                .Width(50)
+                .Hidden()
+                .HtmlAttributes(new { style = "text-align:center;height:30px" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                .ClientTemplate("<div>#=m1#</div>");
+        col.Bound(c => c.m2)
+                .HeaderTemplate(@<text>Feb</text>)
+                .Width(50)
+                .Hidden()
+                .HtmlAttributes(new { style = "text-align:center;height:30px" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                .ClientTemplate("<div>#=m2#</div>");
+        col.Bound(c => c.m3)
+                .HeaderTemplate(@<text>Mar</text>)
+                .Width(50)
+                .Hidden()
+                .HtmlAttributes(new { style = "text-align:center;height:30px" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                .ClientTemplate("<div>#=m3#</div>");
+        col.Bound(c => c.m4)
+                .HeaderTemplate(@<text>Apr</text>)
+                .Width(50)
+                .Hidden()
+                .HtmlAttributes(new { style = "text-align:center;height:30px" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                .ClientTemplate("<div>#=m4#</div>");
+        col.Bound(c => c.m5)
+                .HeaderTemplate(@<text>May</text>)
+                .Width(50)
+                .Hidden()
+                .HtmlAttributes(new { style = "text-align:center;height:30px" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                .ClientTemplate("<div>#=m5#</div>");
+        col.Bound(c => c.m6)
+                .HeaderTemplate(@<text>Jun</text>)
+                .Width(50)
+                .Hidden()
+                .HtmlAttributes(new { style = "text-align:center;height:30px" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                .ClientTemplate("<div>#=m6#</div>");
+        col.Bound(c => c.m7)
+                .HeaderTemplate(@<text>Jul</text>)
+                .Width(50)
+                .Hidden()
+                .HtmlAttributes(new { style = "text-align:center;height:30px" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                .ClientTemplate("<div>#=m7#</div>");
+        col.Bound(c => c.m8)
+                .HeaderTemplate(@<text>Aug</text>)
+                .Width(50)
+                .Hidden()
+                .HtmlAttributes(new { style = "text-align:center;height:30px" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                .ClientTemplate("<div>#=m8#</div>");
+        col.Bound(c => c.m9)
+                .HeaderTemplate(@<text>Sep</text>)
+                .Width(50)
+                .Hidden()
+                .HtmlAttributes(new { style = "text-align:center;height:30px" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                .ClientTemplate("<div>#=m9#</div>");
+        col.Bound(c => c.m10)
+                .HeaderTemplate(@<text>Oct</text>)
+                .Width(50)
+                .Hidden()
+                .HtmlAttributes(new { style = "text-align:center;height:30px" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                .ClientTemplate("<div>#=m10#</div>");
+        col.Bound(c => c.m11)
+                .HeaderTemplate(@<text>Nov</text>)
+                .Width(50)
+                .Hidden()
+                .HtmlAttributes(new { style = "text-align:center;height:30px" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                .ClientTemplate("<div>#=m11#</div>");
+        col.Bound(c => c.m12)
+                .HeaderTemplate(@<text>Dec</text>)
+                .Width(50)
+                .Hidden()
+                .HtmlAttributes(new { style = "text-align:center;height:30px" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                .ClientTemplate("<div>#=m12#</div>");
+        col.Template(@<text></text>)
+                .HeaderTemplate(@<text>Weight</text>)
+            .Hidden()
+            .HtmlAttributes(new { style = "text-align:center;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=weight# </div>");
+
+        col.Template(@<text></text>)
+                .HeaderTemplate(@<text>Total <br />Qty</text>)
+                .Width(50)
+                .HtmlAttributes(new { style = "text-align:center;height:30px" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                .ClientTemplate("<div>#=kendo.toString(totalqty,'c2')# </div>");
+        col.Template(@<text></text>)
+                .HeaderTemplate(@<text>No. of <br />Days</text>)
+                .Width(100)
+                .Hidden()
+                .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                .ClientTemplate("<div>#=kendo.toString(noofdays,'c2')# </div>");
+        col.Template(@<text></text>)
+                .HeaderTemplate(@<text>Amount</text>)
+             .Width(100)
+            .HtmlAttributes(new { style = "text-align:right;height:30px" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=kendo.toString(amount,'c2')# </div>");
+        col.Bound(c => c.totalamount)
+            .HeaderTemplate(@<text>Total <br />Amount</text>)
+                .Width(100)
+                .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                .ClientTemplate("<div>#=kendo.toString(totalamount,'c2')# </div>")
+                .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> </label><label> #=kendo.toString(sum, 'c2')#</label></div>");
+        col.Template(@<text></text>)
+                .HeaderTemplate(@<text>Date/Time Reviewed</text>)
+                .Width(160)
+                .HtmlAttributes(new { style = "text-align:center;" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                .ClientTemplate("<div>#=datetimeentered# </div>");
+        col.Bound(c => c.officeid)
+                //  .HeaderTemplate(@<text>first month rel</text>)
+                .Hidden()
+                .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                .ClientTemplate("<div>#=kendo.toString(officeid,'c2')# </div>");
+        col.Bound(c => c.programid)
+                // .HeaderTemplate(@<text>second month rel</text>)
+                .Hidden()
+                .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                .ClientTemplate("<div>#=kendo.toString(programid,'c2')# </div>");
+        col.Bound(c => c.accountid)
+                //   .HeaderTemplate(@<text>third month rel</text>)
+                .Hidden()
+                .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                .ClientTemplate("<div>#=kendo.toString(accountid,'c2')# </div>");
+        col.Bound(c => c.activityid)
+                //  .HeaderTemplate(@<text>transaction no.</text>)
+                .Hidden()
+                .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                .ClientTemplate("<div>#=activityid#</div>");
+        
+        col.Template(@<text></text>)
+                .Hidden()
+                .HtmlAttributes(new { style = "text-align:left;" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                .ClientTemplate("<div>#=physicaltarget# </div>");
+        col.Template(@<text></text>)
+                .Hidden()
+                .HtmlAttributes(new { style = "text-align:left;" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                .ClientTemplate("<div>#=devtindicator# </div>");
+        col.Template(@<text></text>)
+            .Hidden()
+            .HtmlAttributes(new { style = "text-align:left;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=responsibleperson# </div>");
+        col.Template(@<text></text>)
+                .Hidden()
+                .HtmlAttributes(new { style = "text-align:left;" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                .ClientTemplate("<div>#=isPPMP# </div>");
+         col.Bound(c=> c.prepareuser)
+                .HeaderTemplate(@<text>Implementing <br /> Office </text>)
+                 .Width(120)
+                .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" });
+        col.Bound(c => c.remarks)
+            .HeaderTemplate(@<text>Remarks</text>)
+                 .Hidden()
+                .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" });
+        //   .ClientTemplate("<div>#=remarks)# </div>");
+         col.Bound(c => c.prepareuser)
+                .HeaderTemplate(@<text>Implementing <br /> Office</text>)
+                .Width(120)
+                .HtmlAttributes(new { style = "text-align:center;" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                .ClientTemplate("<div>#=prepareuser# </div>");
+        col.Bound(c => c.wfpno)
+            .HeaderTemplate(@<text>WFP No.</text>)
+                .Width(105)
+                .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                .ClientTemplate("<div>#=wfpno#</div>");
+        col.Bound(c => c.withpr)
+            .HeaderTemplate(@<text>with PR</text>)
+                .Hidden()
+                .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                .ClientTemplate("<div>#=withpr#</div>");
+
+        @*col.Template(@<text></text>)
+                    .HeaderTemplate(@<text></text>)
+                    .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                    .ClientTemplate(
+                        "<div class='k-button k-button-icontext' id='disapproveid#=wfpid#' style='border-radius:50px;color:\\#ffffff;background-color:\\#DE5555;width:80px' onclick='disapprovewfp(#=wfpid#,\"#=wfpno#\")'><span class='fa fa-arrow-circle-left' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'> </span>Return</div> ")
+                    .HtmlAttributes(new { style = "vertical-align: top;" })
+                    .Width(100);*@
+        })
+        .ToolBar(toolbar =>
+        {
+            toolbar.Custom().Text("<span class='fa fa-info-circle'></span> Show Detail").Name("btnShowdetail").Url("javascript:void(0)").HtmlAttributes(new { onclick = "btnShowdetail()", id = "btnreviewdetails_id" });
+            toolbar.Custom().Text("<div style='color:red;'><span id='spanthumbsup' class='fa fa-arrow-circle-left'> </span><span id='SpanOnApproveProgress' style='display:none' class='fa fa-spinner fa-spin'></span> Set As Returned</div>").Name("btnReturn").Url("javascript:void(0)").HtmlAttributes(new { onclick = "btnReturnAccount()" });
+            //toolbar.Custom().Text("<span id='spanthumbsup' class='fa fa-thumbs-o-up'> </span><span id='SpanOnApproveProgress' style='display:none' class='fa fa-spinner fa-spin'></span> Set As Approved").Name("btnApprove").Url("javascript:void(0)").HtmlAttributes(new { onclick = "btnApprove_lce()" });
+            // toolbar.Save();
+        })
+            .Editable(editable => editable.Mode(GridEditMode.InCell))
+            .Resizable(e => e.Columns(true))
+            //.AutoBind(false)
+            .Pageable(pageable => pageable
+            .Refresh(true)
+
+            //.ButtonCount()
+            )
+            .Selectable()
+            .Events(e => e.DataBound("onDataBound").Edit("onGridEdit"))
+            .DataSource(dataSource => dataSource
+            .Ajax()
+            .Batch(true)
+            .Model(m => m.Id(i => i.wfpid))
+            .ServerOperation(false)
+
+            .Aggregates(a =>
+            {
+                a.Add(c => c.totalamount).Sum();
+            })
+            .PageSize(5000)
+            .Read(read => read.Action("GetWFPPrepare", "Report").Data("getParam"))
+            )
+        )
+
+    </div>
+</div>
+
+<div class="fa fa-arrow-circle-left"  style="display:inline-block; background-color:#54625E;margin-top:-5px;padding-top:5px;padding-bottom:5px;width:100%">
+    <span style="font-weight:bold;color:white;margin-left:5px">LEGEND : </span> <span style="color:yellow;margin-right:10px">YELLOW : PPMP </span> <span style="color:white">/ </span>  <span style="color:lightblue;margin-right:10px">LIGHT BLUE : PPMP W/ PR </span><span style="color:#CCCCCC;margin-right:10px"> LIGHT GRAY: WFP (80%)</span>
+</div>
+<div style="display:inline-block">
+    <label style="display:inline-block;margin-left:10px;margin-top:10px;">
+        Activity 
+    </label>
+    <div style="margin-left:10px;width:500px;margin-top:0px;">
+        @(Html.Kendo().ComboBox()
+    .Name("activity_review")
+    .DataTextField("initiative")
+    .DataValueField("initiative_id")
+    .AutoBind(true)
+    .Placeholder("Select activity...")
+    .Filter("contains")
+    .MinLength(3)
+    //     .Events(e => e.Change("fnOffice_sel"))
+    .SelectedIndex(-1)
+    .HtmlAttributes(new { style = "width:100%; height:100%", @class = "form-control autoselect" })
+    .DataSource(source =>
+    {
+        source.Read(read =>
+        {
+            read.Action("GetOfficeActivity", "Report").Data("fnactivity_review");
+        })
+    .ServerFiltering(false);
+    })
+        )
+
+    </div>
+</div>
+<div>
+    <div class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 100px;float:left; margin-top: 10px; margin-left:505px;border-radius:50px;background-color:indianred;color:white; margin-bottom:0px" onclick="reqClose()"><span class="fa fa-close"></span> Close</div>
+    <div id="btnPrintSubmitted" class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 100px;float:right; margin-top:10px; margin-right:75px;border-radius:50px;margin-bottom:0px" onclick="reqPrintApproved()"><span class="mif-printer"></span> Preview</div>
+</div>
+<style>
+    .ChangeBackColor {
+        background-color: #FFFF80;
+    }
+
+    .ChangeApprovedColor {
+        background-color: #00ff21;
+    }
+
+    .k-dropdown-wrap.k-state-default {
+        border-left-style: solid;
+    }
+
+    .PR_ChangeBackColor {
+        background-color:lightblue;
+    }
+</style>
+<script>
+    function reqPrintApproved() {
+        var officeid = $("#office").val();
+        var officename = $("#office").data("kendoComboBox").text()
+        var programID = $("#ooe").val();
+        var yearof = $("#wfpyear").val();
+        var repHistory = $("#repHistory").val();
+        var prepby = $("#prepby").val();
+        var prepwfp= 0//$("#prepwfp").val() == 1 ? 1: 0;
+        var submitwfp = 0;//$("#submitwfp").val() == 1? 2:0;
+        var approvewfp = 3;//$("#approvewfp").val() == 1 ? 3 : 0;
+        var printstatus = Number(prepwfp) + Number(submitwfp) + Number(approvewfp)
+        var projectaip = 0//$("#projectaip").val()
+        var fundsource = $("#fundsource").data("kendoDropDownList").text()
+        var accountid = $("#account").val();
+        var accountname = $("#account").data("kendoComboBox").text()
+        var municipal = $("#municipal").data("kendoDropDownList").text()
+        var barangay = $("#barangay").data("kendoDropDownList").text()
+        var ooeclass = $("#ooeclass").data("kendoDropDownList").text()
+        var activityid=$("#activity_review").val()
+        var pgas_loc = $("#pgas_loc").val() == 1 ? 1 : 0;
+        var fundid = $("#gfid").val() == 1 ? 0 : 1
+        //if ((prepby == "" || prepby == "0" || prepby.length == 0) && repHistory.length == 0) {
+        //    swal("Warning", "Please select prepared by from the dropdown list!", "warning")
+        //}
+        //else if (projectaip == 0) {
+        //    swal("Warning", "Please select project in the dropdown list!", "warning")
+        //}
+        if (accountid == 0 || accountid.length > 6) {
+            swal("Warning", "Please select an account from the dropdown list!", "warning")
+        }
+        else {
+            $.ajax({
+                async: false,
+                dataType: 'html',
+                success: window.open("../Reports/ReportViewer.aspx?rid=37&OfficeID=" + officeid + "&year=" + yearof + "&OfficeName=" + officename + "&prepby=" + prepby + "&fundsource=1&ProjectName=&funddescription=&repHistory=" + repHistory + "&printstatus=" + printstatus + "&projectaip=" + projectaip + "&fundsourcename=" + fundsource + "&accountID=" + accountid + "&accountname=" + accountname + "&municipal=" + municipal + "&barangay=" + barangay + "&ooeclass="+ooeclass+"&accountidlist=0&pgas_loc=" + pgas_loc + "&programID=" + programID + "&activityid="+activityid+"&fundid="+fundid+"")
+
+            });
+            $("#repHistory").data("kendoComboBox").dataSource.read();
+        }
+    }
+    function reqClose(){
+        $("#vwApproved").data("kendoWindow").close()
+    }
+    function disapprovewfp(wfpid,wfpno) {
+        var gview = $("#WFPGridApproved").data("kendoGrid");
+        var selectedItem = gview.dataItem(gview.select());
+        var yearof = $("#wfpyear").val()
+        var programid = $("#ooe").val()
+        var accountid = $("#account").val()
+        var ooeclass = $("#ooeclass").val()
+        var fundid = $("#gfid").val() == 1 ? 0 : 1
+        var mode_trans= $("#gf_currentid").val()
+        swal({
+            title: "W A R N I N G!",
+            text: "Return this ITEM?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes",
+            closeOnConfirm: false
+        }, function () {
+            var url = "@Url.Action("disapprovewfp", "Report")";
+            $.get(url, { trnno: wfpid,programid:programid,accountid:accountid,yearof:yearof,ooeclass:ooeclass,fundid:fundid,wfpno:wfpno,mode_trans:mode_trans }, function (e) {
+                if (e == "success") {
+                    swal("Success!", "Item has been returned!", "success");
+                    $("#WFPGridApproved").data("kendoGrid").dataSource.read();
+                    $("#wfpconsol").data("kendoGrid").dataSource.read();
+                } else {
+                    swal("Error!", e, "error");
+                    $("#WFPGridApproved").data("kendoGrid").dataSource.read();
+                    $("#wfpconsol").data("kendoGrid").dataSource.read();
+                }
+            });
+        });
+    }
+</script>

@@ -1,0 +1,111 @@
+﻿
+
+<script>
+    function reqShowPass() {
+        $("#pass").css("background-color", "transparent");
+        $("#eShowPass").hide();
+    }
+
+    function reqPIEdit() {
+        $('#siteContent').html('<div style="width: 100%;height:100%;"><img src="@Url.Content("~/Content/MyTheme/loading_2x.gif")" alt="Loading..." style="position: absolute;top: 40%;left: 57%;margin-top: -16px;margin-left: -16px;" /></div>');
+        $('#webTitle').html("Personal Info. Modification");
+        var url = "@Url.Action("EditInfo", "Account")";
+        $.get(url, function (d) {
+            $('#siteContent').html(d);
+        })
+    }
+
+    function reqLIEdit() {
+        $('#siteContent').html('<div style="width: 100%;height:100%;"><img src="@Url.Content("~/Content/MyTheme/loading_2x.gif")" alt="Loading..." style="position: absolute;top: 40%;left: 57%;margin-top: -16px;margin-left: -16px;" /></div>');
+        $('#webTitle').html("Log-in Information");
+        var url = "@Url.Action("EditLogIn", "Account")"
+        $.get(url, function (d) {
+            $('#siteContent').html(d);
+        })
+    }
+</script>
+@{
+    var image_id = Account.UserInfo.imgName;
+    var image_path = "http://121.97.216.184:82/idprod/PGAS/";
+    var image_IDPath = image_path+image_id;
+    var Name = Account.UserInfo.empName;
+    var Office = Account.UserInfo.OfficeName;
+    var PGASEmail = Account.UserInfo.emailaddress;
+    var PGASPassword = Account.UserInfo.Passcode;
+    var UserLevel = Account.UserInfo.UserTypeDesc;
+    var display_image_profile = "";
+    HttpWebResponse response = null;
+    var request = (HttpWebRequest)WebRequest.Create(image_IDPath);
+    request.Method = "HEAD";
+    try
+    {
+        response = (HttpWebResponse)request.GetResponse();
+        display_image_profile = image_IDPath;
+    }
+    catch (WebException ex)
+    {
+        display_image_profile = "Content/images/no_avatar_available.jpg";
+    }
+}
+<style>
+    .password-dots:hover .password-display
+    {
+        display:none;
+    }
+    .password-dots:hover:after
+    {
+        content: "@PGASPassword";
+    }
+</style>
+<div style="border-color:#1fa67a;border-width:3px;border-style:solid;width:100%;float:left;margin-top:10px;">
+    <div style="background-color:#ffffff;width:200px;margin-left:10px;margin-top:-20px;"><h2>Account Details</h2></div>
+    <div style="margin-left:10px;">
+        <div style="float:left;width:170px;">
+            <img src="@display_image_profile" width="150" height="150" style="border-radius:100px;border-color:#1fa67a;border-style:solid;border-width:2px;" />
+        </div>
+        <div style="float:left;width:500px;margin-left:10px;margin-top:30px;">
+            <p><b>Name : </b> @Name</p>
+            <p><b>Office :</b> @Office </p>
+            <p><b>PGAS Email :</b> @PGASEmail </p>
+            @*<div>
+                <p class="password-dots"><b>PGAS Password <span style="font-size:12px;">(hover to show Password)</span> :</b> <span class="password-display">●●●●●●</span></p>
+            </div>*@
+            <p><b>User Level : </b> @UserLevel</p>
+        </div>
+    </div>
+    <script>
+        function LoginHistoryParameter() {
+            var UserID = @Account.UserInfo.eid;
+            return {
+                UserID: UserID
+            }
+        }
+    </script>
+    <div style="margin-left:20px;margin-top:10px;float:left;width:90%;margin-bottom:10px;">
+        <h2 style="margin-bottom:10px;">Login History</h2>
+        @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.UserLogInfo>()
+            .Name("grUserLogInfo")
+            .Columns(col =>
+            {
+                col.Bound(m => m.Date).Title("Date");
+                col.Bound(m => m.IP_Address).Title("IP Address");
+                col.Bound(m => m.PC_Name).Title("PC Name");
+                col.Bound(m => m.Time_in).Title("Time in");
+                col.Bound(m => m.Time_out).Title("Time out");
+            })
+            
+                                        .Pageable(page => page.Refresh(true)
+                                        .Enabled(true)
+                                        .ButtonCount(4)
+                                        .PreviousNext(true)
+                                        )
+                                           .Selectable(selectable => selectable.Mode(GridSelectionMode.Single))
+                                           .DataSource(d => d
+                                           .Ajax()
+                                           .PageSize(10)
+                                              .Model(m => m.Id(i => i.UserLogID))
+                                                      .Read(read => read.Action("LoginHistory", "Login").Data("LoginHistoryParameter"))
+                                           )
+        )
+    </div>
+</div>

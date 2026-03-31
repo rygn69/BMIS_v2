@@ -1,0 +1,135 @@
+﻿@model IEnumerable<iFMIS_BMS.BusinessLayer.Models.AllLineGraph_Model>
+
+    @(Html.Kendo().Chart(Model)
+    .Name("chartLine")
+    .HtmlAttributes(new { style = "width:1200px;height:800px" })
+    .Title((string)ViewBag.accountName)
+    .Legend(legend => legend
+    .Position(ChartLegendPosition.Right)
+    )
+
+    .SeriesDefaults(seriesDefaults =>
+    seriesDefaults.Line().Style(ChartLineStyle.Normal)
+    )
+    .Series(series =>
+    {
+
+    
+    @*series.Line(s => s.office1).Name("PGO (Obligation)").Color("#277547");
+    series.Line(s => s.office1v).Name("PGO (Appropration)").Color("#10582D");
+    series.Line(s => s.office2).Name("BACCAU (Obligation)").Color("#459063");
+    series.Line(s => s.office2v).Name("BACCAU (Appropration)").Color("#72AF8B");*@
+    series.Line(s => s.office4).Name("PIMO (Obligation)").Color("#1fa67a");
+    series.Line(s => s.office4v).Name("PIMO (Appropration)").Color("#57A44F");
+    @*series.Line(s => s.office5).Name("ADMIN (Obligation)").Color("#366C13");
+    series.Line(s => s.office5v).Name("ADMIN (Appropration)").Color("#79B055");
+    series.Line(s => s.office7).Name("SPORTS (Obligation)").Color("#406E14");
+    series.Line(s => s.office7v).Name("SPORTS (Appropration)").Color("#84B357");
+    series.Line(s => s.office9).Name("COOP (Obligation)").Color("#5B7415");
+    series.Line(s => s.office9v).Name("COOP (Appropration)").Color("#A3BD5B");
+    series.Line(s => s.office12).Name("PESO (Obligation)").Color("#6F7916");
+    series.Line(s => s.office12v).Name("PESO (Appropration)").Color("#BBC45F"); 
+    series.Line(s => s.office14).Name("SP (Obligation)").Color("#7B7616");
+    series.Line(s => s.office14v).Name("SP (Appropration)").Color("#C8C361"); 
+    series.Line(s => s.office15).Name("PHRMO (Obligation)").Color("#7B6416");
+    series.Line(s => s.office15v).Name("PHRMO (Appropration)").Color("#C8B061");
+    series.Line(s => s.office16).Name("PGSO (Obligation)").Color("#7B5B16");
+    series.Line(s => s.office16v).Name("PGSO (Appropration)").Color("#C8A761");
+    series.Line(s => s.office17).Name("CSU (bligation").Color("#7B5416");
+    series.Line(s => s.office17v).Name("CSU (Appropration)").Color("#C8A061");
+    series.Line(s => s.office18).Name("PLO (Obligation)").Color("#7B4B16");
+    series.Line(s => s.office18v).Name("PLO (Appropration)").Color("#C89761");
+    series.Line(s => s.office19).Name("PPDC (Obligation)").Color("#7B4416");
+    series.Line(s => s.office19v).Name("PPDC (Appropration)").Color("#C88F61");
+    series.Line(s => s.office21).Name("PBO (Obligation)").Color("#7B3316");
+    series.Line(s => s.office21v).Name("PBO (Appropration)").Color("#C87E61");
+    series.Line(s => s.office22).Name("PACCO (Obligation)").Color("#7B2616");
+    series.Line(s => s.office22v).Name("PACCO (Appropration)").Color("#C87161");
+    series.Line(s => s.office23).Name("PEO (Obligation)").Color("#7A1619");
+    series.Line(s => s.office23v).Name("PEO (Appropration)").Color("#C66063");
+    series.Line(s => s.office24).Name("PSWD (Obligation)").Color("#71142A");
+    series.Line(s => s.office24v).Name("PSWD (Appropration)").Color("#B8596F");
+    series.Line(s => s.office25).Name("PHO (Obligation)").Color("#691336");
+    series.Line(s => s.office25v).Name("PHO (Appropration)").Color("#AC5377");
+    series.Line(s => s.office26).Name("DOPMH (Obligation)").Color("#62123F");
+    series.Line(s => s.office26v).Name("DOPMH (Appropration)").Color("#9F4D7D");
+    series.Line(s => s.office27).Name("BDH (Obligation)").Color("#56104B");
+    series.Line(s => s.office7v).Name("BDH (Appropration)").Color("#8D4482");
+    series.Line(s => s.office28).Name("EMCH (Obligation)").Color("#4C0F50");
+    series.Line(s => s.office28v).Name("EMCH (Appropration)").Color("#7F4083");
+    series.Line(s => s.office29).Name("TDH (Obligation)").Color("#3E1252");
+    series.Line(s => s.office29v).Name("TDH (Appropration)").Color("#704485");
+    series.Line(s => s.office30).Name("LDH (Obligation)").Color("#361352");
+    series.Line(s => s.office30v).Name("LDH (Appropration)").Color("#694686");
+    series.Line(s => s.office31).Name("PASSO (Obligation)").Color("#2A1654");
+    series.Line(s => s.office31v).Name("PASSO (Appropration)").Color("#5E4989");
+    series.Line(s => s.office32).Name("PTO (Obligation)").Color("#1E1955");
+    series.Line(s => s.office32v).Name("PTO (Appropration)").Color("#534D8B");
+    series.Line(s => s.office33).Name("AGRI (Obligation)").Color("#172653");
+    series.Line(s => s.office33v).Name("AGRI (Appropration)").Color("#495987");
+    series.Line(s => s.office35).Name("PENRO (Obligation)").Color("#11394E");
+    series.Line(s => s.office35v).Name("PENRO (Appropration)").Color("#41697F");
+    series.Line(s => s.office36).Name("PVO (Obligation)").Color("#0F523A");
+    series.Line(s => s.office36v).Name("PVO (Appropration)").Color("#41866E");
+    series.Line(s => s.office37).Name("PLC (Obligation)").Color("#513C01");
+    series.Line(s => s.office37v).Name("PLC (Appropration)").Color("#A38636");
+    series.Line(s => s.office38).Name("WATERWORKS (Obligation)").Color("#512D01");
+    series.Line(s => s.office38v).Name("WATERWORKS (Appropration)").Color("#F4CE9F");
+    series.Line(s => s.office39).Name("PEEDO (Obligation)").Color("#511901");
+    series.Line(s => s.office39v).Name("PEEDO (Appropration)").Color("#F4B89F");
+    series.Line(s => s.office41).Name("ARC (Obligation)").Color("#480116");
+    series.Line(s => s.office41v).Name("ARC (Appropration)").Color("#DA8EA5");
+    series.Line(s => s.office43).Name("NONOFFICE (Obligation)").Color("#3E0129");
+    series.Line(s => s.office43v).Name("NONOFFICE (Appropration)").Color("#BC7AA5");
+    series.Line(s => s.office49).Name("PVGO (Obligation)").Color("#210436");
+    series.Line(s => s.office49v).Name("PVGO (Appropration)").Color("#8D6EA4");
+    series.Line(s => s.office51).Name("TOURISM (Obligation)").Color("#110738");
+    series.Line(s => s.office51v).Name("TOURISM (Appropration)").Color("#7F74A8");
+    series.Line(s => s.office53).Name("MORAL (Obligation)").Color("#051835");
+    series.Line(s => s.office53v).Name("MORAL (Appropration)").Color("#6E82A1");
+    series.Line(s => s.office57).Name("SEC (Obligation)").Color("#013528");
+    series.Line(s => s.office57v).Name("SEC (Appropration)").Color("#679F91");
+    series.Line(s => s.office63).Name("PDRRMO (Obligation)").Color("#515101");
+    series.Line(s => s.office63v).Name("PDRRMO (Appropration)").Color("#F4F49F");
+    series.Line(s => s.office65).Name("PIAO (Obligation)").Color("#7B6C16");        
+    series.Line(s => s.office65v).Name("PIAO (Appropration)").Color("#C8B861");
+    series.Line(s => s.office69).Name("PCSMO (Obligation)").Color("#A39E36");          
+    series.Line(s => s.office69v).Name("PCSMO (Appropration)").Color("#F4F09F");
+    series.Line(s => s.office70).Name("PPIO (Obligation)").Color("#97A035");   
+    series.Line(s => s.office70v).Name("PPIO (Appropration)").Color("#E9F09C");*@
+
+
+    })
+    .CategoryAxis(axis => axis
+    .Categories("2014", "2015", "2016", "2017", "2018", "2019")
+    .MajorGridLines(lines => lines.Visible(false))
+    )
+    .ValueAxis(axis => axis
+    .Numeric().Labels(labels => labels.Format("₱ {0:N0}"))
+    .Line(line => line.Visible(true))
+    .AxisCrossingValue(-10)
+    )
+    .Tooltip(tooltip => tooltip
+    .Visible(true)
+    .Format("₱ {0:N0}")
+
+    )
+    //   .Legend(legend => legend.Position(ChartLegendPosition.Bottom).Labels(x => x.Font(font: "bold 12px Arial,Helvetica,sans-serif").Template("History Amount")))
+    )
+
+    <script>
+        function hideSeriesAll() {
+            for (var i = 0; i <= 82; i++) {
+                if ($("#chartLine").getKendoChart()._sourceSeries[i].visible) {
+                    $("#chartLine").getKendoChart()._legendItemClick(i);
+                }
+            }
+        }
+        function showSeriesAll() {
+            for (var i = 0; i <= 82; i++) {
+                if (!$("#chartLine").getKendoChart()._sourceSeries[i].visible) {
+                    $("#chartLine").getKendoChart()._legendItemClick(i);
+                }
+            }
+        }
+    </script>

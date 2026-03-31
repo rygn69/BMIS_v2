@@ -1,0 +1,288 @@
+﻿@model iFMIS_BMS.BusinessLayer.Models.AccountComputationModel
+<script>
+    function ChangeAmountField() {
+        if ($("#ddlComputationType").val() == 1) {
+            document.getElementById("Amount").innerHTML = "Max Amount :";
+        } else {
+            document.getElementById("Amount").innerHTML = "Amount :";
+        }
+    }
+
+    function DisableLetters(event) {
+        if ($.inArray(event.keyCode, [46, 8, 9, 27, 13, 110]) !== -1 ||
+            // Allow: Ctrl+A, Command+A
+           (event.keyCode == 65 && (event.ctrlKey === true || event.metaKey === true)) ||
+            // Allow: home, end, left, right, down, up
+           (event.keyCode >= 35 && event.keyCode <= 40 || event.keyCode == 190)) {
+            // let it happen, don't do anything
+            return;
+        }
+        // Ensure that it is a number and stop the keypress
+        if ((event.shiftKey || (event.keyCode < 48 || event.keyCode > 57)) && (event.keyCode < 96 || event.keyCode > 105)) {
+            event.preventDefault();
+        }
+    }
+    function SetAccountValue() {
+        $("#ddlAccount").data("kendoComboBox").value($("#accountCode").val());
+        if ($("#accountCode").val() == $("#ddlAccount").data("kendoComboBox").text()) {
+            $("#ddlAccount").data("kendoComboBox").value("")
+        }
+    }
+    function CheckKeyPress(event) {
+        if (event.keyCode == 13) {
+            SetAccountValue();
+        }
+    }
+    function ChangeAccountCode() {
+        document.getElementById("accountCode").value = $("#ddlAccount").val()
+    }
+    function GetDropdownParam() {
+        return {
+            YearActive: $("#ddlYear").val()
+        }
+    }
+    document.getElementById('txtAmount').onkeypress = function (e) {
+        if (e.keyCode === 46 && this.value.split('.').length === 2) {
+            return false;
+        }
+    }
+    document.getElementById('txtPercentage').onkeypress = function (e) {
+        if (e.keyCode === 46 && this.value.split('.').length === 2) {
+            return false;
+        }
+    }
+    function reqSave() {
+        if ($("#ddlAccount").val() != "") {
+            var accountCode = $("#ddlAccount").val();
+            var Amount = 0;
+            var MaxAmount = 0;
+            var Percentage = 0;
+            var Roundoff = $("#ddlRoundOff").val();
+            var EmpoyeeType = "";
+            var Period = $("#ddlPeriod").val();
+            var YearActive = $("#ddlYear").val();
+
+            if ($("#txtPercentage").val() != "") {
+                Percentage = $("#txtPercentage").val();
+            }
+            if ($("#ddlEmployeetype").val() > 3) {
+                EmpoyeeType = 3;
+            }
+            else {
+                EmpoyeeType = $("#ddlEmployeetype").val();
+            }
+            if ($("#ddlComputationType").val() == 1) {
+                if ($("#txtAmount").val() != "") {
+                    MaxAmount = $("#txtAmount").val();
+                }
+                else {
+                    MaxAmount = 0;
+                }
+            }
+            else {
+                if ($("#txtAmount").val() != "") {
+                    Amount = $("#txtAmount").val();
+                }
+                else {
+                    Amount = 0;
+                }
+            }
+            if (@Model.ComputationID == 0) {
+                var url = "@Url.Action("SaveNewComputation", "Maintenance")";
+                $.post(url, {AccountCode:accountCode,Amount:Amount,NoOfMonths:Period,Percentage:Percentage
+                    , isRoundOff: Roundoff, MaxAmount: MaxAmount, EmployeeType: EmpoyeeType, YearActive: YearActive}, function (d) {
+                        if (d == 1) {
+                            swal({ title: "Success!", text: "Successfuly Saved!", timer: 1000, showConfirmButton: false, type: "success" });
+                            ClearFields();
+                            $("#grdAccountComputation").data("kendoGrid").dataSource.read();
+                        }
+                        else {
+                            swal("Something Went Wrong!", d, "error");
+                        }
+                    })
+            }
+            else {
+                var url = "@Url.Action("UpdateComputation", "Maintenance")";
+                $.post(url, {ComputationID:@Model.ComputationID,Amount:Amount,NoOfMonths:Period,Percentage:Percentage
+                    , isRoundOff: Roundoff, MaxAmount: MaxAmount, EmployeeType: EmpoyeeType}, function (d) {
+                        if (d == 1) {
+                            document.documentElement.style.overflow = 'auto';  // firefox, chrome
+                            document.body.scroll = "yes";
+                            $("#NewComputation").data("kendoWindow").close();
+                            swal({ title: "Success!", text: "Successfuly Updated!", timer: 1000, showConfirmButton: false, type: "success" });
+                            ClearFields();
+                            $("#grdAccountComputation").data("kendoGrid").dataSource.read();
+                        }
+                        else {
+                            swal("Something Went Wrong!", d, "error");
+                        }
+                    })
+            }
+        }
+        else {
+            swal({title:"Cannot Complete Request!", text:"Please Select Account", timer:1000,showConfirmButton:false,type: "warning"});
+        }
+
+    }
+    function ClearFields() {
+        $("#ddlComputationType").data("kendoDropDownList").value(1);
+        $("#ddlAccount").data("kendoComboBox").value("");
+        $("#ddlRoundOff").data("kendoDropDownList").value(0);
+        $("#ddlEmployeetype").data("kendoDropDownList").value(1);
+        $("#ddlPeriod").data("kendoDropDownList").value(12);
+        document.getElementById("Amount").innerHTML = "Max Amount :";
+        document.getElementById('accountCode').value = "";
+        document.getElementById('txtAmount').value = "";
+        document.getElementById('txtPercentage').value = "";
+        document.getElementById('accountCode').disabled = false;
+        $("#ddlAccount").data("kendoComboBox").enable();
+        document.getElementById('btnSave').innerHTML = "Save";
+    }
+    function reqClose(){
+        document.documentElement.style.overflow = 'auto';  // firefox, chrome
+        document.body.scroll = "yes";
+        $("#NewComputation").data("kendoWindow").close();
+    }
+    function CheckifBackSpace(e){
+        alert(e.keyCode)
+    }
+</script>
+<div>
+    <label style="margin-left: 5px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px; display : inline-block">
+        Account Code :<br />
+        <input id="accountCode" class="k-textbox" style="width:80px" onkeypress="CheckKeyPress(event)" onkeyup="CheckifBackSpace(e)">
+        <button id="btnAccountCode" class=" k-button k-button-icontext" style="height:35px;width:40px; margin-left:-5.5px;margin-top:1px;border:1px solid #dadada" onclick="SetAccountValue()"><span class="mif-search"></span></button>
+    </label>
+    <br />
+    <label style="margin-left: 5px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px; display : inline-block">
+        Account Name:<br />  @(Html.Kendo().ComboBox()
+                         .Name("ddlAccount")
+                         .DataTextField("account_desc")
+                         .DataValueField("ref_account_id")
+                         .Filter("contains")
+                         .MinLength(1)
+                         .Placeholder("Select Acount...")
+                         .HtmlAttributes(new { @style = "width: 520px;" })
+                         .Events(e => e.Change("ChangeAccountCode"))
+                         .DataSource(source => source.Read(read => read.Action("ddlAccountAndAccountCode", "Dropdowns").Data("GetDropdownParam")).ServerFiltering(false)) 
+        )
+    </label>
+    <label style="margin-left: 5px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px; display : inline-block">
+        Computation Type :<br />  @(Html.Kendo().DropDownList()
+                         .Name("ddlComputationType")
+                         .DataTextField("Text")
+                         .DataValueField("Value")
+                         .HtmlAttributes(new { @style = "width: 200px;" })
+                         .BindTo(new List<SelectListItem>()
+                         {
+                            new SelectListItem() {
+                                Text = "Salary Based", Value = "1"  
+                            },
+                            new SelectListItem() {
+                                Text = "Given Amount", Value = "2"  
+                            }
+                         }).Events(e => e.Change("ChangeAmountField"))
+        )
+    </label>
+    <label style="margin-left: 5px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px; display : inline-block">
+        <span id="Amount">Max Amount :</span> <br />
+        <input class="k-textbox" onkeydown="DisableLetters(event)" id="txtAmount">
+    </label>
+    <label style="margin-left: 5px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px; display : inline-block">
+        Percentage :<br />
+        <input class="k-textbox" style="width:90px" onkeydown="DisableLetters(event)" id="txtPercentage">
+    </label>
+    <label style="margin-left: 5px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px; display : inline-block">
+        Round Off :<br />  @(Html.Kendo().DropDownList()
+                         .Name("ddlRoundOff")
+                         .DataTextField("Text")
+                         .DataValueField("Value")
+                         .HtmlAttributes(new { @style = "width: 200px;" })
+                         .BindTo(new List<SelectListItem>()
+                         {
+                            new SelectListItem() {
+                                Text = "No", Value = "0"
+                            },
+                            new SelectListItem() {
+                                Text = "Yes", Value = "1"
+                            }
+                         })
+        )
+    </label>
+    <label style="margin-left: 5px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px; display : inline-block">
+        Employee Type :<br />  @(Html.Kendo().DropDownList()
+                         .Name("ddlEmployeetype")
+                         .DataTextField("Text")
+                         .DataValueField("Value")
+                         .HtmlAttributes(new { @style = "width: 200px;" })
+                         .BindTo(new List<SelectListItem>()
+                         {
+                            new SelectListItem() {
+                                Text = "Regular", Value = "1"
+                            },
+                            new SelectListItem() {
+                                Text = "Casual", Value = "2"
+                            },
+                            new SelectListItem() {
+                                Text = "Regular & Casual", Value = "3"
+                            },
+                            new SelectListItem() {
+                                Text = "Department Head", Value = "4"
+                            },
+                            new SelectListItem() {
+                                Text = "All Employee", Value = "5"
+                            }
+                         })
+        )
+    </label>
+    <br />
+    <label style="margin-left: 5px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px; display : inline-block">
+        Period :<br />  @(Html.Kendo().DropDownList()
+                         .Name("ddlPeriod")
+                         .DataTextField("Text")
+                         .DataValueField("Value")
+                         .HtmlAttributes(new { @style = "width: 200px;" })
+                         .BindTo(new List<SelectListItem>()
+                         {
+                            new SelectListItem() {
+                                Text = "Monthly", Value = "12"
+                            },
+                            new SelectListItem() {
+                                Text = "Yearly", Value = "1"
+                            }
+                         })
+        )
+    </label>
+    <div style="float:right; margin-top:30px;">
+        <div id="btnSave" class="k-button k-button-icontext" style="margin-bottom:5px;display:inline-block;width: 80px;clear:both; margin-top:5px;" onclick="reqSave()">Save</div>
+        <div id="btnclose" class="k-button k-button-icontext" style="margin-bottom:5px;display:inline-block;width: 80px;clear:both; margin-top:5px;" onclick="reqClose()">Close</div>
+    </div>
+</div>
+
+<script>
+    if (@Model.ComputationID == 0) {
+        ClearFields();
+    }
+    else {
+        document.getElementById('btnSave').innerHTML = "Update";
+        document.getElementById('btnAccountCode').disabled = true;
+        document.getElementById('accountCode').disabled = true;
+        $("#ddlAccount").data("kendoComboBox").enable(false);
+        document.getElementById('accountCode').value = @Model.AccountCode;
+        if (@Model.Amount == 0) {
+            document.getElementById("Amount").innerHTML = "Max Amount :";
+            document.getElementById('txtAmount').value = @Model.MaxAmount;
+            $("#ddlComputationType").data("kendoDropDownList").value(1);
+        }
+        else {
+            document.getElementById("Amount").innerHTML = "Amount :";
+            document.getElementById('txtAmount').value = @Model.Amount;
+            $("#ddlComputationType").data("kendoDropDownList").value(2);
+        }
+        document.getElementById('txtPercentage').value = @Model.Percentage;
+        $("#ddlAccount").data("kendoComboBox").value("@Model.AccountName");
+        $("#ddlPeriod").data("kendoDropDownList").value(@Model.Month);
+        $("#ddlRoundOff").data("kendoDropDownList").value(@Model.isRoundOf);
+        $("#ddlEmployeetype").data("kendoDropDownList").value(@Model.EmployeeType);
+    }
+</script>

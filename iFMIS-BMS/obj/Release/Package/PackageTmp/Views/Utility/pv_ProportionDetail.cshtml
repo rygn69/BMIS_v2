@@ -1,0 +1,81 @@
+﻿<script>
+
+function getParam() {
+    return {
+            offname: '@Session["offname"]' ,
+            accountid:'@Session["acctnameid"]'
+            }
+        }
+    function getLabel() {
+        //alert('@Session["acctnameid"]')
+        if ('@Session["acctnameid"]' == 342) { //gasoline
+            document.getElementById("proportionStatus").innerHTML = "End User";
+        } else {
+            document.getElementById("proportionStatus").innerHTML = "Employment Status";
+        }
+
+    }
+</script>
+
+
+<div style="width:100%;float:left;margin-top:10px;">
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.ReportModel>()
+            .Name("PropBreakdown")
+            .HtmlAttributes(new { style = "height:420px;" })
+            .Scrollable()
+            .Columns(col =>
+            {
+            col.Template(@<text></text>)
+                                @*.Hidden()*@
+            .HeaderTemplate(@<text>No.</text>)
+            .Width(40)
+            .HtmlAttributes(new { style = "text-align:center;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;height:30px;", @class = "metro-header" })
+            @*.HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal"})*@
+            .ClientTemplate("<div>#=trnno# </div>");
+
+            col.Template(@<text></text>)
+            .HeaderTemplate(@<text>Name</text>)
+            .Width(240)
+            .HtmlAttributes(new { style = "text-align:left;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;height:30px;", @class = "metro-header" })
+            .ClientTemplate("<div>#=articlename# </div>");
+
+            col.Template(@<text></text>)
+            .HeaderTemplate(@<text><span id="proportionStatus"></span> </text>)
+            .Width(180)
+            .HtmlAttributes(new { style = "text-align:left;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;height:30px;", @class = "metro-header" })
+            .ClientTemplate("<div>#=enduser# </div>");
+
+            })
+                //.Editable(editable => editable.Mode(GridEditMode.InCell))
+                .Pageable(pageable => pageable
+                .Refresh(true)
+                .ButtonCount(4))
+                .Selectable()
+                //     .Events(e => e.Change("WFPgrid"))
+                .DataSource(dataSource => dataSource
+                .Ajax()
+                .Batch(true)
+                .Model(m => m.Id(i => i.trnno))
+                .ServerOperation(false)
+
+
+                //.Aggregates(a =>
+                //{
+                //    a.Add(c => c.Amount).Sum();
+                //})
+                .PageSize(10)
+                .Read(read => read.Action("GetAppProportionBreakdown", "Report").Data("getParam"))
+                )
+)
+</div>
+
+<script>
+    $(document).ready(function () {
+        getParam()
+        getLabel()
+
+    }, 1000);
+</script>

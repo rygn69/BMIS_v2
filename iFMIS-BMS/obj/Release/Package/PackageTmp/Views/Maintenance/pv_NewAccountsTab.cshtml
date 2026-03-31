@@ -1,0 +1,210 @@
+﻿<script>
+
+    $("#SearchNewCreatedAccount").keypress(function (e) {
+        if (e.keyCode == 13) {
+            SearchNewCreatedAccount();
+        }
+    });
+    document.getElementById('SearchNewCreatedAccount').onkeyup = function () {
+        if (($(this).val() == '' || $(this).val() == 'Search by Account Name') && $(this).attr('type') != 'hidden') {
+            SearchNewCreatedAccount()
+        }
+    }
+    function onGridEdit(arg) {
+        var gridName = $('#grNewCreatedAccounts').data('kendoGrid');
+        var dataRows = gridName.items();
+        var rowIndex = dataRows.index(gridName.select());
+        var ds = gridName.dataSource.data();
+        var AccountID = "";
+
+        $(gridName.tbody).on("blur", "td", function (e) {
+            AccountID = ds[rowIndex].AccountID;
+        });
+        if (arg.container.find("input[name=AccountName]").length > 0) {
+            $("#grNewCreatedAccounts").data("kendoGrid").closeCell(arg.container)
+        }
+        var input = arg.container.find("input[name=OrderNo]");
+        var value = input.val();
+        var OldValue = input.val();
+        input.keyup(function () {
+            value = input.val();
+        });
+        input.blur(function () {
+            if (value != OldValue) {
+                var url = "@Url.Action("UpdateAccountOrder", "Maintenance")";
+                $.post(url, {  OrderNo: value,AccountID: AccountID },function (d){
+                    if (d == "1") {
+                        $("#grNewCreatedAccounts").data("kendoGrid").dataSource.read();
+                    }
+                    else {
+                        alert('Failed To Update Order No. Please Try Again')
+                    }
+                })
+            }
+        });
+    }
+    var SelectedAccounts = [];
+    function btnUpdateReferenceClick() {
+        if (document.getElementById("updateButtonLabel").innerHTML == "Update References") {
+            document.getElementById("updateButtonLabel").innerHTML = "Update Marked"
+            $("#grNewCreatedAccounts").data("kendoGrid").showColumn(0);
+        }
+        else {
+            var url = "@Url.Action("reqShowTargetAccountWindow", "Maintenance")";
+            var grid = $("#grNewCreatedAccounts").data("kendoGrid")
+            var ds = grid.dataSource.data();
+            var isOrderingUpdated = "Yes";
+
+            for (var i = 0; i < ds.length; i++) {
+                var row = grid.table.find("tr[data-uid='" + ds[i].uid + "']");
+                var checkbox = $(row).find(".checkbox");
+                if (checkbox.is(":checked")) {
+                    SelectedAccounts.push(ds[i].AccountID);
+                    if (ds[i].OrderNo == 0) {
+                        isOrderingUpdated = "No"
+                    }
+                }
+            }
+            if (SelectedAccounts == "") {
+                swal({ title: "Error!", text: "No Account Selected", timer: 1000, showConfirmButton: false, type: "error" });
+            }
+            else {
+                if (isOrderingUpdated == "Yes") {
+                    if ($('#UpdateButtonSpinner').css("display") == 'none') {
+                        $("#btnUpdateReference").attr('disabled', 'disabled');
+                        $('#UpdateButtonSpinner').css("display", "auto");
+                        $('#updateButtonIcon').css("display", "none");
+
+                        $.post(url, function (d) {
+                            $(window).scrollTop(0);
+                            $('#TargetAccountWindow').html(d);
+                            $('#TargetAccountWindow').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Select Account to be Referenced").center().open();
+                        })
+                    }
+                }
+                else {
+                    swal({ title: "Error!", text: "Please Update the Order No. First", showConfirmButton: true, type: "error" });
+                }
+
+            }
+            document.getElementById("updateButtonLabel").innerHTML = "Update References"
+            $("#grNewCreatedAccounts").data("kendoGrid").hideColumn(0);
+        }
+    }
+    function onDataBound() {
+        $("#grNewCreatedAccounts").data("kendoGrid").hideColumn(0);
+    }
+    function CheckAll(e) {
+        $("#grNewCreatedAccounts tbody input:checkbox").prop("checked", e.checked);
+    }
+    function showBuildUpAccountWindow(AccountID) {
+        var url = "@Url.Action("ShowBuildAccountWindow", "Maintenance")";
+        $.post(url,{AccountID:AccountID} ,function (d) {
+            $(window).scrollTop(0);
+            $('#BuildAccountWindow').html(d);
+            $('#BuildAccountWindow').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Account Build-Up").center().open();
+        })
+    }
+</script>
+<div style="width : 100%; margin-top: 20px;border-style: solid; border-color: #1fa67a">
+    <div style="width:100%;height : 35px ; background-color:#1fa67a; color: white">
+        <h2 style="margin-left: 5px;color:white"><i class="fa fa-plus-circle"></i> Accounts For Build-Up</h2>
+    </div>
+
+    <div style="padding:5px;">
+        <div style="margin-top:20px;"></div>
+        @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Maintenance.AccountsForBuildUpModel>()
+        .Name("grNewCreatedAccounts")
+        .Columns(col =>
+        {
+            col.Template(@<text></text>)
+                        .ClientTemplate("<input type='checkbox' class='checkbox'/>")
+                        .Title("<input onclick=CheckAll(this) type='checkbox'   class='checkbox'/>")
+                        .Width(70)
+                        .HtmlAttributes(new { @onclick = "click", style = "align:center;float:none;text-align:center; vertical-align: middle;" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+            col.Bound(m => m.AccountID).Title("AccountID").Hidden();
+            col.Bound(m => m.OrderNo).Title("Order No").Width(90)
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                .ClientTemplate("<div style ='text-align:center'>#=OrderNo# </div>");
+            col.Bound(m => m.AccountName).Title("Account Name");
+
+            col.Bound(m => m.OfficeName).Title("Office Name").Hidden()
+                .ClientGroupHeaderTemplate("<div style='display:inline-block'>#= value #</div>");
+            col.Template(t => { }).ClientTemplate(
+            "<div class='btn-delete'> <a  title='Edit' onclick='showBuildUpAccountWindow(#=AccountID#,#=OrderNo#)'><span class='fa fa-pencil-square-o' style='font-size: 12pt;'></span></a></div>"
+            ).HtmlAttributes(new { style = "margin-left:5px;" }).Width(40);
+        })
+        .ToolBar(t => t.Template(@<text>
+            <div style="float: left; width: 0; margin-top:-3px;margin-bottom:-100px;margin-left:-3px; height: 0; border-right: 0px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;">
+                <div style="float: left; width: 0; margin-top:0px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 37px solid #EEE; ">
+                    <div style="float: left; height:28px; margin-left:-59px; margin-top: 5px;">
+                        <i class="fa fa-tasks fa-2x fg-white"></i>
+                    </div>
+                </div>
+            </div>
+        <div style="display:inline-block; margin-right:20px">
+            <div id="btnUpdateReference" class="k-button k-button-icontext" style="height:33px;" onclick="btnUpdateReferenceClick()"><span id="updateButtonIcon" class="fa fa-upload"></span><i id="UpdateButtonSpinner" style="display:none" class="fa fa-spinner fa-spin"></i> <span id="updateButtonLabel">Update References</span></div>
+        </div>
+            <div style="float: right; height:28px;margin-top:2px;">
+                <link href="~/Content/metroui/css/docs.css" rel="stylesheet" />
+                <div style="background-color:white;border:solid;border-color:whitesmoke;border-width:thin;width:310px;height:33px;float:right;padding:0px;margin-top:-3px;" id="search">
+                    <input type="text" style="width:260px;border-collapse:collapse;border-color:white;margin:0px;margin-left:-10px;height:70%;outline:none;border-left-style:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search by Account Name" id="SearchNewCreatedAccount" name="SearchNewCreatedAccount">
+                    <div class="k-button k-button-icontext" style="height:33px;width:40px;" onclick="SearchNewCreatedAccount()"><span class="mif-search"></span></div>
+                </div>
+            </div>
+        </text>))
+        .Selectable(selectable => selectable.Mode(GridSelectionMode.Single))
+        .Scrollable(s => s.Enabled(true))
+        .Editable(editable => editable.Mode(GridEditMode.InCell))
+        .Events(e => e.Edit("onGridEdit").DataBound("onDataBound"))
+        .HtmlAttributes(new {style = "height:400px;"})
+        .DataSource(d => d
+            .Ajax()
+            .Model(m => m.Id(i => i.AccountID))
+            .Read(read => read.Action("GetNewCreatedAccountsFromProposal", "Maintenance"))
+            .ServerOperation(false)
+            .Group(g=> g.Add(c => c.OfficeName))
+            .Sort(s => s.Add("AccountName"))
+        )
+        )
+
+    </div>
+</div>
+@(Html.Kendo().Window()
+    .Name("TargetAccountWindow")
+    .Title("Select Account to be Referenced")
+    .Width(600)
+    .Height(500)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(true)
+    .AutoFocus(true)
+    .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        }).Actions(a => { }))
+
+@(Html.Kendo().Window()
+    .Name("BuildAccountWindow")
+    .Title("Account Build-Up")
+    .Width(600)
+    .Height(420)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(true)
+    .AutoFocus(true)
+    .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        }).Actions(a => { }))

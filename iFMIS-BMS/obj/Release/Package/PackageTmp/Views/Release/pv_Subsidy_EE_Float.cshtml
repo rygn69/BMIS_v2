@@ -1,0 +1,1179 @@
+﻿<script>
+
+    //setTimeout(function () {
+    //    var office_id = $("#available_sub").val();
+    //    if (office_id == null || office_id == 6 || office_id == '') {
+    //        $("#float_offs_EE_Sub").data("kendoComboBox").enable(false);
+    //        $("#float_Progss_EE_Sub").data("kendoDropDownList").enable(false);
+    //        $("#float_ooe_id_EE_Sub").data("kendoDropDownList").enable(false);
+    //        $("#float_account_list_EE_Sub").data("kendoComboBox").enable(false);
+    //        $("#float_Months_EE_Sub").data("kendoDropDownList").enable(false);
+    //        $("#float_numeric_EE_Sub").data("kendoNumericTextBox").enable(false);
+    //    } else {
+    //        $("#float_offs_EE_Sub").data("kendoComboBox").enable(true);
+    //        $("#float_Progss_EE_Sub").data("kendoDropDownList").enable(true);
+    //        $("#float_ooe_id_EE_Sub").data("kendoDropDownList").enable(true);
+    //        $("#float_account_list_EE_Sub").data("kendoComboBox").enable(true);
+    //        $("#float_Months_EE_Sub").data("kendoDropDownList").enable(true);
+    //        $("#float_numeric_EE_Sub").data("kendoNumericTextBox").enable(true);
+    //    }
+
+    //}, 500);
+
+
+    setTimeout(function () {
+
+
+        $(':radio[name=float_radio]').change(function () {
+            if ($('input[name=float_radio]:checked').val() == 'Subsidy') {
+
+
+                document.getElementById("float_indicator").value = 1;
+                //getAvailable_sub();
+                FundGrid_Load_EE_Sub();
+                //$("#float_offs_EE_Sub").data("kendoComboBox").dataSource.read();
+                //$("#float_Progss_EE_Sub").data("kendoDropDownList").dataSource.read();
+                //$("#float_ooe_id_EE_Sub").data("kendoDropDownList").dataSource.read();
+                //$("#float_account_list_EE_Sub").data("kendoComboBox").dataSource.read();
+                //document.getElementById("available_sub").value = 0;
+                //$("#float_offs_EE_Sub").data("kendoComboBox").enable(true);
+                //$("#float_Progss_EE_Sub").data("kendoDropDownList").enable(true);
+                //$("#float_ooe_id_EE_Sub").data("kendoDropDownList").enable(true);
+                //$("#float_account_list_EE_Sub").data("kendoComboBox").enable(true);
+                //$("#float_Months_EE_Sub").data("kendoDropDownList").enable(true);
+                //$("#float_numeric_EE_Sub").data("kendoNumericTextBox").enable(true);
+            } else {
+
+                document.getElementById("float_indicator").value = 0;
+                //getAvailable_inc();
+                FundGrid_Load_EE_Inc();
+                //$("#float_offs_EE_Sub").data("kendoComboBox").dataSource.read();
+                //$("#float_Progss_EE_Sub").data("kendoDropDownList").dataSource.read();
+                //$("#float_ooe_id_EE_Sub").data("kendoDropDownList").dataSource.read();
+                //$("#float_account_list_EE_Sub").data("kendoComboBox").dataSource.read();
+                //document.getElementById("available_sub").value = 0;
+                //$("#float_offs_EE_Sub").data("kendoComboBox").enable(true);
+                //$("#float_Progss_EE_Sub").data("kendoDropDownList").enable(true);
+                //$("#float_ooe_id_EE_Sub").data("kendoDropDownList").enable(true);
+                //$("#float_account_list_EE_Sub").data("kendoComboBox").enable(true);
+                //$("#float_Months_EE_Sub").data("kendoDropDownList").enable(true);
+                //$("#float_numeric_EE_Sub").data("kendoNumericTextBox").enable(true);
+            }
+        });
+
+    }, 500);
+
+    function fn_reqAdd_Float_EE_Sub() {
+
+        var url = "@Url.Action("Save_Flaot_Sub", "Release")";
+        var lur = "@Url.Action("Save_Flaot_Inc", "Release")";
+
+        var office_id = $("#float_offs_EE_Sub").val();
+        var program_id = $("#float_Progss_EE_Sub").val();
+        var ooe_id = $("#float_ooe_id_EE_Sub").val();
+        var account_id = $("#float_account_list_EE_Sub").val();
+        var amount_sub_PS = $("#float_PS_EE_Sub").val();
+        var amount_sub_MOOE = $("#float_MOOE_EE_Sub").val();
+        var amount_sub_CO = $("#float_CO_EE_Sub").val();
+        var month_ = $("#float_Months_EE_Sub").val();
+        var numeric_ = $("#float_numeric_EE_Sub").val();
+        var year_ = $("#float_ddlYear_EE_Sub").val();
+        var koko = $("#available_sub").val();
+        var indicator_ = $("#float_indicator").val();
+
+        var balance_amount = (koko - (amount_sub_PS + amount_sub_MOOE + amount_sub_CO))
+
+        
+
+        if (amount_sub_PS == '' || amount_sub_PS == "" || amount_sub_PS == null || (ooe_id == 2 && ooe_id == 3)) { amount_sub_PS = 0; }
+        if (amount_sub_MOOE == '' || amount_sub_MOOE == "" || amount_sub_MOOE == null || (ooe_id == 1 && ooe_id == 3)) { amount_sub_MOOE = 0; }
+        if (amount_sub_CO == '' || amount_sub_CO == "" || amount_sub_CO == null || (ooe_id == 2 && ooe_id == 1)) { amount_sub_CO = 0; }
+
+        if (ooe_id == 1) {
+            if (amount_sub_PS == 0 ) {
+
+                swal({
+                    title: "Error!",
+                    text: "System Error! Please Check Balance Amount.",
+                    timer: 2000,
+                    type: "error",
+                    showConfirmButton: false
+                })
+            }
+            else {
+
+                if (balance_amount < 0 || balance_amount < 0 || balance_amount < 0) {
+                    swal({
+                        title: "Oppss!",
+                        text: "Please fill in the amount",
+                        timer: 2000,
+                        type: "error",
+                        showConfirmButton: false
+                    })
+                }
+                else {
+                    if (indicator_ == 1) {
+                        swal({
+                            title: "Are you sure?",
+                            text: "You want to Release this Float?",
+                            type: "info",
+                            showCancelButton: true,
+                            closeOnConfirm: false,
+                            confirmButtonColor: "#1fa67a",
+                            confirmButtonText: "Yes, Save It!",
+                            showLoaderOnConfirm: true,
+                        },
+                        function () {
+                            $.post(url, {
+                                office_id: office_id,
+                                program_id: program_id,
+                                ooe_id: ooe_id,
+                                account_id: account_id,
+                                amount_sub_PS: amount_sub_PS,
+                                amount_sub_MOOE: amount_sub_MOOE,
+                                amount_sub_CO: amount_sub_CO,
+                                month_: month_,
+                                numeric_: numeric_,
+                                year_: year_,
+                                balance_amount: balance_amount,
+                                indicator_: indicator_
+                            }, function (e) {
+                                $("#float_PS_EE_Sub").val('');
+                                $("#float_MOOE_EE_Sub").val('');
+                                $("#float_CO_EE_Sub").val('');
+
+                                if (e == "1") {
+                                   // getAvailable_sub();
+                                    swal({
+                                        title: "Success!",
+                                        text: "Float has been Added.",
+                                        timer: 2000,
+                                        type: "success",
+                                        showConfirmButton: false
+                                    })
+                                    $("#grd_Float_EE_sub").data("kendoGrid").dataSource.read();
+                                    $('#EconomicEnterprise_Grid').data('kendoGrid').dataSource.read();
+                                } else {
+                                    swal({
+                                        title: "Error!",
+                                        text: "System Error! Please try again.",
+                                        timer: 2000,
+                                        type: "error",
+                                        showConfirmButton: false
+                                    })
+                                }
+                            });
+                        });
+                    } else if (indicator_ == 0) {
+
+                        swal({
+                            title: "Are you sure?",
+                            text: "You want to Release this Float?",
+                            type: "info",
+                            showCancelButton: true,
+                            closeOnConfirm: false,
+                            confirmButtonColor: "#1fa67a",
+                            confirmButtonText: "Yes, Save It!",
+                            showLoaderOnConfirm: true,
+                        }, function () {
+                            $.post(lur, {
+                                office_id: office_id,
+                                program_id: program_id,
+                                ooe_id: ooe_id,
+                                account_id: account_id,
+                                amount_sub_PS: amount_sub_PS,
+                                amount_sub_MOOE: amount_sub_MOOE,
+                                amount_sub_CO: amount_sub_CO,
+                                month_: month_,
+                                numeric_: numeric_,
+                                year_: year_,
+                                balance_amount: balance_amount,
+                                indicator_: indicator_
+                            }, function (e) {
+                                $("#float_PS_EE_Sub").val('');
+                                $("#float_MOOE_EE_Sub").val('');
+                                $("#float_CO_EE_Sub").val('');
+
+                                if (e == "1") {
+                                    getAvailable_inc();
+                                    swal({
+                                        title: "Success!",
+                                        text: "Float has been Added.",
+                                        timer: 2000,
+                                        type: "success",
+                                        showConfirmButton: false
+                                    })
+                                    $("#grd_Float_EE_inc").data("kendoGrid").dataSource.read();
+                                    $('#EconomicEnterprise_Grid').data('kendoGrid').dataSource.read();
+                                } else {
+                                    swal({
+                                        title: "Error!",
+                                        text: "System Error! Please try again.",
+                                        timer: 2000,
+                                        type: "error",
+                                        showConfirmButton: false
+                                    })
+                                }
+                            });
+                        });
+
+
+
+                    } else {
+                        swal({
+                            title: "Error!",
+                            text: "System Error! Please try again.",
+                            timer: 2000,
+                            type: "error",
+                            showConfirmButton: false
+                        })
+
+                    }
+
+
+                }
+                //--
+            }
+        } else if (ooe_id == 2) {
+
+              if ( amount_sub_MOOE == 0 ) {
+
+            swal({
+                title: "Error!",
+                text: "System Error! Please Check Balance Amount.",
+                timer: 2000,
+                type: "error",
+                showConfirmButton: false
+            })
+        }
+        else {
+
+        if (balance_amount < 0 || balance_amount < 0 || balance_amount < 0) {
+            swal({
+                title: "Oppss!",
+                text: "Please fill in the amount",
+                timer: 2000,
+                type: "error",
+                showConfirmButton: false
+            })
+        }
+        else {
+            if (indicator_ == 1) {
+
+                swal({
+                    title: "Are you sure?",
+                    text: "You want to Release this Float?",
+                    type: "info",
+                    showCancelButton: true,
+                    closeOnConfirm: false,
+                    confirmButtonColor: "#1fa67a",
+                    confirmButtonText: "Yes, Save It!",
+                    showLoaderOnConfirm: true,
+                }, function () {
+                    $.post(url, {
+                        office_id: office_id,
+                        program_id: program_id,
+                        ooe_id: ooe_id,
+                        account_id: account_id,
+                        amount_sub_PS: amount_sub_PS,
+                        amount_sub_MOOE: amount_sub_MOOE,
+                        amount_sub_CO: amount_sub_CO,
+                        month_: month_,
+                        numeric_: numeric_,
+                        year_: year_,
+                        balance_amount:balance_amount,
+                        indicator_: indicator_
+                    }, function (e) {
+                        $("#float_PS_EE_Sub").val('');
+                        $("#float_MOOE_EE_Sub").val('');
+                        $("#float_CO_EE_Sub").val('');
+
+                        if (e == "1") {
+                            //getAvailable_sub();
+                            swal({
+                                title: "Success!",
+                                text: "Float has been Added.",
+                                timer: 2000,
+                                type: "success",
+                                showConfirmButton: false
+                            })
+                            $("#grd_Float_EE_sub").data("kendoGrid").dataSource.read();
+                            $('#EconomicEnterprise_Grid').data('kendoGrid').dataSource.read();
+                        } else {
+                            swal({
+                                title: "Error!",
+                                text: "System Error! Please try again.",
+                                timer: 2000,
+                                type: "error",
+                                showConfirmButton: false
+                            })
+                        }
+                    });
+                });
+            } else if (indicator_ == 0) {
+              
+                swal({
+                    title: "Are you sure?",
+                    text: "You want to Release this Float?",
+                    type: "info",
+                    showCancelButton: true,
+                    closeOnConfirm: false,
+                    confirmButtonColor: "#1fa67a",
+                    confirmButtonText: "Yes, Save It!",
+                    showLoaderOnConfirm: true,
+                }, function () {
+                    $.post(lur, {
+                        office_id: office_id,
+                        program_id: program_id,
+                        ooe_id: ooe_id,
+                        account_id: account_id,
+                        amount_sub_PS: amount_sub_PS,
+                        amount_sub_MOOE: amount_sub_MOOE,
+                        amount_sub_CO: amount_sub_CO,
+                        month_: month_,
+                        numeric_: numeric_,
+                        year_: year_,
+                        balance_amount: balance_amount,
+                        indicator_: indicator_
+                    }, function (e) {
+                        $("#float_PS_EE_Sub").val('');
+                        $("#float_MOOE_EE_Sub").val('');
+                        $("#float_CO_EE_Sub").val('');
+
+                        if (e == "1") {
+                            getAvailable_inc();
+                            swal({
+                                title: "Success!",
+                                text: "Float has been Added.",
+                                timer: 2000,
+                                type: "success",
+                                showConfirmButton: false
+                            })
+                            $("#grd_Float_EE_inc").data("kendoGrid").dataSource.read();
+                            $('#EconomicEnterprise_Grid').data('kendoGrid').dataSource.read();
+                        } else {
+                            swal({
+                                title: "Error!",
+                                text: "System Error! Please try again.",
+                                timer: 2000,
+                                type: "error",
+                                showConfirmButton: false
+                            })
+                        }
+                    });
+                });
+
+
+
+            } else {
+                swal({
+                    title: "Error!",
+                    text: "System Error! Please try again.",
+                    timer: 2000,
+                    type: "error",
+                    showConfirmButton: false
+                })
+
+            }
+
+
+        }
+            //--
+        }
+
+
+
+
+
+        } else if (ooe_id == 3) {
+
+            if ( amount_sub_CO == 0) {
+
+                swal({
+                    title: "Error!",
+                    text: "System Error! Please Check Balance Amount.",
+                    timer: 2000,
+                    type: "error",
+                    showConfirmButton: false
+                })
+            }
+            else {
+
+                if (balance_amount < 0 || balance_amount < 0 || balance_amount < 0) {
+                    swal({
+                        title: "Oppss!",
+                        text: "Please fill in the amount",
+                        timer: 2000,
+                        type: "error",
+                        showConfirmButton: false
+                    })
+                }
+                else {
+                    if (indicator_ == 1) {
+
+                        swal({
+                            title: "Are you sure?",
+                            text: "You want to Release this Float?",
+                            type: "info",
+                            showCancelButton: true,
+                            closeOnConfirm: false,
+                            confirmButtonColor: "#1fa67a",
+                            confirmButtonText: "Yes, Save It!",
+                            showLoaderOnConfirm: true,
+                        }, function () {
+                            $.post(url, {
+                                office_id: office_id,
+                                program_id: program_id,
+                                ooe_id: ooe_id,
+                                account_id: account_id,
+                                amount_sub_PS: amount_sub_PS,
+                                amount_sub_MOOE: amount_sub_MOOE,
+                                amount_sub_CO: amount_sub_CO,
+                                month_: month_,
+                                numeric_: numeric_,
+                                year_: year_,
+                                balance_amount: balance_amount,
+                                indicator_: indicator_
+                            }, function (e) {
+                                $("#float_PS_EE_Sub").val('');
+                                $("#float_MOOE_EE_Sub").val('');
+                                $("#float_CO_EE_Sub").val('');
+
+                                if (e == "1") {
+                                   // getAvailable_sub();
+                                    swal({
+                                        title: "Success!",
+                                        text: "Float has been Added.",
+                                        timer: 2000,
+                                        type: "success",
+                                        showConfirmButton: false
+                                    })
+                                    $("#grd_Float_EE_sub").data("kendoGrid").dataSource.read();
+                                    $('#EconomicEnterprise_Grid').data('kendoGrid').dataSource.read();
+                                } else {
+                                    swal({
+                                        title: "Error!",
+                                        text: "System Error! Please try again.",
+                                        timer: 2000,
+                                        type: "error",
+                                        showConfirmButton: false
+                                    })
+                                }
+                            });
+                        });
+                    } else if (indicator_ == 0) {
+
+                        swal({
+                            title: "Are you sure?",
+                            text: "You want to Release this Float?",
+                            type: "info",
+                            showCancelButton: true,
+                            closeOnConfirm: false,
+                            confirmButtonColor: "#1fa67a",
+                            confirmButtonText: "Yes, Save It!",
+                            showLoaderOnConfirm: true,
+                        }, function () {
+                            $.post(lur, {
+                                office_id: office_id,
+                                program_id: program_id,
+                                ooe_id: ooe_id,
+                                account_id: account_id,
+                                amount_sub_PS: amount_sub_PS,
+                                amount_sub_MOOE: amount_sub_MOOE,
+                                amount_sub_CO: amount_sub_CO,
+                                month_: month_,
+                                numeric_: numeric_,
+                                year_: year_,
+                                balance_amount: balance_amount,
+                                indicator_: indicator_
+                            }, function (e) {
+                                $("#float_PS_EE_Sub").val('');
+                                $("#float_MOOE_EE_Sub").val('');
+                                $("#float_CO_EE_Sub").val('');
+
+                                if (e == "1") {
+                                    getAvailable_inc();
+                                    swal({
+                                        title: "Success!",
+                                        text: "Float has been Added.",
+                                        timer: 2000,
+                                        type: "success",
+                                        showConfirmButton: false
+                                    })
+                                    $("#grd_Float_EE_inc").data("kendoGrid").dataSource.read();
+                                    $('#EconomicEnterprise_Grid').data('kendoGrid').dataSource.read();
+                                } else {
+                                    swal({
+                                        title: "Error!",
+                                        text: "System Error! Please try again.",
+                                        timer: 2000,
+                                        type: "error",
+                                        showConfirmButton: false
+                                    })
+                                }
+                            });
+                        });
+
+
+
+                    } else {
+                        swal({
+                            title: "Error!",
+                            text: "System Error! Please try again.",
+                            timer: 2000,
+                            type: "error",
+                            showConfirmButton: false
+                        })
+
+                    }
+
+
+                }
+                //--
+            }
+        }
+        //--
+    }
+
+
+
+
+
+    function ReleaseFloat_EE_Sub() { 
+        var url = "@Url.Action("addFloat_Sub", "Release")";
+        var lur = "@Url.Action("addFloat_Inc", "Release")";
+
+        var indicator_ = $("#float_indicator").val();
+
+        if (indicator_ == 1) {
+           
+            var idsToSend = [];
+            var grid = $("#grd_Float_EE_sub").data("kendoGrid")
+            var ds = grid.dataSource.view();
+
+            for (var i = 0; i < ds.length; i++) {
+                var row = grid.table.find("tr[data-uid='" + ds[i].uid + "']");
+                var checkbox = $(row).find(".checkbox");
+                if (checkbox.is(":checked")) {
+                    idsToSend.push(ds[i].release_float_id);
+
+                }
+                if (idsToSend == "") {
+                    swal({ title: "Error!", text: "Please mark the accounts first", timer: 1000, showConfirmButton: false, type: "error" });
+                } else {
+                    swal({
+                        title: "Are you sure?",
+                        text: "You want to Release this allotment as Float?",
+                        type: "info",
+                        showCancelButton: true,
+                        closeOnConfirm: false,
+                        confirmButtonColor: "#1fa67a",
+                        confirmButtonText: "Yes, Save It!",
+                        showLoaderOnConfirm: true,
+                    }, function () {
+
+                        $.post(url, { release_float_id: idsToSend }, function (d) {
+                            if (d == 1) {
+                                swal({ title: "Success!", text: "Selected Float RELEASE!", timer: 1000, showConfirmButton: false, type: "success" });
+                                
+                                $("#grd_Float_EE_sub").data("kendoGrid").dataSource.read();
+                                $('#EconomicEnterprise_Grid').data('kendoGrid').dataSource.read();
+                                FundGrid_Load_EE_Sub();
+                                acc_availble_mount();
+                                income_available_();
+                                subsidy_available_();
+                            }
+                            else {
+                                swal("Something Went Wrong!", d, "error");
+                            }
+                        });
+                    });
+                }
+            } 
+
+        } else if (indicator_ == 0) {
+           
+            var idsToSend = [];
+            var grid = $("#grd_Float_EE_inc").data("kendoGrid")
+            var ds = grid.dataSource.view();
+
+            for (var i = 0; i < ds.length; i++) {
+                var row = grid.table.find("tr[data-uid='" + ds[i].uid + "']");
+                var checkbox = $(row).find(".checkbox");
+                if (checkbox.is(":checked")) {
+                    idsToSend.push(ds[i].release_float_id);
+
+                }
+                if (idsToSend == "") {
+                    swal({ title: "Error!", text: "Please mark the accounts first", timer: 1000, showConfirmButton: false, type: "error" });
+                } else {
+                    swal({
+                        title: "Are you sure?",
+                        text: "You want to Release this allotment as Float?",
+                        type: "info",
+                        showCancelButton: true,
+                        closeOnConfirm: false,
+                        confirmButtonColor: "#1fa67a",
+                        confirmButtonText: "Yes, Save It!",
+                        showLoaderOnConfirm: true,
+                    }, function () {
+
+                        $.post(lur, { release_float_id: idsToSend }, function (d) {
+                            if (d == 1) {
+                                swal({ title: "Success!", text: "Selected Float RELEASE!", timer: 1000, showConfirmButton: false, type: "success" });
+                                $("#grd_Float_EE_inc").data("kendoGrid").dataSource.read();
+                                $('#EconomicEnterprise_Grid').data('kendoGrid').dataSource.read();
+                                FundGrid_Load_EE_Inc();
+                                acc_availble_mount();
+                                income_available_();
+                                subsidy_available_();
+                            }
+                            else {
+                                swal("Something Went Wrong!", d, "error");
+                            }
+                        });
+                    });
+                }
+            }
+
+        }
+
+    }
+    function fn_refresher_float_EE_Sub() {
+
+        $("#FloatWindow_EE").data("kendoWindow").close();
+
+    }
+    //setTimeout(function () {
+
+    //    FundGrid_Load_EE_Sub();
+
+    //}, 1000);
+
+    function fn_grid_refresh_div_EE_Sub() {
+
+        setTimeout(function () {
+
+            FundGrid_Load_EE_Sub();
+            fn_OfficesF_EE_Sub();
+            $("#grd_Float_EE_Sub").data("kendoGrid").dataSource.read();
+        }, 500);
+    }
+    function FundGrid_Load_EE_Inc() {
+
+        var url = "@Url.Action("Float_Grid_EE_Inc", "Release")";
+        var office_id = $("#float_offs_EE_Sub").val();
+        var program_id = $("#float_Progss_EE_Sub").val();
+        var ooe_id = $("#float_ooe_id_EE_Sub").val();
+        var account_id = $("#float_account_list_EE_Sub").val();
+        var month_ = $("#float_Months_EE_Sub").val();
+        var numeric_ = $("#float_numeric_EE_Sub").val();
+        var year_ = $("#float_ddlYear_EE_Sub").val();
+        var classtype = $("#classtype").val();
+
+
+        $.get(url, { office_id: office_id, month_: month_, numeric_: numeric_, year_: year_ }, function (d) {
+            $("#FundGrid_id_EE_Sub").html(d);
+        })
+
+    }
+    function FundGrid_Load_EE_Sub() {
+
+        var url = "@Url.Action("Float_Grid_EE_Sub", "Release")";
+        var office_id = $("#float_offs_EE_Sub").val();
+        var program_id = $("#float_Progss_EE_Sub").val();
+        var ooe_id = $("#float_ooe_id_EE_Sub").val();
+        var account_id = $("#float_account_list_EE_Sub").val();
+        var month_ = $("#float_Months_EE_Sub").val();
+        var numeric_ = $("#float_numeric_EE_Sub").val();
+        var year_ = $("#float_ddlYear_EE_Sub").val();
+        var classtype = $("#classtype").val();
+
+
+        $.get(url, { office_id: office_id, month_: month_, numeric_: numeric_, year_: year_ }, function (d) {
+            $("#FundGrid_id_EE_Sub").html(d);
+        })
+
+    }
+    function fn_dprefresher_fund_null_Sub() {
+        var balance_amount = $("#float_indicator").val();
+        if (balance_amount == 0) {
+            setTimeout(function () {
+               // getAvailable_inc();
+                //$("#grd_Float_EE_inc").data("kendoGrid").dataSource.read();
+                $("#float_Progss_EE_Sub").data("kendoDropDownList").dataSource.read();
+                $("#float_ooe_id_EE_Sub").data("kendoDropDownList").dataSource.read();
+                $("#float_account_list_EE_Sub").data("kendoComboBox").dataSource.read();
+            }, 500);
+        }
+        else {
+            setTimeout(function () {
+
+               // getAvailable_sub();
+                //$("#grd_Float_EE_sub").data("kendoGrid").dataSource.read();
+                $("#float_Progss_EE_Sub").data("kendoDropDownList").dataSource.read();
+                $("#float_ooe_id_EE_Sub").data("kendoDropDownList").dataSource.read();
+                $("#float_account_list_EE_Sub").data("kendoComboBox").dataSource.read();
+
+            }, 500);
+        }
+    }
+
+    function fn_year_REF() {
+        var balance_amount = $("#float_indicator").val();
+        if (balance_amount == 0) {
+            setTimeout(function () {
+                getAvailable_inc();
+                $("#grd_Float_EE_inc").data("kendoGrid").dataSource.read();
+               }, 500);
+        }
+        else {
+            setTimeout(function () {
+               // getAvailable_sub();
+               $("#grd_Float_EE_sub").data("kendoGrid").dataSource.read();
+               }, 500);
+        }
+    }
+    function ref_gryd() {
+        var program_id = $("#float_Progss_EE_Sub").val();
+        var ooe_id = $("#float_ooe_id_EE_Sub").val();
+        var account_id = $("#float_account_list_EE_Sub").val();
+
+        var balance_amount = $("#float_indicator").val();
+        if (balance_amount == 0) {
+            setTimeout(function () {
+                getAvailable_inc();
+                $("#grd_Float_EE_inc").data("kendoGrid").dataSource.read();
+                         }, 500);
+        }
+        else {
+           
+            setTimeout(function () {
+
+               // getAvailable_sub();
+                $("#grd_Float_EE_sub").data("kendoGrid").dataSource.read();
+               
+            }, 500);
+        }
+
+        //setTimeout(function () {
+
+        //    getAvailable_sub();
+        //    // getAvailable_inc();
+        //    $("#grd_Float_EE_sub").data("kendoGrid").dataSource.read();
+        //  //  $("#grd_Float_EE_inc").data("kendoGrid").dataSource.read();
+
+
+        //}, 500);
+
+    }
+    function ref_ubos() {
+        $("#float_ooe_id_EE_Sub").data("kendoDropDownList").dataSource.read();
+        $("#float_account_list_EE_Sub").data("kendoComboBox").dataSource.read();
+    }
+    function ref_ubos2() {
+      
+        $("#float_account_list_EE_Sub").data("kendoComboBox").dataSource.read();
+        var ooe_ids = $('#float_ooe_id_EE_Sub').val()
+        $("#float_account_list_EE").data("kendoComboBox").dataSource.read();
+        if (ooe_ids == 1) {
+           
+            document.getElementById("float_PS_EE_Sub").disabled = false;
+            document.getElementById("float_MOOE_EE_Sub").disabled = true;
+            document.getElementById("float_CO_EE_Sub").disabled = true;
+
+        }
+        else if (ooe_ids == 2) {
+            document.getElementById("float_PS_EE_Sub").disabled = true;
+            document.getElementById("float_MOOE_EE_Sub").disabled = false;
+            document.getElementById("float_CO_EE_Sub").disabled = true;
+        }
+        else if (ooe_ids == 3) {
+            document.getElementById("float_PS_EE_Sub").disabled = true;
+            document.getElementById("float_MOOE_EE_Sub").disabled = true;
+            document.getElementById("float_CO_EE_Sub").disabled = false;
+        }
+        else {
+            document.getElementById("float_PS_EE_Sub").disabled = true;
+            document.getElementById("float_MOOE_EE_Sub").disabled = true;
+            document.getElementById("float_CO_EE_Sub").disabled = true;
+        }
+    }
+    @*function getAvailable_sub() {
+        var url = "@Url.Action("sub_available", "Release")"
+
+        var office_id = $("#float_offs_EE_Sub").val();
+        var year_ = $("#float_ddlYear_EE_Sub").val();
+
+
+        $.get(url, { office_id: office_id, year_: year_ }, function (d) {
+            document.getElementById("available_sub").value = d;
+
+            //alert(d.balance_amount)
+        })
+    }*@
+    function getAvailable_inc() {
+        var url = "@Url.Action("inc_available", "Release")"
+
+        var office_id = $("#float_offs_EE_Sub").val();
+        var year_ = $("#float_ddlYear_EE_Sub").val();
+
+
+        $.get(url, { office_id: office_id, year_: year_ }, function (d) {
+            document.getElementById("available_sub").value = d;
+
+            //alert(d.balance_amount)
+        })
+    }
+
+</script>
+
+
+
+<div style="border: outset;clear:both;border-width:1px;border-color:#1fa67a; width: 739px; padding-left:0px;padding-right:0px;padding-top:0px;padding-bottom:7px;margin-top: 0px;">
+    <div style=" width: 0;height: 0; border-right: 5px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;margin-top: -1px; ">
+        <div style="float: left; width: 673px; margin-top:1px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 36px solid #1fa67a; ">
+            <div style="float: left; height:28px; margin-left:-59px; margin-top: 5px;">
+                <i class="fa fa-tasks fa-2x fg-white"></i>
+
+            </div>
+
+            @*<div style="text-align: right;float: right;margin-right:10px;margin-top:2px;">
+
+
+                @(Html.Kendo().DropDownList()
+                        .Name("float_ddlYear_EE_Sub")
+                        .DataTextField("ProposalYear")
+                        .DataValueField("ProposalYear")
+                        .SelectedIndex(0)
+                        .HtmlAttributes(new { @style = "width: 70px;" })
+                        .Events(e => e.Change("fn_year_REF"))
+                        .DataSource(source => source.Read(read => read.Action("GetPropYear2", "PYear")))
+                )
+
+
+
+
+            </div>
+            <div style="float: right;margin-right:10px;margin-top:2px;">
+                <i class="fa fa-calendar fa-2x #33333"></i>
+            </div>*@
+
+
+        </div>
+    </div>
+
+    <div class="demo-section k-content" style=" float:right;margin-top: 7px;margin-right:7px ">
+
+    </div>
+    <div id="FundGrid_id_EE_Sub" class="demo-section k-content">
+
+
+    </div>
+
+</div>
+
+
+
+<div id="radios" style="float: left; margin-top: 15px ; margin-left : 0px;">
+    <script type="text/javascript">
+    var allRadios = document.getElementsByName('float_radio');
+    var booRadio;
+    var x = 0;
+    for (x = 0; x < allRadios.length; x++) {
+
+        allRadios[x].onclick = function () {
+            if (booRadio == this) {
+                this.checked = false;
+                booRadio = null;
+                document.getElementById("float_indicator").value = 6;
+                $("#float_offs_EE_Sub").data("kendoComboBox").enable(false);
+                $("#float_Progss_EE_Sub").data("kendoDropDownList").enable(false);
+                $("#float_ooe_id_EE_Sub").data("kendoDropDownList").enable(false);
+                $("#float_account_list_EE_Sub").data("kendoComboBox").enable(false);
+                $("#float_Months_EE_Sub").data("kendoDropDownList").enable(false);
+                $("#float_numeric_EE_Sub").data("kendoNumericTextBox").enable(false);
+            } else {
+                booRadio = this;
+            }
+        };
+    }
+    </script>
+
+
+
+    <form action="">
+        <div style="float:left;margin-left:250px">
+            <input type="radio" id="float_radio" name="float_radio" value="Subsidy" style="width:30px"> Subsidy
+        </div>
+        <div style="float:left;margin-left:130px">
+            <input type="radio" id="float_radio" name="float_radio" value="Income" style="width:30px"> Income
+        </div>
+    </form>
+    <br />
+</div>
+
+@*<div style="float: none;clear:both;margin-top:12px;">
+
+    <div style="float: left;margin-right:10px;margin-top:2px;">
+        <label style="float:left;margin-left: 50px;">
+            Office    :
+        </label>
+    </div>
+    <div style="float: right;margin-right:60px;margin-top:0px;">
+
+
+        @(Html.Kendo().ComboBox()
+                            .Name("float_offs_EE_Sub")
+                            .DataTextField("OfficeName")
+                            .DataValueField("OfficeID")
+                            .Placeholder("Select office...")
+                            .Filter("contains")
+                            .MinLength(1)
+                            .HtmlAttributes(new { @style = "width: 500px;" })
+                            .Events(e => e.Change("fn_dprefresher_fund_null_Sub"))
+                       .DataSource(source => source.Read(read => read.Action("GetOffice_EE", "Release")))
+        )
+
+
+
+    </div>
+
+    <div style="height:10px;">
+
+    </div></div>
+
+    <div id="ProgramAndExpenseClassDiv" style="float: none;clear:both; margin-top: 25px">
+
+        <div style="float: left;margin-right:10px;margin-top:2px;">
+            <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                Program :
+            </label>
+        </div>
+        <div style="float: right;margin-right:60px;margin-top:0px;">
+            <script>
+                function fn_OfficesF_EE() {
+                    var proyy = $("#float_ddlYear_EE_Sub").val();
+                    var off_id = $("#float_offs_EE_Sub").val();
+                    var ooe_id = $("#float_ooe_id_EE_Sub").val();
+
+                    return {
+                        propYear: proyy,
+                        office_ID: off_id,
+                        ooe_id: ooe_id
+                    }
+                }
+            </script>
+
+            @(Html.Kendo().DropDownList()
+                            .Name("float_Progss_EE_Sub")
+                            .DataTextField("ProgramDescription  ")
+                            .DataValueField("ProgramID")
+                            .OptionLabel("Select programs...")
+                            .HtmlAttributes(new { @style = "width: 500px;" })
+                            .Events(e => e.Change("ref_ubos"))
+                   .DataSource(source => source.Read(read => read.Action("GetPrograms2", "dpPrograms").Data("fn_OfficesF_EE")))
+            )
+
+        </div>
+
+        <div style="float: left;margin-right:10px;margin-top:10px;">
+            <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                Expense Class    :
+            </label>
+        </div>
+        <div style="float: right;margin-right:60px;margin-top: 5px;">
+            @(Html.Kendo().DropDownList()
+                        .Name("float_ooe_id_EE_Sub")
+                        .DataTextField("ooe_name")
+                        .DataValueField("ooe_id")
+                        .OptionLabel("Select Expenses...")
+                         .Events(e => e.Change("ref_ubos2"))
+                        .HtmlAttributes(new { @style = "width: 500px;" })
+
+                        .DataSource(source => source.Read(read => read.Action("ddlOOENonOfficeLevel", "Dropdowns")))
+            )
+        </div>
+        <div style="float: left;margin-right:10px;margin-top:10px;">
+            <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                Account    :
+            </label>
+        </div>
+        <div style="float: right;margin-right:60px;margin-top:5px;">
+            <script>
+                function fn_ForAccount_float_null_Sub() {
+                    var propYear = $("#float_ddlYear_EE_Sub").val();
+                    var office_ID = $("#float_offs_EE_Sub").val();
+                    var ooe_id = $("#float_ooe_id_EE_Sub").val();
+                    var prog_id = $("#float_Progss_EE_Sub").val();
+                    return {
+                        propYear: propYear,
+                        office_ID: office_ID,
+                        ooe_id: ooe_id,
+                        prog_id: prog_id
+                    }
+                }
+            </script>
+
+            @(Html.Kendo().ComboBox()
+                        .Name("float_account_list_EE_Sub")
+                        .DataTextField("account_name")
+                        .DataValueField("account_id")
+                        .Filter("contains")
+                        .MinLength(1)
+                        .Placeholder("Select Account...")
+                        .HtmlAttributes(new { @style = "width: 500px;" })
+                        .Events(e => e.Change("ref_gryd"))
+                        .DataSource(source => source.Read(read => read.Action("MOS_Account", "Dropdowns").Data("fn_ForAccount_float_null_Sub")))
+            )
+        </div>
+
+
+    </div>
+
+    <div id="MonthDepartment" style="float: none;clear:both; margin-top: 20px">
+
+        <div style="float:left;margin-left:50px;margin-top:5px;">
+            <label>
+                Release Month    :
+            </label>
+        </div>
+        <div style="float:left;margin-left:28px;margin-top:5px;">
+            @(Html.Kendo().DropDownList()
+                          .Name("float_Months_EE_Sub")
+                          .DataTextField("Text")
+                          .DataValueField("Value")
+                          .Events(e => e.Change("fn_grid_refresh_div_EE_Sub"))
+                          .BindTo(new List<SelectListItem>() {
+                              new SelectListItem() {
+                                  Text = "January",
+                                  Value = "1"
+                              },
+                              new SelectListItem() {
+                                  Text = "Febuary",
+                                  Value = "2"
+                              },
+                              new SelectListItem() {
+                                  Text = "March",
+                                  Value = "3"
+                              },
+                              new SelectListItem() {
+                                  Text = "April",
+                                  Value = "4"
+                              },
+                              new SelectListItem() {
+                                  Text = "May",
+                                  Value = "5"
+                              },
+                              new SelectListItem() {
+                                  Text = "June",
+                                  Value = "6"
+                              },
+                              new SelectListItem() {
+                                  Text = "July",
+                                  Value = "7"
+                              },
+                              new SelectListItem() {
+                                  Text = "August",
+                                  Value = "8"
+                              },
+                              new SelectListItem() {
+                                  Text = "September",
+                                  Value = "9"
+                              },
+                              new SelectListItem() {
+                                  Text = "October",
+                                  Value = "10"
+                              },
+                              new SelectListItem() {
+                                  Text = "November",
+                                  Value = "11"
+                              },
+                              new SelectListItem() {
+                                  Text = "December",
+                                  Value = "12"
+                              }
+                          })
+                          .Value(@ViewBag.MonthVaue)
+                          .HtmlAttributes(new { style = "width: 150px" })
+            )
+
+        </div>
+
+
+        <div style="float:right;margin-right:60px;margin-top:5px;">
+            @(Html.Kendo().NumericTextBox<double>()
+            .Name("float_numeric_EE_Sub")
+            .Value(1)
+            .Placeholder("Enter numeric value")
+            .HtmlAttributes(new { style = "width: 110px" })
+            )
+        </div>
+        <div style="float:right;margin-right:30px;margin-top:5px;">
+            <label>
+                Monthly Release Batch    :
+            </label>
+        </div>
+    </div>*@
+
+
+
+
+
+    <div id="AmountDepartment" style="float: none;clear:both; margin-top: 20px">
+        @*<div style="float:left;margin-left:50px;margin-top:5px;">
+            <label>
+                Available   :
+            </label>
+        </div>
+        <div style="float:left;margin-left:68px;margin-top:5px;">
+            <input type="text" style="width:190px" name="available_sub" id="available_sub" placeholder="        Available Amount" disabled>
+        </div>
+
+
+        <div style="float:left;margin-left:-340px;margin-top:40px;">
+            <label>
+                Amount    :
+            </label>
+        </div>
+        <div style="float:left;margin-left:-201px;margin-top:40px;">
+            <input type="text" style="width:140px" name="float_PS_EE_Sub" id="float_PS_EE_Sub" placeholder="PS" disabled>
+        </div>
+        <div style="float:left;margin-left:-24px;margin-top:40px;">
+            <input type="text" style="width:140px" name="float_MOOE_EE_Sub" id="float_MOOE_EE_Sub" placeholder="MOOE" disabled>
+        </div>
+        <div style="float:left;margin-left:24px;margin-top:40px;">
+            <input type="text" style="width:140px" name="float_CO_EE_Sub" id="float_CO_EE_Sub" placeholder="CO" disabled>
+        </div>*@
+        <div style="float:left;margin-left:24px;margin-top:-240px;">
+            <input type="text" style="width:140px" name="float_indicator" id="float_indicator"  disabled hidden>
+        </div>
+
+        @*<div style="float:left;margin-left:424px;margin-top: 10px;">
+            <div class="k-button k-button-icontext" style=" bottom: 55px; right: 220px;width: 80px;" onclick="fn_reqAdd_Float_EE_Sub()">Add</div>
+        </div>*@
+        @*<div style="float:left;margin-left:524px;margin-top: -5px;">
+            <div class="k-button k-button-icontext" style=" bottom: 55px; right: 120px;width: 80px;" onclick="ReleaseFloat_EE_Sub()">Release</div>
+        </div>
+        <div style="float:left;margin-left:30px;margin-top: -6px;">
+            <div class="k-button k-button-icontext" style=" bottom: 55px; right: 20px;width: 80px;" onclick="fn_refresher_float_EE_Sub()">Close</div>
+        </div>*@
+ 
+        <div style="float:left;margin-top:26px;margin-left:530px">
+            <div class="k-button k-button-icontext" style=" bottom: 15px; right: 220px;width: 80px; border-radius:50px;color:#ffffff;background-color:#1FA67A;" onclick="ReleaseFloat_EE_Sub()"><span class='fa fa-plus-circle' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'></span> Save</div>
+        </div>
+        <div style="float:left;margin-top:-29px;margin-left:617px">
+            <div class="k-button k-button-icontext" style=" bottom: 15px; right: 220px;width: 80px; border-radius:50px;color:#ffffff;background-color:#DE5555;" onclick="fn_refresher_float_EE_Sub()"><span class='fa fa-times' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'></span> Close</div>
+        </div>
+
+    @*<div class="k-button k-button-icontext" style=" bottom: 55px; right: 220px;width: 80px;" onclick="fn_reqAdd_Float_EE_Sub()">Add</div>
+    <div class="k-button k-button-icontext" style=" bottom: 55px; right: 120px;width: 80px;" onclick="ReleaseFloat_EE_Sub()">Release</div>
+    <div class="k-button k-button-icontext" style=" bottom: 55px; right: 20px;width: 80px;" onclick="fn_refresher_float_EE_Sub()">Clear</div>*@
+</div>
+
+
+
+
+
+
+

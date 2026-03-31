@@ -1,0 +1,64 @@
+﻿@model IEnumerable<iFMIS_BMS.BusinessLayer.Models.MenuModel>
+<script>
+    function Loading() {
+        if ($("#panelbar-images").kendoPanelBar().data("kendoPanelBar").select().children("ul").length == 0)
+        {
+            $('#siteContent').html('<div style="width: 100%;height:100%;"><img src="@Url.Content("~/Content/images/loading.gif")" alt="Loading..." style="position: absolute;top: 40%;left: 55%;margin-top: -16px;margin-left: -16px;" /></div>');
+        }
+    }
+    //function expand(){
+
+    //}
+    //function sample() {
+    //    //alert($('#SampleMain').is(":hover"));
+    //    console.log($(this).attr("id"))
+    //    //console.log($('#' + MenuID + '').is(":hover") +',' + MenuLevel);
+    //    //alert($("#panelbar-images").kendoPanelBar().data("kendoPanelBar")..children("ul").length == 0)
+    //}
+</script>
+
+@(Html.Kendo().PanelBar()
+.Name("panelbar-images")
+.HtmlAttributes(new { style = "width:200px" })
+.Items(trans1 =>
+{
+    foreach (var menuitem in Model)
+    {
+        if (menuitem.MenuLevel == 0)
+        {
+            trans1.Add().Text(menuitem.MenuName).SpriteCssClasses(menuitem.MenuIcon).Action(menuitem.MenuAction, menuitem.MenuController).Expanded(false)
+            // .HtmlAttributes(new { @onmouseover = "sample()", @id = "" + menuitem.MenuID + "" })
+            .Items(trans2 =>
+            {
+                foreach (var subitem in Model)
+                {
+                    if (subitem.MenuLevel >= 1 && subitem.MenuParent == menuitem.MenuID)
+                    {
+                        trans2.Add().Text(subitem.MenuName).SpriteCssClasses(subitem.MenuIcon).Action(subitem.MenuAction, subitem.MenuController).Expanded(false)
+                        .HtmlAttributes(new { @style = "font-size:14px" })
+                        .Items(trans3 =>
+                        {
+                            if (subitem.MenuLevel == 2)
+                            {
+                                foreach (var subitem2 in Model)
+                                {
+                                    if (subitem2.MenuLevel == 3 && subitem2.MenuParent == subitem.MenuID)
+                                    {
+                                        trans3.Add().Text(subitem2.MenuName).SpriteCssClasses(subitem2.MenuIcon).Action(subitem2.MenuAction, subitem2.MenuController).Expanded(false)
+                                        .HtmlAttributes(new { @style = "font-size:14px" });
+                                    }
+                                }
+                            }
+                        });
+                    }
+                }
+            });
+        }
+    }
+})
+    .ExpandMode(PanelBarExpandMode.Single)
+    .Events(events => events
+    .Select("Loading")
+    )
+)
+                

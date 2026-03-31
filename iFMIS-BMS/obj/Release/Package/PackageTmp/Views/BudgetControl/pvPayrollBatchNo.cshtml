@@ -1,0 +1,84 @@
+﻿@model iFMIS_BMS.BusinessLayer.Models.BudgetControlModel
+@using iFMIS_BMS.Base
+@using iFMIS_BMS.Models
+
+<script>
+    
+
+    //$("#batchno").keypress(function (e) {
+    //    alert(e.keyCode)
+    //    if (e.keyCode == 13) {
+    //        // $('#Display').click(function ()
+    //        alert("ew");
+    //        View()
+    //    }
+    //});
+   
+    //$(function () {
+    //    $("#batchno").change(function (e) {
+    //        View();
+    //    }).keypress(function (e) {
+    //        if (e.keyCode == 13) {
+    //            View();
+    //        }
+    //    });
+    //})
+</script>
+
+<div style="width:300px;margin-top:15px;height:40px">
+    <div style="width:90px;display:inline-block;"><span style="font-size:15px;font-weight:bold">Batch No.: </span></div> <div style="display:inline-block">
+        <input class="k-input"type="number" id="batchno" autocomplete="off" name="batchno" placeholder="Enter batch no.!" style="width:200px;text-align:center;font-size:large;font-weight:700;color:#ff0000" />
+   @* <input type="text" id="batchno" name="batchno" placeholder="Enter batch no.?" style="width:200px;text-align:center;font-size:large;font-weight:700;color:#ff0000" />*@
+      @*<div style="width:120px;display:inline-block;"><input type="text" id="TransactionNo" name="TransactionNo" value="@Model.TransactionNo" /> </div>*@
+    </div>
+</div>
+<div style="margin-left:130px;margin-top:20px; display:inline-block">
+    <div class="k-button" style="padding:5px;width:75px; height:75%;border-radius:50px" id="Display" name ="Display" onclick="View()"><span class="fa fa-list-alt"></span> View </div>
+</div>
+
+<script>
+    //$('#Display').click(function () {
+    $(document).ready(function () {
+        $('#batchno').NumericOnly()
+        //$('#batchno').focus()
+    });
+
+    function View() {
+        var transyear = $("#Years").val();
+        $.ajax({
+            type: "POST",
+            tradition: true,
+            url: '@Url.Content("~/BudgetControl/BatchDetails")',
+            data: JSON.stringify({
+                batchno: $("#batchno").val(),
+                tyear: transyear
+            }),
+        contentType: "application/json",
+        cache: false,
+        success: function (result) {
+           // alert(result);
+            if (result != '') {
+                var arr = result.toString().split(';');
+                var str1 = arr[0];
+                var str2 = arr[1];
+                var str3 = arr[2];
+            }
+            else {
+                var str1 = '';
+                var str2 = '';
+                var str3 = '';
+            }
+            //alert(str1)
+            //alert(str2)
+            //alert(str3)
+
+            displayDetails(str1, str2, str3)
+            
+          
+        }
+        })
+    }
+  
+   
+</script>
+    

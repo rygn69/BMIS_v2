@@ -1,0 +1,226 @@
+﻿<script>
+    function fnofficestatus() {
+        officeid = @Account.UserInfo.Department;
+    }
+
+    function getlbparmter() {
+        var officeid= $("#officestatus").val() ==""? 0 : $("#officestatus").val()
+        return {
+            year: $("#ddlYear").val(),
+            officeid:officeid,
+            docuid : '@Session["docuid"]'
+        }
+    }
+    function btn_review_special_co() {
+        if (document.getElementById("checkshowspco_review").checked == true) {
+            $("#checkshowspco_review").val(1)
+        }
+        else {
+            $("#checkshowspco_review").val(0)
+        }
+        $("#grid_lbpstatus").data("kendoGrid").dataSource.read()
+    }
+    function fnOffice_event(){
+        $("#grid_lbpstatus").data("kendoGrid").dataSource.read()
+    }
+    function searchAccount() {
+        var $filter = new Array();
+        $filter = [];
+
+        if ($('#SearchData_Re').val().length > 0) {
+            $filter.push({ field: "office", operator: "contains", value: $('#SearchData_Re').val() }),
+            $filter.push({ field: "accountname", operator: "contains", value: $('#SearchData_Re').val() }),
+            $filter.push({ field: "remarks", operator: "contains", value: $('#SearchData_Re').val() }),
+            $filter.push({ field: "status", operator: "contains", value: $('#SearchData_Re').val() });
+        }
+
+        $('#grid_lbpstatus').data('kendoGrid').dataSource.filter({
+            logic: "or",
+            filters: $filter
+        });
+
+    }
+
+    $(function () {
+        $("#SearchData_Re").keypress(function (e) {
+            if (e.keyCode == 13) {
+                searchAccount();
+            }
+        });
+    });
+    function rprtlbp(status,docid,gov_sig){
+        //if (status == "Ready To Print" && gov_sig == 344880){
+            //success: window.open("https://pgas.ph/bmsattachment/" + reportpdf)
+        //success: window.open("https://pgas.ph/dgsign/blank/getPDF_View?pdfData=application/pdf&FormID="+ docid )
+        success: window.open("https://pgas.ph/dgsign/blank/getPDF_digital_only?pdfData=application/pdf&FormID="+ docid +"")
+        //}
+    }
+    function onDataBoundWFP(e) {
+        //$(".k-hierarchy-cell").hide();
+        //$(".k-hierarchy-col").hide();
+        //var grid = $("#grid_lbpstatus").data("kendoGrid")
+        //var ds = grid.dataSource.view();
+        //var rows = e.sender.tbody.children();
+        //var status = "";
+        //var accountid=0;
+        //var gov_sig
+        //for (var i = 0; i < ds.length; i++) {
+        //    status = ds[i].status;
+        //    accountid=ds[i].accountid;
+        //    gov_sig=ds[i].gov_sig;
+        //    var row = $(rows[i]);
+        //    if (status == "Ready To Print" && gov_sig == 344880) {
+        //        $('#printwfpid' + accountid + '').css("display", "normal");
+        //    }
+        //    else{
+        //        $('#printwfpid' + accountid + '').css("display", "normal");
+        //    }
+        //}
+    }
+</script>
+<label style="display:inline-block;margin-left:10px;margin-top:10px;">
+    Office 
+</label>
+<div style="margin-left:10px;width:500px;">
+    @(Html.Kendo().ComboBox()
+            .Name("officestatus")
+            .DataTextField("offname")
+            .DataValueField("OfficeID")
+            .AutoBind(true)
+            .Placeholder("Select Office...")
+            .Filter("contains")
+            .MinLength(3)
+            .Events(e => e.Change("fnOffice_event"))
+            .SelectedIndex(-1)
+            .HtmlAttributes(new { style = "width:100%; height:100%", @class = "form-control autoselect" })
+            .DataSource(source =>
+            {
+                source.Read(read =>
+                {
+                    read.Action("GetOfficeWFP", "Report").Data("fnofficestatus");
+                })
+            .ServerFiltering(false);
+            })
+    )
+
+</div>
+<div id="searchAccountid" style="height: 30px; margin-top: -27px; float: right;">
+    <input type="text" style="width:212px;border-collapse:collapse;margin:0px;border-style:solid;margin-left:0px;height:70%;outline:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search..." id="SearchData_Re" name="SearchData_Re">
+    <div class="k-button k-button-icontext" style="height:30px;width:40px;border-style:solid;" onclick="searchAccount()"><span class="mif-search"></span></div>
+</div>
+<div style="display:inline-block;width:100%;margin-top:-3px;">
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.WFPrepare>()
+            .Name("grid_lbpstatus")
+            .HtmlAttributes(new { style = "" })
+            .Scrollable()
+            .Columns(col =>
+            {
+                col.Template(@<text></text>)
+            .HeaderTemplate(@<text>Office</text>)
+            .Width(50)
+            .HtmlAttributes(new { style = "text-align:left;;font-size:12px" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=office# </div>");
+                col.Template(@<text></text>)
+            .HeaderTemplate(@<text>office id</text>)
+            .Width(0)
+            .Hidden()
+            .HtmlAttributes(new { style = "text-align:left;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=officeid# </div>");
+                col.Template(@<text></text>)
+            .HeaderTemplate(@<text>Office</text>)
+            .Width(0)
+            .Hidden()
+            .HtmlAttributes(new { style = "text-align:left;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=office# </div>");
+                col.Template(@<text></text>)
+            .HeaderTemplate(@<text>Account</text>)
+            .Width(130)
+            .HtmlAttributes(new { style = "text-align:left;;font-size:12px" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=accountname# </div>");
+                col.Template(@<text></text>)
+            .HeaderTemplate(@<text>Date/Time <br />Submitted</text>)
+            .Width(80)
+            .HtmlAttributes(new { style = "text-align:left;;font-size:12px" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=datetimeentered# </div>");
+                @*col.Template(@<text></text>)
+            .HeaderTemplate(@<text>Year</text>)
+            .Width(0)
+            .Hidden()
+            .HtmlAttributes(new { style = "text-align:left;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=yearof# </div>");*@
+           
+            col.Bound(m => m.status)
+            .HeaderTemplate(@<text>Signature <br />Status</text>)
+            .Width(100)
+            .HtmlAttributes(new { style = "text-align:left;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=status# </div>");
+            
+             col.Template(@<text></text>)
+            .HeaderTemplate(@<text></text>)
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:10px;color:beige;" })
+            .ClientTemplate(
+                "<div id='printwfpid#=accountid#' style='color:red;cursor:pointer' onclick='rprtlbp(\"#=status#\",#=docid#,#=gov_sig#)'><span class='fa fa-search' title='Click to preview LBP FORMS!' style='font-size: 16px;margin: 1px;margin-top: -1px;margin-left: 2px;margin-right:2px;width:25px;text-align:center;cursor:pointer;'></span>Preview</div> ")
+            .HtmlAttributes(new { style = "vertical-align: middle;text-align:center" })
+            .Width(55);
+
+                @*col.Template(@<text></text>)
+            .HeaderTemplate(@<text>with approved</text>)
+            .Width(0)
+            .Hidden()
+            .HtmlAttributes(new { style = "text-align:left;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=withapprove# </div>");*@
+                
+                col.Template(@<text></text>)
+            .HeaderTemplate(@<text>Gov Signature</text>)
+            .Width(0)
+            .Hidden()
+            .HtmlAttributes(new { style = "text-align:left;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=gov_sig# </div>");
+
+                col.Bound(m =>m.docid)//Template(@<text></text>)
+            .HeaderTemplate(@<text>document ID</text>)
+            .Width(0)
+            .Hidden()
+            .HtmlAttributes(new { style = "text-align:left;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=docid# </div>");
+            })
+            .ToolBar(toolbar =>
+            {
+                toolbar.Custom().Text("<input id='checkshowspco_review' type='checkbox' value=0 style='zoom:1.2'  title='Ticked checkbox to set as reviewed!'  class='checkbox'/> Show Special Project & CO").Name("btnreview").Url("javascript:void(0)").HtmlAttributes(new { onclick = "btn_review_special_co()", id = "btn_review_special_co_id" });
+            })
+            .Editable(editable => editable.Mode(GridEditMode.InCell))
+            .Resizable(e => e.Columns(true))
+            .Pageable(pageable => pageable
+            .Refresh(true)
+            .ButtonCount(1))
+            //.HtmlAttributes(new { @class = "table-responsive", style = "height:410px;" })
+            .HtmlAttributes(new { @class = "table-responsive", style = "height:490px;" })
+            .Selectable()
+          //  .Events(e => e.DataBound("onDataBoundWFP"))
+            .DataSource(dataSource => dataSource
+            .Ajax()
+            .Batch(true)
+            .Model(m => m.Id(i => i.locationid))
+            .ServerOperation(false)
+            .PageSize(3000)
+            .Read(read => read.Action("GetLBPDgsign_status", "Report").Data("getlbparmter"))
+            )
+)
+</div>
+<br />
+<div class="k-button k-button-icontext"  style="bottom: 15px; right: 25px;width: 100px;float:left; margin-top: 10px; margin-left:805px;border-radius:50px;background-color:indianred;color:white; margin-bottom:0px" onclick="reqReviewClose()"><span class="fa fa-close"></span> Close</div>
+<script>
+    function reqReviewClose(){
+        $("#LBPstatusform").data("kendoWindow").close()
+    }
+</script>

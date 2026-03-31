@@ -1,0 +1,246 @@
+﻿<script>
+    function officeval() {
+        return {
+            year: $("#tyear").val(),
+            office: $("#officeid").val()
+        };
+    }
+    function programaccount() {
+        return {
+            year: $("#tyear").val(),
+            program: $("#programid").val()
+        }
+    }
+    function fnOffice() {
+
+        //setTimeout(function () {
+        $("#programid").data("kendoComboBox").dataSource.read();
+        $('#wfpitem_grid').data('kendoGrid').dataSource.read();
+        //}, 500);
+    }
+
+    function ocakeyear() {
+        //$('#NonOfficeSub').data('kendoGrid').dataSource.read({ program: $("#program").val(), accountTemp: $("#accountTemp").val(), year: $("#ProposalYear").val() });
+        //$('#MotherAccount').data('kendoComboBox').dataSource.read();
+    }
+    function fnprogram() {
+        //setTimeout(function () {
+            $("#accountid").data("kendoComboBox").dataSource.read();
+        //}, 500);
+    }
+    function onData() {
+        return {
+            officeid: $('#officeid').val(),
+            tyear: $('#tyear').val()
+        }
+    }
+</script>
+<h2><span class="fa fa-gears"></span> WFP Add Item Exemption</h2>
+'
+<div style="margin-top:20px;margin-left:-80px;">
+    <label style="margin-left:121px;font-size:12px;">Year :</label>
+    <div style="float:left;margin-top:-30px;margin-left:160px">
+        @(Html.Kendo().DropDownList()
+        .Name("tyear")
+        .DataTextField("ProposalYear")
+        .DataValueField("ProposalYear")
+        .SelectedIndex(0)
+        .HtmlAttributes(new { style = "width:150px; height:100%;font-size:14px;", @class = "form-control autoselect" })
+        .Events(e => e.Change("ocakeyear"))
+        .DataSource(source => source.Read(read => read.Action("WFPYears", "PYear")))
+        )
+    </div>
+</div>
+
+<div style="margin-top:20px;margin-left:-80px;">
+    <label style="margin-left:111px;font-size:12px;">Office :</label>
+    <div style="float:left;margin-top:-30px;margin-left:160px;">
+        @(Html.Kendo().ComboBox()
+        .Name("officeid")
+        .DataTextField("offname")
+        .DataValueField("OfficeID")
+        .AutoBind(true)
+        .Placeholder("Select Office...")
+        .Filter("contains")
+        .MinLength(3)
+        .Events(e => e.Change("fnOffice"))
+        .SelectedIndex(-1)
+        .HtmlAttributes(new { style = "width:500px;height: 100%;", @class = "form-control autoselect" })
+        .DataSource(source =>
+        {
+            source.Read(read =>
+            {
+                read.Action("GetOfficeOtherPPA", "Report");//.Data("fnMainPPA");
+            })
+        .ServerFiltering(false);
+        })
+        )
+
+    </div>
+</div>
+
+<div style="margin-top:20px;margin-left:-80px;">
+    <label style="margin-left:96px;font-size:12px;">Program :</label>
+    <div style="float:left;margin-top:-30px;margin-left:160px">
+        @(Html.Kendo().ComboBox()
+        .Name("programid")
+        .DataTextField("ProgramDescription")
+        .DataValueField("ProgramID")
+        .AutoBind(true)
+        .Placeholder("Select Program...")
+        .Filter("contains")
+        .MinLength(3)
+        .Events(e => e.Change("fnprogram"))
+        .SelectedIndex(-1)
+        .HtmlAttributes(new { style = "width:500px; height:100%", @class = "form-control autoselect" })
+        .DataSource(source =>
+        {
+            source.Read(read =>
+            {
+                read.Action("GetProgram", "Report").Data("officeval");
+            })
+            .ServerFiltering(false);
+        })
+        )
+    </div>
+</div>
+
+<div id="accountorigid" style="margin-top:20px;margin-left:-80px;">
+    <label style="margin-left:98px;font-size:12px;">Account :</label>
+    <div style="float:left;margin-top:-30px;margin-left:160px">
+        @(Html.Kendo().ComboBox()
+        .Name("accountid")
+        .DataTextField("AccountName")
+        .DataValueField("AccountID")
+        .AutoBind(true)
+        .Placeholder("Select Account...")
+        .Filter("contains")
+        .MinLength(3)
+        .SelectedIndex(-1)
+        .HtmlAttributes(new { style = "width:500px; height:100%", @class = "form-control autoselect" })
+        .DataSource(source =>
+        {
+            source.Read(read =>
+            {
+                read.Action("GetAccountactual", "Report").Data("programaccount");
+            })
+            .ServerFiltering(false);
+        })
+        )
+    </div>
+</div>
+<div id="btnSave" class="k-button k-button-icontext" style="bottom: 15px; right: 15px;width: 90px;float:right; margin-right:200px; margin-bottom:0px;margin-top:10px;border-radius:50px;background-color:cornflowerblue;color:white" onclick="btnSave()"><span class="fa fa-save"></span> Save </div>
+<label style="float:left;margin-top:40px;font-family:Arial;font-size:12px;"><span class="fa fa-list"> </span> List of Exempted Account</label>
+<div style="float:left;margin-top:-5px;">
+    @(Html.Kendo().Grid<iFMIS_BMS.Models.NonOfficeSubAccount>()
+        .Name("wfpitem_grid")
+        .Columns(columns =>
+        {
+            columns.Template(@<text></text>).Hidden().ClientTemplate("<div>#=trnnoid# </div>");
+            columns.Template(@<text></text>).Hidden().ClientTemplate("<div>#=tyear# </div>");
+
+            columns.Template(@<text></text>)
+             .HeaderTemplate(@<text><div style="text-align:center; vertical-align: middle; overflow: visible; white-space: normal;color:white">Office</div></text>)
+             .HtmlAttributes(new { style = "text-align:left" })
+             .HeaderHtmlAttributes(new { style = "text-align:center", @class = "metro-header" })
+            // .Width(a)
+             .ClientTemplate("<div>#=Office# </div>");
+
+            columns.Template(@<text></text>)
+             .HeaderTemplate(@<text><div style="text-align:center; vertical-align: middle; overflow: visible; white-space: normal;color:white">Program</div></text>)
+             .HtmlAttributes(new { style = "text-align:left" })
+             .HeaderHtmlAttributes(new { style = "text-align:center", @class = "metro-header" })
+             //.Width(a)
+             .ClientTemplate("<div>#=Program# </div>");
+
+             columns.Template(@<text></text>)
+             .HeaderTemplate(@<text><div style="text-align:center; vertical-align: middle; overflow: visible; white-space: normal;color:white">Account</div></text>)
+             .HtmlAttributes(new { style = "text-align:left" })
+             .HeaderHtmlAttributes(new { style = "text-align:center", @class = "metro-header" })
+             //.Width(a)
+             .ClientTemplate("<div>#=Account# </div>");
+        
+            columns.Template(t => { })
+            .HeaderHtmlAttributes(new { style = "text-align:center", @class = "metro-header" })
+            .ClientTemplate(
+               "<div class='btn-delete'> <a  title='Delete' onclick='deleteaccount(#=trnnoid#)'><span class='fa fa-trash' style='font-size: 15pt;color:red;cursor:pointer'></span></a></div>"
+               ).HtmlAttributes(new { style = "margin-left:5px;" }).Width(40);
+        })
+       
+        .Sortable()
+     
+        .Pageable(pageable => pageable.Refresh(true))
+        .Scrollable()
+        .Resizable(e => e.Columns(true))
+        .HtmlAttributes(new { @class = "table-responsive", style = "height:400px;overflow-y:hidden;" })
+        .Selectable(selectable => selectable
+        .Mode(GridSelectionMode.Single)
+        .Type(GridSelectionType.Row))
+        //   .Events(events => events.Change("selectedrow"))
+        .DataSource(dataSource => dataSource
+            .Ajax()
+            .Aggregates(a =>
+            {
+                a.Add(c => c.amount).Sum();
+            })
+            .Model(model => model.Id(u => u.nonofficeid))
+            .PageSize(1000)
+            .ServerOperation(false)
+            .Read(read => read.Action("wfptitemexempt", "Maintenance").Data("onData"))
+        )
+
+    )
+</div>
+<script>
+    function deleteaccount(trnnoid) {
+        var url = "@Url.Action("deletewfpexemption", "Maintenance")";
+        swal({
+            title: "Confirmation!",
+            text: "Do you want to remove this account?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes",
+            closeOnConfirm: false
+        }, function () {
+            $.get(url, { trnnoid: trnnoid }, function (d) {
+                if (d == "success") {
+                    swal("Success", "The account has been successfully removed from the WFP exemption.", "success")
+                    $('#wfpitem_grid').data('kendoGrid').dataSource.read();
+                }
+                else {
+                    swal("",d, "error")
+                }
+            })
+        });
+    }
+    function btnSave() {
+        var officeid = $("#officeid").val()
+        var programid = $("#programid").val()
+        var accountid = $("#accountid").val()
+        var tyear = $("#tyear").val()
+
+        var url = "@Url.Action("savewfpexemption", "Maintenance")";
+        swal({
+            title: "Confirmation!",
+            text: "Save?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes",
+            closeOnConfirm: false
+        }, function () {
+            $.get(url, { officeid: officeid, programid: programid, accountid: accountid, tyear: tyear}, function (d) {
+                if (d == "success") {
+                    swal("Success", "The new account has been exempted from the requirement to add WFP items for capital outlay.", "success")
+                    $("#accountid").data("kendoComboBox").value("");
+                    $('#wfpitem_grid').data('kendoGrid').dataSource.read();
+                }
+                else {
+                    swal("Error", d, "error")
+                }
+            })
+
+        });
+    }
+</script>

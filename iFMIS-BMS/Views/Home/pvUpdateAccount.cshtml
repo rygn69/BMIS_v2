@@ -1,0 +1,50 @@
+﻿@model iFMIS_BMS.BusinessLayer.Models.AccountsModel
+<h2> Edit Proposal Account Info </h2>
+<div style="margin-top:5px;margin-left:5px;">
+    <span>Office Name: <b> @Model.UpdateOfficeName </b></span>
+</div>
+<div style="margin-top:5px;margin-left:5px">
+    <span>Account Name: <b> @Model.AccountName </b></span>
+</div>
+
+<div style="margin-top:5px;margin-left:5px;">
+    @(Html.Kendo().DropDownList()
+                            .Name("Progss")
+                            .DataTextField("ProgramDescription  ")
+                            .DataValueField("ProgramID")
+                            .OptionLabel("Select programs...")
+                            .HtmlAttributes(new { @style = "width: 500px;" })
+            //.Events(e => e.Change("fn_refresher"))
+                           .DataSource(source => source.Read(read => read.Action("ddlgetPrograms", "Dropdowns").Data("ProgramParam")))
+    )
+    <script>
+    function ProgramParam (){
+        var OfficeID = @Model.UpdateOfficeID;
+        var TransactionYear = @Model.UpdateTransactionYear;
+        return {
+            OfficeID: OfficeID,
+            TrasactionYear: TransactionYear
+        }
+    }
+    </script>
+</div>
+<script>
+    $(document).ready(function () {
+        @*var ProposalID = @Model.UpdateProposalAccount;
+        var ProgramID = @Model.UpdateProgramID;
+        var AccountID = @Model.UpdateAccountID;
+        var OOEID = @Model.UpdateOOEID;*@
+        @*var url = "@Url.Action("DataUpdateAccount", "Maintenance")";
+        var checkData = "CheckUser";
+        $.post(url, checkData, function (d) {
+            if (d != 0) {
+                // alert(d);
+                //$("#office_id").data("kendoComboBox").value(d);
+                //document.getElementById("text_office_id").value = d;
+                //$("#office_id").data("kendoComboBox").enable(false);
+            }
+            //alert(d);
+
+        })*@
+    });
+</script>

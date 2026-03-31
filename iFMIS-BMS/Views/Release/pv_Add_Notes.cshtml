@@ -1,0 +1,149 @@
+﻿
+@model iFMIS_BMS.BusinessLayer.Models.TransFundsModel
+
+<script>
+
+
+    function close_notch() {
+        $("#addNotch_").data("kendoWindow").close();
+    }
+
+    function fn_addNote() {
+        var officeID = $("#offs").val();
+        var year_ = $("#ddlYear").val();
+        var classtype = $("#classtype").val();
+        var month_ = $("#Months").val();
+        var batch = $("#numerictextbox").val();
+        var sort_ = $("#cake").val();
+        //var sort_ = $("#cake").val();
+        var note_ = $("#note_").val();
+        var expclass = $("#expclass").val();
+        var purposeid = $("#purposeid").val();
+        var Fundtype = $("#classtype").val();
+        var packet = $("#is_pocket").val();
+        var is_oldAA = $("#is_oldAA").val();
+        var reporthistory = $("#reporthistory").val();
+        var is_float = $("#is_float").val();
+        var budgettype = $("#budgettype").val();
+        var dateissue = $("#dateissue").val();
+
+        if (is_oldAA == 1) {
+            if (classtype == 2) {
+                $.ajax({
+                    async: false,
+                    dataType: 'html',
+                    success: window.open("../Reports/ReportViewer.aspx?rid=16&OfficeID=" + officeID + "&Year=" + year_ + "&classtype=" + classtype + "&month_=" + month_ + "&batch=" + batch + "&sort_=" + sort_ + "&note_=" + note_ + "")
+                });
+                $("#addNotch_").data("kendoWindow").close();
+            } else {
+
+            $.ajax({
+                async: false,
+                dataType: 'html',
+                success: window.open("../Reports/ReportViewer.aspx?rid=101&OfficeID=" + officeID + "&Year=" + year_ + "&classtype=" + classtype + "&month_=" + month_ + "&batch=" + batch + "&sort_=" + sort_ + "&note_="+ note_ + "")
+            });
+            $("#reporthistory").data("kendoComboBox").dataSource.read();
+            $("#addNotch_").data("kendoWindow").close();
+            }
+        }
+        else {
+            $.ajax({
+                async: false,
+                dataType: 'html',
+                success: window.open("../Reports/ReportViewer.aspx?rid=10&OfficeID=" + officeID + "&Year=" + year_ + "&classtype=" + classtype + "&month_=" + month_ + "&batch=" + batch + "&sort_=" + sort_ + "&note_="
+                    + note_ + "&expclass=" + expclass + "&purposeid=" + purposeid + "&Fundtype=" + Fundtype + "&packet=" + packet + "&reporthistory=" + reporthistory + "&is_float=" + is_float + "&budgettype=" + budgettype + "&dateissue=" + dateissue + "")
+            });
+            $("#reporthistory").data("kendoComboBox").dataSource.read();
+            $("#addNotch_").data("kendoWindow").close();
+        }
+    }
+
+    function PrevDgsign_Note(){
+        var officeID = $("#offs").val()
+        var ReportType = $('input[name=ReportTypeRadioButton]:checked').val();
+        var Year = $("#ddlYear").val()
+        var includeLBP1 = 0;
+        var includeLBP2_SP =0;
+        var userid=@Account.UserInfo.eid.ToString();
+        var includezero=0;
+        var lbp2export=0;
+        var reloadlbp2=0;
+        var sectoral=0;
+        var includeCOE=0;
+        var eco=0;
+        var month_ = $("#Months").val();
+
+        var batch = $("#numerictextbox").val();
+        var sort_ = $("#cake").val();
+        var note_ = $("#note_").val();
+        var classtype = $("#classtype").val();
+        var expclass = $("#expclass").val();
+        var purposeid = $("#purposeid").val();
+        var Fundtype = $("#classtype").val();
+        var packet = $("#is_pocket").val();
+        var reporthistory = $("#reporthistory").val();
+        var is_oldAA = $("#is_oldAA").val();
+        var is_float = $("#is_float").val();
+        var budgettype = $("#budgettype").val();
+        var dateissue = $("#dateissue").val();
+
+        var url = "@Url.Action("dgsignreport", "Report")";
+        swal({
+            title: "Confirmation!",
+            text: "Would you like to create a document for digital signature? \n\n",
+            type: "info",
+            showCancelButton: true,
+            closeOnConfirm: false,
+            confirmButtonColor: "#1fa67a",
+            confirmButtonText: "Yes",
+            showLoaderOnConfirm: true,
+        },
+         //$.ajax({
+         //    async: false,
+         //    dataType: 'html',
+         //    success: window.open("../Reports/ReportViewer.aspx?rid=10&OfficeID=" + officeID + "&Year=" + year_ + "&classtype=" + classtype + "&month_=" + month_ + "&batch=" + batch + "&sort_=" + sort_ + "&note_="
+         //        + note_ + "&expclass=" + expclass + "&purposeid=" + purposeid + "&Fundtype=" + Fundtype + "&packet=" + packet + "&reporthistory=" + reporthistory + "&is_float=" + is_float + "&budgettype=" + budgettype + "&dateissue=" + dateissue + "")
+         //});
+        //$("#reporthistory").data("kendoComboBox").dataSource.read();
+            function (isConfirm) {
+                if (isConfirm) {
+                    $.post(url, { YearOf:Year,OfficeID:officeID, ReportTypeID:classtype,docuid:14,reloadlbp4:month_,includeLBP1:batch,pagnoid:$("#pagnoid").val(),includeLBP2_SP:expclass,eid:userid,includezero:includezero,lbp2export:Fundtype,reloadlbp2:reloadlbp2,sectoral:sectoral,includeCOE:dateissue,eco:budgettype,purpose:purposeid,note:note_,sort_:sort_  }, function (d) {
+                        if (d != "") {
+                            //swal.close();
+                            swal("Success","The document generated for digital signature has been sent via SMS and is now available for viewing.","success")
+                            $("#grid_aro").data("kendoGrid").dataSource.read()
+                            //success: window.open(d)
+                        }
+                        else {
+                            swal("Something Went Wrong!", d, "error");
+                        }
+                    })
+                }
+            })
+    }
+</script>
+
+<div>
+
+
+    <label>Note :</label>
+   
+</div><div>
+    <textarea id="note_" rows="4" cols="50" style="width:470px;height:106px" placeholder="Place your note here...."></textarea>
+</div>
+<label style="margin-top:7px">Purpose :</label>
+
+<div>
+    <textarea id="purposeid" rows="4" cols="50" style="width:470px;height:106px" placeholder="Place your purpose here...."></textarea>
+</div>
+<div style="float:right;margin-left:130px">
+    
+    <div style="float:left;margin-top:9px;margin-left:150px">
+        <div id="" class="k-button k-button-icontext" style="width: 152px;float:left; margin-top: 0px; margin-left:-158px; margin-bottom:5px;border-radius:50px;background-color:cornflowerblue;color:white" onclick="PrevDgsign_Note()"><span class="mif-printer"></span> Preview Via Dgsign</div>
+        <div class="k-button k-button-icontext" style=" bottom: 15px; right: 220px;width: 100px; border-radius:50px;color:#ffffff;background-color:cornflowerblue;color:white"" onclick="fn_addNote()"><span class='mif-printer' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'></span> Preview</div>
+    </div>
+
+    <div style="float:left;margin-top:-36px;margin-left:253px">
+        <div class="k-button k-button-icontext" style=" bottom: 15px; right: 220px;width: 80px; border-radius:50px;color:#ffffff;background-color:#DE5555;" onclick="close_notch()"><span class='fa fa-times' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'></span> Close</div>
+    </div>
+</div>

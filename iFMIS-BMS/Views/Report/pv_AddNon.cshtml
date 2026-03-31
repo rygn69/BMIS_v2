@@ -1,0 +1,67 @@
+﻿@model iFMIS_BMS.BusinessLayer.Models.SOONon_Model
+
+<script>
+
+
+
+
+    function reqSave() {
+        var notifi = new $("#popupNotification").data("kendoNotification");
+
+        var url = "@Url.Action("SaveNon", "Report")";
+
+        var trnno = $('#NonList').val()
+        var BudgetAcctName = $("#NonList").data("kendoComboBox").text();
+        
+
+        var Year = $("#YearGrid").val()
+        $.post(url, { trnno: trnno, BudgetAcctName: BudgetAcctName, Year: Year }, function (d) {
+
+            $('#addNonOff').data('kendoWindow').close();
+            $('#NonGrid').data('kendoGrid').dataSource.read();
+
+        })
+    }
+
+    function ProgramData() {
+
+
+        var proyy = $("#YearGrid").val();
+        var off_id = $("#ddlOffices").val();
+
+
+        return {
+            propYear: proyy,
+            office_ID: off_id,
+
+
+        }
+    }
+
+
+</script>
+
+
+@Html.HiddenFor(m => m.trnno)
+@Html.HiddenFor(m => m.FMISProgramCode)
+@Html.HiddenFor(m => m.OOECode)
+@Html.HiddenFor(m => m.FMISAccountCode)
+@Html.HiddenFor(m => m.BudgetAcctName)
+@Html.HiddenFor(m => m.Yearof)
+@Html.HiddenFor(m => m.AllotedAmount)
+    
+<label>Non-Office :</label>
+@(Html.Kendo().ComboBox()
+        .Name("NonList")
+        .DataTextField("BudgetAcctName")
+        .DataValueField("trnno")
+        .Placeholder("Select Non-Office...")
+        .HtmlAttributes(new { @style = "width: 310px;" })
+        .DataSource(source => source.Read(read => read.Action("GetNonNames", "Report").Data("ProgramData")))
+
+
+)
+
+
+
+<div class="k-button k-button-icontext" style="position: absolute; bottom: 15px; right: 20px;width: 80px;" onclick="reqSave()">Save</div>

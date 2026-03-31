@@ -1,0 +1,32 @@
+﻿<div>
+    @(Html.Kendo().TabStrip()
+          .Name("tabstripCAF")
+          // .Navigatable(false)
+          .Animation(animation =>
+              animation.Open(effect =>
+              effect.Fade(FadeDirection.In)))
+          //.Events(e => e.Activate("OnTabstripActivate"))
+          .Items(tabstrip =>
+          {
+              tabstrip.Add().Text("For Posting").Selected(true).LoadContentFrom("postcaf_forposted", "Release");//.Enabled(false);
+              tabstrip.Add().Text("Posted").LoadContentFrom("postcaf_posted", "Release");
+
+
+          })
+    )
+</div>
+
+<div class="k-button k-button-icontext" style="float:right; bottom: 15px; right: 15px;width: 120px;margin-right:5px; margin-bottom:0px;margin-top:10px;border-radius: 50px;background-color:indianred;color:white" onclick="btnpostingclose()"><span class="fa fa-close"></span> Close </div>
+<script>
+    function OnTabstripActivate() {
+        if (SelectedTabIndex == 0) {
+          $("#cafgridposting").data("kendoGrid").dataSource.read();
+        }
+        else {
+            $("#cafgridposted").data("kendoGrid").dataSource.read();
+        }
+    }
+    function btnpostingclose() {
+        $("#postcaf").data("kendoWindow").close()
+    }
+</script>

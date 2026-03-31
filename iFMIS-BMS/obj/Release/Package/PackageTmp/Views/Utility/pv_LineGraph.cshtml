@@ -1,0 +1,81 @@
+﻿@model IEnumerable<iFMIS_BMS.BusinessLayer.Models.LineGraph_Model>
+
+<script>
+
+    $("#LineChart").html(d);
+
+    function fn_Offices() {
+        var proyy = $("#ddlYear").val();
+        var off_id = $("#offs").val();
+        var ooe_id = $("#ooe_id").val();
+
+        return {
+            propYear: proyy,
+            office_ID: off_id,
+            ooe_id: ooe_id
+        }
+    }
+
+
+    function reqpreview(e) {
+        var url = "@Url.Action("sampleGraph", "Utility")"
+        
+        $.get(url, { ProposalID: 14122, gLineAccountCode: 701, gLineProgramID: 4, gLineAccountID: 299, LineYear: 2017, LineOffice: 4, LineOOE: 1 }, function (d) {
+            $("#LineChart").html(d);
+        })
+      
+
+
+    }
+
+
+   </script>
+
+
+
+<div id="example">
+    <div class="demo-section k-content wide">
+        <div id="chart" style="background: center no-repeat url('../content/shared/styles/world-map.png');"></div>
+    </div>
+    @*@Html.Raw(ViewBag.param)*@
+
+
+
+</div>
+
+
+
+
+
+
+
+
+    <div style=" width: 0;height: 0; border-right: 5px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;margin-top: -1px;margin-bottom: 0px; ">
+        <div style="float: left; width: 678px; margin-top:1px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 36px solid #1fa67a; ">
+
+            <div style="float: left; height:28px; margin-left:-59px; margin-top: 5px;">
+                <i class="fa fa-tasks fa-2x fg-white">  &nbsp;&nbsp; </i>
+
+            </div>
+
+            <div style="text-align: right;float: right;margin-right:10px;margin-top:2px;">
+              
+            </div>
+            <div style="float: right;margin-right:10px;margin-top:2px;">
+                <i class="fa fa-calendar fa-2x #33333"></i>
+            </div>
+
+        </div>
+
+    </div>
+    <div id="btnView" class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 90px;float:right; margin-top: 5px; margin-right:34px; margin-bottom:5px" onclick="reqpreview()"><span class="fa fa-line-chart"></span> preview</div>
+
+<div>
+    @(ViewBag.param) 
+</div>
+
+    <div class="demo-section k-content wide" id="LineChart" style="margin-left:20px;margin-top:30px;"></div>
+
+
+
+

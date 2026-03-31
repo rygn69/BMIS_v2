@@ -1,0 +1,444 @@
+﻿
+<script>
+
+    function getParam() {
+        return {
+            office:'@Session["office"]',
+            tyear: '@Session["tyear"]',
+            id:'@Session["id"]',
+            ooeid:'@Session["ooeid"]',
+            qtr: '@Session["qtr"]',
+            programid:'@Session["programid"]' ,
+            accountid:'@Session["accountid"]'
+        }
+    }
+
+    var thisculture = kendo.culture();
+    thisculture.numberFormat.currency.symbol = ' ';
+
+    function frmclose() {
+        $("#addbrekdownform").data("kendoWindow").close();
+        $("#WFPDetails").data("kendoGrid").dataSource.read();
+        clearentry()
+    }
+    function onDataBound(e) {
+        $(".k-hierarchy-cell").hide();
+        $(".k-hierarchy-col").hide();
+        var grid = $("#grd_breakdown").data("kendoGrid")
+        var ds = grid.dataSource.view();
+        var rows = e.sender.tbody.children();
+
+        for (var i = 0; i < ds.length; i++) {
+            trnno = ds[i].trnno;
+            userofficeid=ds[i].userofficeid
+
+
+            var row = $(rows[i]);
+            if (userofficeid == '@Account.UserInfo.Department') {
+                $('#editid' + trnno + '').css("display", "normal");
+                $('#deleteid' + trnno + '').css("display", "normal");
+
+            }
+            else {
+                $('#editid' + trnno + '').css("display", "none");
+                $('#deleteid' + trnno + '').css("display", "none");
+                grid.hideColumn('editid' + trnno + '');
+                grid.hideColumn('deleteid' + trnno + '');
+            }
+        }
+    }
+    function searchSubmitConsol() {
+        var $filter = new Array();
+        $filter = [];
+
+        if ($('#searchSubmitConsol').val().length > 0) {
+            $filter.push({ field: "particular", operator: "contains", value: $('#searchSubmitConsol').val() }),
+            $filter.push({ field: "officename", operator: "contains", value: $('#searchSubmitConsol').val() })
+        }
+
+        $('#grd_breakdown').data('kendoGrid').dataSource.filter({
+            logic: "or",
+            filters: $filter
+        });
+
+    }
+
+    $(function () {
+        $("#searchSubmitConsol").keypress(function (e) {
+            if (e.keyCode == 13) {
+                searchSubmitConsol();
+            }
+        });
+    });
+    function frmaddbreakdown() {
+
+        var officeid=@Session["office"]
+        var tyear= @Session["tyear"]
+        var id=@Session["id"]
+        var qtr= @Session["qtr"];
+        var programid=@Session["programid"] ;
+        var accountid=@Session["accountid"];
+        var denomination=$("#denomination").val().replace(" ","")
+        var qty=$("#qty").val()
+        var amount=$("#amount").val()
+        var totalamount=covert_empty($("#totalamount").val())
+        var trnno=$("#temptrnno").val()
+        var titleass="";
+       
+        if (trnno == 0){
+            titleass="ADD Denomination?"
+        }
+        else{
+            titleass="UPDATE Denomination?"
+        }
+        if (denomination == "" || qty ==0 || amount== 0)
+        {
+            swal("Warning","Please enter the description, quantity and amount!","warning")
+        }
+        else{
+          
+            swal({
+                title:  titleass,
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                closeOnConfirm: false,
+                showLoaderOnConfirm: true
+            },
+                     function (isConfirm) {
+
+                         if (isConfirm) {
+                             var url = "@Url.Action("dfpptaddDenomination", "Report")";
+                             $.get(url, { officeid: officeid,tyear:tyear,id:id,qtr:qtr, programid: programid, accountid: accountid,denomination:denomination,qty:qty,amount:amount,totalamount:totalamount,trnno:trnno}, function (e) {
+                                 if (e == "success") {
+
+                                     swal("Success", "Saved!", "success");
+                                     $("#grd_breakdown").data("kendoGrid").dataSource.read();
+                                     frmclear()
+                                 } else {
+                                     swal("Error", e, "error");
+                                 }
+                             });
+                         }
+                     });
+        }
+    }
+
+    function sync(){
+        var qty=$("#qty").val()
+        var amount=$("#amount").val()
+        var totalamount=0
+        var temptrnno=$("#demmaintrnno").val()
+        var programid=@Session["programid"] ;
+        var accountid=@Session["accountid"];
+        var tyear= @Session["tyear"]
+        var qtr= @Session["qtr"];
+        var appropriation= $("#appropriation").val()
+        var firstmonFin_temp= covert_empty($("#firstmonFin").val());//$("#firstmonFin_temp").val()
+        var secondmonFin_temp=covert_empty($("#secondmonFin").val());//$("#secondmonFin_temp").val()
+        var thirdmonFin_temp=covert_empty($("#thirdmonFin").val());//$("#thirdmonFin_temp").val()
+        var selmon=$("#selmon").val() //selected month
+        var breakdowntrnno=$("#temptrnno").val()
+        var appropriation=$("#appropriation").val()
+        var allotment = $("#totalallotment").val()
+        var totalapp_temp=$("#totalapp_temp").val() //total denomination amount per account and quarter
+        var tempamount=$("#tempamount").val() //edit amount
+        var appbal= parseFloat(Number(appropriation)-Number(allotment)).toFixed(2)
+     
+     
+            if (selmon == 1){
+                totalmainfin= parseFloat(Number(secondmonFin_temp)+ Number(thirdmonFin_temp)).toFixed(2)
+            }
+            else if(selmon == 2){
+                totalmainfin= parseFloat(Number(firstmonFin_temp)+ Number(thirdmonFin_temp)).toFixed(2)
+            }
+            else{
+                totalmainfin= parseFloat(Number(secondmonFin_temp)+ Number(firstmonFin_temp)).toFixed(2)
+            }
+            totalamount=parseFloat(Number(qty) * Number(amount)).toFixed(2)
+
+            var editamount=parseFloat(Number(totalapp_temp) - Number(tempamount)).toFixed(2)
+            
+            var curbal=parseFloat(Number(appbal)-Number(Number(totalamount) + Number(editamount) + Number(totalmainfin))).toFixed(2)
+           
+           
+            if (breakdowntrnno != 0) //update
+            {
+                if (Number(curbal) < 0){
+                    swal("Warning","Insufficient balance! Please check the amount you've entered.","warning")
+                    $("#amount").val(0)
+                    $("#totalamount").val(0)
+                }
+                else{
+                    $("#totalamount").val(MoneyFormat(totalamount))
+                }
+            }
+            else{ //new entry
+                
+                if (Number(curbal) < 0){
+                    swal("Warning","Insufficient balance! Please check the amount you've entered.","warning")
+                    $("#amount").val(0)
+                    $("#totalamount").val(0)
+                }
+                else{
+                    $("#totalamount").val(MoneyFormat(totalamount))
+                }
+            }
+        //});
+        
+    }
+</script>
+<div id="searchAccountid" style="height: 30px; margin-top: 0px; float: right; margin-left: 200px;">
+    <input type="text" style="width:406px;border-collapse:collapse;margin:0px;border-style:solid;margin-left:0px;height:70%;outline:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search..." id="searchSubmitConsol" name="searchSubmitConsol">
+    <div class="k-button k-button-icontext" style="height:30px;width:40px;border-style:solid;" onclick="searchSubmitConsol()"><span class="mif-search"></span></div>
+</div>
+<div class="fa fa-re" >
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.WFPSubmitted>()
+        .Name("grd_breakdown")
+        .HtmlAttributes(new { style = "height:400px;" })
+        .Scrollable()
+        .Columns(col =>
+        {
+      
+        col.Template(@<text></text>)
+                    .HeaderTemplate(@<text>Particular</text>)
+                    .Width(280)
+                    .HtmlAttributes(new { style = "text-align:left;" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                    .ClientTemplate("<div>#=particular# </div>")
+                    .ClientFooterTemplate("<div style='text-align:center;font-weight:bold'> TOTAL </div>");
+
+        col.Template(@<text></text>)
+                    .HeaderTemplate(@<text>Amount</text>)
+                    .Width(100)
+                    .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                    .ClientTemplate("<div>#=kendo.toString(denoAmount,'c2')# </div>");
+                    
+        col.Template(@<text></text>)
+                    .HeaderTemplate(@<text>Qty</text>)
+                    .Width(60)
+                    .HtmlAttributes(new { style = "text-align:center;height:30px" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                    .ClientTemplate("<div>#=qty# </div>");
+        col.Bound(c => c.TotaldenoAmount)
+                    .HeaderTemplate(@<text>Total Amount</text>)
+                    .Width(125)
+                    .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                    .ClientTemplate("<div>#=kendo.toString(TotaldenoAmount,'c2')# </div>")
+                    .ClientFooterTemplate("<div style='text-align:right'><label> </label><label> #=kendo.toString(sum, 'c2')#</label></div>");
+        col.Bound(c => c.officename)
+               .HeaderTemplate(@<text>Office</text>)
+               .Width(200)
+               .HtmlAttributes(new { style = "text-align:left;height:30px" })
+               .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+               .ClientTemplate("<div>#=kendo.toString(officename,'c2')# </div>");
+        col.Bound(c => c.trnno)
+               .HeaderTemplate(@<text>trnno</text>)
+               .Hidden()
+               .HtmlAttributes(new { style = "text-align:right;height:30px" })
+               .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+               .ClientTemplate("<div>#=trnno# </div>");
+        col.Bound(c => c.userofficeid)
+               .HeaderTemplate(@<text>User Office ID</text>)
+               .Hidden()
+               .HtmlAttributes(new { style = "text-align:right;height:30px" })
+               .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+               .ClientTemplate("<div>#=userofficeid# </div>");
+         col.Bound(c => c.accountid)
+               .HeaderTemplate(@<text>User Office ID</text>)
+               .Hidden()
+               .HtmlAttributes(new { style = "text-align:right;height:30px" })
+               .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+               .ClientTemplate("<div>#=accountid# </div>");
+
+         col.Template(@<text></text>)
+                    .HeaderTemplate(@<text></text>    )
+                    .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                    .ClientTemplate(
+                        "<div class='k-button k-button-icontext' id='editid#=trnno#' style='border-radius:50px;color:\\#ffffff;background-color:cornflowerblue;' onclick='editbrkdown(#=trnno#,\"#=particular#\",#=qty#,#=denoAmount#,#=TotaldenoAmount#,#=totalamount#)'><span class='fa fa-edit' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'> </span>Edit</div> " +
+                        "<div class='k-button k-button-icontext' id='deleteid#=trnno#' style='border-radius:50px;color:\\#ffffff;background-color:\\#DE5555;' onclick='deletebrkdown(#=trnno#)'><span class='fa fa-trash' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'> </span>Delete</div> ")
+                    .HtmlAttributes(new { style = "vertical-align:middle;" })
+                    .Width(170);
+         col.Bound(c => c.totalamount)
+                    .HeaderTemplate(@<text>total amount</text>)
+                    .Hidden()
+                    .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                    .ClientTemplate("<div>#=kendo.toString(totalamount,'c2')# </div>");
+        })
+            //.Editable(editable => editable.Mode(GridEditMode.InCell))
+            //.Navigatable()
+            .Pageable(pageable => pageable
+            .Refresh(true)
+            .Enabled(true)
+            .ButtonCount(2))
+            .Selectable()
+            .AutoBind(false)
+            .Resizable(s => s.Columns(true))
+            //.Sortable(sortable => sortable
+            //.AllowUnsort(true)
+            //.SortMode(GridSortMode.MultipleColumn))
+            .Events(e => e.DataBound("onDataBound"))
+            .DataSource(dataSource => dataSource
+            .Ajax()
+            .Batch(true)
+            .Model(m => m.Id(i => i.trnno))
+            .ServerOperation(false)
+            .Aggregates(a =>
+            {
+                a.Add(c => c.TotaldenoAmount).Sum();
+            })
+            .PageSize(1000)
+           .Read(read => read.Action("GetDFpptBreakdown", "Report").Data("getParam"))
+            //  .Update("Editing_Update", "Report")
+            )
+)
+</div>
+<div style="float: left;margin-left:10px;margin-top:10px;">
+    <div style="float: left;margin-left:10px;margin-top:15px;">
+        <label style="float:left;margin-left: 50px;margin-top:38px;">
+            Description    :
+        </label>
+        <textarea type="text" id="denomination" value="" style="width:400px;font-size:large;display:inline-block;margin-left:10px" />
+    </div>
+    
+    <div style="margin-left:116px;margin-top:95px">
+        <label>
+            Qty    :
+        </label>    
+        <input type="number" id="qty" value="" onkeyup ="sync()" style="float:right;width:100px;font-size:larger;margin-top:-30px;margin-right:300px;height:20px;" />
+    </div>
+   
+    <div style="float: left;margin-left:34px;margin-top:15px;">
+        <label style="float:left;margin-left: 50px;margin-top:7px;">
+            Amount    :
+        </label>   
+        <input type="number" id="amount" value="" onkeyup ="sync()" style="float:right;width:100px;font-size:large;margin-left:10.5px;" /> 
+    </div>
+    <div style="display:inline-block;margin-left:20px;margin-top:15px;">
+        <label style="float:left;margin-left: 50px;margin-top:7px">
+            Total Amount    :
+        </label>
+        <input type="text" id="totalamount" value="" style="float:right;width:100px;font-size:large;margin-left:10.5px;"readonly />
+    </div>
+  
+</div>
+<div style="float:right;margin-top:70px;">
+    <div id="addid" class="k-button k-button-icontext" style="width: 100px;float:right;background-color:cornflowerblue; color:white; margin-top: 20px; margin-right:300px;border-radius:50px;margin-top:-30px; margin-bottom:0px" onclick="frmaddbreakdown()"><span class="fa fa-plus"></span> Add</div>
+    <div class="k-button k-button-icontext" style="width: 100px;float:right; margin-top: 20px; margin-right:190px;border-radius:50px;margin-top:-30px; margin-bottom:0px" onclick="frmclear()"><span class=""></span> Clear</div>
+    <div  class="k-button k-button-icontext" style="width: 100px;float:right;background-color:indianred; color:white; margin-top: 20px; margin-right:80px;border-radius:50px;margin-top:-30px; margin-bottom:0px" onclick="frmclose()"><span class="fa fa-close"></span> Close</div>
+</div>
+<div style="display:none">
+    <input type="number" id="temptrnno" value="0" />
+    <input type="number" id="tempqty" value="0" />
+    <input type="number" id="tempamount" value="0" />
+    <input type="number" id="temptotalamount" value="0" />   
+    <input type="number" id="demmaintrnno" value="0" />   
+    <input type="number" id="selmon" value="0" />   
+    <input type="number" id="totalallotment" value="0" />   
+    <input type="number" id="totalapp_temp" value="0" />   
+</div>
+<script>
+    $(document).ready(function () {
+        var programid=@Session["programid"];
+        var accountid=@Session["accountid"];
+        var tyear= @Session["tyear"]
+        var qtr= @Session["qtr"];
+    
+        $("#demmaintrnno").val('@Session["maintrnno"]')
+        $("#selmon").val('@Session["id"]')
+        $("#grd_breakdown").data("kendoGrid").dataSource.read();
+        var lbl = ""
+        if ('@Session["id"]' == 1) {
+            lbl = "First Month"
+        }
+        else if ('@Session["id"]' == 2) {
+            lbl = "Second Month"
+        }
+        else
+        {
+            lbl = "Third Month"
+        }
+
+        var url = "@Url.Action("totalallocation", "Report")";//SaveWFPdetails();
+        $.get(url, { programid:programid,accountid:accountid, transyear:tyear,qtr:qtr, trnno: 0,selmon:$("#selmon").val() }, function (e) {
+            var allotment = parseFloat(Number(e.TotaldenoAmount)).toFixed(2)
+            $("#totalallotment").val(allotment)
+            $("#totalapp_temp").val(e.totalamount)
+        })
+
+        //if (localStorage['page'] == document.URL) {
+        //    $(document).scrollTop(localStorage['scrollTop']);
+        //}
+
+        $('#addbrekdownform').data('kendoWindow').title("<i class='fa fa-navicon'> </i> PPMP denomination - " + lbl + "").center().open();
+
+    });
+    //$(document).scroll(function(){
+    //    localStorage['page'] = document.URL;
+    //    localStorage['scrollTop'] = $(document).scrollTop();
+    //});
+
+    function frmclear(){
+        $("#denomination").val("")
+        $("#qty").val(0)
+        $("#amount").val(0.00)
+        $("#totalamount").val(0.00)
+        $("#addid").html("<span class='fa fa-plus' style=''> </span> Add");
+        $("#temptrnno").val(0)
+    }
+    function editbrkdown(trnno,particular,qty,denoAmount,TotaldenoAmount,totalamount){
+        $("#temptrnno").val(trnno)
+        $("#denomination").val(particular)
+        $("#qty").val(qty)
+        $("#tempqty").val(qty)
+        $("#amount").val(denoAmount)
+        $("#tempamount").val(denoAmount)
+        $("#totalamount").val(TotaldenoAmount)
+        $("#temptotalamount").val(TotaldenoAmount)
+        $("#addid").html("<span class='fa fa-edit' style=''> </span> Update");
+        var temptrnno=$("#demmaintrnno").val()
+        var programid=@Session["programid"] ;
+        var accountid=@Session["accountid"];
+        var tyear= @Session["tyear"]
+        var qtr= @Session["qtr"];
+        var appropriation= $("#appropriation").val()
+
+        var url = "@Url.Action("totalallocation", "Report")";//SaveWFPdetails();
+        $.get(url, { programid:programid,accountid:accountid, transyear:tyear,qtr:qtr, trnno: temptrnno,selmon:$("#selmon").val() }, function (e) {
+            var allotment =Number(e.TotaldenoAmount)
+            
+            $("#totalallotment").val(allotment)
+        })
+    }
+    function deletebrkdown(trnno){
+        swal({
+            title: "Delete this particular denomination?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes",
+            closeOnConfirm: false,
+            showLoaderOnConfirm: true
+        },
+            function (isConfirm) {
+
+                if (isConfirm) {
+                    var url = "@Url.Action("dfpptDeleteDenomination", "Report")";
+                    $.get(url, { trnno:trnno}, function (e) {
+                        if (e == "success") {
+
+                            swal("Success", "Denomination has been deleted!", "success");
+                            $("#grd_breakdown").data("kendoGrid").dataSource.read();
+                            frmclear()
+                        } else {
+                            swal("Error", e, "error");
+                        }
+                    });
+                }
+            });
+    }
+</script>

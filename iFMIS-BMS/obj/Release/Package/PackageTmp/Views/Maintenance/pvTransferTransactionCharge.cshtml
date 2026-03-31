@@ -1,0 +1,311 @@
+﻿<style>
+    input[type="radio"] {
+        width: auto;
+    }
+
+    textarea {
+        resize: none;
+    }
+
+        textarea:focus, input:focus, input[type]:focus, .uneditable-input:focus {
+            border-color: rgba(0, 128, 0, 0.8);
+            box-shadow: 0 1px 1px rgba(0, 128, 0, 0.075) inset, 0 0 8px rgba(0, 128, 0, 0.6);
+            outline: 0 none;
+        }
+</style>
+
+<div style="border-color:gray;border-width:1px;border-style:solid;width:500px;margin-top:10px;float:left">
+    <div style="background-color:white;width:120px;margin-top:-15px;margin-left:15px;"><span style="font-size:18px;margin-left:5px;">General Info</span></div>
+    <div style="padding:10px;">
+        <div style="">
+            <div style="display:inline;display:none">
+                <div style="display:none;">
+                    <span><input type="radio" id="Current" name="FundType" style="margin:0;width:20px;" value="0" /> Default</span>
+                </div>
+                <div style="display:inline">
+                    <span><input type="radio" id="Current" name="FundType" style="margin:0;width:20px;" value="1" checked /> Current</span>
+                </div>
+                <div style="margin-right:10px;display:inline">
+                    <span><input type="radio" id="Excess" name="FundType" style="margin:0;width:20px;" value="2" /> Excess</span>
+                </div>
+            </div>
+            <div style="margin-top:5px;margin-right:5px;text-align:left">
+                <div style="display:inline-block;">
+                    <span style="" id="SEFFundText"><input type="radio" id="SEFFund" name="FundType" value="201"> SEF </span>
+                    <span style="margin-left:20px;" id="GeneralFundText"><input type="radio" id="GeneralFund" name="FundType" value="101"> General Fund </span>
+                    <span style="margin-left:20px;" id="EcoFundText"><input type="radio" id="EcoFund" name="FundType" value="119"> Eco </span>
+                </div>
+            </div>
+
+        </div>
+        <div style="width:440px;margin-top:5px;">
+            <input type="text" id="ModeIndicator" name="ModeIndicator" value="0" style="display:none;" />
+            <input type="text" id="UserID" name="UserID" value="@Account.UserInfo.eid" style="display:none;" />
+            <div style="width:80px;display:inline-block;"><span style="">OBRNo :</span></div> <div style="display:inline-block">
+                <input class="k-input" type="text" id="OBRNo" name="OBRNo" style="width:320px;font-weight:700;text-align:left;color:black;font-size:18px;" autocomplete="off" value="" />
+                <input type="number" id="_trnno" name="_trnno" style="display:none" />
+            </div>
+            
+        </div>
+        <hr/>
+        <div style="width:150px;border-style:solid;border-color:black;border-width:1px;padding:5px;display:inline-block">
+            <span style="font-size:18px;font-weight:bold"> <span id="mode-status" style="color:green">Preview Changes</span></span>
+        </div>
+        <hr />
+        <div>
+            @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Maintenance.ChangeTransactionCharge>()
+                .HtmlAttributes(new { style = "width:480px;height:220px;" })
+                .Name("grTransactionCharge")
+                .Scrollable()
+                .Columns(col =>
+                {
+                    col.Bound(m => m.AccountName).Title("Account Name").Width(350).ClientFooterTemplate("Total :");
+                    col.Bound(m => m.AmountDummy).Title("Amount").Width(100).ClientTemplate("<div> #=kendo.toString(AmountDummy, 'c2')# </div>")
+                        .ClientFooterTemplate("<div > <span style='text-align:right;color:black;' id='SumAmount'> #=kendo.toString(sum, 'c2') # </span> </div>");
+                    col.Template(t => { }).ClientTemplate(
+                    "<div class='k-button' onclick='(Delete(#=TempID#))'> DELETE </div>"
+                    ).HtmlAttributes(new { style = "margin-left:5px;" }).Width(100);
+                    col.Bound(m => m._OldAcctCharge).Hidden();      
+                        })
+                        .AutoBind(false)
+                        .Pageable(page => page.Refresh(true)
+                        .Enabled(true)
+                        .ButtonCount(4)
+                        .PreviousNext(true)
+                        )
+                            .Selectable(selectable => selectable.Mode(GridSelectionMode.Single))
+                            .DataSource(d => d
+                            .Ajax()
+                            .Aggregates(aggregates =>
+                                {
+                                    aggregates.Add(p => p.AmountDummy).Sum();
+                                })
+                            .PageSize(10)
+                            .Model(m => m.Id(i => i.TempID))
+                                    .Read(read => read.Action("grTransactionCharge", "Maintenance").Data("TransactionChargeParam"))
+                            )
+            )
+        </div>
+        <div style="width:440px;margin-top:15px;">
+            <div style="width:120px;display:inline-block;"><span style="">Final OBR :</span></div> 
+                <div style="display:inline-block">
+                    <input class="k-input" type="text" id="_finalOBR" name="_finalOBR" style="width:280px;background-color:#ededed;text-align:right;font-weight:700;font-size:18px;" autocomplete="off" value="" readonly />
+                </div>
+        </div>
+        <div style="width:440px;margin-top:15px;">
+            <div style="width:120px;display:inline-block;"><span style="">Total Amount :</span></div> 
+                <div style="display:inline-block">
+                    <input class="k-input" type="text" id="_TotalAmount" name="_TotalAmount" style="width:280px;background-color:#ededed;text-align:right;font-weight:700;font-size:18px;" autocomplete="off" value="" readonly />
+                </div>
+        </div>   
+        <div style="width:440px;margin-top:15px;">
+            <div style="width:120px;display:inline-block;"><span style="">Original Amount :</span></div>
+            <div style="display:inline-block">
+                <input class="k-input" type="text" id="OriginalAmount" name="OriginalAmount" style="width:280px;background-color:#ededed;text-align:right;font-weight:700;font-size:18px;" autocomplete="off" value="" readonly />
+            </div>
+        </div> 
+
+    </div>
+</div>
+<div style="border-color:gray;border-width:1px;border-style:solid;width:500px;margin-top:10px;float:left;margin-left:10px;">
+    <div style="background-color:white;width:180px;margin-top:-15px;margin-left:15px;"><span style="font-size:18px;margin-left:5px;text-align:right;">Transaction Info</span></div>
+
+    <div style="padding:10px;">
+        <div style="width:40px;border-style:solid;border-color:black;border-width:1px;padding:3px;display:inline-block">
+            <span style="font-size:12px;font-weight:bold"> <span id="mode-status" style="color:green">FROM: </span></span>
+        </div>
+        <div style="width:440px;margin-top:5px;">
+            <div style="width:120px;display:inline-block;"><span style="">Office :</span></div> <div style="display:inline-block">
+
+                @(Html.Kendo().ComboBox()
+                                    .Name("Office")
+                                    .DataTextField("OfficeName")
+                                    .DataValueField("OfficeID")
+                                    .Placeholder("Search Office Name . .")
+                                    .Filter("contains")
+                                    .MinLength(3)
+                                    .SelectedIndex(0)
+                        //   .Events(e => e.Change("refreshProgram"))
+                                    .AutoBind(false)
+                                    .HtmlAttributes(new { @style = "width: 310px;" })
+                                    .DataSource(source => source.Read(read => read.Action("ddlOfficeControlFrom", "Dropdowns").Data("ParamFrom")))
+                )
+                <input type="text" id="OfficeID" name="OfficeID" style="display:none;">
+            </div>
+        </div>
+        <div style="width:440px;margin-top:5px;">
+            <div style="width:120px;display:inline-block;"><span style="">Program :</span></div> <div style="display:inline-block">
+                @(Html.Kendo().ComboBox()
+                                    .Name("Program")
+                                    .DataTextField("ProgramName")
+                                    .DataValueField("ProgramID")
+                                    .Placeholder("Search Program . .")
+                                    .Filter("contains")
+                                    .SelectedIndex(0)
+                                    .MinLength(3)
+                        // .Events(e => e.Change("refreshExpenditure"))
+                                    .AutoBind(false)
+                                    .HtmlAttributes(new { @style = "width: 310px;" })
+                                    .DataSource(source => source.Read(read => read.Action("ddlgetProgramsFrom", "Dropdowns").Data("ParamFrom")))
+                )
+            </div>
+        </div>
+        <div style="width:440px;margin-top:5px;">
+            <div style="width:120px;display:inline-block;"><span style="" id="ooename">Obj of Expenditure:</span></div> <div style="display:inline-block">
+                @(Html.Kendo().ComboBox()
+                                    .Name("ObjOfExpenditure")
+                                    .DataTextField("AccountName")
+                                    .DataValueField("AccountID")
+                                    .Placeholder("Search . .")
+                                    .Filter("contains")
+                                    .MinLength(3)
+                                    .Events(e => e.Change("SetAmountCharge"))
+                                    .AutoBind(false)
+                                    .HtmlAttributes(new { @style = "width: 310px;" })
+                                    .DataSource(source => source.Read(read => read.Action("ddlObjOfExpenditureFrom", "Dropdowns").Data("ParamFrom")))
+                )
+            </div>
+        </div>
+        <div style="width:430px;margin-top:5px;margin-bottom:5px;">
+            <div style="width:120px;display:inline-block;"></div>
+            <div style="display:inline-block">
+                <input type="radio" id="EconomicDefault" name="SubsidyIncome" value="0" checked style="display:none">
+                <span><input type="radio" id="EconomicSubsidy" name="SubsidyIncome" value="1"> Subsidy </span>
+                <span><input type="radio" id="EconomicIncome" name="SubsidyIncome" value="0"> Income </span>
+            </div>
+        </div>
+        <hr />
+        @*<div style="width:430px;margin-top:15px;margin-bottom:50px;">
+            <div style="float:right">
+                <div class="k-button" style="padding:5px;width:99px;margin-top:-10px;" id="Add" onclick="Save()"><span class="fa fa-save"></span> SAVE</div>
+                <div class="k-button" style="padding:5px;width:99px;margin-top:-10px;" id="Save" onclick="Edit()"><span class="fa fa-edit"></span> EDIT</div>
+                <div class="k-button" style="padding:5px;width:99px;margin-top:-10px" id="Clear" onclick="ClearForm()"><span class="fa fa-times"></span> CLEAR</div>
+            </div>     
+        </div>*@
+        <div style="width:40px;border-style:solid;border-color:black;border-width:1px;padding:3px;display:inline-block">
+            <span style="font-size:12px;font-weight:bold"> <span id="mode-status" style="color:green">TO: </span></span>
+        </div>
+        <div style="width:440px;margin-top:5px;">
+            <div style="width:120px;display:inline-block;"><span style="">Office :</span></div> <div style="display:inline-block">
+
+                @(Html.Kendo().ComboBox()
+                                    .Name("NewOffice")
+                                            .DataTextField("OfficeName")
+                                            .DataValueField("OfficeID")
+                                    .Placeholder("Search Office Name . .")
+                                    .Filter("contains")
+                                    .MinLength(3)
+                                    .Events(e => e.Change("CheckIfEdit"))
+                                    .AutoBind(false)
+                                    .HtmlAttributes(new { @style = "width: 310px;" })
+                                    .DataSource(source => source.Read(read => read.Action("ddlOfficeControlByFund", "Dropdowns").Data("getOffice")))
+                )
+                <input type="text" id="OfficeID" name="OfficeID" style="display:none;">
+            </div>
+        </div>
+        <div style="width:440px;margin-top:5px;">
+            <div style="width:120px;display:inline-block;"><span style="">Program :</span></div> <div style="display:inline-block">
+                @(Html.Kendo().ComboBox()
+                                    .Name("NewProgram")
+                                            .DataTextField("ProgramName")
+                                            .DataValueField("ProgramID")
+                                    .Placeholder("Search Program . .")
+                                    .Filter("contains")
+                                    .MinLength(3)
+                                    .Events(e => e.Change("SetProgramID"))
+                                    .AutoBind(false)
+                                    .HtmlAttributes(new { @style = "width: 310px;" })
+                                            .DataSource(source => source.Read(read => read.Action("ddlgetProgramsByFund", "Dropdowns").Data("getProgram")))
+                )
+            </div>
+        </div>
+        <div style="width:440px;margin-top:5px;">
+            <div style="width:120px;display:inline-block;"><span style="" id="ooename">Obj of Expenditure:</span></div> <div style="display:inline-block">
+                @(Html.Kendo().ComboBox()
+                                    .Name("NewAccounts")
+                                            .DataTextField("AccountName")
+                                            .DataValueField("AccountID")
+                                    .Placeholder("Search . .")
+                                    .Filter("contains")
+                                    .MinLength(3)
+                                    .Events(e => e.Change("SetRemainingBalance"))
+                                    .AutoBind(false)
+                                    .HtmlAttributes(new { @style = "width: 310px;" })
+                                    .DataSource(source => source.Read(read => read.Action("ddlCheckedByFund", "Dropdowns").Data("getAccount")))
+                )
+            </div>
+        </div>
+        <div style="width:430px;margin-top:5px;margin-bottom:10px;">
+            <div style="width:120px;display:inline-block;"></div>
+            <div style="display:inline-block">
+                <input type="radio" id="NewEconomicDefault" name="NewSubsidyIncome" value="0" checked style="display:none">
+                <span><input type="radio" id="NewEconomicSubsidy" name="NewSubsidyIncome" value="0"> Subsidy </span>
+                <span><input type="radio" id="NewEconomicIncome" name="NewSubsidyIncome" value="1"> Income </span>
+            </div>
+        </div>
+        <hr />
+        <div style="width:430px;margin-top:15px;margin-bottom:50px;">
+            <div style="float:right">
+                <div class="k-button k-state-disabled" style="padding:5px;width:99px;margin-top:-10px;" id="Save" onclick="Save()"><span class="fa fa-save"></span> SAVE</div>
+                @*<div class="k-button" style="padding:5px;width:99px;margin-top:-10px;" id="Save" onclick="Save()"><span class="fa fa-save"></span> SAVE</div>*@
+                <div class="k-button" style="padding:5px;width:99px;margin-top:-10px;display:none" id="Edit" onclick="Edit()"><span class="fa fa-edit"></span> EDIT</div>
+                <div class="k-button" style="padding:5px;width:99px;margin-top:-10px;" id="Update" onclick="Update()"><span class="fa fa-edit"></span> UPDATE</div>
+                <div class="k-button" style="padding:5px;width:99px;margin-top:-10px" id="Clear" onclick="Clear()"><span class="fa fa-times"></span> CLEAR</div>
+
+            </div>
+        </div>
+        
+        <div style="width:440px;margin-top:5px;">
+            <div style="width:150px;display:inline-block;"><span style="">Allotment Available :</span></div> 
+            <div style="display:inline-block">
+                <input class="k-input" type="text" id="AllotmentAvailable" name="AllotmentAvailable" style="width:270px;background-color:#ededed;text-align:right;color:#4061ff;font-weight:bold" autocomplete="off" value="" readonly />
+            </div>
+        </div>
+        <div style="width:440px;margin-top:5px;">
+            <div style="width:150px;display:inline-block;"><span style="">Less: This Claim :</span></div> 
+            <div style="display:inline-block">
+                 <input class="k-input" type="text" id="Claim" name="Claim" style="width:270px;background-color:#ededed;text-align:right;color:black;font-weight:700" autocomplete="off" value="" readonly />
+            </div>
+        </div>
+        <div style="width:440px;margin-top:5px;">
+            <div style="width:150px;display:inline-block;"><span style="">Balance of Allotment :</span></div> 
+            <div style="display:inline-block">
+                 <input class="k-input" type="text" id="BalanceAllotment" name="BalanceAllotment" style="width:270px;background-color:#ededed;text-align:right;color:#4061ff;font-weight:bold" autocomplete="off" value="" readonly />
+            </div>
+        </div>
+        <div style="display:none">
+            <input type="number" value="0" name="_Edit" id="_Edit" />
+            <input type="number" value="0" name="_Office" id="_Office" />
+            <input type="number" value="0" name="_Program" id="_Program" />
+            <input type="number" value="0" name="_Amount" id="_Amount" />
+            <input type="number" value="0" name="_Claim" id="_Claim" />
+            <input type="number" value="0" name="_AllotmentAvailable" id="_AllotmentAvailable" />
+            <input type="number" value="0" name="_BalanceAllotment" id="_BalanceAllotment" />
+            <input type="number" value="0" name="_OriginalAmount" id="_OriginalAmount" />
+            <input type="number" value="0" name="_PartialAmount" id="_PartialAmount" />
+            <input type="number" value="" name="_IsIncome" id="_IsIncome" />
+        </div>
+    </div>
+</div>
+
+<script>
+    function searchOBRNoURL() {
+        return "@Url.Action("searchOBR", "Maintenance")";
+    }
+    function SetAmountChargeURL(){
+        return "@Url.Action("SetAmountCharge", "Maintenance")";
+    }
+    function CheckRemainingBalanceURL() {
+        return "@Url.Action("CheckRemainingBalance", "Maintenance")";
+    }
+    function UpdateURL() {
+        return "@Url.Action("AddTransferTransaction", "Maintenance")";
+    }
+    function SaveURL() {
+        return "@Url.Action("SaveTransfer", "Maintenance")";
+    }
+    function DeleteURL() {
+        return "@Url.Action("DeleteTransfer", "Maintenance")";
+    }
+</script>
+<script src="~/Scripts/BMS/Maintenance/ChangeAcctCharage.js"></script>

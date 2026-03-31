@@ -1,0 +1,600 @@
+﻿
+<script>
+
+    
+
+
+    function delete_reserve(reserve_id) {
+
+            var url = "@Url.Action("delete_reserve", "Release")";
+          
+        swal({
+            title: "Are you sure?",
+            text: "This item will be removed!",
+            type: "info",
+            showCancelButton: true,
+            closeOnConfirm: false,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, Remove It!",
+            showLoaderOnConfirm: true,
+        }, function () {
+
+                    $.get(url, { reserve_id: reserve_id }, function (e) {
+
+                        if (e == "1") {
+                            swal({
+                                title: "Success!",
+                                text: "Non-Office Account has been Removed.",
+                                timer: 2000,
+                                type: "success",
+                                showConfirmButton: false
+                            })
+                            $('#GeneralFund_Grid').data('kendoGrid').dataSource.read();
+                            $('#Reserve_Grid').data('kendoGrid').dataSource.read();
+
+                        } else {
+                            swal({
+                                title: "Error!",
+                                text: "System Error! Please try again.",
+                                timer: 2000,
+                                type: "error",
+                                showConfirmButton: false
+                            })
+                        }
+
+                    })
+                });
+             }
+
+    function fn_CloseReserve() {
+
+        $("#ReserveWindow").data("kendoWindow").close();
+    }
+
+    function read_reserve() {
+        var office_id = $('#office_reserve_null').val()
+        var year_ = $("#ddlYear").val();
+        return {
+            office_id: office_id,
+            year_: year_
+        }
+
+    }
+
+    function fn_readreserve_null() {
+
+        var url = "@Url.Action("Edit_Reserve","Release")";
+
+        var office_id = $('#office_reserve_null').val()
+        var program_id = $('#Program_reserve_null').val()
+      
+        var account_id = $('#account_list_reserve_null').val()
+        var year_ = $("#ddlYear").val();
+       
+       
+
+        $.get(url, { office_id: office_id, program_id: program_id, account_id: account_id, year_: year_ }, function (d) {
+          
+
+            if (d.reserve_flag == 0) {
+                document.getElementById("percent_null").value = d.ReservePercent;
+                document.getElementById("money_null").value = 0;
+                document.getElementById("percent_null").disabled = true;
+                document.getElementById("money_null").disabled = true;
+        
+
+            }
+            else if (d.reserve_flag == 1) {
+                document.getElementById("percent_null").value = 0;
+                document.getElementById("money_null").value = commaSeparateNumber(d.Amount);
+                document.getElementById("percent_null").disabled = true;
+                document.getElementById("money_null").disabled = true;
+            }
+            else {
+                document.getElementById("percent_null").value = "";
+                document.getElementById("money_null").value = "";
+            }
+           
+        })
+
+
+    }
+    function fn_savereserve_null() {
+
+        var url = "@Url.Action("Save_Reserve_Null", "Release")";
+        var lure = "@Url.Action("Save_Reserve_Acc", "Release")";
+
+        var office_id = $('#office_reserve_null').val()
+        var program_id = $('#Program_reserve_null').val()
+        var ooe_id = $('#ooe_id_reserve_null').val()
+        var account_id = $('#account_list_reserve_null').val()
+        var percent = $('#percent_null').val()
+        var money = $('#money_null').val();
+        var year_ = $("#ddlYear").val();
+
+        if (percent == '' || percent == null || money == '' || money == null)
+        {
+            swal({
+                title: "Error!",
+                text: "Please select percent or money.",
+                timer: 3000,
+                type: "error",
+                showConfirmButton: false
+            })
+        } else{
+
+        if (percent == 0 || percent == '0') {
+
+            var reserve_flag = 1
+        } else if (money == 0 || money == '0') {
+
+            var reserve_flag = 0
+        } else {
+            alert('Error')
+        }
+
+        if (account_id == 0 || account_id == null || account_id == "") {
+            //  alert(account_id)
+
+
+            if (office_id == null || office_id == '' || office_id == "" ||
+                program_id == null || program_id == '' || program_id == "") {
+                swal({
+                    title: "Error!",
+                    text: "Please select atleast program and office",
+                    timer: 2000,
+                    type: "error",
+                    showConfirmButton: false
+                })
+            } else {
+                //alert(office_id)
+                //alert(program_id)
+                //alert(account_id)
+                //alert(percent)
+                //alert(money)
+                //alert(reserve_flag)
+
+                swal({
+                    title: "Are you sure?",
+                    text: "This Item will be SAVED!",
+                    type: "info",
+                    showCancelButton: true,
+                    closeOnConfirm: false,
+                    confirmButtonColor: "#1fa67a",
+                    confirmButtonText: "Yes, Save It!",
+                    showLoaderOnConfirm: true,
+                }, function () {
+
+                   
+                    $.post(lure, {
+                        office_id: office_id,
+                        program_id: program_id,
+                        ooe_id: ooe_id,
+                        account_id: account_id,
+                        percent: percent,
+                        money: ConvertCommasToEmpty(money),
+                        year_: year_,
+                        reserve_flag: reserve_flag
+                    }, function (e) {
+                        if (e == "1") {
+                            swal({
+                                title: "Success!",
+                                text: "Reserve has been Saved.",
+                                timer: 2000,
+                                type: "success",
+                                showConfirmButton: false
+                            })
+                            $('#Reserve_Grid').data('kendoGrid').dataSource.read();
+                            $('#GeneralFund_Grid').data('kendoGrid').dataSource.read();
+                        } else {
+                            swal({
+                                title: "Error!",
+                                text: "System Error! Please try again.",
+                                timer: 2000,
+                                type: "error",
+                                showConfirmButton: false
+                            })
+                        }
+
+                    });
+                });
+
+            }
+
+
+
+
+        } else {
+
+
+            //if (office_id == null || office_id == '' || office_id == "" ||
+            //    program_id == null || program_id == '' || program_id == "" ||
+
+            //    account_id == 0 || account_id == null || account_id == "") {
+            //    swal({
+            //        title: "Error!",
+            //        text: "Please Complete the sentence",
+            //        timer: 2000,
+            //        type: "error",
+            //        showConfirmButton: false
+            //    })
+            //} else {
+            swal({
+                title: "Are you sure?",
+                text: "This Item will be SAVED!",
+                type: "info",
+                showCancelButton: true,
+                closeOnConfirm: false,
+                confirmButtonColor: "#1fa67a",
+                confirmButtonText: "Yes, Save It!",
+                showLoaderOnConfirm: true,
+            }, function () {
+
+
+                $.post(url, { office_id: office_id, program_id: program_id,ooe_id: ooe_id, account_id: account_id, percent: percent, money: ConvertCommasToEmpty(money),
+                    year_: year_, reserve_flag: reserve_flag }, function (e) {
+                    if (e == "1") {
+                        swal({
+                            title: "Success!",
+                            text: "Reserve has been Saved.",
+                            timer: 2000,
+                            type: "success",
+                            showConfirmButton: false
+                        })
+                        $('#Reserve_Grid').data('kendoGrid').dataSource.read();
+                        $('#GeneralFund_Grid').data('kendoGrid').dataSource.read();
+                    } else {
+                        swal({
+                            title: "Error!",
+                            text: "System Error! Please try again.",
+                            timer: 2000,
+                            type: "error",
+                            showConfirmButton: false
+                        })
+                    }
+
+                });
+            });
+
+            //}
+        }
+    }
+    }
+    function fn_refresher() {
+
+        $("#office_reserve_null").val(null);
+        $("#account_list_reserve_null").val(null);
+
+        $("#office_reserve_null").data("kendoComboBox").text(null);
+        $("#account_list_reserve_null").data("kendoComboBox").text(null);
+
+        $("#Program_reserve_null").data("kendoDropDownList").dataSource.read();
+        $("#ooe_id_reserve_null").data("kendoDropDownList").dataSource.read();
+        $("#account_list_reserve_null").data("kendoComboBox").dataSource.read();
+
+    }
+
+    function fn_dprefresherorb() {
+        $("#Reserve_Grid").data("kendoGrid").dataSource.read();
+        $("#Program_reserve_null").data("kendoDropDownList").dataSource.read();
+        $("#ooe_id_reserve_null").data("kendoDropDownList").dataSource.read();
+        $("#account_list_reserve_null").data("kendoComboBox").dataSource.read();
+
+    }
+
+    function fn_refAcccc() {
+
+      
+        $("#account_list_reserve_null").data("kendoComboBox").dataSource.read();
+
+    }
+
+
+    $(':radio[name=reserve_null]').change(function () {
+        if ($('input[name=reserve_null]:checked').val() == 'percent') {
+            
+            document.getElementById("percent_null").disabled = false;
+            document.getElementById("money_null").disabled = true;
+           // document.getElementById("percent_null").value = '';
+            document.getElementById("money_null").value = 0;
+
+        } else {
+
+            document.getElementById("percent_null").disabled = true;
+            document.getElementById("money_null").disabled = false;
+            document.getElementById("percent_null").value = 0;
+            //document.getElementById("money_null").value = '';
+
+        }
+    });
+    function Select_Office_Reserve() {
+        var classtype = $("#classtype").val();
+        return { classtype: classtype }
+
+    }
+</script>
+<div style="border: outset;clear:both;border-width:1px;border-color:#1fa67a; width: 749px; padding-left:0px;padding-right:0px;padding-top:0px;padding-bottom:7px;margin-top: 0px;">
+    <div style=" width: 0;height: 0; border-right: 5px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;margin-top: -1px; ">
+        <div style="float: left; width: 683px; margin-top:1px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 36px solid #1fa67a; ">
+            <div style="float: left; height:28px; margin-left:-59px; margin-top: 5px;">
+                <i class="fa fa-tasks fa-2x fg-white"></i>
+
+            </div>
+
+
+
+        </div>
+    </div>
+
+
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Monthly_reserve_Model>()
+    .Name("Reserve_Grid")
+   // .Scrollable()
+    .Columns(col =>
+    {
+       
+        col.Bound(m => m.account_name)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Account</div></text>)
+                        .Width(214)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+
+        col.Bound(m => m.ReservePercent).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Percentage</div></text>)
+                        .Width(70)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("# if(reserve_flag == 0) { #" +
+                                       "<div>#=kendo.toString(ReservePercent) #  %</div>" +
+                                       "# } else{ #" +
+                                       "---" +
+                                       "# } #");
+        col.Bound(m => m.percentInmoney).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Percentage in Money</div></text>)
+                        .Width(120)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("# if(reserve_flag == 0) { #" +
+                                       "<div>#=kendo.toString(percentInmoney,'c2') # </div>" +
+                                       "# } else{ #" +
+                                       "---" +
+                                       "# } #");
+
+        col.Bound(m => m.Amount)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Amount</div></text>)
+                        .Width(120)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("# if(reserve_flag == 1) { #" +
+                                       "<div>#=kendo.toString(Amount,'c2')# </div>" +
+                                       "# } else{ #" +
+                                       "---" +
+                                       "# } #");
+        col.Bound(m => m.moneyInpercent)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Amount in percentage</div></text>)
+                        .Width(70)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("# if(reserve_flag == 1) { #" +
+                                       "<div>#=kendo.toString(moneyInpercent)# %</div>" +
+                                       "# } else{ #" +
+                                       "---" +
+                                       "# } #");
+
+
+        col.Bound(m => m.YearOf).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Year</div></text>)
+                        .Width(70)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+
+
+
+        col.Template(t => { }).ClientTemplate(
+
+
+                                     "<div class='k-button k-button-icontext' style='border-radius:50px;color:\\#ffffff;background-color:\\#DE5555;'   onclick='delete_reserve(#=reserve_id#)'   ><span class='fa fa-trash-o' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'> </span>del</div> "
+                                    ).HtmlAttributes(new { style = "vertical-align: top;" }).Width(85);
+                                    
+        col.Bound(m => m.reserve_id)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Transaction ID</div></text>)
+                        .Width(70)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+    })
+
+                                        .Sortable()
+                                        .Scrollable()
+                                        .Selectable()
+                                        .HtmlAttributes(new { style = "height:200px" })
+                                                        .DataSource(d => d
+                                                        .Ajax()
+                                                        .PageSize(1000)
+                                                        .Model(m => m.Id(i => i.reserve_id))
+                                                        .Read(read => read.Action("read_reserve", "Release").Data("read_reserve")))
+)
+    </div>
+<div style ="height: 5px;">
+
+</div>
+    <div style="float: none;clear:both;">
+        <div style="float: left;margin-right:10px;margin-top:2px;">
+            <label style="float:left;margin-left: 50px;">
+                Office    :
+            </label>
+        </div>
+        <div style="float: right;margin-right:65px;margin-top:0px;">
+
+
+            @(Html.Kendo().ComboBox()
+             
+                            .Name("office_reserve_null")
+                            .DataTextField("OfficeName")
+                            .DataValueField("OfficeID")
+                            .Placeholder("Select office...")
+                            .Filter("contains")
+                            .MinLength(1)
+                            .HtmlAttributes(new { @style = "width: 500px;" })
+                            .Events(e => e.Change("fn_dprefresherorb"))
+                            .DataSource(source => source.Read(read => read.Action("GetOffice_MO", "Release").Data("Select_Office_Reserve")))
+            )
+
+
+        </div>
+
+        <div style="height:10px;">
+
+        </div>
+
+        <div id="ProgramAndExpenseClassDiv" style="float: none;clear:both; margin-top: 25px">
+
+            <div style="float: left;margin-right:10px;margin-top:2px;">
+                <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                    Program :
+                </label>
+            </div>
+            <div style="float: right;margin-right:65px;margin-top:0px;">
+                <script>
+                    function fn_Offices() {
+
+                        var proyy = $("#ddlYear").val();
+                        var off_id = $("#office_reserve_null").val();
+                        //var ooe_id = $("#ooe_id_reserve_null").val();
+
+                        return {
+                            propYear: proyy,
+                            office_ID: off_id
+                        }
+                    }
+                </script>
+
+                @(Html.Kendo().DropDownList()
+                
+                            .Name("Program_reserve_null")
+                            .DataTextField("ProgramDescription  ")
+                            .DataValueField("ProgramID")
+                            .OptionLabel("Select programs...")
+                            .HtmlAttributes(new { @style = "width: 500px;" })
+                            .Events(e => e.Change("fn_refAcccc"))
+                            .AutoBind(true)
+                   .DataSource(source => source.Read(read => read.Action("GetPrograms2", "Release").Data("fn_Offices")))
+                )
+
+            </div>
+
+            <div style="float: left;margin-right:10px;margin-top:10px;">
+                    <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                        Expense Class    :
+                    </label>
+                </div>
+                <div style="float: right;margin-right:65px;margin-top: 5px;">
+                    @(Html.Kendo().DropDownList()
+                                .Name("ooe_id_reserve_null")
+                                .DataTextField("ooe_name")
+                                .DataValueField("ooe_id")
+                                .OptionLabel("Select Expenses...")
+                                .HtmlAttributes(new { @style = "width: 500px;" })
+                                .Events(e => e.Change("fn_refAcccc"))
+                                .DataSource(source => source.Read(read => read.Action("ddlOOENonOfficeLevel", "Dropdowns")))
+                    )
+                </div>
+            <div style="float: left;margin-right:10px;margin-top:10px;">
+                <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                    Account    :
+                </label>
+            </div>
+            <div style="float: right;margin-right:65px;margin-top:5px;">
+                <script>
+                    function fn_ForAccount() {
+                        var propYear = $("#ddlYear").val();
+                        var office_ID = $("#office_reserve_null").val();
+                        var ooe_id = $("#ooe_id_reserve_null").val();
+                        var prog_id = $("#Program_reserve_null").val();
+
+                        return {
+                            propYear: propYear,
+                            office_ID: office_ID,
+                            ooe_id: ooe_id,
+                            prog_id: prog_id,
+                            vwAllAccountsid: 1
+                        }
+                        
+                    }
+                </script>
+              
+                @(Html.Kendo().ComboBox()
+                
+                        .Name("account_list_reserve_null")
+                        .DataTextField("account_name")
+                        .DataValueField("account_id")
+                        .Filter("contains")
+                        .MinLength(1)
+                        .Placeholder("Select Account...")
+                        .HtmlAttributes(new { @style = "width: 500px;" })
+                        .Events(e => e.Change("fn_readreserve_null"))
+                        .AutoBind(true)
+                       .DataSource(source => source.Read(read => read.Action("MOS_Account", "Dropdowns").Data("fn_ForAccount")))
+                )
+            </div>
+
+
+        </div>
+
+        <div id="MonthDepartment" style="float: none;clear:both; margin-top: 20px ; margin-left : 300px">
+
+            <form action="">
+
+                <input type="radio" id="reserve_null" name="reserve_null" value="percent" style="width:30px"> Percent
+                <input type="radio" id="reserve_null" name="reserve_null" value="money" style="width:30px"> Money
+
+            </form>
+            <br />
+
+        </div>
+
+
+        <div id="MonthDepartment" style="float: left; margin-top: -20px ; margin-left : 220px">
+            <input type="text" style="width:130px" name="percent_null" id="percent_null" onfocus="this.select();" disabled>
+        </div>
+        <div id="MonthDepartment" style="float: right; margin-top: -20px ; margin-right : 220px">
+            <input type="text" style="width:130px" name="money_null" id="money_null" onkeyup="commaSeparateNumberversion2('money_null')" onfocus="this.select();" disabled>
+        </div>
+
+
+
+        @*<div class="k-button k-button-icontext" style="position: absolute; bottom: 15px; right: 20px;width: 80px;" onclick="fn_refresher()">reset</div>
+            <div class="k-button k-button-icontext" style="position: absolute; bottom: 15px; right: 120px;width: 80px;" onclick="fn_savereserve_null()">save</div>*@
+
+        <div style="float:left;margin-top:26px;margin-left:530px">
+            <div class="k-button k-button-icontext" style=" bottom: 15px; right: 220px;width: 80px; border-radius:50px;color:#ffffff;background-color:#1FA67A;" onclick="fn_savereserve_null()"><span class='fa fa-plus-circle' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'></span> Save</div>
+        </div>
+        <div style="float:left;margin-top:-29px;margin-left:617px">
+            <div class="k-button k-button-icontext" style=" bottom: 15px; right: 220px;width: 80px; border-radius:50px;color:#ffffff;background-color:#DE5555;" onclick="fn_CloseReserve()"><span class='fa fa-times' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'></span> Close</div>
+        </div>
+    </div>
+
+
+<script>
+    $(document).ready(function () {
+        var kgraa = $('#offs').val()
+        $("#office_reserve_null").data("kendoComboBox").value(kgraa);
+        fn_dprefresherorb();
+    }, 1000);
+    //$(document).ready(function () {
+    //    var ijefwwwqs = $('#Progss').val()
+    //    $("#Program_reserve_null").data("kendoDropDownList").value(ijefwwwqs);
+    //}, 1000);
+    //$(document).ready(function () {
+    //    var slkkwr = $('#account_list').val()
+    //    $("#account_list_reserve_null").data("kendoComboBox").value(slkkwr);
+    //    setTimeout(function () {
+    //        $("#account_list_reserve_null").data("kendoComboBox").dataSource.read();
+
+    //    }, 500);
+       
+    //}, 1000);
+</script>
+
+
+
+
+
+
+

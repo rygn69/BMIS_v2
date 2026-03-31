@@ -1,0 +1,165 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>IFMIS-BMS</title>
+    <link rel="icon" type="image/png" href="~/Images/Ph_seal_agusan_del_sur.png" />
+    @*<script src="@Url.Content("~/Scripts/jquery.min.js")"></script>*@
+    @*<script src="@Url.Content("~/Scripts/jquery-2.1.0.js")"></script>*@
+    <script src="@Url.Content("~/Scripts/jquery-2.1.0.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/BMSCustomScript.js")"></script>
+    <link href="@Url.Content("~/Content/themes/darkGreen/darkGreen.css")" rel="stylesheet" type="text/css" id="style_color" />
+    <link href="@Url.Content("~/Content/metroui/css/metro-bootstrap.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Content/metroui/css/docs.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Content/metroui/css/metro-icons.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Content/css/global.min.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Content/kendo/2015.1.408/kendo.common.min.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Content/kendo/2015.1.408/kendo.mobile.all.min.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Content/kendo/2015.1.408/kendo.dataviz.min.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Content/kendo/2015.1.408/kendo.dataviz.metro.min.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Content/Site.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Content/Theme.css")" rel="stylesheet" type="text/css" />
+    <link href="~/Content/overide.css" rel="stylesheet" />
+
+    <!-- #region Kendo Scripts -->
+
+    <script src="@Url.Content("~/Scripts/kendo/2015.1.408/jszip.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/kendo/2015.1.408/kendo.all.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/kendo/2015.1.408/kendo.aspnetmvc.min.js")"></script>
+
+
+    <!-- #endregion -->
+    <!-- #region Metro Scripts -->
+
+    <script src="@Url.Content("~/Scripts/header-loader.js")"></script>
+    <script src="@Url.Content("~/Scripts/metro.js")"></script>
+    <script src="@Url.Content("~/Content/metroui/js/metro/metro-dropdown.js")"></script>
+
+    <!-- #endregion -->
+
+    <!-- #fa region -->
+  
+    <link href="@Url.Content("~/Content/font-awesome/css/font-awesome.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Content/font-awesome/css/font-awesome.min.css")" rel="stylesheet" type="text/css" />
+
+    <link href="~/Content/sweetalert-master/dist/sweetalert.css" rel="stylesheet" />
+    <script src="~/Content/sweetalert-master/dist/sweetalert-dev.js"></script>
+    <script src="~/Content/sweetalert-master/dist/sweetalert.min.js"></script>
+    <!-- #end fa region -->
+
+
+    <!-- #endregion -->
+
+    <!-- #region Custom CSS & JS: Added by Ranel Cator -->
+
+    <link href="~/Content/custom-css/metroui/css/metro-icons.css" rel="stylesheet" />
+    <link href="~/Content/custom-css/metroui/css/metro.css" rel="stylesheet" />
+    <script src="@Url.Content("~/Scripts/BMS/global-functions.js")"></script>
+    <!-- #endregion -->
+    <style>
+        .scrollToTop{	        
+	        padding:10px; 
+	        text-align:center; 
+	        font-weight: bold;
+	        color: #313331;
+	        text-decoration: none;
+	        position:fixed;
+	        top:560px;
+	        right:30px;
+	        display:none;
+	        /*background: url('arrow_up.png') no-repeat 0px 20px;*/
+        }
+        .scrollToTop:hover{
+	        text-decoration:none;
+        }
+
+    </style>
+</head>
+
+<body class="metro">
+    
+    <div class="Notification-Fields" id="note-field" ></div>
+    <div class="page-container">
+        @Html.Partial("vwHeader")
+        <div class="my-area">
+            <div id="body">
+                <section class="content-wrapper main-content clear-fix">
+                    <table style="margin-top: 0px;background-color: transparent;">
+                        <tr>
+                            <td style="padding: 0px;padding-right: 5px;">
+                                <div style="margin-left: -9px;">
+                                  
+                                    @Html.Action("LoadMenu", "Home")
+
+                                  
+
+
+                                </div>
+                                <div style="margin-left: -9px;margin-top:50px;" id="chartByOffice">
+
+                                    
+
+                                    @*@Html.Action("LoadChart", "Home")*@
+
+
+                                </div>
+                                
+
+
+                                <div id="moreInfo" style="max-width: 208px;margin-top: 5px;margin-left: -5px;">
+                                    @*@Html.Action("GetStatistic", "Statistics")*@
+                                </div>
+                            </td>
+                            <td style="padding: 0px;">
+                                <div id="DivContent" style="width: 780px;">
+                                    <div ><h2 class="h2-content-head"><span style="font-family: 'Arial Rounded MT';color:#363940;text-shadow: 1px 1px 2px #999, 0 0 1em #fff, 0 0 0.2em #fff;font-size:18px;">BMS •</span> <span style="color:#FFFFFF; vertical-align: auto;font-size: 18px;font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;vertical-align: initial;" id="webTitle"></span></h2></div>
+                                    <div id="siteContent" class="pageContent">
+                                        @RenderBody()
+                                    </div>
+
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </section>
+            </div>
+        </div>
+        <div class="page-footer footer-top-border" style="height:auto;background-color: #313331;">
+            @Html.Partial("vwfooter")
+        </div>
+    </div>
+<a href="#" class="scrollToTop"><i class="fa fa-toggle-up fa-3x"></i><p>Scroll to Top</p></a>
+<script>
+    $(document).ready(function () {
+
+        //Check to see if the window is top if not then display button
+        $(window).scroll(function () {
+            if ($(this).scrollTop() > 100) {
+                $('.scrollToTop').fadeIn();
+            } else {
+                $('.scrollToTop').fadeOut();
+            }
+        });
+
+        //Click event to scroll to top
+        $('.scrollToTop').click(function () {
+            $('html, body').animate({ scrollTop: 0 }, 800);
+            return false;
+        });
+
+    });
+</script>
+</body>
+</html>
+<script>
+    $(document).ready(function () {
+        GetUserType();
+    })
+    function GetUserType() {
+        var url = "@Url.Action("getUserType", "Home")";
+        $.get(url, function (d) {
+            document.getElementById("webTitle").innerHTML = d;
+        })
+    }
+</script>
+
+

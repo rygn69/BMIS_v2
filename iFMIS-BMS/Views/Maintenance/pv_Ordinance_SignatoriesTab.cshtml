@@ -1,0 +1,60 @@
+﻿<script>
+    function UpdateReportSignatories() {
+        var url = "@Url.Action("UpdateReportSignatory", "Maintenance")";
+        var Signatory1Name = $("#txtsig1Name").val();
+        var Signatory1Pos = $("#txtsig1Pos").val();
+        var Signatory2Name = $("#txtsig2Name").val();
+        var Signatory2Pos = $("#txtsig2Pos").val();
+        var Signatory2Rule = $("#txtsig2Rule").val();
+        var Signatory3Name = $("#txtsig3Name").val();
+        var Signatory3Pos = $("#txtsig3Pos").val();
+        $.post(url,{Signatory1Name:Signatory1Name,Signatory1Pos:Signatory1Pos,Signatory2Name:Signatory2Name,
+            Signatory2Pos:Signatory2Pos,Signatory2Rule:Signatory2Rule,Signatory3Name:Signatory3Name,Signatory3Pos:Signatory3Pos}, function (d) {
+                if (d == 1) {
+                    alert('Success')
+                }
+                else {
+                    alert(d)
+                }
+        });
+    }
+    function getReportSignatories() {
+        var url = "@Url.Action("GetReportSignatories", "Maintenance")";
+        $.getJSON(url, function (d) {
+            document.getElementById("txtsig1Name").value = d[0];
+            document.getElementById("txtsig1Pos").value = d[1];
+            document.getElementById("txtsig2Name").value = d[2];
+            document.getElementById("txtsig2Pos").value = d[3];
+            document.getElementById("txtsig2Rule").value = d[4];
+            document.getElementById("txtsig3Name").value = d[5];
+            document.getElementById("txtsig3Pos").value = d[6];
+        });
+    }
+</script>
+<div style="width : 100%; margin-top: 0px;border-style: solid; border-color: #1fa67a">
+    <div style="width:100%;height : 25px ; background-color:#1fa67a; color: white">
+        <label class="fa fa-file-text-o fa-lg" style="margin-left: 5px; display:inline-block">  Report Signatories (Footer Section)</label>
+    </div>
+    
+    <div style="margin-left:5px">
+        <label>Signatory #1 :</label>
+        <input id="txtsig1Name" placeholder="Signatory 1 (Name)" style="width:50%;margin-left:10px; margin-top:10px" />
+        <input id="txtsig1Pos" placeholder="Signatory 1 (Position)" style="width:50%;margin-left:10px; margin-top:10px" />
+        <label>Signatory #2 :</label>
+        <input id="txtsig2Name" placeholder="Signatory 2 (Name)" style="width:50%;margin-left:10px; margin-top:10px" />
+        <input id="txtsig2Pos" placeholder="Signatory 2 (Position)" style="width:50%;margin-left:10px; margin-top:10px" />
+        <input id="txtsig2Rule" placeholder="Signatory 2 (Rule)" style="width:50%;margin-left:10px; margin-top:10px" />
+        <label>Signatory #3 :</label>
+        <input id="txtsig3Name" placeholder="Signatory 3 (Name)" style="width:50%;margin-left:10px; margin-top:10px" />
+        <input id="txtsig3Pos" placeholder="Signatory 3 (Position)" style="width:50%;margin-left:10px; margin-top:10px" />
+    </div style="margin-left:5px">
+    <div style="display:inline-block; width:100%; margin-top:10px">
+        <div style=" float:right; margin-right:12px ; margin-bottom:5px" class="k-button k-button-icontext" onclick="UpdateReportSignatories()"> <i class="fa fa-exchange"></i> Update </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        getReportSignatories();
+    });
+</script>

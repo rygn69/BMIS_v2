@@ -1,0 +1,109 @@
+﻿<div style="display:inline-block; margin-left:10px">
+    <div style="display:inline-block;margin-top:15px">
+        <label> Calendar Year :</label>
+        @(Html.Kendo().ComboBox()
+            .Name("cyear")
+            .DataTextField("ProposalYear")
+            .DataValueField("ProposalYear")
+            .Placeholder("Select year...")
+            .Filter("contains")
+            .MinLength(1)
+            .SelectedIndex(0)
+            .HtmlAttributes(new { @style = "width: 200px;" })
+            .DataSource(source => source.Read(read => read.Action("GetProposalYear", "PYear")))
+        )
+    </div>
+    <div style="display:inline-block;margin-top:5px;">
+        <label> Old Account :</label>
+        <input type="text" id="oldaccountid" style="width:488px" value="@Session["AccountName"]" />
+    </div>
+    <div style="display:inline-block;margin-top:5px;">
+        <label> Budget Account :</label>
+        <input type="text" id="budgetaccount" style="width:488px" value="" />
+    </div>
+    <div style="display:inline-block;margin-top:15px">
+        <label> PPSAS Account :</label>
+        @(Html.Kendo().ComboBox()
+            .Name("ppsas")
+            .DataTextField("AccountName")
+            .DataValueField("ChartAccountID")
+            .Placeholder("Select office...")
+            .Filter("contains")
+            .MinLength(1)
+            .HtmlAttributes(new { @style = "width: 500px;" })
+            .DataSource(source => source.Read(read => read.Action("Getppsasaccount", "Home")))
+        )
+    </div>  
+    <div style="display:inline-block;margin-top:30px;margin-left:210px">
+        <div id="btnreset" class="k-button k-button-icontext" style="margin-bottom:5px;display:inline-block;background-color:#24803c;color:#ffffff;width: 80px;border-radius:7px;clear:both; margin-top:5px;" onclick="resetaccount()">Reset</div>
+        <div id="btnsave" class="k-button k-button-icontext" style="margin-bottom:5px;display:inline-block;background-color:cornflowerblue;color:#ffffff;width: 80px;border-radius:7px;clear:both; margin-top:5px;margin-left:10px" onclick="reqSave()">Save</div>
+        <div id="" class="k-button k-button-icon" style="  bottom: 15px; right: 220px;width: 80px; border-radius:7px;color:#ffffff;background-color:#DE5555;clear:both;margin-left:10px" onclick="ReqClose()">Close</div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        @*alert(@Session["ProposalID"])*@
+        @*alert(@Session["AccountName"])*@
+    })
+    function reqSave() {
+        var ProposalID=@Session["ProposalID"];
+        var BudgetYear = $("#cyear").val();
+        var ppsasid=$("#ppsas").val() == ""? 0: $("#ppsas").val();
+        var ppsasname=$("#ppsas").data("kendoComboBox").text();
+        var budgetaccount=$("#budgetaccount").val()
+        var url = "@Url.Action("ppsasupdate", "Home")";
+        var oldaccount=$("#oldaccountid").val();
+        
+        $.get(url, {ProposalID:ProposalID,ppsasid:ppsasid,ppsasname:ppsasname,BudgetYear:BudgetYear,budgetaccount:budgetaccount}, function (d) {
+            if (d == "success") {
+                //swal("Success!", "Account successfully linked!", "success");
+                swal({
+                    title: "Success",
+                    text: "All proposed "+ oldaccount +" account name has been successfully updated! Do you want to refresh the table?",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Yes",
+                    closeOnConfirm: true,
+                    showLoaderOnConfirm: true
+                }, function () {
+                    ReqClose()
+                    $("#grd_BudgetApprovalBudget").data("kendoGrid").dataSource.read()
+                });
+            }
+            else {
+                swal("Error","Something went wrong! Please try again...","error")
+            }
+            $("#ppsas").data("kendoComboBox").value("")
+            ReqClose()
+        });
+    }
+    function resetaccount(){
+        var ProposalID=@Session["ProposalID"];
+        var url = "@Url.Action("resetppsasaccount", "Home")";
+        $.get(url, {ProposalID:ProposalID}, function (d) {
+            if (d == "success") {
+                //swal("Success!", "Account successfully linked!", "success");
+                swal({
+                    title: "Success",
+                    text: "Account successfully reset!",
+                    type: "warning",
+                    showCancelButton: false,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Ok",
+                    closeOnConfirm: true,
+                    showLoaderOnConfirm: true
+                }, function () {
+                    $("#grd_BudgetApprovalBudget").data("kendoGrid").dataSource.read()
+                });
+            }
+            else {
+                swal("Error","Something went wrong! Please try again...","error")
+            }
+            $("#ppsas").data("kendoComboBox").value("")
+        });
+    }
+    function ReqClose() {
+        $("#UpdatePPSAS").data("kendoWindow").close();
+    }
+</script>

@@ -1,0 +1,77 @@
+﻿<script>
+    $("#SearchData").keypress(function (e) {
+        if (e.keyCode == 13) {
+            searchAccount();
+        }
+    });
+    document.getElementById('SearchData').onkeyup = function () {
+        if (($(this).val() == '' || $(this).val() == 'Search by Account Name') && $(this).attr('type') != 'hidden') {
+            searchAccount()
+        }
+    }
+</script>
+
+<div style="width : 100%; margin-top: 20px;border-style: solid; border-color: #1fa67a">
+
+    <div style="width:100%;height : 35px ; background-color:#1fa67a; color: white">
+        <h2 style="margin-left: 5px;color:white"><i class="fa fa-plus-circle"></i> Active Accounts</h2>
+    </div>
+    <div style="padding:5px;">
+        <div style="margin-top:20px;"></div>
+        <style>
+            h2 {
+                text-decoration-style: none;
+            }
+        </style>
+        @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Maintenance.account_code>()
+    .Name("grAccount")
+    .Columns(col =>
+    {
+        col.Bound(m => m.account_desc).Title("Accounts");
+        col.Bound(m => m.FundType).Title("Fund Type");
+        col.Bound(m => m.account_id).Title("Account ID").Hidden();
+        col.Template(t => { }).ClientTemplate(
+"<div class='btn-delete'> <a  title='Delete' onclick='deleteAccount(#=account_id#)'><span class='fa fa-trash' style='font-size: 12pt;'></span></a></div>"
+).HtmlAttributes(new { style = "margin-left:5px;" }).Width(40);
+
+    })
+    .ToolBar(t => t.Template(@<text>
+
+
+        <div style="float: left; width: 0; margin-top:-3px;margin-bottom:-100px;margin-left:-3px; height: 0; border-right: 0px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;">
+            <div style="float: left; width: 0; margin-top:0px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 37px solid #EEE; ">
+
+                <div style="float: left; height:28px; margin-left:-59px; margin-top: 5px;">
+                    <i class="fa fa-tasks fa-2x fg-white"></i>
+
+                </div>
+
+            </div>
+        </div>
+        <div style="float: right; height:28px;margin-top:2px;">
+            <link href="~/Content/metroui/css/docs.css" rel="stylesheet" />
+            <div style="background-color:white;border:solid;border-color:whitesmoke;border-width:thin;width:310px;height:33px;float:right;padding:0px;margin-top:-3px;" id="search">
+                <input type="text" style="width:260px;border-collapse:collapse;border-color:white;margin:0px;margin-left:-10px;height:70%;outline:none;border-left-style:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search by Account Name" id="SearchData" name="SearchData">
+                <div class="k-button k-button-icontext" style="height:33px;width:40px;" onclick="searchAccount()"><span class="mif-search"></span></div>
+            </div>
+
+        </div>
+    </text>))
+                    .Pageable(page => page.Refresh(true)
+                    .Enabled(true)
+                    .ButtonCount(4)
+
+                    .PreviousNext(true)
+                    )
+                        .Selectable(selectable => selectable.Mode(GridSelectionMode.Single))
+
+                        .DataSource(d => d
+                        .Ajax()
+                        .PageSize(10)
+                            .Model(m => m.Id(i => i.account_id))
+                            .Read(read => read.Action("SearchActiveAccount", "Maintenance"))
+                        )
+        )
+    </div>
+</div>
+

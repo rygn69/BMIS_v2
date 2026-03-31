@@ -1,0 +1,800 @@
+﻿@model IEnumerable<iFMIS_BMS.BusinessLayer.Models.DashBoard.DashBoardModel>
+<script>
+    function onData() {
+        var office = $("#offs").val()
+        var program = $("#Progss").val();
+        var account = $("#account_com").val();
+        var year = $("#ddlYear").val();
+        var excess = $("#excessid_temp").val();
+
+        return {
+            office:office,
+            program: program,
+            account: account,
+            year: year,
+            excess: excess
+        }
+    }
+
+    function sync() {
+        //$("#").val(
+            
+        var bal1 = parseFloat(Number($("#balamount_temp").val()) - (Number($("#totreserveamount_temp").val()) - Number($("#relamount_temp").val()))).toFixed(2)
+        var bal2 = parseFloat(Number(bal1) - Number($("#relamount").val())).toFixed(2)
+      //  alert(bal2)
+        if (Number(bal2) < 0) {
+            swal("Warning","Insufficient balance! Reserve appropriation must not be greater than the balance appropriation less total reserve appropriation.","warning")
+            $("#relamount").val($("#relamount_temp").val())
+            $("#relamount").focus()
+        }
+    }
+
+    function onDataBound(e) {
+        $(".k-hierarchy-cell").hide();
+        $(".k-hierarchy-col").hide();
+        var grid = $("#cafgrid").data("kendoGrid")
+        var ds = grid.dataSource.view();
+       
+        var statuscode = 0;
+        var comid=0
+   
+        for (var i = 0; i < ds.length; i++)
+        {
+            statuscode = ds[i].statuscode;
+            comid = ds[i].comid;
+         
+            if (statuscode !=1) {
+                $('#edit' + comid + '').css("display", "none");
+                $('#delete' + comid + '').css("display", "none");
+            }
+        }
+    }
+    function historyparam(){
+        var office = $("#offs").val()
+        var program = $("#Progss").val();
+        var account = $("#account_com").val();
+        var year = $("#ddlYear").val();
+        //var excess = $("#excessid_temp").val();
+        return {
+            office:office,
+            program: program,
+            accountid: account,
+            year: year
+            //excess: excess
+        }
+    }
+
+    function Close() {
+      
+    }
+    var thisculture = kendo.culture();
+    thisculture.numberFormat.currency.symbol = ' ';
+</script>
+<div style="width:100%;height : 35px ; background-color:#1fa67a; color: white;" >
+    <h2 style="margin-left: 5px;color:white;font-size:25px"><i style="margin-bottom:5px;width:30px;height:27px" class="k-sprite fa fa-calendar-check-o"></i>  Governor's Commitment</h2>
+</div>
+<div style="float: none;clear:both;margin-top:20px;">
+    <div  style="display:inline-block;margin-left:230px">
+        <input type="radio" checked="checked" id="currentid" onclick="fn_current()" style="width:30px;zoom:1.3"/>
+        <label style="display:inline-block" onclick="fn_current()">Current</label>
+        <input type="radio" id="excessid"  onclick="fn_excess()" style="width:30px;zoom:1.3;margin-left:30px;" />
+        <label style="display:inline-block" onclick="fn_excess()">Continuing</label>
+        <input type="radio" id="listid" onclick="fn_list()" style="width:30px;zoom:1.3;margin-left:30px;" />
+        <label style="display:inline-block" onclick="fn_list()">View Summary</label>
+    </div>
+    <div style="margin-top:17px">
+
+        <div style="float: left;margin-left:100.5px;margin-top:0px;display:inline-block">
+            <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;font-size:14px;">
+                Year    :
+            </label>
+        </div>
+        <div style="text-align: right;float: left;margin-left:36px;margin-top:0px;display:inline-block">
+            @(Html.Kendo().DropDownList()
+                        .Name("ddlYear")
+                        .DataTextField("ProposalYear")
+                        .DataValueField("ProposalYear")
+                        .SelectedIndex(0)
+                        .HtmlAttributes(new { @style = "width: 70px;text-align:left" })
+                        .Events(e => e.Change("yearcake"))
+                        .DataSource(source => source.Read(read => read.Action("GetPropYear3", "PYear")))
+            )
+        </div>
+
+        <div id="office" style="float: left; margin-left: -162.5px; margin-top: 35px; display: inline;">
+            <label style="">
+                Office    :
+            </label>
+        </div>
+        <div id="officeid"  style="float: right; margin-right: 130px; margin-top: 5px; display: inline;">
+            <span style="float:left;font-style:italic;color:red;font-weight:bold;font-size:20px;margin-left:-5px">*</span> &nbsp;
+            @(Html.Kendo().ComboBox()
+        .Name("offs")
+        .DataTextField("OfficeName")
+        .DataValueField("OfficeID")
+        .Placeholder("Select office...")
+        .Filter("contains")
+        .MinLength(1)
+        .HtmlAttributes(new { @style = "width: 400px;" })
+        .Events(e => e.Change("fn_dprefresher"))
+        .DataSource(source => source.Read(read => read.Action("GetOffice_MO", "Release").Data("Select_Office")))
+            )
+        </div>
+        <div id="program" style="float: left; margin-left: 73.5px; margin-top: 42px; display: inline;">
+            <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;font-size:14px;">
+                Program :
+            </label>
+        </div>
+        <div id="programid" style="float: left;margin-left:26px;margin-top:5px;">
+            <span style="float:left;font-style:italic;color:red;font-weight:bold;font-size:20px;margin-left:-5px">*</span> &nbsp;
+            @(Html.Kendo().ComboBox()
+        .Name("Progss")
+        .DataTextField("ProgramDescription")
+        .DataValueField("ProgramID")
+        .Placeholder("Select programs...")
+        .HtmlAttributes(new { @style = "width: 400px;" })
+        .Events(e => e.Change("fn_dprefresherprogs"))
+        .DataSource(source => source.Read(read => read.Action("GetPrograms2", "dpPrograms").Data("fn_Offices")))
+            )
+        </div>
+
+        <div style="float:right;margin-right:572px;margin-top:10px">
+            <label style="">
+                Account    :
+            </label>
+        </div>
+        <div style="float:left;margin-left:217px;margin-top:-28px">
+            <script>
+                function fn_ForAccount() {
+                    var propYear = $("#ddlYear").val();
+                    var prog_id = $("#Progss").val() == "" ? 0 : $("#Progss").val();
+                    var excess = $("#excessid_temp").val();
+                    return {
+                        propYear: propYear,
+                        prog_id: prog_id,
+                        excess: excess
+                    }
+                }
+            </script>
+            <span style="float:left;font-style:italic;color:red;font-weight:bold;font-size:20px;margin-left:-5px">*</span> &nbsp;
+            @(Html.Kendo().ComboBox()
+                        .Name("account_com")
+                        .DataTextField("account_name")
+                        .DataValueField("account_id")
+                        .Filter("contains")
+                        .MinLength(1)
+                        .Placeholder("Select Account...")
+                        .HtmlAttributes(new { @style = "width: 400px;" })
+                        .Events(e => e.Change("xxx"))
+                        .SelectedIndex(-1)
+                        .DataSource(source => source.Read(read => read.Action("commitment", "Dropdowns").Data("fn_ForAccount")))
+            )
+        </div>
+     
+        <div style="float: left;margin-left:39px;margin-top:9px;">
+            <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;font-size:14px;">
+                Appropriation    :
+            </label>
+        </div>
+        <div style="float: left;margin-left:37px;margin-top:5px;">
+            <input id="appamount" name="appamount" value="0.00" type="text" min="0" disabled style="width:139px;height:100%;font-size:16px;color:blue" class="form-control">
+        </div>
+        <div style="float: left;margin-left:-390px;margin-top:40px;">
+            <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;font-size:14px;">
+                Total Release Amount    :
+            </label>
+
+        </div>
+        <div style="float: left;margin-left:-150px;margin-top:38px;">
+            <input id="totrelamount" name="totrelamount" value="0.00" type="text" min="0" disabled style="width:139px;height:100%;font-size:16px;color:red" class="form-control">
+        </div>
+        <div style="float: left;margin-left:-299px;margin-top:72px;">
+            <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;font-size:14px;">
+                Balance    :
+            </label>
+        </div>
+       
+        <div style="float: left;margin-left:-150px;margin-top:72px;">
+            <input id="balamount" name="balamount" value="0.00" type="text" min="0" disabled style="width:139px;height:100%;font-size:16px;color:green" class="form-control">
+        </div>
+
+        <div style="border-color:black;border-style:dashed;border-width:1px;width:700px;margin-left:20px;margin-top:74px;display:inline-block;padding:5px;">
+            <div style="background-color:white;width:110px;margin-top:-15px;margin-left:15px;"><span style="background-color:white;font-size:16px;width:70px;margin-top:-19px;margin-left:15px;font-style:italic">Details</span></div>
+
+            <div style="float:right;margin-right:540px;margin-top:10px">
+                <label style="font-size:14px">
+                    City/Municipality    :
+                </label>
+            </div>
+            <div style="float:left;margin-left:202px;margin-top:-28px">
+                @(Html.Kendo().ComboBox()
+                        .Name("municipal")
+                        .DataTextField("municipal")
+                        .DataValueField("citymunCode")
+                        .Filter("contains")
+                        .MinLength(1)
+                        .Placeholder("Select municipality...")
+                        .HtmlAttributes(new { @style = "width: 400px;" })
+                        .Events(e => e.Change("munsel"))
+                        .SelectedIndex(-1)
+                        .DataSource(source => source.Read(read => read.Action("getmunicipality", "Dropdowns")))
+                )
+            </div>
+            <div style="float:right;margin-right:540px;margin-top:10px">
+                <label style="font-size:14px">
+                    Barangay    :
+                </label>
+            </div>
+            <div style="float:left;margin-left:202px;margin-top:-28px">
+                <script>
+                    function fn_barangay() {
+                
+                    var munid = $("#municipal").val();
+                    return {
+                        munid: munid
+                    }
+                }
+                </script>
+
+                @(Html.Kendo().ComboBox()
+                        .Name("barangay")
+                        .DataTextField("brgyDesc")
+                        .DataValueField("brgyCode")
+                        .Filter("contains")
+                        .MinLength(1)
+                        .Placeholder("Select barangay...")
+                        .HtmlAttributes(new { @style = "width: 400px;" })
+                        .SelectedIndex(-1)
+                        .DataSource(source => source.Read(read => read.Action("getbarangay", "Dropdowns").Data("fn_barangay")))
+                )
+            </div>
+            <div style="float: right;margin-right:472.5px;margin-top:0px;">
+                <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;font-size:14px;width:160px">
+                    Total Reserve Appropriation    :
+                </label>
+            </div>
+            <div style="float: left;margin-left:201.5px;margin-top:-33px;">
+                <input id="totreserveamount" name="totreserveamount" value="0.00" type="text" min="0" style="width:139px;height:100%;font-size:16px;color:black" disabled class="form-control">
+            </div>
+            <div style="float: right;margin-right:526px;margin-top:10px;">
+                <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;font-size:14px;width:160px">
+                    Reserve Appropriation    :
+                </label>
+            </div>
+            <div style="float: left;margin-left:201.5px;margin-top:-28px;">
+                <span style="font-style:italic;color:red;font-weight:bold;font-size:20px;margin-left:-16px">*</span> &nbsp;<input id="relamount" name="relamount" value="0.00" type="number" min="0" style="width:139px;height:100%;font-size:16px;color:black" onkeyup="sync()" class="form-control">
+            </div>
+            <div style="float: left;margin-left:-323.5px;margin-top:12px;">
+                <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;font-size:14px;">
+                    Description    :
+                </label>
+            </div>
+            <div style="float: left;margin-left:-150px;margin-top:6px;">
+                <span style="font-style:italic;color:red;font-weight:bold;font-size:20px;margin-left:-16px">*</span> &nbsp;<textarea id="particular" name="particular" type="text" placeholder="Enter description here..." style="width:390px;height:100%;font-size:16px;color:black" class="form-control"> </textarea>
+            </div>
+            <div style="float: right;margin-right:496.5px;margin-top:5px; width:100px">
+                <label style="font-size:14px">
+                    Remark    :
+                </label>
+            </div>
+            <div style="float: left;margin-left:202.5px;margin-top:-22px;">
+               <textarea id="remark" name="remark" type="text" style="width:390px;height:100%;font-size:16px;color:black" disabled class="form-control"> </textarea>
+            </div>
+            <div style="float: right;margin-right:508.5px;margin-top:5px; width:100px">
+                <label style="font-size:14px">
+                    Code No.    :
+                </label>
+            </div>
+            <div style="float: right;margin-right:386.5px;margin-top:-22px;margin-bottom:5px">
+                <input id="codeno" name="codeno" type="text" style="width:100px;font-size:16px;color:black;background-color:cornsilk" disabled class="form-control">
+            </div>
+        </div>
+       
+       
+     
+        
+        <div style="float: left;margin-left:190px;margin-top:8px;">
+            <span style="font-weight:bold"> Note:</span> &nbsp;&nbsp; <span style="font-style:italic;color:red;font-weight:bold;font-size:11px;margin-left:-10px">Please fill out the fields marked with asterisk(*)!</span>
+        </div>
+     </div>
+ </div>
+<div style="float:left;background-color:antiquewhite;margin-left:-10px;width:779px;margin-bottom:5px;margin-top:10px">
+    <div id="btnSave" class="k-button k-button-icontext" style="padding:4px; bottom: 15px; right: 15px;width: 110px;float:right; margin-right:135px; margin-bottom:8px;margin-top:8px;border-radius: 50px;background-color:cornflowerblue;color:white" onclick="btnSave(0)"><span class="fa fa-save"></span> Save </div>
+    <div class="k-button k-button-icontext" style="padding:4px;bottom: 15px; right: 16px;width: 110px;float:right;margin-right:-225px; margin-bottom:8px;margin-top:8px;border-color:black;border-radius: 50px;" onclick="btnClear()"><span class="fa fa-eraser"></span> Clear </div>
+</div>
+
+<div class="transition animated fadeInUp" style="margin-top:10px;">  
+         @(Html.Kendo().Grid<iFMIS_BMS.Models.NonOfficeSubAccount>()
+            .Name("cafgrid")
+            .Scrollable()
+            .Columns(col =>
+            {
+            col.Template(@<text></text>).Hidden().ClientTemplate("<div>#=comid# </div>");
+            col.Template(@<text></text>)
+            .HeaderTemplate(@<text>Description</text>)
+            .Width(250)
+            .HtmlAttributes(new { style = "text-align:left;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;height:30px;", @class = "metro-header" })
+             .ClientTemplate("<div>#=particular# </div>")
+             .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> TOTAL  : </label></div>");
+
+            col.Bound(c => c.amount)
+            .HeaderTemplate(@<text>Amount</text>)
+            .Width(135)
+            .HtmlAttributes(new { style = "text-align:right;height:30px" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;height:30px;", @class = "metro-header" })
+            .ClientTemplate("<div>#=kendo.toString(amount,'c2')# </div>")
+            .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> </label><label> #=kendo.toString(sum, 'c2')#</label></div>");
+            
+            col.Template(@<text></text>)
+            .HeaderTemplate(@<text>Remarks</text>)
+            .Width(250)
+            .HtmlAttributes(new { style = "text-align:left;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;height:30px;", @class = "metro-header" })
+            .ClientTemplate("<div>#=status# </div>");
+
+            col.Template(@<text></text>)
+            .HeaderTemplate(@<text>Code No.</text>)
+            .Width(90)
+            .HtmlAttributes(new { style = "text-align:center;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;height:30px;", @class = "metro-header" })
+             .ClientTemplate("<div>#=transcode# </div>");
+             //.ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> TOTAL  : </label></div>");
+           
+               
+            col.Template(@<text></text>)
+            .HeaderTemplate(@<text>Control No.</text>)
+            .Width(200)
+            .HtmlAttributes(new { style = "text-align:center;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;height:30px;", @class = "metro-header" })
+            .ClientTemplate("<div>#=obrno# </div>");
+
+            col.Template(t => { })
+            .HeaderHtmlAttributes(new { style = "text-align:center", @class = "metro-header" })
+            .ClientTemplate(
+            "<div class='btn-edit'>  <a id='edit#=comid#' title='Edit' onclick='edittrans(#=comid#,#=officeid#,#=programid#,#=accountid#,\"#=particular#\",#=amount#,\"#=transcode#\",#=mun_code#,#=brgy_code#,\"#=status#\")'><span class='fa fa-edit' style ='font-size: 15pt;color:blue'></span></a></div>")
+            .HtmlAttributes(new { style = "margin-left:5px;" }).Width(40);
+            
+            col.Template(t => { })
+            .HeaderHtmlAttributes(new { style = "text-align:center", @class = "metro-header" })
+            .ClientTemplate("<div class='btn-delete'> <a id='delete#=comid#' title='Delete' onclick='deletetrans(#=comid#,\"#=transcode#\")'><span class='fa fa-trash' style='font-size: 15pt;color:red'></span></a></div>")
+            .HtmlAttributes(new { style = "margin-left:5px;" }).Width(40);
+            })
+            .Pageable(pageable => pageable
+            .Refresh(true)
+            .ButtonCount(4))
+            .HtmlAttributes(new { @class = "table-responsive", style = "height:420px;width:750px; overflow-x:hidden;" })
+            .Events(e => e.DataBound("onDataBound"))
+            .Selectable(selectable => selectable
+            .Mode(GridSelectionMode.Single)
+            .Type(GridSelectionType.Row))
+            .DataSource(dataSource => dataSource
+            .Ajax()
+            .Batch(true)
+            .Model(m => m.Id(i => i.comid))
+            .ServerOperation(false)
+            .Aggregates(a =>
+            {
+                a.Add(c => c.amount).Sum();
+            })
+            .PageSize(12)
+            .Read(read => read.Action("CommHistory", "Release").Data("onData"))
+            )
+            )
+            
+    
+</div>
+<div style="float:left;background-color:antiquewhite;margin-left:-10px;width:779px;margin-bottom:5px;margin-top:10px">
+    <div style="display:inline-block;margin-top:10px;margin-left:70px;">
+        <label> Report History :</label>
+    </div>
+    <div style="display:inline-block">
+        @(Html.Kendo().ComboBox()
+                        .Name("rephistory")
+                        .DataTextField("datetimegenerate")
+                        .DataValueField("com_id")
+                        .Filter("contains")
+                        .MinLength(1)
+                        .Placeholder("Select report date...")
+                        .HtmlAttributes(new { @style = "width: 400px;" })
+                        .SelectedIndex(-1)
+                        .DataSource(source => source.Read(read => read.Action("gethistoryreport", "Dropdowns").Data("historyparam")))
+        )
+    </div>
+    <div id="btnprview" class="k-button k-button-icontext" style="padding:4px; bottom: 15px; right: 15px;width: 110px;border-color:black; margin-left:650px; margin-bottom:-8px;margin-top:-55px;border-radius: 50px" onclick="btnpreview()" title="Click to preview report!"><span class="fa fa-print"></span> Preview </div>
+</div>
+
+<div id="txtfields" display="none">
+    <input id="appamount_temp" name="appamount_temp" value="" type="text" min="0" disabled style="width:139px;height:100%;font-size:16px;color:green" class="form-control">
+    <input id="totrelamount_temp" name="totrelamount_temp" value="" type="text" min="0" disabled style="width:139px;height:100%;font-size:16px;color:green" class="form-control">
+    <input id="balamount_temp" name="balamount_temp" value="" type="text" min="0" disabled style="width:139px;height:100%;font-size:16px;color:green" class="form-control">
+    <input id="relamount_temp" name="relamount_temp" value="" type="text" min="0" disabled style="width:139px;height:100%;font-size:16px;color:green" class="form-control">
+    <input id="transid" name="transid" value="0" type="number" />
+    <input id="excessid_temp" type="number" value="0">
+    <input id="transcode" type="text">
+    <input id="totreserveamount_temp" type="number" />
+</div>
+   
+@(Html.Kendo()
+.Window()
+.Name("addCAFStatement")
+.Title("Add Certification Statement")
+.Width(495)
+.Height(205)
+.Visible(false)
+.Modal(true)
+.Draggable(true)
+.AutoFocus(true)
+.Animation(a =>
+{
+    a.Open(o => o.SlideIn(SlideDirection.Down));
+    a.Close(c =>
+    {
+        c.SlideIn(SlideDirection.Down); c.Reverse(true);
+    }); 
+})
+.Actions(a =>
+{
+    a.Close();
+}))
+<script>
+
+    $(document).ready(function () {
+        $("#txtfields").hide();
+        $("#municipal").data("kendoComboBox").dataSource.read();
+    });
+
+    function munsel() {
+        $("#barangay").data("kendoComboBox").value("");
+        $("#barangay").data("kendoComboBox").dataSource.read()
+    }
+    function edittrans(comid, officeid, programid, accountid, particular, amount, transcode, mun_code, brgy_code,status) {
+        $("#offs").data("kendoComboBox").value(officeid)
+        $("#Progss").data("kendoComboBox").dataSource.read()
+        $("#Progss").data("kendoComboBox").value(programid)
+        $("#account_com").data("kendoComboBox").dataSource.read()
+        $("#account_com").data("kendoComboBox").value(accountid)
+        xxx()
+        $("#particular").val(particular)
+        $("#btnSave").attr("onclick", "btnSave(1)");
+        $("#btnSave").html("<span class='fa fa-edit'> </span> Update");
+        $("#relamount").val(amount);
+        $("#relamount_temp").val(amount);
+        $("#transid").val(comid)
+        $("#transcode").val(transcode);
+        $("#codeno").val(transcode);
+        $("#municipal").data("kendoComboBox").value(mun_code)
+        $("#barangay").data("kendoComboBox").dataSource.read()
+        $("#barangay").data("kendoComboBox").value(brgy_code)
+        $("#remark").val(status);
+
+        //var bal1=parseFloat(Number($("#totreserveamount_temp").val()) -Number($("#relamount_temp").val())).toFixed(2)
+        //$("#totreserveamount").val(MoneyFormat(bal1));
+        //$("#totreserveamount_temp").val(bal1);
+
+    }
+
+    function deletetrans(comid, transcode) {
+        //alert(transcode)
+        urldelete="@Url.Action("DeleteComm", "Release")"
+        swal({
+            title: "Confirmation!",
+            text: "Do you want to delete this transaction?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes",
+            closeOnConfirm: false
+        }, function () {
+            $.get(urldelete, { transid: comid, transcode: transcode }, function (d) {
+                if (d == 'success') {
+                    swal("", "Transaction has been deleted!", "success")
+                    $("#relamount").val(0)
+                    $("#cafgrid").data("kendoGrid").dataSource.read();
+                }
+                else {
+                    swal("Error", "Something went wrong!", "error");
+                }
+             //  fn_computebalance();
+            })
+
+        });
+
+    }
+    function btnpreview() {
+
+        var offs = $("#offs").val();
+        var program = $("#Progss").val();
+        var account = $("#account_com").val();
+        var accountname = $("#account_com").data("kendoComboBox").text();
+        var year = $("#ddlYear").val();
+        var excess = $("#excessid_temp").val();
+        var commitmentthistory = $("#rephistory").val()
+    
+        $.ajax({
+            async: false,
+            dataType: 'html',
+            success: window.open("../Reports/ReportViewer.aspx?rid=36&OfficeID=" + offs + "&program=" + program + "&accountcom=" + account + "&year=" + year + "&excess=" + excess + "&accountname='" + accountname + "'&commitmentthistory=" + commitmentthistory + "")
+        });
+    }
+    function btnSave(id) {
+        var relamount = $("#relamount").val() == "" ? 0 : $("#relamount").val();
+        var office = $("#offs").val();
+        var program = $("#Progss").val();
+        var account = $("#account_com").val();
+        var amount = $("#relamount").val();
+        var month = 0;
+        var year = $("#ddlYear").val();
+        var transid = $("#transid").val();
+        var excess = $("#excessid_temp").val();
+        var particular = $("#particular").val();
+        var status = ""
+        var municipal = $("#municipal").val()
+        var barangay = $("#barangay").val()
+
+        sync()
+
+        url = "@Url.Action("InsertCommitment", "Release")"
+        
+        if (id == 0) {
+            status="save"
+        }
+        else {
+            status = "update"
+        }
+        if (Number(relamount) == "0" || Number(relamount) == "0.00")
+        {
+            swal("", "Please enter reserve appropriation!", "warning")
+            $("#relamount").focus()
+        }
+        else if (particular == "") {
+            swal("", "Please enter the description!", "warning")
+            $("#particular").focus()
+        }
+        else{// if (id==0) { //Insert new trans...
+            swal({
+                title: "Confirmation!",
+                text: "Do you wanna " + status + " this commitment?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                closeOnConfirm: false
+            }, function () {
+                $.get(url, { office: office, program: program, account: account, particular: particular, amount: amount, year: year, excess: excess, transcode: $("#transcode").val(), municipal: municipal, barangay: barangay }, function (d) {
+                    if (d=="success"){
+                        swal("", "New commitment saved!", "success")
+                        xxx()
+                        $("#relamount").val("0.00")
+                        $("#particular").val("")
+                        $("#cafgrid").data("kendoGrid").dataSource.read();
+                    }
+                    else if (d=="updated"){
+                        swal("", "Transaction has been updated!!", "success")
+                        btnClear(1);
+                    }
+                    else{
+                        swal("Error",d,"error")
+                    }
+                })
+
+            });
+        }
+    }
+
+    function btnClear(id) {
+        $("#appamount").val("0.00")
+        $("#totrelamount").val("0.00")
+        $("#balamount").val("0.00")
+        $("#relamount").val("0.00")
+        $("#appamount_temp").val("");
+        $("#totrelamount_temp").val("");
+        $("#balamount_temp").val("");
+        $("#btnSave").html("<span class='fa fa-save'> </span> Save");
+        $("#btnSave").attr("onclick", "btnSave(0)");
+    
+        $("#transcode").val(0)
+
+        $("#offs").data("kendoComboBox").value("")
+        $("#Progss").data("kendoComboBox").value("")
+        $("#account_com").data("kendoComboBox").value("")
+        $("#account_com").data("kendoComboBox").dataSource.read()
+        
+        $("#particular").val("")
+       
+        $("#relamount_temp").val("0");
+        $("#transid").val(0)
+        $("#codeno").val("")
+        $("#cafgrid").data("kendoGrid").dataSource.read();
+        $("#municipal").data("kendoComboBox").value("")
+        $("#barangay").data("kendoComboBox").value("")
+        $("#remark").val("");
+        $("#totreserveamount").val("0.00")
+        $("#totreserveamount_temp").val("0")
+        $("#rephistory").data("kendoComboBox").value("")
+        
+    }
+    function fn_computebalance()
+    {
+        //alert(1)
+        var year = $("#ddlYear").val()
+        var Progid = $("#Progss").val() == "" ? 0 : $("#Progss").val();
+        var accountid = $("#account_com").val()
+        var ppaid = $("#subppa_list").val() == "" ? 0 : $("#subppa_list").val();
+        var chargeofficeid = $("#charge_office").val() == "" ? 0 : $("#charge_office").val();
+        var excess = $("#excessid_temp").val();
+        var url = "@Url.Action("CommComp", "Release")"
+        $.get(url, { year: year, Progid: Progid, accountid: accountid, excess: excess }, function (d) {
+            $("#appamount").val(MoneyFormat(d.Appropriation));
+            $("#totrelamount").val(MoneyFormat(d.AllotedAmount));
+            $("#balamount").val(MoneyFormat(d.BalanceAllotment));
+            $("#appamount_temp").val(d.Appropriation);
+            $("#totrelamount_temp").val(d.AllotedAmount);
+            $("#balamount_temp").val(d.BalanceAllotment);
+            $("#totreserveamount").val(MoneyFormat(d.totreserveapp));
+            $("#totreserveamount_temp").val(d.totreserveapp);
+        //    $("#cafgrid").data("kendoGrid").dataSource.read();
+        });
+
+    }
+    function Select_Office() {
+        var classtype = $("#classtype").val();
+
+        if (classtype == null || classtype == "") {
+
+            return { classtype: 2 }
+        }
+        else {
+            return { classtype: classtype }
+        }
+    }
+
+    function fn_Offices() {
+        var proyy = $("#ddlYear").val();
+        var off_id = $("#offs").val();
+
+        return {
+            propYear: proyy,
+            office_ID: off_id
+        }
+    }
+    function fn_dprefresher() {
+        $("#Progss").data("kendoComboBox").dataSource.read();   
+        $("#account_com").data("kendoComboBox").value("");
+
+    }
+    function fn_dprefresherprogs() {
+        $("#account_com").data("kendoComboBox").dataSource.read();
+    }
+    function xxx() {
+            
+            fn_computebalance()
+            $("#cafgrid").data("kendoGrid").dataSource.read();
+            $("#rephistory").data("kendoComboBox").value("");
+            $("#rephistory").data("kendoComboBox").dataSource.read();
+        
+    }
+    function yearcake() {
+        $("#account_com").data("kendoComboBox").dataSource.read();
+        $("#account_com").data("kendoComboBox").value("");
+    }
+    function fn_ForPPA() {
+        var ppayear = 0;
+
+        if ($("#account_com").val() == 2861) {
+            ppayear = $("#ddlYear").val();
+            document.getElementById("ppalabel").style.display = "inline"
+            document.getElementById("ppalist").style.display = "inline"
+            document.getElementById("subppalabel").style.display = "inline"
+            document.getElementById("subppalist").style.display = "inline"
+            document.getElementById("chargeoffice").style.display = "none"
+            document.getElementById("chargeofficelabel").style.display = "none"
+        }
+        else if ($("#account_com").val() == 336 || $("#account_com").val() == 334 || $("#account_com").val() == 342) {
+            document.getElementById("ppalabel").style.display = "none"
+            document.getElementById("ppalist").style.display = "none"
+            document.getElementById("subppalabel").style.display = "none"
+            document.getElementById("subppalist").style.display = "none"
+            document.getElementById("chargeoffice").style.display = "inline"
+            document.getElementById("chargeofficelabel").style.display = "inline"
+        }
+        else {
+            document.getElementById("ppalabel").style.display = "none"
+            document.getElementById("ppalist").style.display = "none"
+            document.getElementById("subppalabel").style.display = "none"
+            document.getElementById("subppalist").style.display = "none"
+            document.getElementById("chargeoffice").style.display = "none"
+            document.getElementById("chargeofficelabel").style.display = "none"
+
+            ppayear = 9999;
+        }
+        return {
+            ppayear: ppayear
+        }
+    }
+    function onClickSubppa() {
+        if ($("#ppa_list").val() != 0) {
+            $("#subppa_list").data("kendoComboBox").dataSource.read();
+        }
+    }
+    function fn_ForSubPPA() {
+        var ppayear = 0;
+        var ppa_list = $("#ppa_list").val();
+        if ($("#account_com").val() == 2861) {
+            ppayear = $("#ddlYear").val();
+        }
+        else {
+            ppayear = 9999;
+        }
+        return {
+            ppayear:ppayear,
+            ppa_list: ppa_list
+        }
+    }
+    function fn_current() {
+        document.getElementById("currentid").checked = true
+        document.getElementById("excessid").checked = false
+        document.getElementById("listid").checked = false
+        document.getElementById("office").style.display = "inline"
+        document.getElementById("officeid").style.display = "inline"
+        document.getElementById("program").style.display = "inline"
+        document.getElementById("programid").style.display = "inline"
+        $("#excessid_temp").val(0);
+        btnClear()
+    }
+    function fn_excess() {
+        document.getElementById("excessid").checked = true
+        document.getElementById("currentid").checked = false
+        document.getElementById("listid").checked = false
+        document.getElementById("office").style.display = "none"
+        document.getElementById("officeid").style.display = "none"
+        document.getElementById("program").style.display = "none"
+        document.getElementById("programid").style.display = "none"
+        $("#excessid_temp").val(1);
+        btnClear()
+    }
+    function fn_list() {
+        document.getElementById("excessid").checked = false
+        document.getElementById("currentid").checked = false
+        //document.getElementById("office").style.display = "none"
+        //document.getElementById("officeid").style.display = "none"
+        //document.getElementById("program").style.display = "none"
+        //document.getElementById("programid").style.display = "none"
+        $("#excessid_temp").val(0);
+        btnClear()
+
+        var url = "@Url.Action("ComSummary", "Release")";
+
+        $.get(url, {
+            year_: $("#ddlYear").val()
+        }, function (d) {
+            $('#CoSummary').html(d);
+        })
+
+        $('#CoSummary').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Summary").center().open();
+    }
+</script>
+
+@(Html.Kendo().Window()
+        .Name("CoSummary")
+        .Title("Commitment Summary")
+        .Width(1035)
+        .Height(460)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+        .Events(e => e.Close("Close"))
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+                .Actions(a => { a.Close(); })
+)
+
+

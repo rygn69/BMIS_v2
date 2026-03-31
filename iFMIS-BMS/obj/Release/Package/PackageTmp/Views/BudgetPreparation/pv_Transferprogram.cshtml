@@ -1,0 +1,201 @@
+﻿
+@model iFMIS_BMS.BusinessLayer.Models.Maintenance.PlantillaModel
+
+<script>
+    function getOffice() {
+        return {
+            OfficeID: $("#officeLink").val(),
+            TransactionYear: $("#propsYears").val()
+        }
+    }
+    
+    function getOfficeto() {
+        return {
+            OfficeID: $("#officeLinkto").val(),
+            TransactionYear: $("#propsYears").val()
+        }
+    }
+    function getProgram() {
+        return {
+            programID:$("#programLink").val(),
+            TransactionYear:  $("#propsYears").val()
+        }
+    }
+    function getProgramTo() {
+        return {
+            programID:$("#programLinkto").val(),
+            TransactionYear:  $("#propsYears").val()
+        }
+    }
+    function SelOffice() {
+        $("#programLink").data("kendoComboBox").value("");
+        $("#accountLinkfrom").data("kendoComboBox").value("");
+        $("#programLink").data("kendoComboBox").dataSource.read();
+        $("#programLinkto").data("kendoComboBox").dataSource.read();
+    }
+    function SelOfficeTo() {
+        $("#programLinkto").data("kendoComboBox").value("");
+        $("#accountLinkto").data("kendoComboBox").value("");
+        $("#programLinkto").data("kendoComboBox").dataSource.read();
+        $("#accountLinkto").data("kendoComboBox").dataSource.read();
+    }
+    function SelProgram() {
+        $("#accountLinkfrom").data("kendoComboBox").dataSource.read();
+    }
+    function SelProgramTo() {
+        $("#accountLinkto").data("kendoComboBox").dataSource.read();
+    }
+    function ReqClose() {
+        $("#transferprogram").data("kendoWindow").close();
+    }
+</script>
+<div style="display:inline-block;margin-top:15px;margin-left:5px">
+    <label> Office : </label>
+    <div style="float:left;margin-top:-25px;margin-left:80px">
+        @(Html.Kendo().ComboBox()
+        .Name("officeLink")
+        .DataTextField("office_name")
+        .DataValueField("office_id")
+        .Filter("contains")
+        .MinLength(3)
+        .Placeholder("Select office...")
+        .SelectedIndex(-1)
+        .HtmlAttributes(new { @style = "width: 440px;" })
+        .Events(e => e.Change("SelOffice"))
+        .DataSource(source => source.Read(read => read.Action("ddlOffice", "Dropdowns")))
+
+        )
+    </div>
+</div>
+
+<div style="display:inline-block;margin-top:15px;margin-left:5px">
+    <label> Program : </label>
+    <div style="float:left;margin-top:-25px;margin-left:80px">
+        @(Html.Kendo().ComboBox()
+        .Name("programLink")
+        .DataTextField("setProgramDesc")
+        .DataValueField("setProgramID")
+        .Filter("contains")
+        .MinLength(3)
+        .Placeholder("Select program...")
+        .SelectedIndex(-1)
+        .HtmlAttributes(new { @style = "width: 440px;" })
+        .DataSource(source => source.Read(read => read.Action("ddlgetPrograms", "Dropdowns").Data("getOffice")))
+        .Events(e => e.Change("SelProgram"))
+        )
+    </div>
+</div>
+
+<div style="display:inline-block;margin-top:15px;margin-left:5px">
+    <label> Account : </label>
+    <div style="float:left;margin-top:-25px;margin-left:80px">
+        @(Html.Kendo().ComboBox()
+        .Name("accountLinkfrom")
+        .DataTextField("setAccountname")
+        .DataValueField("setAccountID")
+        .Filter("contains")
+        .MinLength(3)
+        .Placeholder("Select account...")
+        .SelectedIndex(-1)
+        .HtmlAttributes(new { @style = "width: 440px;" })
+        .DataSource(source => source.Read(read => read.Action("ddlgetAccount", "Dropdowns").Data("getProgram")))
+        //.Events(e => e.Change("GetSelectedCasualRate"))
+        )
+    </div>
+</div>
+<div style="border-color:gray;border-width:1px;border-style:solid;width:550px;margin-top:20px;float:left;height:80px">
+    <div style="background-color:white;width:160px;margin-top:-12px;margin-left:15px;"><span style="font-size:17px;margin-left:5px;">Transfer TO:</span></div>
+    @*<div style="display:inline-block;margin-top:15px;margin-left:5px">
+        <label> Office : </label>
+        <div style="float:left;margin-top:-25px;margin-left:80px">
+        @(Html.Kendo().ComboBox()
+        .Name("officeLinkto")
+        .DataTextField("office_name")
+        .DataValueField("office_id")
+        .Filter("contains")
+        .MinLength(3)   
+        .Placeholder("Select office...")
+        .SelectedIndex(-1)
+        .HtmlAttributes(new { @style = "width: 440px;" })
+        .Events(e => e.Change("SelOfficeTo"))
+        .DataSource(source => source.Read(read => read.Action("ddlOffice", "Dropdowns")))
+
+            )
+        </div>
+    </div>*@
+    <div style="display:inline-block;margin-top:15px;margin-left:5px">
+        <label> Program : </label>
+        <div style="float:left;margin-top:-25px;margin-left:80px">
+            @(Html.Kendo().ComboBox()
+        .Name("programLinkto")
+        .DataTextField("setProgramDesc")
+        .DataValueField("setProgramID")
+        .Filter("contains")
+        .MinLength(3)
+        .Placeholder("Select program...")
+        .SelectedIndex(-1)
+        .HtmlAttributes(new { @style = "width: 440px;" })
+        .DataSource(source => source.Read(read => read.Action("ddlgetPrograms", "Dropdowns").Data("getOffice")))
+        .Events(e => e.Change("SelProgramTo"))
+            )
+        </div>
+    </div>
+    
+</div>
+    <script>
+        $(document).ready(function(){
+            var proYe = $("#propsYears").val();
+            var ProgramID =@Session["ProgramID"];
+            var officeID = @Session["selectedOfficeID"];
+            var AccountID=@Session["AccountID"];
+          
+            $("#officeLink").data("kendoComboBox").value(officeID)
+            $("#programLink").data("kendoComboBox").dataSource.read()
+            $("#programLinkto").data("kendoComboBox").dataSource.read()
+            $("#programLink").data("kendoComboBox").value(ProgramID)
+            $("#accountLinkfrom").data("kendoComboBox").dataSource.read()
+            $("#accountLinkfrom").data("kendoComboBox").value(AccountID)
+
+        })
+        function reqSave(){
+            var proYer = $("#propsYears").val();
+            var officeID =$("#officeLink").val()
+            var ProgramID =$("#programLink").val()
+            var AccountID=$("#accountLinkfrom").val()
+            var ProgramIDTo =$("#programLinkto").val()
+
+            var url = "@Url.Action("TransferProgram", "Maintenance")";
+            $.get(url, {officeID:officeID,ProgramID:ProgramID,AccountID:AccountID,ProgramIDTo:ProgramIDTo,proYer:proYer}, function (d) {
+                if (d == "success") {
+                    
+                    swal({
+                        title: "Success",
+                        text: "Transfer of account done!  Do you want to reload the grid?",
+                        type: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#DD6B55",
+                        confirmButtonText: "Yes",
+                        closeOnConfirm: true,
+                        showLoaderOnConfirm: true
+                    }, function () {
+                        $("#AccountsGrid").data("kendoGrid").dataSource.read()
+                    });
+                }
+                else {
+                    swal("Error","Something went wrong! Please try again...","error")
+                }
+                $("#programLinkto").data("kendoComboBox").value("")
+                
+            });
+        }
+    </script>
+    <br />
+    @*onclick="reqSave()"*@
+    @*onclick="ReqClose()"*@
+    <div style="float:right;margin-top:30px;margin-right:20px">
+        <div id="btnsave" class="k-button k-button-icontext" style="margin-bottom:5px;display:inline-block;width: 80px;border-radius:7px;clear:both; margin-top:5px;" onclick="reqSave()">Save</div>
+        <div id="btnCloseNewCasualSettings" class="k-button k-button-icon" style=" bottom: 15px; right: 220px;width: 80px; border-radius:7px;color:#ffffff;background-color:#DE5555;clear:both;" onclick="ReqClose()">Close</div>
+    </div>
+    <script>
+
+    </script>

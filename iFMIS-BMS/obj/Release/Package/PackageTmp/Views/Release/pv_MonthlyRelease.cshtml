@@ -1,0 +1,776 @@
+﻿    <script>
+   
+    function ConvertCommasToEmpty(str) {
+        str = str.toString().replace(/,/g, "");
+        parseInt(str, 20);
+        return str;
+    }
+    function commaSeparateNumber(val) {
+        //while (/(\d+)(\d{3})/.test(val.toString())) {
+        //    val = val.toString().replace(/(\d+)(\d{3})/, '$1' + ',' + '$2');
+        //}
+        //return val;
+        // alert(val)
+        val = val.toFixed(2);
+
+
+
+        val = val.toString().replace(/,/g, ''); //remove existing commas first
+        //var valSplit = val.toFixed(2).split('.'); //then separate decimals
+
+        var valSplit = val.split('.'); //then separate decimals
+        while (/(\d+)(\d{3})/.test(valSplit[0].toString())) {
+            valSplit[0] = valSplit[0].toString().replace(/(\d+)(\d{3})/, '$1' + ',' + '$2');
+        }
+
+        if (valSplit.length == 2) { //if there were decimals
+            val = valSplit[0] + "." + valSplit[1]; //add decimals back
+        } else {
+            val = valSplit[0];
+        }
+
+        return val;
+
+       
+    }
+
+
+
+    function commaSeparateNumberversion2(val) {
+
+
+
+        //var num = parseFloat($(this).val());
+        //var cleanNum = num.toFixed(2);
+        //$(this).val(cleanNum);
+
+
+        var ReturnValue = $('#' + val + '').val();
+
+
+
+        ReturnValue = ReturnValue.toString().replace(/,/g, ''); //remove existing commas first
+        // alert(ReturnValue);
+        var valSplit = ReturnValue.split('.'); //then separate decimals
+
+        while (/(\d+)(\d{3})/.test(valSplit[0].toString())) {
+            valSplit[0] = valSplit[0].toString().replace(/(\d+)(\d{3})/, '$1' + ',' + '$2');
+        }
+
+        if (valSplit.length == 2) { //if there were decimals
+            ReturnValue = valSplit[0] + "." + valSplit[1]; //add decimals back
+        } else {
+            ReturnValue = valSplit[0];
+        }
+
+
+
+        $('#' + val + '').val(ReturnValue);
+
+    }
+
+
+
+    var thisculture = kendo.culture();
+    thisculture.numberFormat.currency.symbol = '₱'; // Script For Changing The Currency Sign
+
+    function iyot() {
+
+        if ($('input[name=release_rad]:checked').val() == 'Subsidy') {
+            document.getElementById("WithSubsidyFlag").value = 1;
+            // $('#EconomicEnterprise_Grid').data('kendoGrid').dataSource.read();
+        } else
+        {
+            document.getElementById("WithSubsidyFlag").value = 0;
+            // $('#EconomicEnterprise_Grid').data('kendoGrid').dataSource.read();
+        }
+    }
+
+    function vwAllAccounts() {
+        if (document.getElementById('vwAllAccounts').checked) {
+            document.getElementById("vwAllAccounts").value = 1;
+        } else {
+            document.getElementById("vwAllAccounts").value = 0;
+        }
+        $("#account_list").data("kendoComboBox").dataSource.read();
+    }
+    function allrelease() {
+        if (document.getElementById('allrelease').checked) {
+            document.getElementById('allrelease').value = 1;
+        }
+        else
+        {
+            document.getElementById('allrelease').value = 0;
+        }
+    }
+   
+    function acc_availble_mount() {
+        var url = "@Url.Action("datass", "Release")";
+
+        var office_id = $('#offs').val()
+        var program_id = $('#Progss').val()
+        var account_id = $('#account_list').val()
+        var year_ = $("#ddlYear").val();
+
+        $.post(url, { office_id: office_id, program_id: program_id,  account_id: account_id, year_: year_ }, function (e) {
+            document.getElementById("available_EEOK").value = e;
+           // alert(e);
+        })
+
+
+        var lure = "@Url.Action("get_TotalRelease", "Release")";
+
+
+        $.post(lure, { office_id: office_id, program_id: program_id, account_id: account_id, year_: year_ }, function (d) {
+            document.getElementById("total_Release").value = d;
+
+        })
+
+    }
+
+
+    function get_Expense_() {
+        var url = "@Url.Action("get_Expense", "Release")";
+
+
+        var program_id = $('#Progss').val()
+        var account_id = $('#account_list').val()
+        var year_ = $("#ddlYear").val();
+
+        if (program_id == null || program_id == 0 || program_id == "") {
+
+            program_id = 0;
+            account_id = 0;
+
+            $.post(url, { program_id: program_id, account_id: account_id, year_: year_ }, function (e) {
+                document.getElementById("Expense_").value = e;
+
+            })
+        }
+        else {
+
+            $.post(url, { program_id: program_id, account_id: account_id, year_: year_ }, function (e) {
+                document.getElementById("Expense_").value = e;
+
+            })
+
+        }
+
+
+    }
+
+
+    function numeric_desu() {
+            var url = "@Url.Action("numeric_des", "Release")";
+           
+            var office_id = $("#offs").val();
+            var program_id = $("#Progss").val();
+            var account_id = $("#account_list").val();
+            var year_ = $("#ddlYear").val();
+            var date_desu = $("#datepicker_desu").data("kendoDatePicker").value();
+        // alert((date_desu.getMonth() + 1));
+  
+            if (account_id == null || account_id == 0 || account_id == "" || account_id == ''
+                || program_id == null || program_id == 0 || program_id == "" || program_id == ''
+                ) {
+
+
+                $.get(url, { office_id: office_id, program_id: 0, account_id: 0, year_: year_, month_: date_desu.getMonth() + 1 }, function (d) {
+                    if (d == null || d == 0 || d == "" || d == '') {
+                        $("#numeric").data("kendoNumericTextBox").value(1);
+
+                    }
+                    else {
+                        $("#numeric").data("kendoNumericTextBox").value(d);
+
+                    }
+
+
+                })
+            } else {
+
+                $.get(url, { office_id: office_id, program_id: program_id, account_id: account_id, year_: year_, month_: date_desu.getMonth() + 1 }, function (d) {
+                    if (d == null || d == 0 || d == "" || d == '') {
+                        $("#numeric").data("kendoNumericTextBox").value(1);
+
+                    }
+                    else {
+                        $("#numeric").data("kendoNumericTextBox").value(d);
+
+                    }
+
+
+                })
+            }
+            
+
+
+        }
+
+        function ocake() {
+            var office_id = $("#offs").val();
+            var program_id = $("#Progss").val();
+            var account_id = $("#account_list").val();
+         setTimeout(function () {
+            numeric_desu();
+            income_available_();
+            subsidy_available_();
+            acc_availble_mount();
+            get_Balance_GF();
+            ChangeGrid();
+            fn_Offices();
+            get_Expense_();
+        }, 1000);
+    }
+    function ChangeGrid() {
+        //$("#offs").data("kendoComboBox").value("");
+
+        $("#offs").data("kendoComboBox").dataSource.read();
+
+        var url = "@Url.Action("ChangeGrid", "Release")";
+        var office_id = $("#offs").val();
+        var program_id = $("#Progss").val();
+        var ooe_id = $("#ooe_id").val();
+        var account_id = $("#account_list").val();
+        var month_ = $("#Months").val();
+        var numeric_ = $("#numeric").val();
+        var year_ = $("#ddlYear").val();
+        var classtype = $("#classtype").val();
+        //alert(classtype);
+        if (classtype == 1 || classtype == 0) {
+            document.getElementById('radios').style.visibility = 'hidden';
+
+        } else if (classtype == 2) {
+            document.getElementById('radios').style.visibility = 'hidden';
+
+        }
+
+        else {
+
+            document.getElementById('radios').style.visibility = 'visible';
+        }
+
+        $.get(url, { office_id: office_id, program_id: program_id, ooe_id: ooe_id, account_id: account_id, month_: month_, numeric_: numeric_, year_: year_, classtype: classtype }, function (d) {
+            $("#GridsID").html(d);
+        })
+
+    }
+
+    function ChangeGrid2() {
+        $("#offs").data("kendoComboBox").value("");
+        //$("#account_id").data("kendoComboBox").value("");
+        $("#Progss").data("kendoDropDownList").value("");
+        $("#ooe_id").data("kendoDropDownList").value("");
+        $("#account_list").data("kendoComboBox").value("");
+
+        $("#offs").data("kendoComboBox").dataSource.read();
+
+        var url = "@Url.Action("ChangeGrid", "Release")";
+        var office_id = $("#offs").val();
+        var program_id = $("#Progss").val();
+        var ooe_id = $("#ooe_id").val();
+        var account_id = $("#account_list").val();
+        var month_ = $("#Months").val();
+        var numeric_ = $("#numeric").val();
+        var year_ = $("#ddlYear").val();
+        var classtype = $("#classtype").val();
+
+        if (classtype == 1) {
+            document.getElementById('radios').style.visibility = 'hidden';
+
+        } else if (classtype == 2) {
+            document.getElementById('radios').style.visibility = 'hidden';
+
+        } else {
+
+            document.getElementById('radios').style.visibility = 'visible';
+        }
+
+        $.get(url, { office_id: office_id, program_id: program_id, ooe_id: ooe_id, account_id: account_id, month_: month_, numeric_: numeric_, year_: year_, classtype: classtype }, function (d) {
+            $("#GridsID").html(d);
+        })
+
+    }
+
+    function Select_Office() {
+        var classtype = $("#classtype").val();
+
+        if (classtype == null || classtype == "") {
+
+            return { classtype: 2 }
+        }
+        else {
+            return { classtype: classtype }
+        }
+    }
+    function fn_dprefresherOOied() {
+        $("#account_list").data("kendoComboBox").dataSource.read();
+    }
+    function fn_dprefresherprogs() {
+        $("#ooe_id").data("kendoDropDownList").dataSource.read();
+      //  $("#account_list").data("kendoComboBox").dataSource.read();
+    }
+    function get_Balance_GF() {
+        var url = "@Url.Action("get_balance", "Release")"
+
+        var office_id = $("#offs").val();
+        var program_id = $("#Progss").val();
+        var ooe_id = $("#ooe_id").val();
+        var account_id = $("#account_list").val();
+        var month_ = $("#Months").val();
+        var numeric_ = $("#numeric").val();
+        var year_ = $("#ddlYear").val();
+
+
+        $.get(url, { office_id: office_id, program_id: program_id, ooe_id: ooe_id, account_id: account_id, month_: month_, numeric_: numeric_, year_: year_ }, function (d) {
+            document.getElementById("balance_amount_ps_GF").value = d.balance_amount_ps;
+            document.getElementById("balance_amount_mooe_GF").value = d.balance_amount_mooe;
+            document.getElementById("balance_amount_co_GF").value = d.balance_amount_co;
+
+            //alert(d.balance_amount_ps)
+            //alert(d.balance_amount_moo)
+            //alert(d.balance_amount_co)
+        })
+    }
+
+        function income_available_() {
+        //    alert("income")
+        var url = "@Url.Action("get_Available_Inc", "Release")"
+
+        var office_id = $("#offs").val();
+
+        var year_ = $("#ddlYear").val();
+
+
+        $.get(url, { office_id: office_id,  year_: year_ }, function (d) {
+            document.getElementById("income_Available").value = d;
+         //   alert(d);
+
+        })
+            
+    }
+
+    function subsidy_available_() {
+        var url = "@Url.Action("sub_available", "Release")"
+
+        var office_id = $("#offs").val();
+
+        var year_ = $("#ddlYear").val();
+
+
+        $.get(url, { office_id: office_id, year_: year_ }, function (d) {
+            //alert(d)
+            //alert('a')
+            document.getElementById("subsidy_Available").value = d;
+
+        })
+    }
+
+
+    function fn_dprefresher() {
+
+        //ocake();
+        $("#Progss").data("kendoDropDownList").dataSource.read();
+        //$("#ooe_id").data("kendoDropDownList").dataSource.read();
+        //$("#account_list").data("kendoComboBox").dataSource.read();
+
+    }
+    function ExpenseClassOnChange() {
+        $("#grd_BudgetApprovalBudget").data("kendoGrid").dataSource.read();
+    }
+    function Close() {
+
+    }
+</script>
+<div style="background-color:#802fa7"></div>
+<div style="float: none;clear:both;">
+    <div style="float: left;margin-right:10px;margin-top:2px;">
+        <label style="float:left;margin-left: 50px;">
+            Office    :
+        </label>
+    </div>
+    <div style="float:left;margin-left:24px;margin-top:-9115px;">
+        <input type="text" style="width:140px" name="account_ids" id="account_ids" disabled hidden>
+    </div>
+    <div style="float:left;margin-left:24px;margin-top:-9115px;">
+        <input type="text" style="width:140px" name="balance_amount_ps_GF" id="balance_amount_ps_GF" disabled hidden>
+    </div>
+    <div style="float:left;margin-left:24px;margin-top:-9125px;">
+        <input type="text" style="width:140px" name="balance_amount_mooe_GF" id="balance_amount_mooe_GF" disabled hidden>
+    </div>
+    <div style="float:left;margin-left:24px;margin-top:-9135px;">
+        <input type="text" style="width:140px" name="balance_amount_co_GF" id="balance_amount_co_GF" disabled hidden>
+    </div>
+    <div style="float: right;margin-right:70px;margin-top:0px;">
+                   
+       
+            @(Html.Kendo().ComboBox()
+                            .Name("offs")
+                            .DataTextField("OfficeName")
+                            .DataValueField("OfficeID")
+                            .Placeholder("Select office...")
+                            .Filter("contains")
+                            .MinLength(1)
+                            .HtmlAttributes(new { @style = "width: 500px;" })
+                            .Events(e => e.Change("fn_dprefresher"))
+                            .DataSource(source => source.Read(read => read.Action("GetOffice_MO", "Release").Data("Select_Office")))
+            )
+      
+       
+
+    </div>
+
+    <div style="height:10px;">
+
+    </div>
+   
+    <div id="ProgramAndExpenseClassDiv" style="float: none;clear:both; margin-top: 25px">
+      
+        <div style="float: left;margin-right:10px;margin-top:2px;">
+            <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                Program :
+            </label>
+        </div>
+        <div style="float: right;margin-right:70px;margin-top:0px;">
+          <script>
+              function fn_Offices() {
+                  var proyy = $("#ddlYear").val();
+                  var off_id = $("#offs").val();
+                  var ooe_id = $("#ooe_id").val();
+
+                  return {
+                      propYear: proyy,
+                      office_ID: off_id,
+                      ooe_id: ooe_id
+                  }
+              }
+          </script>
+
+            @(Html.Kendo().DropDownList()
+                            .Name("Progss")
+                            .DataTextField("ProgramDescription")
+                            .DataValueField("ProgramID")
+                            .OptionLabel("Select programs...")
+                            .HtmlAttributes(new { @style = "width: 500px;" })
+                            .Events(e => e.Change("fn_dprefresherprogs"))
+                   .DataSource(source => source.Read(read => read.Action("GetPrograms2", "dpPrograms").Data("fn_Offices")))
+            )
+
+        </div>
+
+        <div style="float: left;margin-right:10px;margin-top:10px;">
+            <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                Expense Class    :
+            </label>
+        </div>
+        <div style="float: right;margin-right:70px;margin-top: 5px;">
+            @(Html.Kendo().DropDownList()
+                        .Name("ooe_id")
+                        .DataTextField("OOEName")
+                        .DataValueField("OOEID")
+                        .OptionLabel("Select Expenses...")
+                        .HtmlAttributes(new { @style = "width: 500px;" })
+                        .Events(e => e.Change("fn_dprefresherOOied"))
+                        .DataSource(source => source.Read(read => read.Action("dp_OOE", "Dropdowns")))
+            )
+        </div>
+        <div style="float: left;margin-right:10px;margin-top:10px;">
+            <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                Account    :
+            </label>
+        </div>
+        <div style="float: right;margin-right:70px;margin-top:5px;">
+            <script>
+                    function fn_ForAccount() {
+                        var propYear = $("#ddlYear").val();
+                        var office_ID = $("#offs").val();
+                        var ooe_id = $("#ooe_id").val();
+                        var prog_id = $("#Progss").val();
+                        var vwAllAccountsid = $("#vwAllAccounts").val();
+                        return {
+                            propYear: propYear,
+                            office_ID: office_ID,
+                            ooe_id: ooe_id,
+                            prog_id: prog_id,
+                            vwAllAccountsid: vwAllAccountsid
+                        }
+                    }
+            </script>
+
+            @(Html.Kendo().ComboBox()
+                        .Name("account_list")
+                        .DataTextField("account_name")
+                        .DataValueField("account_id")
+                        .Filter("contains")
+                        .MinLength(1)
+                        .Placeholder("Select Account...")
+                        .HtmlAttributes(new { @style = "width: 500px;" })
+                        .Events(e => e.Change("ocake"))
+                        .DataSource(source => source.Read(read => read.Action("MOS_Account", "Dropdowns").Data("fn_ForAccount")))
+            )
+        </div>
+        
+    </div>
+    <div style="float:left;margin-left:188px;clear:both;margin-top:2px;font-size:11px">
+        <input type='checkbox' class='checkbox' id="vwAllAccounts" onclick=vwAllAccounts() /> View All Accounts
+    </div>
+    <div id="MonthDepartment" style="float: none;clear:both; margin-top: 20px">
+
+        <div style="float:left;margin-left:50px;margin-top:5px;">
+            <label>
+                Release Month    :
+            </label>
+        </div>
+            <div style="float:left;margin-left:21px;margin-top:5px;">
+                @*@(Html.Kendo().DropDownList()
+                          .Name("Months")
+                          .DataTextField("Text")
+                          .DataValueField("Value")
+                          //.Events(e => e.Change("change"))
+                          .BindTo(new List<SelectListItem>() {
+                              new SelectListItem() {
+                                  Text = "January",
+                                  Value = "1"
+                              },
+                              new SelectListItem() {
+                                  Text = "Febuary",
+                                  Value = "2"
+                              },
+                              new SelectListItem() {
+                                  Text = "March",
+                                  Value = "3"
+                              },
+                              new SelectListItem() {
+                                  Text = "April",
+                                  Value = "4"
+                              },
+                              new SelectListItem() {
+                                  Text = "May",
+                                  Value = "5"
+                              },
+                              new SelectListItem() {
+                                  Text = "June",
+                                  Value = "6"
+                              },
+                              new SelectListItem() {
+                                  Text = "July",
+                                  Value = "7"
+                              },
+                              new SelectListItem() {
+                                  Text = "August",
+                                  Value = "8"
+                              },
+                              new SelectListItem() {
+                                  Text = "September",
+                                  Value = "9"
+                              },
+                              new SelectListItem() {
+                                  Text = "October",
+                                  Value = "10"
+                              },
+                              new SelectListItem() {
+                                  Text = "November",
+                                  Value = "11"
+                              },
+                              new SelectListItem() {
+                                  Text = "December",
+                                  Value = "12"
+                              }
+                          })
+                          .Value(@ViewBag.MonthVaue)
+                          .HtmlAttributes(new { style = "width: 150px" })
+                                )*@
+
+                @(Html.Kendo().DatePicker()
+              .Name("datepicker_desu")
+              .Start(CalendarView.Year)
+              .Depth(CalendarView.Year)
+              .Format("MMMM")
+              .Events(e => e.Change("numeric_desu"))
+              .HtmlAttributes(new { style = "width: 150px" })
+                )
+                
+            </div>
+       
+
+            <div style="float:right;margin-right:70px;margin-top:5px;">
+                @(Html.Kendo().NumericTextBox<double>()
+            .Name("numeric")
+            .Value(1)
+            .Placeholder("Enter numeric value")
+            .Format("{0:n0}")
+            .Min(0)
+           
+            .HtmlAttributes(new { style = "width: 110px" })
+                     
+                )
+            </div>
+        <div style="float:right;margin-right:30px;margin-top:5px;">
+            <label>
+                Monthly Release Batch    :
+            </label>
+        </div>
+       
+            <div id="radios" style="float: left; margin-top: 15px ; margin-left : 0px; visibility:hidden">
+
+
+                <form action="">
+                    <div style="float:left;margin-left:250px">
+                        <input onclick="iyot()" type="radio" id="release_rad" name ="release_rad" value="Subsidy" style="width:30px" checked="checked"> Subsidy
+                    </div>
+                    <div style="float:left;margin-left:130px">
+                        <input onclick="iyot()" type="radio" id="release_rad" name="release_rad" value="Income" style="width:30px"> Income
+                    </div>
+                    </form>
+                <br />
+            </div>
+       
+        </div>
+    </div>
+<div id="relforapproval"style="float:left;margin-left:-540px;margin-top:22px;">
+    <div class="k-button k-button-icontext eeeewqwdqwd" style="border-radius:12px;color:white;background-color:red;height:30px;width:180px;text-align:center" onclick="ReleaseForApproval()" id="Release_GG"> For Approval Summary</div>
+</div>
+<div style="float:left;margin-left:-356px;margin-top:25px;">
+    <input type='checkbox' class='checkbox' value="0" id="allrelease" title="Checked the box, to view all allotment released FOR APPROVAL!" style="zoom:1.5" onclick=allrelease() />
+</div>
+<div style="float:left;margin-left:474px;margin-top:-360px;">
+    <input type="text" style="width:140px" name="WithSubsidyFlag" id="WithSubsidyFlag" value="1"  disabled>
+</div>
+<div style="border: outset;clear:both;border-width:1px;border-color:#1fa67a; width: 749px; padding-left:0px;padding-right:0px;padding-top:0px;padding-bottom:7px;margin-top: 40px;">
+    <div style=" width: 0;height: 0; border-right: 5px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;margin-top: -1px; ">
+        <div style="float: left; width: 683px; margin-top:1px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 36px solid #1fa67a; ">
+            <div style="float: left; height:28px; margin-left:-59px; margin-top: 5px;">
+                <i class="fa fa-tasks fa-2x fg-white"></i>
+
+            </div>
+   
+            <div style="text-align: right;float: right;margin-right:10px;margin-top:2px;">
+
+
+                @(Html.Kendo().DropDownList()
+                        .Name("ddlYear")
+                        .DataTextField("ProposalYear")
+                        .DataValueField("ProposalYear")
+                        .SelectedIndex(0)
+                        .HtmlAttributes(new { @style = "width: 70px;" })
+                        .Events(e => e.Change("ocake"))
+                        .DataSource(source => source.Read(read => read.Action("GetPropYear4", "PYear")))
+                )
+
+
+
+
+            </div>
+            <div style="float: right;margin-right:10px;margin-top:2px;">
+                <i class="fa fa-calendar fa-2x #33333"></i>
+            </div>
+            <script>
+                function onChangePercent() {
+                    $("#grd_BudgetApprovalBudget").data("kendoGrid").dataSource.read();
+                }
+            </script>
+            <div style="float: right;margin-right:10px;margin-top:2px;">
+                @(Html.Kendo().DropDownList()
+                              .Name("classtype")
+                              .DataTextField("Class_Type")
+                              .DataValueField("Class_ID") 
+                              .SelectedIndex(0)
+                              .HtmlAttributes(new { @style = "width: 160px;" })
+                              .DataSource(source => source.Read(read => read.Action("ddlClasses", "Dropdowns")))
+                              .Events(e => e.Change("ChangeGrid2"))
+                )
+            </div>
+            <div style="float: right;margin-right:10px;margin-top:8px;">
+                <span style="font-size:14px;color:#ffffff">Fund Type :</span>
+            </div>
+
+        </div>
+    </div>
+   
+    <div class="demo-section k-content" style=" float:right;margin-top: 7px;margin-right:7px ">
+        <div style="float:left;margin-left:474px;margin-top:-68px;">
+           
+            <input type="text" style="width:140px" name="available_EEOK" id="available_EEOK" value="0"  hidden disabled>
+        </div>
+        <div style="float:left;margin-left:504px;margin-top:-68px;">
+
+            <input type="text" style="width:140px" name="Expense_" id="Expense_" value="0" hidden disabled>
+        </div>
+        <div style="float:left;margin-left:534px;margin-top:-68px;">
+
+            <input type="text" style="width:140px" name="income_Available" id="income_Available" value="0" hidden disabled>
+        </div>
+        <div style="float:left;margin-left:564px;margin-top:-68px;">
+
+            <input type="text" style="width:140px" name="subsidy_Available" id="subsidy_Available" value="0" hidden disabled>
+        </div>
+        <div style="float:left;margin-left:544px;margin-top:-68px;">
+
+            <input type="text" style="width:140px" name="total_Release" id="total_Release" value="0" hidden disabled>
+        </div>
+    </div>
+    <div id="GridsID" class="demo-section k-content">
+      
+
+    </div>
+    <div id="AmountDepartment" style="float: none;clear:both; margin-top: 60px">
+</div>
+
+    </div>
+
+<script>
+    setTimeout(function () {
+        var todayDate = kendo.toString(kendo.parseDate(new Date()), 'MMMM');
+        $("#datepicker_desu").data("kendoDatePicker").value(todayDate);
+        fn_Offices();
+    }, 100);
+
+    //setTimeout(function () {
+
+    ////    ChangeGrid();
+    //    fn_Offices();
+
+    //}, 1000);
+
+    function ReleaseForApproval() {
+        var url = "@Url.Action("releaseforapproval", "Release")";
+     
+        if ($("#allrelease").val() == 0 && ($("#account_list").val() == 0 || $("#account_list").val()==""))
+        {
+            swal("Warning","Please select an account in the dropdown list!","warning")
+        }
+        else {
+            $.get(url, {
+                year_: $("#ddlYear").val()
+            }, function (d) {
+                $('#RelForApproval').html(d);
+            })
+
+            $('#RelForApproval').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Release for Approval").center().open();
+        }
+    }
+</script>
+
+@(Html.Kendo().Window()
+        .Name("RelForApproval")
+        //.Title("Release Summary")
+        .Width(1035)
+        .Height(380)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+        .Events(e => e.Close("Close"))
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+                .Actions(a => { a.Close(); })
+)
+
+

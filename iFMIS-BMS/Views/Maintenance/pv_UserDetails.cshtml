@@ -1,0 +1,67 @@
+﻿
+<div style="border: outset;clear:both;border-width:1px;border-color:#1fa67a; width: 749px; padding-left:0px;padding-right:0px;padding-top:0px;padding-bottom:7px;margin-top: 10px;">
+    <div style=" width: 0;height: 0; border-right: 5px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;margin-top: -1px; ">
+        <div style="float: left; width: 678px; margin-top:1px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 36px solid #1fa67a; ">
+
+            <div style="float: left; height:28px; margin-left:-59px; margin-top: 5px;">
+                <i class="fa fa-tasks fa-2x fg-white"></i>
+
+            </div>
+
+            <div style="text-align: right;float: right;margin-right:10px;margin-top:2px;">
+                @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Maintenance.UserDetails_Model>()
+                     .Name("SensorGrid")
+
+    .Columns(columns =>
+    {
+        columns.Bound(s => s.UserID).Visible(false);
+        columns.Bound(s => s.UserTypeDesc);
+        columns.Bound(s => s.eid);
+        columns.Bound(s => s.EmpName);
+        columns.Bound(s => s.emailaddress);
+        columns.Bound(s => s.passcode);
+        columns.Bound(s => s.OfficeName)
+           
+          .ClientTemplate(Html.Kendo().DropDownList()
+         .Name("Value")
+         .DataTextField("Value")
+         .DataValueField("Key")
+         
+         .DataSource(source =>
+         {
+             source.Read(read =>
+             {
+                 read.Action("userOffice", "Dropdowns");
+             });
+         }
+         
+         )
+         .Events(e => e.Change("SelectCol"))
+         .ToClientTemplate()
+         .ToHtmlString()
+          );
+    })
+        .ToolBar(toolBar => toolBar.Save())
+        .Editable(editable => editable.Mode(GridEditMode.InCell))
+        .Pageable()
+        .Sortable()
+        .Scrollable()
+        .DataSource(dataSource => dataSource
+            .Ajax()
+            .Batch(true)
+            .ServerOperation(false)
+            .Model(model =>
+            {
+                model.Id(s => s.UserID);
+                model.Field(s => s.UserID).Editable(false);
+            })
+                .Read(read => read.Action("UserDetails", "Maintenance"))
+               // .Update(update => update.Action("Sensors_Update", "Details"))
+        )
+                )
+            
+            
+             </div>
+        </div>
+    </div>
+</div>

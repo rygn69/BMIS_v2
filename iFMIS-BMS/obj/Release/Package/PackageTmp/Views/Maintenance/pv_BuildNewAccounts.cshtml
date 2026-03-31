@@ -1,0 +1,147 @@
+﻿@model iFMIS_BMS.BusinessLayer.Models.AccountsModel
+<script>
+    function reqCloseBuildNewAccountsWindow() {
+        document.documentElement.style.overflow = 'auto';  // firefox, chrome
+        document.body.scroll = "yes";
+        $("#BuildAccountWindow").data("kendoWindow").close();
+    }
+    function getProgramParam() {
+        var OfficeID = @Model.SelectedOfficeID;
+        var YearOf = @Model.ProposalYear;
+        return {
+            OfficeID: OfficeID,
+            YearOf:YearOf
+        }
+    }
+    function OnddlProgramDatabound() {
+        $("#ddlProgram").data("kendoDropDownList").value(@Model.ProgramID);
+    }
+    function DisableLetters(event) {
+        if ($.inArray(event.keyCode, [46, 8, 9, 27, 13, 110]) !== -1 ||
+            // Allow: Ctrl+A, Command+A
+           (event.keyCode == 65 && (event.ctrlKey === true || event.metaKey === true)) ||
+            // Allow: home, end, left, right, down, up
+           (event.keyCode >= 35 && event.keyCode <= 40)) {
+            // let it happen, don't do anything
+            return;
+        }
+        // Ensure that it is a number and stop the keypress
+        if ((event.shiftKey || (event.keyCode < 48 || event.keyCode > 57)) && (event.keyCode < 96 || event.keyCode > 105)) {
+            event.preventDefault();
+        }
+    }
+    function reqBuildAccount() {
+        var AccountName = $("#txtAccountName").val();
+        var AccountID = @Model.AccountID;
+        var AccountCode = $("#txtAccountCode").val();
+        var ChildAccountCode = $("#txtChildAccountCode").val();
+        var ProgramID = $("#ddlProgram").data("kendoDropDownList").value();
+        var ThirdLevelGroupID = $("#ddlThirdLevelGroup").data("kendoDropDownList").value();
+        var ThirdLevelGroupDesc = $("#ddlThirdLevelGroup").data("kendoDropDownList").text();
+        var FundType = $("#ddlFundType").data("kendoDropDownList").value();
+        var OrderNo = $("#txtOrderNo").val();
+        var RefYearOf = @Model.ProposalYear;
+        var RefProgramID = @Model.ProgramID;
+        var url = "@Url.Action("BuildNewAccount", "Maintenance")";
+
+        if (AccountName == "" || AccountID == "" || AccountCode == "" || ProgramID == "" ||
+            ThirdLevelGroupID == "" || ThirdLevelGroupDesc == "" || FundType == "" || OrderNo == "") {
+            swal({ title: "Error!",html:true, text: "Fields Marked With <span style='color:red'>*</span> are Required!", showConfirmButton: true, type: "error" });
+        }
+        else {
+            if ($('#BuildAccountButtonSpinner').css("display") == 'none') {
+                $("#btnUpdateAccount").attr('disabled', 'disabled');
+                $('#BuildAccountButtonSpinner').css("display", "auto");
+
+                $.post(url, { AccountName:AccountName,AccountID:AccountID,AccountCode:AccountCode,
+                    ChildAccountCode:ChildAccountCode,ProgramID:ProgramID,ThirdLevelGroupID:ThirdLevelGroupID,
+                    ThirdLevelGroupDesc:ThirdLevelGroupDesc,FundType:FundType,OrderNo:OrderNo,RefYearOf:RefYearOf,RefProgramID:RefProgramID }, function (d) {
+                    if (d == "1") {
+                        swal({ title: "Success!", text: "Account Successfuly Build", timer: 1000, showConfirmButton: false, type: "success" });
+                        $("#grNewCreatedAccounts").data("kendoGrid").dataSource.read();
+                        document.documentElement.style.overflow = 'auto';  // firefox, chrome
+                        document.body.scroll = "yes";
+                        $("#BuildAccountWindow").data("kendoWindow").close();
+                        $('#BuildAccountButtonSpinner').css("display", "none");
+                        $("#btnUpdateAccount").removeAttr('disabled');
+                        $("#grNewCreatedAccounts tbody input:checkbox").prop("checked", false);
+                    }
+                    else {
+                        swal({ title: "Error!", text: d, timer: 1000, showConfirmButton: false, type: "error" });
+                        $('#BuildAccountButtonSpinner').css("display", "none");
+                        $("#btnUpdateAccount").removeAttr('disabled');
+                    }
+                })
+            }
+        }
+    }
+</script>
+<div id="NewAccountDiv">
+    <div style="display:inline-block;width:100%; margin-top: 10px">
+        <label>
+            Account Name <span style="color:red">*</span> : <br />
+            <input type="text" id="txtAccountName" class="k-textbox" placeholder="Account Name" style="width: 100%" value="@Model.AccountName">
+        </label>
+    </div>
+    <div style="width:48%;display:inline-block;margin-top: 10px">
+        <label>
+            Account Code <span style="color:red">*</span> : <br />
+            <input type="text" id="txtAccountCode" class="k-textbox" placeholder="Account Code" style="width: 100%" min="0" onkeydown="DisableLetters(event)">
+        </label>
+    </div>
+    <div style="width:48%;display:inline-block;margin-top: 10px; margin-left:15px">
+        <label>
+            Child Series Number : <br />
+            <input type="text" id="txtChildAccountCode" class="k-textbox" placeholder="Child Series Number" style="width: 100%">
+        </label>
+    </div>
+    <div style="display:inline-block;width:100%; margin-top: 10px">
+        <label>
+            Program <span style="color:red">*</span> : <br />
+            @(Html.Kendo().DropDownList()
+                            .Name("ddlProgram")
+                            .DataTextField("ProgramDescription")
+                            .DataValueField("ProgramID")
+                            .OptionLabel("Select Program...")
+                            .Value(Model.OOEID.ToString())
+                            .HtmlAttributes(new { @style = "width: 100%;" }).Events(e => e.DataBound("OnddlProgramDatabound"))
+                            .DataSource(source => source.Read(read => read.Action("ddlNewAccountProgram", "Dropdowns").Data("getProgramParam")))
+            )
+        </label>
+    </div>
+    <div style="display:inline-block;width:100%; margin-top: 10px">
+        <label>
+            Third Level Group <span style="color:red">*</span> : <br />
+            @(Html.Kendo().DropDownList()
+                            .Name("ddlThirdLevelGroup")
+                            .DataTextField("FundName")
+                            .DataValueField("FundID")
+                            .OptionLabel("Select Third Level Group...")
+                            .Value(Model.OOEID.ToString())
+                            .HtmlAttributes(new { @style = "width: 100%;" })
+                            .DataSource(source => source.Read(read => read.Action("ddlThirdLevelGroup", "Dropdowns")))
+            )
+        </label>
+    </div>
+    <div style="display:inline-block;width:100%; margin-top: 10px">
+        <label style="width:80%;display:inline-block">
+            Fund Type <span style="color:red">*</span> : <br />
+            @(Html.Kendo().DropDownList()
+                            .Name("ddlFundType")
+                            .DataTextField("FundName")
+                            .DataValueField("FundName")
+                            .OptionLabel("Select Fund Type...")
+                            .HtmlAttributes(new { @style = "width: 100%;" })
+                            .DataSource(source => source.Read(read => read.Action("ddlFundType", "Dropdowns")))
+            )
+        </label>
+        <label style="width:15%;display:inline-block;margin-left:25px">
+            Order No <span style="color:red">*</span> :<br />
+            <input type="text" id="txtOrderNo" class="k-textbox" style="width: 100%; height:30px" value="@Model.AccountCode" onkeydown="DisableLetters(event)">
+        </label>
+    </div>
+</div>
+<div style="display:inline-block; float: right">
+    <div id="btnUpdateAccount" class="k-button k-button-icontext" style="margin-bottom:5px;display:inline-block;width: 120px;clear:both; margin-top:5px;" onclick="reqBuildAccount()"><span id="BuildAccountButtonSpinner" style="display:none" class="fa fa-spinner fa-spin"></span> Build Account</div>
+    <div id="btnCloseWindow" class="k-button k-button-icontext" style="margin-bottom:5px;display:inline-block;width: 80px;clear:both; margin-top:5px;" onclick="reqCloseBuildNewAccountsWindow()">Close</div>
+</div>

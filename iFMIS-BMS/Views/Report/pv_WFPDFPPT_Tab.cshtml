@@ -1,0 +1,117 @@
+﻿@*<style>
+    .k-grid-header .k-header {
+        height: 20px;
+        padding: 0;
+    }
+
+    .k-grid tbody tr {
+        line-height: 14px;
+    }
+
+    .k-grid tbody td {
+        padding: 0;
+    }
+      .k-dropdown-wrap.k-state-default {
+        border-left-style: solid;
+    }
+</style>*@
+<script>
+    var thisculture = kendo.culture();
+    thisculture.numberFormat.currency.symbol = '';
+
+    function CheckAll(e) {
+        $("#grid_wfpdfppt tbody input:checkbox").prop("checked", e.checked);
+    }
+    function getwfpdfppt_param() {
+
+        var officeid = $("#officewfpdf").val() == "" ? 0 : $("#officewfpdf").val()
+        var year = $("#wfpyear").val()
+        var qtr = $("#qtr").val()
+        return {
+            year: year,
+            officeid: officeid,
+            qtr: qtr
+        }
+    }
+    function fnOffice_wfplist() {
+        var SelectedTabIndex = $("#tabstrip").data("kendoTabStrip").select().index();
+     
+        if (SelectedTabIndex == 0) {
+
+            $("#grid_wfpdfppt").data("kendoGrid").dataSource.read();
+
+        }
+        else if (SelectedTabIndex == 1) {
+            $("#grid_wfpdfppt_rev").data("kendoGrid").dataSource.read();
+        }
+
+    }
+    function fnqtr_dfppt() {
+        $("#grid_wfpdfppt").data("kendoGrid").dataSource.read()
+    }
+    function getyear() {
+        return {
+            year: $("#wfpyear").val()
+        }
+    }
+    function fn_refresher(e) {
+        var SelectedTabIndex = $("#tabstrip").data("kendoTabStrip").select().index();
+        //var text = $(e.item).find("> .k-link").text();
+        //alert(SelectedTabIndex);
+
+        if (SelectedTabIndex == 0) {
+
+            $("#grid_wfpdfppt").data("kendoGrid").dataSource.read();
+
+        }
+        else if (SelectedTabIndex == 1) {
+            $("#grid_wfpdfppt_rev").data("kendoGrid").dataSource.read();
+        }
+
+    }
+</script>
+
+<label style="display:inline-block;margin-left:10px;margin-top:10px;">
+    Office
+</label>
+<div style="margin-left:10px;width:500px;">
+    @(Html.Kendo().ComboBox()
+            .Name("officewfpdf")
+            .DataTextField("offname")
+            .DataValueField("OfficeID")
+            .AutoBind(true)
+            .Placeholder("Select Office...")
+            .Filter("contains")
+            .MinLength(3)
+            .Events(e => e.Change("fnOffice_wfplist"))
+            .SelectedIndex(-1)
+            .HtmlAttributes(new { style = "width:75%; height:100%", @class = "form-control autoselect" })
+            .DataSource(source =>
+            {
+                source.Read(read =>
+                {
+                    read.Action("GetOfficeWFPDFPPT", "Report").Data("getyear");
+                })
+            .ServerFiltering(false);
+            })
+    )
+
+</div>
+
+<div class="demo-section k-content">
+    @(Html.Kendo().TabStrip()
+          .Name("tabstrip")
+          .Navigatable(false)
+          .Animation(animation =>
+              animation.Open(effect =>
+              effect.Fade(FadeDirection.In)))
+          .Items(tabstrip =>
+          {
+              tabstrip.Add().Text("Submitted").Selected(true).LoadContentFrom("pv_WFPDFPP_det", "Report");
+              tabstrip.Add().Text("Reviewed").LoadContentFrom("pv_WFPDFPP_rev", "Report");
+          })
+          .Events(e => e.Activate("fn_refresher"))
+
+    )
+</div>
+

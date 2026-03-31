@@ -1,0 +1,370 @@
+﻿<script>
+    var thisculture = kendo.culture();
+    thisculture.numberFormat.currency.symbol = '';
+
+    function CheckAll(e) {
+        $("#grid_wfpdfppt tbody input:checkbox").prop("checked", e.checked);
+    }
+    function getwfpdfppt_param() {
+
+        var officeid = $("#officewfpdf").val() == "" ? 0 : $("#officewfpdf").val()
+        var year = $("#wfpyear").val()
+        var qtr = $("#qtr").val()
+        return {
+            year: year,
+            officeid: officeid,
+            qtr: qtr,
+            mode: 0
+        }
+    }
+    function fnOffice_wfplist() {
+        $("#grid_wfpdfppt").data("kendoGrid").dataSource.read()
+    }
+    //function fnqtr_dfppt() {
+    //    $("#grid_wfpdfppt").data("kendoGrid").dataSource.read()
+    //}
+</script>
+
+<div style="display:inline-block;width:100%;margin-top:-3px;">
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.WFPrepare>()
+            .Name("grid_wfpdfppt")
+            .HtmlAttributes(new { style = "height:490px;" })
+            .Scrollable()
+            .Columns(col =>
+            {
+            col.Template(@<text></text>)
+            .ClientTemplate("<input id='check#=accountid#' type='checkbox' style='zoom:1.2'  title='Tick the box to include the account in the review!'  class='checkbox'/>")
+            .Title("<input onclick=CheckAll(this) type='checkbox' title='Tick all the boxes!' class='checkbox'/> <span style='text - align:center; vertical - align:middle; height: 30px; background - color:#ff6a00;font-size:14px;color:beige;font-weight:100;'></span> ")
+            .Width(32)
+            //.Hidden()
+            //.HeaderTemplate(@<text>For Review</text>)
+            .HtmlAttributes(new { style = "text-align:center;height:30px" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" });
+
+            col.Template(@<text></text>)
+            .HeaderTemplate(@<text>Account</text>)
+            .Width(218)
+            .HtmlAttributes(new { style = "text-align:left;vertical-align:top;font-size:12px" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=accountname# </div>")
+            .ClientFooterTemplate("<div style='text-align:center;color:darkgreen;font-size:10px'><label> </label><label> Total</label></div>");
+
+            col.Bound(c => c.firstmon)
+            .HeaderTemplate(@<text>First <br />Month</text>)
+            .Width(100)
+            .HtmlAttributes(new { style = "text-align:right;vertical-align:top;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=kendo.toString(firstmon,'c2')# </div>")
+            .ClientFooterTemplate("<div style='text-align:right;color:darkgreen;font-size:10px'><label> </label><label> ₱#=kendo.toString(sum, 'c2')#</label></div>");
+            col.Bound(c => c.secondmon)
+            .HeaderTemplate(@<text>Second <br />Month</text>)
+            .Width(100)
+            .HtmlAttributes(new { style = "text-align:right;vertical-align:top;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=kendo.toString(secondmon,'c2')# </div>")
+            .ClientFooterTemplate("<div style='text-align:right;color:darkgreen;font-size:10px'><label> </label><label> ₱#=kendo.toString(sum, 'c2')#</label></div>");
+
+            col.Bound(c => c.thirdmon)
+                .HeaderTemplate(@<text>Third <br />Month</text>)
+                .Width(100)
+                .HtmlAttributes(new { style = "text-align:right;vertical-align:top;" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                .ClientTemplate("<div>#=kendo.toString(thirdmon,'c2')# </div>")
+                .ClientFooterTemplate("<div style='text-align:right;color:darkgreen;font-size:10px'><label> </label><label> ₱#=kendo.toString(sum, 'c2')#</label></div>");
+
+            col.Bound(c => c.fourthmon)
+                .HeaderTemplate(@<text>Fourth <br />Month</text>)
+                .Width(100)
+                .HtmlAttributes(new { style = "text-align:right;vertical-align:top;" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                .ClientTemplate("<div>#=kendo.toString(fourthmon,'c2')# </div>")
+                .ClientFooterTemplate("<div style='text-align:right;color:darkgreen;font-size:10px'><label> </label><label> ₱#=kendo.toString(sum, 'c2')#</label></div>");
+
+            col.Template(@<text></text>)
+                .ClientTemplate("<div>#=officeid# </div>")
+                .Hidden();
+
+            col.Template(@<text></text>)
+                .ClientTemplate("<div>#=programid# </div>")
+                .Hidden();
+
+            col.Template(@<text></text>)
+                .ClientTemplate("<div>#=accountid# </div>")
+                .Hidden();
+
+            col.Template(@<text></text>)
+                .ClientTemplate("<div>#=yearof# </div>")
+                .Hidden();
+            })
+             .ToolBar(toolbar =>
+             {
+                 toolbar.Custom().Text("<span id='spanthumbsup' class='fa fa-thumbs-o-up'> </span><span id='SpanOnApproveProgress' style='display:none' class='fa fa-spinner fa-spin'></span> Set As Reviewed").Name("btnApprove").Url("javascript:void(0)").HtmlAttributes(new { onclick = "btnWFPDFPPT_review()" });
+             })
+            //.Sortable() // Disable this function to remove sorting or unlink the column header.
+            //.Editable(editable => editable.Mode(GridEditMode.InCell))
+            .Resizable(e => e.Columns(true))
+            .Pageable(pageable => pageable
+            .Refresh(true)
+            .ButtonCount(5))
+            .HtmlAttributes(new { @class = "table-responsive", style = "height:535px;" })
+            // .HtmlAttributes(new { style = "height:490px;" })
+            .ClientDetailTemplateId("templatefor")
+            .Selectable()
+            //  .Events(e => e.DataBound("onDataBoundWFP"))
+            .DataSource(dataSource => dataSource
+            .Ajax()
+            .Batch(true)
+            .Model(m => m.Id(i => i.locationid))
+            .ServerOperation(false)
+            .Aggregates(a =>
+            {
+                a.Add(c => c.firstmon).Sum();
+                a.Add(c => c.secondmon).Sum();
+                a.Add(c => c.thirdmon).Sum();
+                a.Add(c => c.fourthmon).Sum();
+            })
+            .PageSize(2050)
+            .Read(read => read.Action("GetWFPDfppt_list", "Report").Data("getwfpdfppt_param"))
+            )
+)
+</div>
+<script id="templatefor" type="text/kendo-tmpl">
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.WFPrepare>()
+        .Name("grd_wfpsumdetail#=accountid#")
+         .Columns(col =>
+         {
+
+            col.Template(@<text></text>)
+        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+        .HeaderTemplate(@<text>
+        <div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size:12px;">Item</div></text>)
+        .Width(200)
+        .ClientTemplate("<div font-size:11px;>\\#=particular\\# </div>")
+        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal;background-color:\\#ffd800;font-size:14px;color:black;" })
+        .ClientFooterTemplate("<div style='text-align:center;color:darkgreen'><label> </label><label> Total</label></div>");
+
+            col.Template(@<text></text>)
+        .HtmlAttributes(new { style = "text-align:right;height:30px" })
+        .HeaderTemplate(@<text>
+        <div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size:12px;">Amount</div></text>)
+        .Width(80)
+        .ClientTemplate("<div font-size:11px;>\\#=kendo.toString(amount, 'c2')\\# </div>")
+        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal;background-color:\\#ffd800;font-size:14px;color:black;" });
+        
+        col.Template(@<text></text>)
+        .HtmlAttributes(new { style = "text-align:right;height:30px" })
+        .HeaderTemplate(@<text>
+        <div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size:12px;">Jan</div></text>)
+        .Width(80)
+        .ClientTemplate("<div font-size:11px;>\\#=kendo.toString(m1, 'c2')\\# </div>")
+        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal;background-color:\\#ffd800;font-size:14px;color:black;" });
+
+        col.Template(@<text></text>)
+        .HtmlAttributes(new { style = "text-align:right;height:30px" })
+        .HeaderTemplate(@<text>
+        <div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size:12px;">Feb</div></text>)
+        .Width(80)
+        .ClientTemplate("<div font-size:11px;>\\#=kendo.toString(m2, 'c2')\\# </div>")
+        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal;background-color:\\#ffd800;font-size:14px;color:black;" });
+
+        col.Template(@<text></text>)
+        .HtmlAttributes(new { style = "text-align:right;height:30px" })
+        .HeaderTemplate(@<text>
+        <div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size:12px;">Mar</div></text>)
+        .Width(80)
+        .ClientTemplate("<div font-size:11px;>\\#=kendo.toString(m3, 'c2')\\# </div>")
+        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal;background-color:\\#ffd800;font-size:14px;color:black;" });
+
+        col.Template(@<text></text>)
+        .HtmlAttributes(new { style = "text-align:right;height:30px" })
+        .HeaderTemplate(@<text>
+        <div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size:12px;">Apr</div></text>)
+        .Width(80)
+        .ClientTemplate("<div font-size:11px;>\\#=kendo.toString(m4, 'c2')\\# </div>")
+        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal;background-color:\\#ffd800;font-size:14px;color:black;" });
+
+        col.Template(@<text></text>)
+        .HtmlAttributes(new { style = "text-align:right;height:30px" })
+        .HeaderTemplate(@<text>
+        <div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size:12px;">May</div></text>)
+        .Width(80)
+        .ClientTemplate("<div font-size:11px;>\\#=kendo.toString(m5, 'c2')\\# </div>")
+        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal;background-color:\\#ffd800;font-size:14px;color:black;" });
+
+        col.Template(@<text></text>)
+        .HtmlAttributes(new { style = "text-align:right;height:30px" })
+        .HeaderTemplate(@<text>
+        <div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size:12px;">Jun</div></text>)
+        .Width(80)
+        .ClientTemplate("<div font-size:11px;>\\#=kendo.toString(m6, 'c2')\\# </div>")
+        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal;background-color:\\#ffd800;font-size:14px;color:black;" });
+
+        col.Template(@<text></text>)
+        .HtmlAttributes(new { style = "text-align:right;height:30px" })
+        .HeaderTemplate(@<text>
+        <div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size:12px;">Jul</div></text>)
+        .Width(80)
+        .ClientTemplate("<div font-size:11px;>\\#=kendo.toString(m7, 'c2')\\# </div>")
+        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal;background-color:\\#ffd800;font-size:14px;color:black;" });
+
+        col.Template(@<text></text>)
+        .HtmlAttributes(new { style = "text-align:right;height:30px" })
+        .HeaderTemplate(@<text>
+        <div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size:12px;">Aug</div></text>)
+        .Width(80)
+        .ClientTemplate("<div font-size:11px;>\\#=kendo.toString(m8, 'c2')\\# </div>")
+        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal;background-color:\\#ffd800;font-size:14px;color:black;" });
+
+        col.Template(@<text></text>)
+        .HtmlAttributes(new { style = "text-align:right;height:30px" })
+        .HeaderTemplate(@<text>
+        <div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size:12px;">Sep</div></text>)
+        .Width(80)
+        .ClientTemplate("<div font-size:11px;>\\#=kendo.toString(m9, 'c2')\\# </div>")
+        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal;background-color:\\#ffd800;font-size:14px;color:black;" });
+
+        col.Template(@<text></text>)
+        .HtmlAttributes(new { style = "text-align:right;height:30px" })
+        .HeaderTemplate(@<text>
+        <div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size:12px;">Oct</div></text>)
+        .Width(80)
+        .ClientTemplate("<div font-size:11px;>\\#=kendo.toString(m10, 'c2')\\# </div>")
+        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal;background-color:\\#ffd800;font-size:14px;color:black;" });
+        col.Template(@<text></text>)
+        .HtmlAttributes(new { style = "text-align:right;height:30px" })
+        .HeaderTemplate(@<text>
+        <div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size:12px;">Nov</div></text>)
+        .Width(80)
+        .ClientTemplate("<div font-size:11px;>\\#=kendo.toString(m11, 'c2')\\# </div>")
+        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal;background-color:\\#ffd800;font-size:14px;color:black;" });
+
+        col.Template(@<text></text>)
+        .HtmlAttributes(new { style = "text-align:right;height:30px" })
+        .HeaderTemplate(@<text>
+        <div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size:12px;">Dec</div></text>)
+        .Width(80)
+        .ClientTemplate("<div font-size:11px;>\\#=kendo.toString(m12, 'c2')\\# </div>")
+        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal;background-color:\\#ffd800;font-size:14px;color:black;" });
+
+        col.Bound(m => m.totalamount)
+        .HtmlAttributes(new { style = "text-align:right;height:30px" })
+        .HeaderTemplate(@<text>
+        <div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size:12px;">Total <br />Amount</div></text>)
+        .Width(80)
+        .ClientTemplate("<div font-size:11px;>\\#=kendo.toString(totalamount, 'c2')\\# </div>")
+        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal;background-color:\\#ffd800;font-size:14px;color:black;" })
+        .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> </label><label> ₱\\#=kendo.toString(sum, 'c2')\\#</label></div>");
+
+         })
+        //.Sortable()
+        .Scrollable()
+        .Resizable(e => e.Columns(true))
+        .HtmlAttributes(new { style = "height:300px;" })
+        .Pageable(pageable => pageable
+        .Refresh(true)
+        .ButtonCount(2))
+        .Selectable()
+        .DataSource(d => d
+        .Ajax()
+        .Aggregates(a =>
+        {
+            a.Add(c => c.totalamount).Sum();
+        })
+        .ServerOperation(false)
+        .PageSize(1000)
+        .Model(m => m.Id(i => i.officeid))
+        .Read(read => read.Action("GetWFPDfppt_item", "Report", new { officeid = "#=officeid#", programid = "#=programid#", accountid = "#=accountid#", yearof = "#=yearof#" }))
+        )
+        .Pageable()
+        .ToClientTemplate()
+    )
+</script>
+    <div id="btnPrint" class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 100px;float:right; margin-top:10px; margin-right:50px;border-radius:50px;margin-bottom:10px" onclick="reqPrint()"><span class="fa fa-search"></span> Preview</div>
+    <script>
+
+        function reqPrint() {
+            var officeid = $("#officewfpdf").val() == "" ? 0 : $("#officewfpdf").val()
+            var year = $("#wfpyear").val()
+            var qtr = $("#qtr").val()
+            $.ajax({
+                async: false,
+                dataType: 'html',
+                success: window.open("../Reports/ReportViewer.aspx?rid=41&OfficeID=" + officeid + "&yearof=" + year + "&qtr=" + qtr + "&mode=0")
+
+            });
+        }
+
+        function btnWFPDFPPT_review() {
+            if ($('#SpanOnApproveProgress').css("display") == 'none') {
+                $('#SpanOnApproveProgress').css("display", "auto");
+                $('#spanthumbsup').css("display", "none");
+                var url = "@Url.Action("wfpdfpptsummary", "Report")";
+                var idsToSend = [];
+                var AmountsToSend = [];
+                var BudgetToSend = [];
+                var grid = $("#grid_wfpdfppt").data("kendoGrid")
+                var ds = grid.dataSource.view();
+
+
+                var officeid = $("#officewfpdf").val() == null || $("#officewfpdf").val() == 0 ? 0 : $("#officewfpdf").val();
+                var qtr = $("#qtr").val();
+                var yearof = $("#wfpyear").val();
+
+                for (var i = 0; i < ds.length; i++) {
+                    var row = grid.table.find("tr[data-uid='" + ds[i].uid + "']");
+                    var checkbox = $(row).find(".checkbox");
+                    if (checkbox.is(":checked")) {
+                        idsToSend.push(ds[i].accountid); //loops
+                    }
+                }
+                if (officeid == 0 || qtr == 0) {
+                    swal({ title: "Warning!", text: "Please select an office or period from the dropdown list!", timer: 2500, showConfirmButton: false, type: "warning" });
+                }
+                else if (idsToSend == "") {
+                    swal({ title: "Warning!", text: "Please tick the box to include the account in the review!", timer: 2500, showConfirmButton: false, type: "warning" });
+                    $('#SpanOnApproveProgress').css("display", "none");
+                    $('#spanthumbsup').css("display", "auto");
+                }
+                else {
+                    swal({
+                        title: "Confirmation!",
+                        text: "This will set the DFPPT as Reviewed. Do you want to proceed?",
+                        type: "info",
+                        showCancelButton: true,
+                        closeOnConfirm: false,
+                        confirmButtonColor: "#1fa67a",
+                        confirmButtonText: "Yes",
+                        showLoaderOnConfirm: true,
+                    },
+                    function (isConfirm) {
+                        if (isConfirm) {
+                            $.post(url, { transno: idsToSend, officeid: officeid, qtr: qtr, yearof: yearof, mode: '1' }, function (d) {
+                                if (d == 1) {
+                                    swal({ title: "Success!", text: "WFP/DFPPT Summary is waiting for your signature in the Dgsign App!", timer: 1000, showConfirmButton: false, type: "success" });
+                                    $("#grid_wfpdfppt").data("kendoGrid").dataSource.read()
+                                    $('#SpanOnApproveProgress').css("display", "none");
+                                    $('#spanthumbsup').css("display", "auto");
+                                }
+                                else {
+                                    if (d == "ErrorNAS") {
+                                        swal("Error", "An error occurred while attempting to generate the Work and Financial Plan (WFP) for digital signature. Please review your actions.", "error");
+                                        $('#SpanOnApproveProgress').css("display", "none");
+                                        $('#spanthumbsup').css("display", "auto");
+                                    }
+                                    else {
+                                        swal("Something Went Wrong!", d, "error");
+                                        $('#SpanOnApproveProgress').css("display", "none");
+                                        $('#spanthumbsup').css("display", "auto");
+                                    }
+                                }
+                            })
+                        }
+                        else {
+                            $('#SpanOnApproveProgress').css("display", "none");
+                            $('#spanthumbsup').css("display", "auto");
+                        }
+                    })
+                }
+            }
+        }
+    </script>

@@ -1,0 +1,269 @@
+﻿<script>
+    function reqSave() {
+        if ($("#Account_Name").val() == "" || $("#ThirdLevelGroup").val() == "" || $("#FundType").val() == "")
+        {
+            swal({
+                title: "",
+                text: "Please check your entry!",
+                type: "warning",
+               // timer: 2000,
+                showConfirmButton: true,
+                closeOnConfirm: true
+            })
+        }
+        else {
+            var notifi = new $("#popupNotification").data("kendoNotification");
+            swal({
+                title: "S A V E!",
+                text: "Are you sure?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes!",
+                closeOnConfirm: true
+            }, function () {
+
+                var url = "@Url.Action("SaveNewAccount","Maintenance")";
+                var frmData = $('#formProgram').serialize();
+                if ($("#btnSpinner").attr("class") != 'fa fa-spinner fa-spin') {
+                    $("#btnSpinner").attr('class', 'fa fa-spinner fa-spin');
+                    $.post(url, frmData, function (d) {
+                        if (d == "Success") {
+                            $.Notify({
+                                caption: 'Success!',
+                                content: 'Account Registered',
+                                icon: "<span class='mif-checkmark'></span>",
+                                type: 'success'
+                            });
+                            $("#grAccount").data("kendoGrid").dataSource.read();
+                            clearFields();
+                            $("#btnSpinner").removeClass('fa fa-spinner fa-spin');
+                        } else {
+                            swal("Error!", d, "error")
+                            $("#btnSpinner").removeClass('fa fa-spinner fa-spin');
+                            clearFields();
+                            $("#btnSpinner").removeClass('fa fa-spinner fa-spin');
+                        }
+                    })
+                }
+            })
+        }
+        }
+
+    function onClick() {
+        var entityGrid = $("#grAccount").data("kendoGrid");
+        var selectedItem = entityGrid.dataItem(entityGrid.select());
+        if (selectedItem.ChildSeriesNo == null) {
+            selectedItem.ChildSeriesNo = "";
+        }
+        document.getElementById("mode-status").innerHTML = "Update Account";
+        document.getElementById("button-status").innerHTML = "Update Account";
+        document.getElementById("Account_Name").value = selectedItem.Account_Name;
+        document.getElementById("FMISAccountCode").value = selectedItem.account_id;
+        
+        document.getElementById("AccountCode").value = selectedItem.AccountCode;
+        document.getElementById("child_series_no").value = selectedItem.child_series_no;
+        document.getElementById("child_account_code").value = selectedItem.AccountCode + selectedItem.child_series_no;
+        
+        $("#ThirdLevelGroup").val(selectedItem.ThirdLevelGroup);
+        $("#FundType").data("kendoDropDownList").value(selectedItem.FundType);
+    }
+    function onChange() {
+        $("#grAccount").data("kendoGrid").dataSource.read();
+    }
+    function SearchAccountName() {
+        var FundDropdown = $("#search_fund_id").val();
+        
+        return {
+            FundDropdown: FundDropdown
+        }
+    }
+    
+    function searchAccount() {
+        var SearchProgramData = $("#SearchData").val();
+        $("#grAccount").data("kendoGrid").dataSource.filter([
+            {
+                field: "Account_Name",
+                operator: "contains",
+                value: SearchProgramData
+            }
+        ]);
+    }
+    function clearFields()
+    {
+        $("#Account_Name").val("");
+        $("#FMISAccountCode").val("");
+        $("#ThirdLevelGroup").val("");
+        $("#AccountCode").val("");
+        $("#child_account_code").val("");
+        $("#child_series_no").val("");
+        $("#FundType").data("kendoDropDownList").value("");
+        document.getElementById("mode-status").innerHTML = "New Account";
+        document.getElementById("button-status").innerHTML = "Create Account";
+    }
+</script>
+<div style="margin-bottom:20px;">
+
+    <div style="float:left;border:outset; border-width:1px;border-color:#dadada; border-style:solid; width: 745px; padding-left:7px;padding-right:7px;padding-top:7px;padding-bottom:7px;">
+        <div style="margin-top:10px;">
+            <h2>Existing Accounts</h2>
+        </div>
+        @*<div style="margin-top:10px;">
+                <label>Expense Class</label>
+                @(Html.Kendo().DropDownList()
+                        .Name("search_fund_id")
+                        .DataTextField("ooe_name")
+                        .DataValueField("ooe_id")
+                        .OptionLabel("Search OOE . .")
+                        .HtmlAttributes(new { @style = "width: 80%;" })
+                        .Events(e => { e.Change("onChange"); })
+                        .DataSource(source => source.Read(read => read.Action("ddlOOE", "Dropdowns")))
+
+                )
+            </div>*@
+        <div style="margin-bottom:20px;">
+        </div>
+        @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Maintenance.account_code>()
+            .Name("grAccount")
+            .HtmlAttributes(new { style = "height:auto;" })
+            .Columns(col =>
+            {
+                col.Bound(m => m.Account_Name).Title("Account Name")
+                    .Width(250).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+                col.Bound(m => m.FundType).Title("FundType")
+                    .Width(80).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+                col.Bound(m => m.account_id).Title("AccountID").Hidden();
+                col.Bound(m => m.ThirdLevelGroup).Title("ThirdLevelGroup").Hidden();
+                col.Bound(m => m.AccountCode).Title("AccountCode").Hidden();
+                col.Bound(m => m.child_series_no).Title("ChildSeriesNo").Hidden();
+            })
+            .ToolBar(t => t.Template(@<text>
+
+
+                <div style="float: left; width: 0; margin-top:-3px;margin-bottom:-100px;margin-left:-3px; height: 0; border-right: 0px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;">
+                    <div style="float: left; width: 0; margin-top:0px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 37px solid #EEE; ">
+                        <div style="float: left; height:28px; margin-left:-59px; margin-top: 5px;">
+                            <i class="fa fa-tasks fa-2x fg-white"></i>
+                        </div>
+                    </div>
+                </div>
+                <div style="float: right; height:28px;margin-top:2px;">
+                    <link href="~/Content/metroui/css/docs.css" rel="stylesheet" />
+                    <div style="background-color:white;border:solid;border-color:whitesmoke;border-width:thin;width:310px;height:33px;float:right;padding:0px;margin-top:-3px;" id="search">
+                        <input type="text" style="width:260px;border-collapse:collapse;border-color:white;margin:0px;margin-left:-10px;height:70%;outline:none;border-left-style:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search by Account Name" id="SearchData" name="SearchData">
+                        <div class="k-button k-button-icontext" style="height:33px;width:40px;" onclick="searchAccount()"><span class="mif-search"></span></div>
+                    </div>
+                </div>
+            </text>))
+                                    .Pageable(page => page.Refresh(true)
+                                    .Enabled(true)
+                                    .ButtonCount(4)
+                                    .PreviousNext(true)
+                                    )
+
+                                       .Selectable(selectable => selectable.Mode(GridSelectionMode.Single))
+                                       .Events(e =>
+                                          {
+                                              e.Change("onClick");
+                                          })
+                                       .DataSource(d => d
+                                          .Ajax()
+                                          .PageSize(10)
+                                          .Model(m => m.Id(i => i.account_id))
+                                          .Read(read => read.Action("getExistingAccounts", "Maintenance"))
+                                       )
+        )
+    </div>
+
+    <hr style="margin-top:20px;" />
+    <h2 style="color:#000000;font-style:normal;text-shadow:none;">Mode : <span style="color:#ff0000" id="mode-status"> New Account</span></h2>
+    <hr />
+
+    <form id="formProgram" method="post">
+
+        @*<input type="text" id="FMISAccountCode" name="FMISAccountCode" value="" hidden="hidden" />*@
+        @*<input type="text" id="ProposalID" name="ProposalID" value=""/>*@
+        <div style="margin-top:20px;">
+            <label>Account Name</label>
+            <input type="text" class="k-textbox" style="width: 80%;" id="Account_Name" name="Account_Name" /> <span style="color:red;font-size:20px"> * </span>
+        </div>
+        <input type="text" class="k-textbox" style="width: 80%;display:none" id="FMISAccountCode" name="FMISAccountCode" />
+        <div style="margin-top:20px;">
+            <label>Expense Class</label>
+            @*Update on 2/19/2018 - xXx - Use Look-up expense class*@
+            @*<input type="text" class="k-textbox" style="width: 80%;" id="ThirdLevelGroup" name="ThirdLevelGroup" />*@
+            @(Html.Kendo().DropDownList()
+                    .Name("ThirdLevelGroup")
+                    .DataTextField("ooe_name")
+                    .DataValueField("ooe_name")
+                    .OptionLabel("Select. .")
+                    .HtmlAttributes(new { @style = "width: 80%;" })
+                    @*.DataSource(source => source.Read(read => read.Action("ddlOOE", "Dropdowns")).Data(1))*@
+                    .DataSource(source => {
+                        source.Read(read =>
+                        {
+                            read.Action("ddlOOE", "Dropdowns").Data("1");
+                        })
+                        .ServerFiltering(false);
+                        })
+            )
+            <span style="color:red;font-size:20px"> * </span>
+        </div>
+        <div style="margin-top:20px;">
+            <script>
+                function sync() {
+                    var n1 = document.getElementById('AccountCode');
+                    var n2 = document.getElementById('child_series_no');
+                    var n3 = document.getElementById('child_account_code');
+                    n3.value = n1.value + n2.value;
+                }
+            </script>
+            <label>Account Code</label>
+            <input type="number" class="k-textbox" style="width: 80%;" id="AccountCode" name="AccountCode" onkeyup="sync()" />
+        </div>
+        <div style="margin-top:20px;">
+            <label>Child Series No.</label>
+            <input type="text" class="k-textbox" style="width: 80%;" id="child_series_no" name="child_series_no" value="" onkeyup="sync()" />
+        </div>
+        <div style="margin-top:20px;">
+            <label>Child Account Code</label>
+            <input type="text" class="k-textbox" style="width: 80%;background-color:#ededed" id="child_account_code" name="child_account_code" readonly="readonly" />
+        </div>
+        <div style="margin-top:20px;">
+            <label>Fund Type</label>
+            @(Html.Kendo().DropDownList()
+                                    .Name("FundType")
+                                    .DataTextField("fund_name")
+                                    .DataValueField("fund_name")
+                                    .OptionLabel("Select Fund...")
+                                    .HtmlAttributes(new { @style = "width: 80%;" })
+                                    .DataSource(source => source.Read(read => read.Action("ddlFund", "Dropdowns")))
+
+            )
+            <span style="color:red;font-size:20px"> * </span>
+        </div>
+    </form>
+    <div style="float:left;margin-top:-10px">
+        <span style="font-weight:bold">NOTE : </span>  <span style="color:white;background-color:red"> Field(s) marked with asterisk(*) are required!!! </span>
+    </div>
+    <div style="width:100%;display:block;">
+        <hr />
+        <div class="k-button k-button-icontext" onclick="reqSave()" style="padding:10px;margin-top:20px;"><span id="button-status"><span id="btnSpinner"></span> Create Account</span></div>
+        <div class="k-button k-button-icontext" onclick="clearFields()" style="padding:10px;margin-top:20px;"><span id="button-status">Clear Fields</span></div>
+    </div>
+</div>
+
+<script>
+    $("#SearchData").keypress(function (e) {
+        if (e.keyCode == 13) {
+            searchAccount();
+        }
+    });
+    document.getElementById('SearchData').onkeyup = function () {
+        if (($(this).val() == '' || $(this).val() == 'Search by Account Name') && $(this).attr('type') != 'hidden') {
+            searchAccount()
+        }
+    }
+</script>

@@ -1,0 +1,137 @@
+﻿    <script>
+        //function fn_Program() {
+        //    var off_id = $("#offs").val();
+        //    var proYe = $("#propsYears").val();
+        //    var pro_id = ProgramID;
+        //    return {
+        //        prog_ID: pro_id,
+        //        off_ID: off_id,
+        //        propYear: proYe
+        //    }
+        //}
+    </script>
+
+<script type="text/javascript">
+
+    var BudgetYear = $("#propsYears").val();
+    var PastYear = BudgetYear - 2;
+    var CurrentYear = BudgetYear - 1;
+    document.getElementById("actualYearAppropriateBudget").innerHTML = PastYear;
+    document.getElementById("estimatesYearAppropriateBudget").innerHTML = CurrentYear;
+    document.getElementById("proposedYearAppropriateBudget").innerHTML = BudgetYear;
+
+</script>
+
+
+
+    <div style="border: outset;border-width:1px;border-color:#038603; width: 870px; padding-left:0px;padding-right:0px;padding-top:0px;padding-bottom:7px;margin-top: 10px;">
+          <div style="float: left; height:28px; margin-left:0px; margin-top: 5px;">
+                    <i class="fa fa-tasks fa-2x fg-white" style="color:#000000"> &nbsp;&nbsp; Budget Appropriation</i>
+          </div>
+        <script>
+
+            function fn_Program1() {
+                var off_id = $("#offs").val();
+                //var pro_id = $("#Progss").val();
+                var proYe = $("#propsYears").val();
+                return {
+                    //prog_ID: pro_id,
+                    off_ID: off_id,
+                    propYear: proYe
+
+                }
+            }
+    function ssss() {
+        @*var url = "@Url.Action("updateAccounts", "Annual")";*@
+        swal(
+            "Success!", "Sucessfully save", "success");
+    }
+
+
+    function onGridEdit(arg) {
+        if (arg.container.find("input[name=PastProposalAmmount]").length > 0) {
+
+            $("#qweqweqew").data("kendoGrid").closeCell(arg.container)
+        }
+    }
+    function ooo(e) {
+        $('#editPorgram').data('kendoWindow').title("Edit").center().closeCell();
+        $("#grd_AnnualBudget1111x`").data("kendoGrid").closeCell(arg.container)
+    }
+
+</script>
+
+
+
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.AccountsModel>()
+    .Name("qweqweqew")
+    .HtmlAttributes(new { style = "height:500px" })
+    .Columns(col =>
+    {
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;">Accounts</div></text>)
+                        .Width(250)
+                        .HtmlAttributes(new { style = "text-align:left" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center" })
+                        .ClientTemplate("<div>#=AccountName# </div>").Width(220);
+
+
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;">Account Code</div></text>)
+                        .Width(80)
+                        .HtmlAttributes(new { style = "text-align:left" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center" })
+                        .ClientTemplate("<div>#=AccountCode# </div>").Width(10);
+
+
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;">Past Year</div></text>)
+                        .Width(150)
+                        .HtmlAttributes(new { style = "text-align:left" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center" })
+                        .ClientTemplate("<div>#=PastProposalYear# </div>").Width(29).Hidden();
+
+                      
+        col.Bound(m => m.PastProposalAmmount).HtmlAttributes(new { style = "text-align:left;" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Past Year <span id="actualYearAppropriateBudget"></span>  (Actual)</div></text>)
+                        .HeaderHtmlAttributes(new { style = "text-align:center" })
+                        .Width(110);
+
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Current Year <span id="estimatesYearAppropriateBudget"></span>   (Estimates)</div></text>)
+                        .HtmlAttributes(new { style = "text-align:left" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center" })
+                        .ClientTemplate("<div>#=ProposalYear# </div>").Width(90);
+
+        col.Bound(m => m.ProposalAllotedAmount).HtmlAttributes(new { style = "text-align:left;" })
+            .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Budget Year <span id="proposedYearAppropriateBudget"></span> (Proposed)</div></text>)
+            .HeaderHtmlAttributes(new { style = "text-align:center" }).Width(90);
+
+
+    })
+                               .ToolBar(toolbar =>
+                                     {
+                                         toolbar.Save();
+
+                                            })
+
+
+
+                                                         .Editable(editable => editable.Mode(GridEditMode.InCell))
+                                                         .Pageable(page => page.Refresh(true)
+                                                                            .Enabled(true)
+                                                                            .ButtonCount(4)
+                                                                            .PreviousNext(true))
+                                                         .Events(e => e.SaveChanges("ssss").Edit("onGridEdit").Cancel("ooo"))
+                                                                            .Selectable()
+                                                                            .DataSource(d => d
+                                                                            .Ajax()
+                                                                            .Batch(true)
+                                                                            .PageSize(10)
+                                                                            .Model(m => m.Id(i => i.AccountID))
+                                                                            .Read(read => read.Action("Prog_read", "Annual").Data("fn_Program1"))
+                                                                            .Update("_updateHome4", "Annual"))
+)
+    
+
+</div>

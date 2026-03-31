@@ -1,0 +1,107 @@
+﻿
+<script>
+    var ID = 0;
+    function reqEdit(e) {
+        $(window).scrollTop(0);
+        var url = "@Url.Action("_edithomeprog", "Annual")";
+        ProgramID = e;
+        $.get(url, { ProgramID: e }, function (d) {
+            //alert(ProgramID);
+            $('#editPorgram').html(d);
+        })
+        $('#editPorgram').data('kendoWindow').title("Budget Appropriation").center().open();
+ 
+    }
+
+
+
+
+
+
+</script>
+
+
+<div style="border: outset;clear:both;border-width:1px;border-color:#1fa67a; width: 745px; padding-left:0px;padding-right:0px;padding-top:0px;padding-bottom:7px;margin-top: 10px;">
+    <div style=" width: 0;height: 0; border-right: 5px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;margin-top: -1px; ">
+        <div style="float: left; width: 678px; margin-top:1px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 36px solid #1fa67a; ">
+
+            <div style="float: left; height:28px; margin-left:-59px; margin-top: 5px;">
+                <i class="fa fa-tasks fa-2x fg-white">  &nbsp;&nbsp;  Budget Appropriation</i>
+                <script>
+                    function fn_refresher2() {
+                        $("#grd_AnnualBudget1111").data("kendoGrid").dataSource.read();
+                    }
+                </script>
+
+            </div>
+
+
+            <div style="text-align: right;float: right;margin-right:10px;margin-top:2px;">
+                @(Html.Kendo().ComboBox()
+                                                                    .Name("propsYears")
+                                                                    .DataTextField("ProposalYear")
+                                                                    .DataValueField("ProposalYear")
+                                                                    .Filter("contains")
+                                                                    .SelectedIndex(0)
+                                                                    .MinLength(1)
+                                                                    .HtmlAttributes(new { @style = "width: 90px;" })
+                                                                           .Events(e => e.Change("fn_refresher2"))
+                                                         .DataSource(source => source.Read(read => read.Action("GetPropYear", "PYear")))
+                )
+            </div>
+            <div style="float: right;margin-right:10px;margin-top:2px;">
+                <i class="fa fa-calendar fa-2x #33333"></i>
+            </div>
+
+        </div>
+    </div>
+    <script>
+        function fn_Program() {
+            
+            var proYe = $("#propsYears").val();
+            //alert(off_id + "-" + proYe);
+            return {
+             
+                propYear1: proYe
+            }
+        }
+    </script>
+
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.ProgramsModel>()
+    .Name("grd_AnnualBudget1111")
+    .Columns(col =>
+    {
+        col.Bound(m => m.ProgramDescription).Title("Program");
+
+        col.Template(t => { }).ClientTemplate(
+"<a class='cus-button' title='View Details' onclick='reqEdit(#=ProgramID#)'><span class='fa fa-edit' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'></span></a>"
+).HtmlAttributes(new { style = "vertical-align: top;" }).Width(53);
+
+
+    })
+
+                                  .Pageable(page => page.Refresh(true)
+                                  .Enabled(true)
+                                  .ButtonCount(4)
+                                  .PreviousNext(true)
+                                       ).AutoBind(true)
+                                   .Selectable()
+                                      .DataSource(d => d
+                                      .Ajax()
+                                      
+                                      .PageSize(10)
+                                      .Model(m => m.Id(i => i.ProgramID))
+                                      .Read(read => read.Action("Programs_read1", "Annual").Data("fn_Program"))
+                                                          )
+    )
+
+</div>
+<script>
+    $(document).ready(function () {
+        setTimeout(function () {
+            $("#grd_AnnualBudget1111").data("kendoGrid").dataSource.read();
+        }, 500);
+    })
+</script>
+
+@(Html.Kendo().Window().Name("editPorgram").Title("New Entry").Width(900).Height(500).Visible(false).Modal(true).Draggable(true).AutoFocus(true).Animation(a => { a.Open(o => o.SlideIn(SlideDirection.Down)); a.Close(c => { c.SlideIn(SlideDirection.Down); c.Reverse(true); }); }).Actions(a => { a.Close(); }))

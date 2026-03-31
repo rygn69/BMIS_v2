@@ -1,0 +1,135 @@
+﻿<script>
+    var SeriesID = 0;
+    function reqSaveForm4OtherData() {
+        var ddlForm4DataType = $("#ddlForm4DataType").data("kendoComboBox").value();
+        var OrderNo = $("#txtOrderNo").val();
+        var Description = $("#txtDescription").val();
+        var OfficeID = $("#ddlAIPOffices").val();
+        var yearof = $("#propsYears").val();
+       // alert(yearof);
+        if (ddlForm4DataType != '') {
+            if (document.getElementById("btnAddext").innerHTML == "Add") {
+                var url = "@Url.Action("SaveNewForm4OtherData", "BudgetPreparation")";
+                $.post(url, { DataType: ddlForm4DataType, OrderNo: OrderNo, Description: Description, OfficeID: OfficeID, yearof: yearof }, function (d) {
+                    if (d == 1) {
+                        swal({
+                            title: "Success!",
+                            text: "Data Successfuly Added!",
+                            type: "success",
+                            showConfirmButton: true
+                        });
+                        resetOtherDataFields();
+                        $("#grdLBPForm4OtherData").data("kendoGrid").dataSource.read();
+                    }
+                    else {
+                        swal({
+                            title: "Something went wrong!",
+                            text: d,
+                            type: "error",
+                            showConfirmButton: true
+                        });
+                    }
+                })
+            }
+            else {
+                var url = "@Url.Action("UpdateForm4OtherData", "BudgetPreparation")";
+                $.post(url, { SeriesID: SeriesID, DataType: ddlForm4DataType, OrderNo: OrderNo, Description: Description, yearof: yearof }, function (d) {
+                    if (d == 1) {
+                        swal({
+                            title: "Success!",
+                            text: "Data Successfuly Updated!",
+                            type: "success",
+                            showConfirmButton: true
+                        });
+                        $("#grdLBPForm4OtherData").data("kendoGrid").dataSource.read();
+                        CloseKendoWindow('LBPForm4OtherDataWindow')
+                    }
+                    else {
+                        swal({
+                            title: "Something went wrong!",
+                            text: d,
+                            type: "error",
+                            showConfirmButton: true
+                        });
+                    }
+                })
+            }
+        }
+        else {
+            swal({
+                title: "Something went wrong!",
+                text: "Please Select Type",
+                type: "error",
+                showConfirmButton: true
+            });
+        }
+    }
+    function resetOtherDataFields() {
+        $("#txtDescription").val('');
+        $("#ddlForm4DataType").data("kendoComboBox").value("");
+    }
+    function GetNewOrderNo() {
+        var OfficeID = $("#ddlAIPOffices").val();
+        var DataType = $("#ddlForm4DataType").val();
+        var url = "@Url.Action("GetForm4OtherDataOrderNo", "BudgetPreparation")";
+        $.post(url, { OfficeID: OfficeID, DataType: DataType }, function (d) {
+            $("#txtOrderNo").val(d);
+        })
+    }
+</script>
+<div>
+    <div style="display:inline-block">
+        <label>
+            Type :
+            @(Html.Kendo().ComboBox()
+                         .Name("ddlForm4DataType")
+                         .DataTextField("Text")
+                         .DataValueField("Value")
+                         .Filter("contains")
+                         .MinLength(1)
+                         .Placeholder("Select Type")
+                         .HtmlAttributes(new { @style = "width: 200px;margin-right:10px" })
+                         .DataSource(source => source.Read(read => read.Action("ddlForm4DataType", "BudgetPreparation")))
+                                                     .Events(e => e.Change("GetNewOrderNo"))
+            )
+            Order No : <input id="txtOrderNo" style="width:100px" type="number" />
+        </label>
+    </div>
+    <div>
+        <label>
+            Description :
+            <textarea id="txtDescription" style="width:450px;height:150px"></textarea>
+        </label>
+    </div>
+
+</div>
+<div style="float:right; margin-top: 10px">
+    <div style="display:inline-block" class="k-button k-button-icontext" onclick="reqSaveForm4OtherData()"> <i class="fa fa-save"></i> <span id="btnAddext">Add</span> </div>
+    <div style="display:inline-block" class="k-button k-button-icontext" onclick="CloseKendoWindow('LBPForm4OtherDataWindow')"> <i class="fa fa-times"></i> Close </div>
+</div>
+<style>
+    textarea {
+        resize: none;
+    }
+</style>
+<script>
+    $(document).ready(function () {
+        var ViewBagData = '@ViewBag.Mode';
+        var arr = ViewBagData.split(',')
+        var Mode = arr[0];
+        SeriesID = arr[1];
+        if (Mode == "Add") {
+            resetOtherDataFields();
+            document.getElementById("btnAddext").innerHTML = "Add";
+        }
+        else {
+            var url = "@Url.Action("GetForm4OtherDataSelectedForEdit", "BudgetPreparation")";
+            $.post(url, { SeriesID: SeriesID }, function (d) {
+                document.getElementById("btnAddext").innerHTML = "Update";
+                $("#txtDescription").val(d[0]);
+                $("#ddlForm4DataType").data("kendoComboBox").value(d[1]);
+                $('#txtOrderNo').val(d[2]);
+            })
+        }
+    });
+</script>

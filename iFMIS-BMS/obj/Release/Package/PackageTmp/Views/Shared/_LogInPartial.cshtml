@@ -1,0 +1,36 @@
+﻿@using Microsoft.AspNet.Identity
+
+<script>
+    $(document).ready(function () {
+        var url = "@Url.Action("_MyImage", "LogIn")";
+        var usr = "@User.Identity.GetUserName()";
+        $.post(url, function (data) {
+            document.getElementById("uImg").src = data;
+        })
+    })
+</script>
+
+@{
+    if (Request.IsAuthenticated)
+    {
+        <ul style="float: right;list-style: none;margin-top: 10px;">
+            <li style="float: right;">
+                <a class="aLogIn" href="@Url.Action("LogOut", "LogIn")">Log-out</a>
+            </li>
+            <li style="float: right;margin-left: 5px;margin-right: 5px;color: #333;">  |  </li>
+            <li style="float: right;color: #333;margin-right: 3px;display: inline;">
+                <img class="UserPic" style="width: 30px; height: 30px;" id="uImg" src="" /> <span style="vertical-align: top;">@User.Identity.GetUserName()</span>
+        </ul>
+    }
+    else
+    {
+        <ul style="float: right;list-style: none;margin-top: 10px;">
+            <li style="float: right;">
+                <a class="aLogIn" href="@Url.Action("Index", "LogIn")">log-in</a>.
+            </li>
+            <li style="float: right;color: #333;">
+                Hi! Guest, please
+            </li>
+        </ul>
+    }
+}

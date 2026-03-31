@@ -1,0 +1,190 @@
+﻿
+<script>
+    function RealGridposted() {
+        var office_id = $('#office_revert_to_null').val()
+        var program_id = $('#Program_revert_to_null').val() == "" ? 0 : $('#Program_realigned_to_null').val()
+        var account_id = $('#account_list_revert_to_null').val() == "" ? 0 : $('#account_list_realigned_to_null').val()
+        var subaccount = 0
+        return {
+            office_id: office_id,
+            program_id: program_id,
+            account_id: account_id,
+            yearof: $("#ddlYear").val(),
+            subaccount: subaccount,
+            submit: 1,
+            approved: 1,
+            posted: 1,
+            revsumm: $("#revsummaryid").val()
+        }
+    }
+    function frmRevPostedclose() {
+        $("#reversionposted").data("kendoWindow").close();
+        $("#grd_reversionoffice").data("kendoGrid").dataSource.read();
+    }
+    function searchposted() {
+        var $filter = new Array();
+        $filter = [];
+
+        if ($('#SearchRevPosted').val().length > 0) {
+            $filter.push({ field: "accountfrom", operator: "contains", value: $('#SearchRevPosted').val() }),
+            $filter.push({ field: "ppafrom", operator: "contains", value: $('#SearchRevPosted').val() }),
+            $filter.push({ field: "accountto", operator: "contains", value: $('#SearchRevPosted').val() }),
+            $filter.push({ field: "ppato", operator: "contains", value: $('#SearchRevPosted').val() });
+        }
+        $('#grd_reversionposted').data('kendoGrid').dataSource.filter({
+            logic: "or",
+            filters: $filter
+        });
+    }
+
+    $(function () {
+        $("#SearchRevPosted").keypress(function (e) {
+            if (e.keyCode == 13) {
+                searchposted();
+            }
+        });
+    });
+    function onDataBound(e) {
+        $(".k-hierarchy-cell").hide();
+        $(".k-hierarchy-col").hide();
+        var grid = $("#grd_reversionposted").data("kendoGrid")
+        var ds = grid.dataSource.view();
+        var rows = e.sender.tbody.children();
+        var revsummaryid=$("#revsummaryid").val()
+      
+        if (@Account.UserInfo.UserTypeID != 4 || revsummaryid==0) {
+            grid.showColumn('accountfrom');
+            grid.showColumn('ppafrom');
+            grid.hideColumn('officename');
+        }
+        else{
+            grid.hideColumn('accountfrom');
+            grid.hideColumn('ppafrom');
+            grid.showColumn('officename');
+        }
+    }
+</script>
+<div id="searchAccountid" style="height: 30px; margin-top: -5px; float: right;">
+    <input type="text" style="width:271.5px;border-collapse:collapse;margin:0px;border-style:solid;margin-left:0px;height:70%;outline:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;font-size:14px" placeholder="Search..." id="SearchRevPosted" name="SearchRevPosted">
+    <div class="k-button k-button-icontext" style="height:30px;width:40px;border-style:solid;"onclick="searchposted()"><span class="mif-search"></span></div>
+</div><br />
+<div style="margin-top:6px;">
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Monthly_DD_Model>()
+    .Name("grd_reversionposted")
+    // .Scrollable()
+    .Columns(col =>
+    {
+        @*col.Template(@<text></text>)
+            .ClientTemplate("<input id='check#=realignmentid#' type='checkbox'  class='checkbox'/>")
+            .Title("<input onclick=CheckAll(this) type='checkbox'  class='checkbox'/> <span style='text - align:center; vertical - align:middle; height: 30px;font-weight:600;font-size:14px;'>Approve</span> ")
+            .Width(100)
+            .HtmlAttributes(new { style = "text-align:center;height:30px;font-size:12px;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });*@
+        col.Bound(m => m.officename).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                                .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Office</div></text>)
+                        .Width(150)
+                        .ClientTemplate("<div>#=officename# </div>");
+        col.Template(@<text></text>).HtmlAttributes(new { style = "text-align:  left;height:30px;font-size:12px;" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center;font-size:14px; vertical-align: middle; overflow: visible; white-space: normal;">Account <br />(From)</div></text>)
+                        .Width(150)
+                        .ClientTemplate("<div>#=accountfrom# </div>")
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Template(@<text></text>).HtmlAttributes(new { style = "text-align:left;height:30px;font-size:12px;" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center;font-size:14px; vertical-align: middle; overflow: visible; white-space: normal;">Sub-Acount <br />(From)</div></text>)
+                        .Width(150)
+                        .ClientTemplate("<div>#=ppafrom# </div>")
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        
+        col.Template(@<text></text>).HtmlAttributes(new { style = "text-align:left;height:30px;font-size:12px;" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center;font-size:14px; vertical-align: middle; overflow: visible; white-space: normal;">Account <br />(To)</div></text>)
+                        .Width(150)
+                        .ClientTemplate("<div>#=accountto# </div>")
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Template(@<text></text>).HtmlAttributes(new { style = "text-align:left;height:30px;font-size:12px;" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center;font-size:14px; vertical-align: middle; overflow: visible; white-space: normal;">Sub-Account <br />(To)</div></text>)
+                        .Width(150)
+                        .ClientTemplate("<div>#=ppato# </div>")
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Bound(m => m.Amount)
+                        .HtmlAttributes(new { style = "text-align:right;height:30px;font-size:12px;" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center;font-size:14px; vertical-align: middle; overflow: visible; white-space: normal;">Amount <br>(Requested)</div></text>)
+                    .Width(120)
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                    .ClientTemplate("<div>#=kendo.toString(Amount,'c2')# </div>");
+        col.Bound(m => m.AmountApprove)
+                        .HtmlAttributes(new { style = "text-align:right;height:30px;font-size:12px;" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center;font-size:14px; vertical-align: middle; overflow: visible; white-space: normal;">Amount <br>(Posted)</div></text>)
+                    .Width(120)
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                    .ClientTemplate("<div>#=kendo.toString(AmountApprove,'c2')# </div>");
+        @*col.Bound(m => m.datetimesubmit)
+                    .HtmlAttributes(new { style = "text-align:right;height:30px;font-size:12px;" })
+                    .HeaderTemplate(@<text><div style="font-weight:600;text-align:center;font-size:14px; vertical-align: middle; overflow: visible; white-space: normal;">Date and Time <br />Submitted</div></text>)
+                    .Width(170)
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                    .ClientTemplate("<div>#=datetimesubmit# </div>");*@
+        col.Bound(m => m.datetimeapprove)
+                .HtmlAttributes(new { style = "text-align:right;height:30px;font-size:12px;" })
+                .HeaderTemplate(@<text><div style="font-weight:600;text-align:center;font-size:14px; vertical-align: middle; overflow: visible; white-space: normal;">Date and Time <br />Posted</div></text>)
+                .Width(170)
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                .ClientTemplate("<div>#=datetimeapprove# </div>");
+        col.Bound(m => m.reversion_id).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">id</div></text>)
+                        .Hidden()
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Bound(m => m.fromprogram).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">program(from)</div></text>)
+                        .Hidden()
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Bound(m => m.fromaccount).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">account(from)</div></text>)
+                        .Hidden()
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Bound(m => m.toprogram).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">program(to)</div></text>)
+                        .Hidden()
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Bound(m => m.toaccount).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">account(to)</div></text>)
+                        .Hidden()
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Bound(m => m.subaccount).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">sub-account</div></text>)
+                        .Hidden()
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Bound(m => m.tooffice).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">office(to)</div></text>)
+                        .Hidden()
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Bound(m => m.fromoffice).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">office(from)</div></text>)
+                        .Hidden()
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+    })
+    //.ToolBar(toolbar =>
+    //{
+    //    toolbar.Custom().Text("<span id='spanthumbsup' class='fa fa-thumbs-o-up'> </span><span id='SpanOnApproveProgress' style='display:none' class='fa fa-spinner fa-spin'></span> Post Realignment").Name("btnApprove").Url("javascript:void(0)").HtmlAttributes(new { onclick = "btnPostRealign()" });
+    //    // toolbar.Save();
+    //})
+        .Sortable()
+        .Scrollable()
+        .Events(e => e.DataBound("onDataBound"))
+        //    .Events(e => e.Change("WFPgrid"))
+        .HtmlAttributes(new { style = "height:400px;" })
+        .Pageable(pageable => pageable
+            .Refresh(true)
+            .ButtonCount(2))
+        .DataSource(d => d
+        .Ajax()
+        //.Aggregates(a =>
+        //{
+        //    a.Add(c => c.Amount).Sum();
+        //})
+        .PageSize(1000)
+        .Model(m => m.Id(i => i.supplementalbudget_id))
+        .Read(read => read.Action("Load_Reversion_Req", "Release").Data("RealGridposted")))
+    )
+
+</div>
+<div class="k-button k-button-icontext" style="float:right; bottom: 15px; right: 25px;width: 100px;background-color:indianred; color:white;border-radius:50px;margin-right:244px;margin-top:10px;" onclick="frmRevPostedclose()"><span class="fa fa-close"></span> Close</div>

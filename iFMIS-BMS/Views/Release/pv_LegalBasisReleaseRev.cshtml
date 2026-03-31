@@ -1,0 +1,91 @@
+﻿<script>
+    setTimeout(function () {
+
+        $("#Legal_Basis").data("kendoGrid").dataSource.read();
+
+    }, 500);
+    function refresh_grid(e) {
+        if (e.errors) {
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "\n";
+                    });
+                }
+            });
+            alert(message);
+        }
+        $("#Legal_Basis").data("kendoGrid").dataSource.read();
+    }
+    setTimeout(function () {
+
+        $("#Legal_Basis").data("kendoGrid").dataSource.read();
+
+    }, 1000);
+     
+    function refreshgrid222223235346789() {
+
+        setTimeout(function () {
+
+            $("#Legal_Basis").data("kendoGrid").dataSource.read();
+
+        }, 500);
+    }
+
+    function sample() {
+       // alert('tae')
+    }
+
+</script>
+
+<div style="border: outset;clear:both;border-width:1px;border-color:#1fa67a; width: 749px; padding-left:0px;padding-right:0px;padding-top:0px;padding-bottom:7px;margin-top: 0px;">
+    <div style=" width: 0;height: 0; border-right: 5px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;margin-top: -1px; ">
+        <div style="float: left; width: 683px; margin-top:1px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 36px solid #1fa67a; ">
+            <div style="float: left; height:28px; margin-left:-59px; margin-top: 5px;">
+                <i class="fa fa-tasks fa-2x fg-white"></i>
+
+            </div>
+
+
+
+        </div>
+    </div>
+
+@(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.LegalBasis_Model>()
+    .Name("Legal_Basis")
+    .Columns(columns =>
+    {
+        
+
+        columns.Bound(m => m.LegalCode).Title("Legal Code").Width(50);
+        columns.Bound(m => m.LegalDescription).Title("Legal Description").Width(230);
+        columns.Bound(m => m.YearOf).Title("Year").Width(100);
+        columns.Command(command => { command.Edit(); command.Destroy(); }).Width(140);
+    })
+    .ToolBar(toolbar => toolbar.Create())
+    .Editable(editable => editable.Mode(GridEditMode.InLine))
+    .Events(e => {
+        e.SaveChanges("refreshgrid222223235346789");
+        e.Save("refreshgrid222223235346789");
+        e.Change("refreshgrid222223235346789");
+        
+
+    })
+
+    .Sortable()
+    .Scrollable()
+    .HtmlAttributes(new { style = "height:380px;" })
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .PageSize(1000)
+            .Events(events => events.Error("refresh_grid"))
+        .Model(model => model.Id(p => p.Legal_id))
+        .Create(update => update.Action("LegalBasisRR_Create", "Release"))
+        .Read(read => read.Action("LegalBasisRR_Read", "Release"))
+        .Update(update => update.Action("LegalBasisRR_Update", "Release").Data(""))
+        .Destroy(update => update.Action("LegalBasisRR_Destroy", "Release"))
+    )
+)
+
+</div>

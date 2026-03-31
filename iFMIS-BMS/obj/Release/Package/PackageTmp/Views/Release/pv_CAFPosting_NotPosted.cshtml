@@ -1,0 +1,167 @@
+﻿<script>
+
+    function onDataCAFUnposted() {
+        var program = $("#Progss").val();
+        var account = $("#account_list").val();
+        var ppaid = $("#account_list").val() == 2861 ? $("#subppa_list").val() : 0;
+        var charge_office = $("#account_list").val() == 2861 ? 0 : $("#subppa_list").val();// $("#charge_office").val();
+        var year = $("#ddlYear").val();
+        var caftrans = $("#caftrans").val();
+        var epaid = $("#epaid").val();
+        return {
+            program: program,
+            account: account,
+            ppaid: ppaid,
+            charge_office: charge_office,
+            year: year,
+            caftrans: 0,
+            epaid:epaid
+        }
+    }
+    function searchAccount() {
+        var $filter = new Array();
+        $filter = [];
+
+        if ($('#SearchDataCAFPosting').val().length > 0) {
+            $filter.push({ field: "office", operator: "contains", value: $('#SearchDataCAFPosting').val() }),
+            $filter.push({ field: "account", operator: "contains", value: $('#SearchDataCAFPosting').val() }),
+            $filter.push({ field: "dscription", operator: "contains", value: $('#SearchDataCAFPosting').val() }),
+            $filter.push({ field: "cafno", operator: "contains", value: $('#SearchDataCAFPosting').val() }),
+            $filter.push({ field: "dateissued", operator: "contains", value: $('#SearchDataCAFPosting').val() });
+        }
+
+        $('#cafgridposting').data('kendoGrid').dataSource.filter({
+            logic: "or",
+            filters: $filter
+        });
+
+    }
+
+    $(function () {
+        $("#SearchDataCAFPosting").keypress(function (e) {
+            if (e.keyCode == 13) {
+                searchAccount();
+            }
+        });
+    });
+    function postcaf(cafid, officeid, accountid, cafno, programid) {
+        var year = $("#ddlYear").val()
+        var epaid = $("#epaid").val()
+        swal({
+            title: "C O N F I R M A T I O N !",
+            text: "Do you want to post the CAF?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes",
+            closeOnConfirm: false
+        }, function () {
+            url = "@Url.Action("PostingCafNo","Release")"
+            $.get(url, { cafid: cafid, officeid: officeid, accountid: accountid, cafno: cafno, programid: programid, year: year, epaid: epaid }, function (d) {
+                if (d == "success") {
+                    swal("", "CAF with control number " + cafno + " has been posted successfully!", "success")
+                    $("#cafgridposting").data("kendoGrid").dataSource.read();
+                }
+                else {
+                    swal("Error",d,"error")
+                }
+            })
+        });
+    }
+</script>
+<div id="searchAccountid" style="margin-left:693px;">
+    <input type="text" style="width:212px;border-collapse:collapse;margin:0px;border-style:solid;margin-left:0px;height:70%;outline:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search..." id="SearchDataCAFPosting" name="SearchDataCAFPosting">
+    <div class="k-button k-button-icontext" style="height:30px;width:40px;border-style:solid;" onclick="searchAccount()"><span class="mif-search"></span></div>
+</div>
+<div style="">
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.CAFPosting>()
+        .Name("cafgridposting")
+        .HtmlAttributes(new { style = "" })
+        .Scrollable()
+        .Columns(col =>
+        {
+        col.Template(@<text></text>).HeaderTemplate(@<text>No.</text>).Hidden().ClientTemplate("<div>#=cafid# </div>");
+        col.Template(@<text></text>).HeaderTemplate(@<text>Program id</text>).Hidden().ClientTemplate("<div>#=programid# </div>");
+        col.Template(@<text></text>).HeaderTemplate(@<text>Account id</text>).Hidden().ClientTemplate("<div>#=accountid# </div>");
+        col.Template(@<text></text>).HeaderTemplate(@<text>PPA id</text>).Hidden().ClientTemplate("<div>#=ppaid# </div>");
+        col.Template(@<text></text>).HeaderTemplate(@<text>nonofficeid</text>).Hidden().ClientTemplate("<div>#=nonofficeid# </div>");
+        col.Template(@<text></text>).HeaderTemplate(@<text>nonofficeid</text>).Hidden().ClientTemplate("<div>#=officeid# </div>");
+        
+        col.Template(@<text></text>)
+        .HeaderTemplate(@<text>Office</text>)
+        .Width(80)
+        .HtmlAttributes(new { style = "text-align:left;" })
+        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+        .ClientTemplate("<div>#=office# </div>");
+
+        col.Template(@<text></text>)
+        .HeaderTemplate(@<text>Account</text>)
+        .Width(200)
+        .HtmlAttributes(new { style = "text-align:left;" })
+        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+        .ClientTemplate("<div>#=account# </div>")
+        .ClientFooterTemplate("<div style='text-align:center;color:darkgreen;width:170px'><label>Total :</label></div>");
+    
+        col.Template(@<text></text>)
+        .HeaderTemplate(@<text>PPA</text>)
+        .Width(250)
+        .HtmlAttributes(new { style = "text-align:left;" })
+        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+        .ClientTemplate("<div>#=dscription# </div>");        
+
+        col.Bound(c => c.amount)
+        .HeaderTemplate(@<text>Amount</text>)
+        .Width(120)
+        .HtmlAttributes(new { style = "text-align:right;" })
+        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+        .ClientTemplate("<div>#=kendo.toString(amount,'C2')# </div>")
+        .ClientFooterTemplate("<div style='text-align:right;color:darkgreen;font-size:12px;'><label> </label><label> #=kendo.toString(sum, 'c2')#</label></div>");
+
+        col.Template(@<text></text>)
+        .HeaderTemplate(@<text>CAF No.</text>)
+        .Width(100)
+        .HtmlAttributes(new { style = "text-align:center;" })
+        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+        .ClientTemplate("<div>#=cafno# </div>");
+
+        col.Template(@<text></text>)
+        .HeaderTemplate(@<text>Date Issued</text>)
+        .Width(100)
+        .HtmlAttributes(new { style = "text-align:left;font-size:12px;" })
+        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+        .ClientTemplate("<div>#=dateissued# </div>");
+    
+        col.Template(@<text></text>)
+        .HeaderTemplate(@<text></text>)
+        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:10px;color:beige;" })
+        .ClientTemplate(
+            //"<div class='k-button k-button-icontext' id='deleteid#=wfpid#' style='border-radius:50px;color:\\#ffffff;background-color:\\#DE5555;' onclick='deletewfp(#=wfpid#)'><span class='fa fa-trash' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'> </span></div> ")
+            "<div style='border-radius:50px;' onclick='postcaf(#=cafid#,#=officeid#,#=accountid#,\"#=cafno#\",#=programid#)'><b><span class='fa fa-save' title='Click to post CAF and release of allotment!' style='font-size: 16px;margin: 1px;margin-top: -1px;margin-left: 2px;margin-right: 2px;color:cornflowerblue;cursor:pointer;text-align:center;vertical-align:middle'> </span></b></div> ")
+        .HtmlAttributes(new { style = "vertical-align: top;text-align:center" })
+        .Width(40);
+
+        })
+            //.Editable(editable => editable.Mode(GridEditMode.InCell))
+            .Resizable(e => e.Columns(true))
+            .Pageable(pageable => pageable
+            .Refresh(true)
+            .ButtonCount(5))
+            .HtmlAttributes(new { @class = "table-responsive", style = "height:410px;" })
+            .Selectable()
+            //.Events(e => e.DataBound("onDataBound").Change("WFPgrid"))
+            .DataSource(dataSource => dataSource
+            .Ajax()
+            .Batch(true)
+            .Model(m => m.Id(i => i.cafid))
+            .ServerOperation(false)
+
+            .Aggregates(a =>
+            {
+                a.Add(c => c.amount).Sum();
+            })
+            .PageSize(1000)
+            .Read(read => read.Action("CafUnposted", "Release").Data("onDataCAFUnposted"))
+            )
+    )
+</div>
+

@@ -1,0 +1,150 @@
+﻿<script>
+    function reqPrint() {
+        var OfficeID = $("#pmisofficeid").val();
+        //var asOfDate = $("#DP_AIP_Report_As_Of_Date").val();
+        var YearOf = $("#ddlYear").val();
+        var includesup = $("#includeSuple").val();
+        //var isNonOffice = 0;
+
+        //if ($("#cbNonOffice").is(':checked') == true) {
+        //    isNonOffice = 1;
+        //}
+        //else {
+        //    isNonOffice = 0;
+        //}
+        if (includesup == 0) {
+            $.ajax({
+                async: false,
+                dataType: 'html',
+                sucess: window.open("http://eportal.agusandelsur.gov.ph/spms/Report/ReportViewer.aspx?rid=8&year_=" + YearOf + "&office_id=" + OfficeID + "&Level=1&isIncludeLumpsum=1&isIncludeCCTYPO=0&FundingSource=" + $("#ddlFundSource").val() + "&isIncludeRegularAIP=1&isIncludeSuplementalAIP=0&SupplementalNo=0&isApprovedVersion=0")
+            });
+        }
+        else {
+            $.ajax({
+                async: false,
+                dataType: 'html',
+                //success: window.open("../Reports/ReportViewer.aspx?rid=9&OfficeID=" + OfficeID + "&Year=" + YearOf + "&AsOfDate=" + asOfDate + "&isNonOffice=" + isNonOffice + "")
+                //sucess: window.open("http://192.168.2.104/spms/Report/ReportViewer.aspx?rid=8&year_=" + YearOf + "&office_id=" + OfficeID + " &Level=1&isIncludeLumpsum=1&isIncludeCCTYPO=1&FundingSource=" + $("#ddlFundSource").val() + "")
+                sucess: window.open("http://eportal.agusandelsur.gov.ph/spms/Report/ReportViewer.aspx?rid=8&year_=" + YearOf + "&office_id=" + OfficeID + "&Level=1&isIncludeLumpsum=1&isIncludeCCTYPO=0&FundingSource=" + $("#ddlFundSource").val() + "&isIncludeRegularAIP=0&isIncludeSuplementalAIP=1&SupplementalNo=" + $("#ddlSupple").val() + "&isApprovedVersion=0")
+            });
+        }
+    }
+    function GetOfficeID() {
+        var url = "@Url.Action("getofficeid", "Report")";
+        @*var officeid = $("#ddlOffices").val() == 0 ? @Account.UserInfo.Department :  $("#ddlOffices").val()*@
+        var officeid = $("#ddlOffices").val() == 0 ? 0 : $("#ddlOffices").val()
+       // alert(officeid);
+        if (officeid == 0) {
+            $("#pmisofficeid").val(0);
+        }
+        else {
+            $.get(url, { officeid: officeid }, function (e) {
+                $("#pmisofficeid").val(e);
+            });
+        }
+
+    }
+   
+</script>
+<div style="width : 95%;height:250px; margin-top: 0px;border-style: solid; border-color: #1fa67a;">
+    <div style="width:100%;height : 25px ; background-color:#1fa67a; color: white">
+        <label class="fa fa-file-text-o fa-lg" style="margin-left: 5px; display:inline-block">  AIP REPORT</label>
+    </div>
+    <div style="margin-left: 5px; margin-bottom:5px">
+        <label style="margin-left: 71px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px;">
+            Office :&nbsp;&nbsp;&nbsp;&nbsp;
+            @(Html.Kendo().DropDownList()
+                         .Name("ddlOffices")
+                         .DataTextField("OfficeName")
+                         .DataValueField("OfficeID")
+                         .Filter("contains")
+                         .MinLength(1)
+                         .OptionLabel("Select Office...")
+                         .Events(e => e.Change("GetOfficeID"))
+                         //.SelectedIndex(0)
+                         .HtmlAttributes(new { @style = "width: 527px;" })
+                         .DataSource(source => source.Read(read => read.Action("ddlOfficeWithAll", "User")))
+            )
+
+        </label>
+        <label style="margin-left: 0px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px;">
+            Funding Source :&nbsp;&nbsp;&nbsp;&nbsp;
+            @(Html.Kendo().DropDownList()
+                         .Name("ddlFundSource")
+                         .DataTextField("FundName")
+                         .DataValueField("fundid")
+                         .Filter("contains")
+                         .MinLength(1)
+                         .OptionLabel("Select fund source...")
+                         .HtmlAttributes(new { @style = "width: 250px;" })
+                         .DataSource(source => source.Read(read => read.Action("GetFundingSource", "Report")))
+            )
+
+        </label>
+        <label style="margin-left: 25px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px; display : inline-block">
+            Budget Year :&nbsp;&nbsp;&nbsp;&nbsp;
+             @(Html.Kendo().DropDownList()
+                        .Name("ddlYear")
+                        .DataTextField("ProposalYear")
+                        .DataValueField("ProposalYear")
+                        .SelectedIndex(0)
+                        .HtmlAttributes(new { @style = "width: 90px;" })
+                        .DataSource(source => source.Read(read => read.Action("GetPropYear", "PYear")))
+            )
+        </label>
+        <label style="margin-left: 14px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px; ">
+            Supplemental :&nbsp;&nbsp;&nbsp;&nbsp;
+            @(Html.Kendo().DropDownList()
+                        .Name("ddlSupple")
+                        .DataTextField("SuplementalNo")
+                        .DataValueField("SuplementalNo")
+                        .SelectedIndex(-1)
+                        .HtmlAttributes(new { @style = "width: 90px;" })
+                        .DataSource(source => source.Read(read => read.Action("GetSupplemental", "Report")))
+            )
+            <input type="checkbox" id="includeSuple" value="0" onclick=IncludeSupple() style="zoom:1.5;" /> <label style="font-size:13px;color:red;display:inline-block">Supplemental Only </label>
+            
+        </label>
+            @*<label style="margin-left: 0px;margin-left: 0px;margin-top: 5px;margin-bottom: 2px; display : inline-block;">
+                As Of :&nbsp;&nbsp;&nbsp;&nbsp;
+            </label>
+            @(Html.Kendo().DatePicker()
+            .Name("DP_AIP_Report_As_Of_Date")
+            .Start(CalendarView.Year)
+            .Depth(CalendarView.Year)
+            .Format("MMM yyyy")
+            .Value(DateTime.Now.Month +"/1/" + DateTime.Now.Year)
+            .HtmlAttributes(new { style = "font-weight:bold", type = "text" })
+            )*@
+        @*<label style="display:inline-block">
+             <input id='cbNonOffice' type='checkbox' class='checkbox' /> Non-Office
+        </label>*@
+        <div style="width:100%">
+            <div id="btnPrint" class="k-button k-button-icontext" style="botto;bottom: 15px; right: 25px;border-radius:50px;width: 120px;float:right; margin-top: 5px; margin-right:41px; margin-bottom:5px" onclick="reqPrint()">Preview</div>
+        </div>
+    </div>
+   
+    <div style="display:none">
+        <input type="text" id="pmisofficeid" name="pmisofficeid" value="0" style="display:none;">
+    </div>
+</div>
+<script>
+    //$(document).ready(function () {
+        //DisableOfficeDropDown('@Account.UserInfo.UserTypeDesc','@Account.UserInfo.Department','ddlOffices','kendoDropDownList')
+
+        $(document).ready(function () {
+           // DisableOfficeDropDown('@Account.UserInfo.UserTypeDesc', '@Account.UserInfo.Department', 'ddlOffices', 'kendoDropDownList')
+            GetOfficeID()
+            $("#ddlSupple").data("kendoDropDownList").dataSource.read();
+        });
+    function IncludeSupple() {
+        if (document.getElementById('includeSuple').checked)
+        {
+            document.getElementById("includeSuple").value = 1;
+        }
+        else {
+            document.getElementById("includeSuple").value = 0;
+        }
+    }
+        //});
+</script>

@@ -1,0 +1,373 @@
+﻿<script>
+
+
+    $('#SearchData').keypress(function (e) {
+        if (e.keyCode == 13) {
+            searchAccount();
+        }
+    });
+    function searchAccount() {
+        var Data = $("#SearchData").val();
+        if ($("#obrid").val() == 1) {
+            $("#grCurrentCtrl").data("kendoGrid").dataSource.read();
+        }
+        else if ($("#transid").val() == 1) {
+            $("#grdtransno").data("kendoGrid").dataSource.read();
+        }
+        else if ($("#batchid").val() == 1) {
+
+            $("#grAccount").data("kendoGrid").dataSource.read();
+        }
+
+    }
+    function obrOption() {
+        $("#obrid").val(1)
+        $("#transid").val(0)
+        $("#batchid").val(0)
+        $("#tempobrid").val(0)
+        $("#refid").val(0)
+        $("#transid").prop("checked", false);
+        $("#batchid").prop("checked", false);
+        $("#tempobrid").prop("checked", false);
+        $("#refid").prop("checked", false);
+        $("#SearchData").prop("placeholder", "Search by ObR.")
+        $("#grAccount").hide();
+        $("#grdtransno").hide();
+        $("#grCurrentCtrl").show();
+        $("#returnTrans").hide()
+    }
+    function transOption() {
+        $("#obrid").val(0)
+        $("#transid").val(1)
+        $("#batchid").val(0)
+        $("#tempobrid").val(0)
+        $("#refid").val(0)
+        $("#obrid").prop("checked", false);
+        $("#batchid").prop("checked", false);
+        $("#tempobrid").prop("checked", false);
+        $("#refid").prop("checked", false);
+        $("#SearchData").prop("placeholder", "Search by transaction no.")
+        $("#grAccount").hide();
+        $("#grdtransno").show();
+        $("#grCurrentCtrl").hide();
+        $("#returnTrans").hide()
+    }
+    function batchOption() {
+        $("#obrid").val(0)
+        $("#transid").val(0)
+        $("#batchid").val(1)
+        $("#tempobrid").val(0)
+        $("#refid").val(0)
+        $("#transid").prop("checked", false);
+        $("#obrid").prop("checked", false);
+        $("#tempobrid").prop("checked", false);
+        $("#refid").prop("checked", false);
+        $("#SearchData").prop("placeholder", "Search by batch no.")
+        $("#grAccount").show();
+        $("#grdtransno").hide();
+        $("#grCurrentCtrl").hide();
+        $("#returnTrans").hide()
+    }
+    function tempobrOption() {
+        $("#obrid").val(0)
+        $("#transid").val(0)
+        $("#batchid").val(0)
+        $("#tempobrid").val(1)
+        $("#refid").val(0)
+        $("#transid").prop("checked", false);
+        $("#obrid").prop("checked", false);
+        $("#batchid").prop("checked", false);
+        $("#refid").prop("checked", false);
+        $("#SearchData").prop("placeholder", "Search by control no.")
+        $("#grAccount").hide();
+        $("#grdtransno").hide();
+        $("#grCurrentCtrl").hide();
+        $("#returnTrans").show()
+        //alert($("#SearchData").val())
+    }
+    function refOption() {
+        $("#obrid").val(0)
+        $("#transid").val(0)
+        $("#batchid").val(0)
+        $("#tempobrid").val(0)
+        $("#refid").val(1)
+        $("#transid").prop("checked", false);
+        $("#obrid").prop("checked", false);
+        $("#batchid").prop("checked", false);
+        $("#tempobrid").prop("checked", false);
+        $("#SearchData").prop("placeholder", "Search by reference no.")
+        $("#grAccount").hide();
+        $("#grdtransno").hide();
+        $("#grCurrentCtrl").hide();
+        $("#returnTrans").show()
+        //alert($("#SearchData").val())
+    }
+    function GetParameter() {
+        if ($("#obrid").val() == 1) {
+            return {
+                paramtr: $("#SearchData").val(),
+                opt:1
+            }
+        }
+        else if ($("#transid").val() == 1) {
+            return {
+                paramtr: $("#SearchData").val(),
+                opt: 2
+            }
+        }
+        else if ($("#batchid").val() == 1) {
+            return {
+                paramtr: $("#SearchData").val(),
+                opt: 3
+            }
+        }
+    }
+    function deleteBatchno(id) {
+        var url = "@Url.Action("DeleteBatchno", "Maintenance")";
+
+        swal({
+            title: "System Alert!",
+            text: "Do you want to remove this particular transaction?.",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes",
+            closeOnConfirm: false
+        }, function () {
+            $.get(url, { id: id }, function (d) {
+                swal("Batch No.", "Deleted", "success")
+                $("#grAccount").data("kendoGrid").dataSource.read();
+            })
+        });
+
+    } 
+    
+    function reqSave() {
+        //alert('save')
+        searchAccount()
+        $("#grdtransno").data("kendoGrid").dataSource.read();
+        swal("","Save","success")
+      
+    }
+
+    function deleteCtrl() {
+        searchAccount()
+        $("#grCurrentCtrl").data("kendoGrid").dataSource.read();
+        swal("", "Transaction(s) deleted", "success")
+    }
+    function OnApprovalGridDataBound() {
+        $(".k-hierarchy-cell").hide();
+        $(".k-hierarchy-col").hide();
+        $('#SpanOnApproveProgress').css("display", "none");
+        $('#spanthumbsup').css("display", "auto");
+        fn_dprefresherYear();
+    }
+
+    function onGridEdit(arg) {
+        var gridName = $('#grdtransno').data('kendoGrid');
+        var dataRows = gridName.items();
+        var rowIndex = dataRows.index(gridName.select());
+        var ds = gridName.dataSource.view();
+       
+        if (arg.container.find("input[name=TransactionNo]").length > 0) {
+            $("#grdtransno").data("kendoGrid").closeCell(arg.container)
+        }
+        if (arg.container.find("input[name=obrseries]").length > 0) {
+            $("#grdtransno").data("kendoGrid").closeCell(arg.container)
+        }
+    }
+</script>
+
+<div style="width : 100%;height:170px; margin-top: 10px;border-style: solid; border-color: #1fa67a">
+
+    <div style="width:100%;height : 35px ; background-color:#1fa67a; color: white">
+        <h2 style="margin-left: 5px;color:white"><i class="fa fa-search"></i> Search Criteria </h2>
+    </div>
+    <div style="width:100%;display:inline-block;margin-top:10px;">
+        <div style="margin-left:50px;float:left"><input style="width:50px" type="radio" id="obrid" name="obrid" value="0" onclick="obrOption()"> <span style="margin-left:-15px;color:green"><b>ObR</b> </span></div>
+        <div style="margin-left:10px;float:left"><input style="width:50px" type="radio" id="transid" name="transid" value="0" onclick="transOption()"> <span style="margin-left:-15px;color:green"><b>Transaction No.</b> </span></div>
+        <div style="margin-left:10px;float:left"><input style="width:50px" type="radio" id="batchid" name="batchid" value="0" onclick="batchOption()"> <span style="margin-left:-15px;color:green"><b>Batch No.</b> </span></div>
+        <div style="margin-left:10px;float:left"><input style="width:50px" type="radio" id="tempobrid" name="tempobrid" value="0" onclick="tempobrOption()"> <span style="margin-left:-15px;color:green"><b>Return Temp. ObR</b> </span></div>
+        <div style="margin-left:10px;float:left"><input style="width:50px" type="radio" id="refid" name="refid" value="0" onclick="refOption()"> <span style="margin-left:-15px;color:green"><b>Return Reference No.</b> </span></div>
+    </div>
+
+    <div style="float: left; height:28px;margin-top:8px;margin-left:65px;">
+        <div style="background-color:white;border:solid;border-color:darkgrey;border-width:thin;width:310px;height:33px;float:left;padding:0px;margin-top:-3px;" id="search">
+            <input type="text"  id="SearchData" name="SearchData" style="width:260px;border-collapse:collapse;border-color:white;margin:0px;height:70%;outline:none;border-left-style:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;"/>
+            <div class="k-button k-button-icontext" style="height:33px;width:40px;" onclick="searchAccount()"><span class="mif-search"></span></div>
+        </div>
+        
+        <div id="returnTrans" class="k-button k-button-icontext" style="float:left;margin-left:7px;padding:4px;display:none; bottom: 15px;width: 90px; margin-right:0px; margin-bottom:8px;margin-top:0px;border-radius: 50px;background-color:indianred;color:white" onclick="btnreturn()"><span class="fa fa-undo"></span> Return </div>
+
+    </div>
+        
+    <div style="display:inline-block;margin-top:10px;margin-left:5px">
+        <div id="btnSaveProp" class="k-button k-button-icontext" style="padding:4px; bottom: 15px; right: 15px;width: 310px;float:right; margin-right:135px; margin-bottom:8px;margin-top:8px;border-radius: 50px;background-color:cornflowerblue;color:white" onclick="btnSaveProp()"><span class="fa fa-save"></span> Post Approved Budget (Other Accounts) </div>
+    </div>
+    @*payroll account*@
+    <div style=" height:28px;margin-top:60px;margin-left:0px;">
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Maintenance.account_code>()
+    .Name("grAccount")
+    .Columns(col =>
+    {
+
+        col.Bound(m => m.PayrollBatchNo).Title("Batch No.").HeaderHtmlAttributes(new { style = "text-align: center;" });
+        col.Bound(m => m.obrno).Title("ObR No.").HeaderHtmlAttributes(new { style = "text-align: center;" });
+        col.Bound(m => m.location).Title("Location").HeaderHtmlAttributes(new { style = "text-align: center;" });
+        col.Bound(m => m.DTE).Title("Date").HeaderHtmlAttributes(new { style = "text-align: center;" });
+        col.Template(t => { }).ClientTemplate(
+        "<div class='btn-delete'> <a  title='Delete' onclick='deleteBatchno(#=tracking_id#)'><span class='fa fa-trash' style='font-size: 12pt;'></span></a></div>"
+        ).HtmlAttributes(new { style = "margin-left:5px;" }).Width(40);
+
+    })
+   
+    .Pageable(page => page.Refresh(true)
+    .Enabled(true)
+    .ButtonCount(4)
+
+    .PreviousNext(true)
+    )
+        .Selectable(selectable => selectable.Mode(GridSelectionMode.Single))
+
+        .DataSource(d => d
+        .Ajax()
+        .PageSize(10)
+            .Model(m => m.Id(i => i.account_id))
+            .Read(read => read.Action("SearchControlTrans", "Maintenance").Data("GetParameter"))
+        )
+    )
+    </div>
+
+    @*logger*@
+    <div style="height:28px;margin-top:-28px;margin-left:0px;">
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Maintenance.account_code>()
+    .Name("grdtransno")
+    .Columns(col =>
+    {
+
+        col.Bound(m => m.obrno).Title("ObR No.").HeaderHtmlAttributes(new { style = "text-align: center;" });
+        col.Bound(m => m.obrseries).Title("ObR Series").Hidden();
+        col.Bound(m => m.NonOfficeTransNo).Title("NonOffice No.").HeaderHtmlAttributes(new { style = "text-align: center;" });
+        col.Bound(m => m.ReferenceNo).Title("Ref No.").HeaderHtmlAttributes(new { style = "text-align: center;" });
+        col.Bound(m => m.TransactionNo).Hidden();
+
+    })
+    .ToolBar(toolbar =>
+    {
+        toolbar.Save();
+    })
+    .Pageable(page => page.Refresh(true)
+    .Enabled(true)
+    .ButtonCount(4)
+    .PreviousNext(true)
+    )
+    .Events(e => e.SaveChanges("reqSave").Edit("onGridEdit"))
+    .Selectable(selectable => selectable.Mode(GridSelectionMode.Single))
+    .Editable(editable => editable.Mode(GridEditMode.InCell))
+    .DataSource(d => d
+    .Ajax()
+    .Batch(true)
+    .ServerOperation(false)
+    .PageSize(10)
+    .Model(m => m.Id(i => i.trnno))
+    .Read(read => read.Action("SearchLoggerTrans", "Maintenance").Data("GetParameter"))
+    .Update("UpdateLoggerTrans", "Maintenance"))
+    )
+    </div>
+
+    @*current control*@
+
+    <div style=" height:28px;margin-top:60px;margin-left:0px;">
+
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Maintenance.account_code>()
+    .Name("grCurrentCtrl")
+    .Columns(col =>
+    {
+        col.Bound(m => m.trnno).Hidden();
+        col.Bound(m => m.obrno).Title("ObR No.").HeaderHtmlAttributes(new { style = "text-align: center;" });
+        col.Bound(m => m.actioncode).Title("Actioncode").HeaderHtmlAttributes(new { style = "text-align: center;" });
+        col.Bound(m => m.datetimeentered).Title("Date").HeaderHtmlAttributes(new { style = "text-align: center;" });
+    
+    })
+    .ToolBar(toolbar =>
+    {
+    toolbar.Save();
+    })
+    .Pageable(page => page.Refresh(true)
+    .Enabled(true)
+    .ButtonCount(4)
+    .PreviousNext(true)
+    )
+        .Events(e => e.SaveChanges("deleteCtrl"))//.Edit("onGridEdit"))
+        .Selectable(selectable => selectable.Mode(GridSelectionMode.Single))
+        .Editable(editable => editable.Mode(GridEditMode.InCell))
+        .DataSource(d => d
+        .Ajax()
+        .Batch(true)
+        .ServerOperation(false)
+        .PageSize(10)
+        .Model(m => m.Id(i => i.trnno))
+        .Read(read => read.Action("SearchCurrentCtrl", "Maintenance").Data("GetParameter"))
+        .Update("deleteCurrentCtrl", "Maintenance"))
+    )
+
+</div>
+
+</div>
+<script>
+    $(document).ready(function () {
+        $("#grAccount").hide();
+        $("#grdtransno").hide();
+        $("#grCurrentCtrl").hide();
+    });
+
+    function btnSaveProp() {
+        url = "@Url.Action("ApprovedBudgetPosting", "Maintenance")"
+        swal({
+            title: "Confirmation!",
+            text: "Do you want to post the approved budget?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes",
+            closeOnConfirm: false
+        }, function () {
+            $.get(url, function (d) {
+                if (d == "success")
+                    {
+                    swal("", "Approved budget has been posted!", "success")
+                }
+                else {
+                    swal("Error","Something went wrong!","error")
+                }
+            })
+
+        });
+    }
+    function btnreturn() {
+        tempobrid = $("#tempobrid").val();
+        refid = $("#refid").val();
+     
+        url = "@Url.Action("returntransaction", "Maintenance")"
+        swal({
+            title: "Confirmation!",
+            text: "Do you want to return this control/reference number?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes",
+            closeOnConfirm: false
+        }, function () {
+            $.get(url, { ctrl: $("#SearchData").val(), tempobrid: tempobrid, refid: refid }, function (d) {
+                if (d == "success")
+                {
+                    swal("", "Transaction successfully returned!", "success")
+                }
+                else {
+                    swal("Error","Something went wrong!","error")
+                }
+            })
+
+        });
+    }
+</script>

@@ -1,0 +1,145 @@
+﻿@model iFMIS_BMS.BusinessLayer.Models.TransFundsModel
+
+<script>
+    function kuhaKama(str) {
+        str = str.toString().replace(/,/g, "");
+        parseInt(str, 20);
+        return str;
+    }
+    function awasdasdadawdawdaw(val) {
+
+
+
+        //var num = parseFloat($(this).val());
+        //var cleanNum = num.toFixed(2);
+        //$(this).val(cleanNum);
+
+
+        var ReturnValue = $('#' + val + '').val();
+
+
+
+        ReturnValue = ReturnValue.toString().replace(/,/g, ''); //remove existing commas first
+        // alert(ReturnValue);
+        var valSplit = ReturnValue.split('.'); //then separate decimals
+
+        while (/(\d+)(\d{3})/.test(valSplit[0].toString())) {
+            valSplit[0] = valSplit[0].toString().replace(/(\d+)(\d{3})/, '$1' + ',' + '$2');
+        }
+
+        if (valSplit.length == 2) { //if there were decimals
+            ReturnValue = valSplit[0] + "." + valSplit[1]; //add decimals back
+        } else {
+            ReturnValue = valSplit[0];
+        }
+
+
+
+        $('#' + val + '').val(ReturnValue);
+
+
+
+    }
+
+    function close_addsupsss() {
+        $("#add_supplement_amount_").data("kendoWindow").close();
+    }
+
+    function ad_save_SUpplement() {
+      
+        var url = "@Url.Action("Save_supplement_source", "Release")";
+
+        var supplement_source_ID = $('#supplement_source').val()
+        var supplement_souce = $("#supplement_source").data("kendoComboBox").text();
+        var month_ = $('#Months_supplemental_null_subs').val()
+        var year_ = $("#ddlYear").val();
+        var source_amount = $('#source_amount').val()
+
+        var Year_of = $("#propsYears").val()
+        swal({
+            title: "Are you sure?",
+            text: "To reverse this Amount?",
+            type: "info",
+            showCancelButton: true,
+            closeOnConfirm: false,
+            confirmButtonColor: "#1fa67a",
+            confirmButtonText: "Yes, Save It!",
+            showLoaderOnConfirm: true,
+        }, function () { 
+        $.post(url, { supplement_source_ID: supplement_source_ID, supplement_souce: supplement_souce, month_: month_, year_: year_, source_amount: kuhaKama(source_amount) }, function (d) {
+            if (d == "1") {
+                swal({
+                    title: "Success!",
+                    text: "Successfully Added.",
+                    timer: 2000,
+                    type: "success",
+                    showConfirmButton: false
+                })
+                grid_ref_sup_ok_subs();
+                change_sup();
+                get_total_transfere();
+                $('#GeneralFund_Grid').data('kendoGrid').dataSource.read();
+                document.getElementById("supplement_Subs_Ammount_DUM").value = 0;
+                document.getElementById("supplement_Subs_Ammount_ID").value = 0;
+                document.getElementById("supplement_Subs_Ammount").value = 0;
+                $("#add_supplement_amount_").data("kendoWindow").close();
+            } else {
+                swal({
+                    title: "Error!",
+                    text: "System Error! Please try again.",
+                    timer: 2000,
+                    type: "error",
+                    showConfirmButton: false
+                })
+            }
+
+
+        })
+        });
+    }
+
+
+
+
+</script>
+
+<div>
+
+
+    <label>Source of Funds :</label>
+    @(Html.Kendo().ComboBox()
+        .Name("supplement_source")
+        .DataTextField("supplement_souce")
+        .DataValueField("supplement_source_ID")
+        .Placeholder("Select or Add Source Funds...")
+        .HtmlAttributes(new { @style = "width: 310px;" })
+        .DataSource(source => source.Read(read => read.Action("get_Supplement_Source", "Release")))
+
+
+    )
+
+</div><div>
+
+    <div style="float: left;margin-left:-50px;margin-top:1px;">
+        <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+            Amount :
+        </label>
+
+    </div>
+
+    <div style="float: left;margin-left:0px;margin-top:0px;">
+
+     
+        <input type="text" style="width:299px" name="source_amount" id="source_amount" onkeyup="awasdasdadawdawdaw('source_amount')" onfocus="this.select();">
+
+    </div>
+</div>
+    <div>
+        <div style="float:left;margin-top:9px;margin-left:150px">
+            <div class="k-button k-button-icontext" style=" bottom: 15px; right: 220px;width: 80px; border-radius:50px;color:#ffffff;background-color:#1FA67A;" onclick="ad_save_SUpplement()"><span class='fa fa-plus-circle' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'></span> Save</div>
+        </div>
+
+        <div style="float:left;margin-top:-30px;margin-left:233px">
+            <div class="k-button k-button-icontext" style=" bottom: 15px; right: 220px;width: 80px; border-radius:50px;color:#ffffff;background-color:#DE5555;" onclick="close_addsupsss()"><span class='fa fa-times' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'></span> Close</div>
+        </div>
+    </div>

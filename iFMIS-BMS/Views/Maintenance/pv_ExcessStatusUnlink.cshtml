@@ -1,0 +1,101 @@
+﻿<script>
+    function onData() {
+        return {
+            program: $('#program').val(),
+            accountTemp: $('#accountTemp').val(),
+            year: $('#ProposalYear').val(),
+            fund: $("#tempradid").val(),
+            status:0
+        }
+    }
+    function searchAccount() {
+        var $filter = new Array();
+        $filter = [];
+        if ($('#SearchDataunlink').val().length > 0) {
+            $filter.push({ field: "accountname", operator: "contains", value: $('#SearchDataunlink').val() }),
+            $filter.push({ field: "excessaccount", operator: "contains", value: $('#SearchDataunlink').val() }),
+            $filter.push({ field: "linkaccount", operator: "contains", value: $('#SearchDataunlink').val() });
+        }
+
+        $('#ExcessUnlink').data('kendoGrid').dataSource.filter({
+            logic: "or",
+            filters: $filter
+        });
+
+    }
+    $(function () {
+        $("#SearchDataunlink").keypress(function (e) {
+            if (e.keyCode == 13) {
+                searchAccount();
+            }
+        });
+    });
+</script>
+<div id="searchAccountid" style="height: 30px; margin-top: 0px; float: right; margin-left:200px;">
+    <input type="text" style="width:310px;border-collapse:collapse;margin:0px;border-style:solid;margin-left:0px;height:70%;outline:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search..." id="SearchDataunlink" name="SearchData">
+    <div class="k-button k-button-icontext" style="height:30px;width:40px;border-style:solid;" onclick="searchAccount()"><span class="mif-search"></span></div>
+</div>
+<br />
+<div class="transition animated fadeInUp" style="float:left;margin-top:0px">
+    @(Html.Kendo().Grid<iFMIS_BMS.Models.NonOfficeSubAccount>()
+        .Name("ExcessUnlink")
+        .Columns(columns =>
+        {
+            columns.Template(@<text></text>).Hidden().ClientTemplate("<div>#=nonofficeid# </div>");
+            columns.Template(@<text></text>).Hidden().ClientTemplate("<div>#=officeid# </div>");
+            columns.Template(@<text></text>).Hidden().ClientTemplate("<div>#=programid# </div>");
+            columns.Template(@<text></text>).Hidden().ClientTemplate("<div>#=accountid# </div>");
+            columns.Template(@<text></text>).Hidden().ClientTemplate("<div>#=nonofficeidparent# </div>");
+            columns.Template(@<text></text>).Hidden().ClientTemplate("<div>#=accountnameid# </div>");
+            columns.Template(@<text></text>).Hidden().ClientTemplate("<div>#=actualaccountid# </div>");
+            columns.Bound(m => m.excessaccount)
+                     .HeaderTemplate(@<text><div style="text-align:center; vertical-align: middle; overflow: visible; white-space: normal;color:white">Excess <br />Account</div></text>)
+                     .HtmlAttributes(new { style = "text-align:left" })
+                     .HeaderHtmlAttributes(new { style = "text-align:center", @class = "metro-header" })
+                     .Width(200)
+                     .ClientTemplate("<div>#=excessaccount# </div>");
+            columns.Bound(m => m.linkaccount)
+                     .HeaderTemplate(@<text><div style="text-align:center; vertical-align: middle; overflow: visible; white-space: normal;color:white">Link <br />Account</div></text>)
+                     .HtmlAttributes(new { style = "text-align:left" })
+                     .HeaderHtmlAttributes(new { style = "text-align:center", @class = "metro-header" })
+                     .Width(200)
+                     .ClientTemplate("<div>#=linkaccount# </div>");
+            columns.Template(@<text></text>)
+                     .HeaderTemplate(@<text><div style="text-align:center; vertical-align: middle; overflow: visible; white-space: normal;color:white">Particular</div></text>)
+             .HtmlAttributes(new { style = "text-align:left" })
+             .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle", @class = "metro-header" })
+             //.Width(a)
+             .ClientTemplate("<div>#=accountname# </div>")
+             .ClientFooterTemplate("<div style='text-align:center;'><label> </label><label>TOTAL</label></div>");
+            columns.Bound(m => m.amount)
+             //  columns.Template(@<text></text>)
+             .HeaderTemplate(@<text><div style="text-align:center; vertical-align: middle; overflow: visible; white-space: normal;color:white">Appropriation</div></text>)
+                     .HtmlAttributes(new { style = "text-align:right" })
+                     .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle;", @class = "metro-header" })
+                     .Width(150)
+                     .ClientTemplate("<div>#=kendo.toString(amount, 'n2')# </div>")
+                     .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> </label><label> #=kendo.toString(sum, 'c2')#</label></div>");
+    
+        })
+        .Sortable()
+        .Pageable(pageable => pageable.Refresh(true))
+        .Scrollable()
+        .HtmlAttributes(new { @class = "table-responsive", style = "height:450px;overflow-x:hidden;" })
+        .Selectable(selectable => selectable
+        .Mode(GridSelectionMode.Single)
+        .Type(GridSelectionType.Row))
+        //   .Events(events => events.Change("selectedrow"))
+        .DataSource(dataSource => dataSource
+            .Ajax()
+            .Aggregates(a =>
+            {
+                a.Add(c => c.amount).Sum();
+            })
+            .Model(model => model.Id(u => u.nonofficeid))
+            .PageSize(10)
+            .ServerOperation(false)
+            .Read(read => read.Action("ExcessStatus", "Maintenance").Data("onData"))
+        )
+
+    )
+</div>

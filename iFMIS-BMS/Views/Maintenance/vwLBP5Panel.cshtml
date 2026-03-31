@@ -1,0 +1,919 @@
+﻿<script>
+    var CurrentScrollPosition = 0;
+    function FSUpdate(){
+        var LBP5_FS = document.getElementById("LBP5_FS").value;
+        var IDparam = @Account.UserInfo.Department;
+        var url = "@Url.Action("FSUpdate","Maintenance")";
+
+        $.get(url, { LBP5_FS: LBP5_FS, IDparam: IDparam }, function(e){
+            if(e == "success"){
+                swal({
+                    title: "Success",
+                    text: "FUNCTIONAL STATEMENT has been Updated!",
+                    timer: 2000,
+                    type: "success",
+                    showConfirmButton: false
+                });
+            }else{
+                swal({
+                    title: "ERROR",
+                    text: "FUNCTIONAL STATEMENT has been NOT Updated!",
+                    timer: 2000,
+                    type: "error",
+                    showConfirmButton: false
+                });
+            }
+        });
+    }
+    function EDITFS(EDIT_FS,OrderBy,Desc){
+        CurrentScrollPosition = $(window).scrollTop();
+        $(window).scrollTop(0);
+        var grid = "#grFS";
+        var url = "@Url.Action("Edit_FS", "Maintenance")";
+        $.get(url, { FS_OrderBy: OrderBy, FS_DESC: Desc, FS_ID: EDIT_FS }, function (d) {
+            document.documentElement.style.overflow = 'hidden';  // firefox, chrome
+            document.body.scroll = "no";
+            $('#windowEditFS').html(d);
+        });
+        $('#windowEditFS').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Edit Functional Statement").center().open();
+    }
+    function DeleteFS(FS_ID){
+        CurrentScrollPosition = $(window).scrollTop();
+        var url = "@Url.Action("DeleteFS", "Maintenance")";
+        swal({
+            title: "System Notice!",
+            text: "This will DELETE your FS, Do you want to Continue?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "DELETE",
+            closeOnConfirm: false },
+            function(isConfirm){
+                if (isConfirm) {
+                    $.get(url, { FS_ID: FS_ID }, function(e){
+                        if(e == "success"){
+                            swal({
+                                title: "Success",
+                                text: "FS Deleted!",
+                                timer: 2000,
+                                type: "success",
+                                showConfirmButton: false
+                            });
+                            $("#grFS").data("kendoGrid").dataSource.read();
+                            setTimeout(function(){ 
+                                $(window).scrollTop(CurrentScrollPosition);
+                            }, 2000);
+                        }else{
+                            swal({
+                                title: "Error",
+                                text: "FS failed to Delete!",
+                                timer: 2000,
+                                type: "error",
+                                showConfirmButton: false
+                            });
+                            setTimeout(function(){ 
+                                $(window).scrollTop(CurrentScrollPosition);
+                            }, 2000);
+                        }
+                    });
+                }
+                else {
+                    setTimeout(function(){ 
+                        $(window).scrollTop(CurrentScrollPosition);
+                    }, 100);                
+                }
+                
+            });
+    }
+    function AddOBJ(){
+        CurrentScrollPosition = $(window).scrollTop();
+        $(window).scrollTop(0);
+        var url = "@Url.Action("AddOBJ", "Maintenance")";
+        $.get(url, function (d) {
+            document.documentElement.style.overflow = 'hidden';  // firefox, chrome
+            document.body.scroll = "no";
+            $('#windowAddOBJ').html(d);
+        });
+        $('#windowAddOBJ').data('kendoWindow').title("<i class='fa fa-navicon'>Add New Objective</i>").center().open();
+    }
+    function AddFS(){
+        CurrentScrollPosition = $(window).scrollTop();
+        $(window).scrollTop(0);
+        var url = "@Url.Action("AddFS", "Maintenance")";
+        $.get(url, function (d) {
+            document.documentElement.style.overflow = 'hidden';  // firefox, chrome
+            document.body.scroll = "no";
+            $('#windowAddFS').html(d);
+        });
+        $('#windowAddFS').data('kendoWindow').title("<i class='fa fa-navicon'> Add Functional Statement </i>").center().open();
+    }
+    function ADD_MFO(){
+        CurrentScrollPosition = $(window).scrollTop();
+        $(window).scrollTop(0);
+        var url = "@Url.Action("ADDMFO", "Maintenance")";
+        $.get(url, function (d) {
+            document.documentElement.style.overflow = 'hidden';  // firefox, chrome
+            document.body.scroll = "no";
+            $('#windowAddMFO').html(d);
+        });
+        $('#windowAddMFO').data('kendoWindow').title("<i class='fa fa-navicon'>Add New MFO</i>").center().open();
+    }
+    function EDITOBJ(EDIt_OBJ,OrderBy, Description){
+        CurrentScrollPosition = $(window).scrollTop();
+        $(window).scrollTop(0);
+        var url = "@Url.Action("Edit_Objectives", "Maintenance")";
+        $.get(url, { OrderBy: ((OrderBy == '') ? 0 : OrderBy), Description: Description, ID: EDIt_OBJ }, function (d) {
+            document.documentElement.style.overflow = 'hidden';  // firefox, chrome
+            document.body.scroll = "no";
+            $('#windowEditAddOBJ').html(d);
+        });
+        $('#windowEditAddOBJ').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Edit Objective").center().open();
+    }
+
+    function EditBreakdown(PPA_ID,PPA_Description,PPA_Output_Indicator,PPA_Target,PPA_Implement_from,PPA_Implement_To,PPA_Cost,PPA_CodeRef,PPA_MFO_ID,Sub_PPA){
+        CurrentScrollPosition = $(window).scrollTop();
+        $(window).scrollTop(0);
+        var url = "@Url.Action("EditBreakdown", "Maintenance")";
+
+        $.get(url , { PPA_ID: PPA_ID, PPA_Description: PPA_Description, PPA_Output_Indicator: PPA_Output_Indicator, PPA_Target: PPA_Target,
+            PPA_Implement_FROM: PPA_Implement_from, PPA_Implement_TO: PPA_Implement_To, PPA_Cost: PPA_Cost, PPA_CodeRef: PPA_CodeRef,
+            PPA_MFO_ID: PPA_MFO_ID, Sub_PPA: Sub_PPA }, function(e){
+            document.documentElement.style.overflow = 'hidden';  // firefox, chrome
+            document.body.scroll = "no";
+            $('#windowEditMFOBreakdown').html(e);
+        });
+        $('#windowEditMFOBreakdown').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Edit MFO Breakdown").center().open();
+    }
+    function EditMFO(PPA_MFO_ID,OrderBy,Description,Cost)
+    {
+        CurrentScrollPosition = $(window).scrollTop();
+        $(window).scrollTop(0);
+        var url = "@Url.Action("EditMFO", "Maintenance")";
+        $.get(url, { PPA_MFO_ID: PPA_MFO_ID, PPA_MFO_Description: Description, MFO_COST: Cost, MFO_OrderBy: OrderBy }, function(d) {
+            document.documentElement.style.overflow = 'hidden';  // firefox, chrome
+            document.body.scroll = "no";
+            $('#windowEditMFO').html(d);
+        });
+        $('#windowEditMFO').data('kendoWindow').title("<i class='fa fa-navicon'> </i> EDIT MFO").center().open();
+    }
+    function SubmitMFOBreakdown(PPA_MFO_ID){
+        var PPA_MFO_ID = PPA_MFO_ID;
+        CurrentScrollPosition = $(window).scrollTop();
+        $(window).scrollTop(0);
+        var url = "@Url.Action("ADDMFOBreakdown", "Maintenance")";
+        $.get(url, {PPA_MFO_ID: PPA_MFO_ID}, function (d) {
+            document.documentElement.style.overflow = 'hidden';  // firefox, chrome
+            document.body.scroll = "no";
+            $('#windowAddMFOBreakdown').html(d);
+        });
+        $('#windowAddMFOBreakdown').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Add New MFO").center().open();
+    }
+    function DeleteOBJ(OBJ_ID){
+        CurrentScrollPosition = $(window).scrollTop();
+        var url = "@Url.Action("DeleteOBJ", "Maintenance")";
+        swal({
+            title: "System Notice!",
+            text: "This will DELETE your Objectives, Do you want to Continue?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "DELETE",
+            closeOnConfirm: false },
+            function(isConfirm){
+                if (isConfirm) {
+                    $.get(url, { OBJ_ID: OBJ_ID }, function(e){
+                        if(e == "success"){
+                            swal({
+                                title: "Success",
+                                text: "Objectives Deleted!",
+                                timer: 2000,
+                                type: "success",
+                                showConfirmButton: false
+                            });
+                            $("#grOBJ").data("kendoGrid").dataSource.read();
+                            setTimeout(function(){ 
+                                $(window).scrollTop(CurrentScrollPosition);
+                            }, 2000);
+                        }else{
+                            swal({
+                                title: "Error",
+                                text: "Objectives failed to Delete!",
+                                timer: 2000,
+                                type: "error",
+                                showConfirmButton: false
+                            });
+                            setTimeout(function(){ 
+                                $(window).scrollTop(CurrentScrollPosition);
+                            }, 2000);
+                        }
+                    });
+                }
+                else {
+                    setTimeout(function(){ 
+                        $(window).scrollTop(CurrentScrollPosition);
+                    }, 100);
+                }
+            });
+    }
+
+    function DeleteMFO(PPA_MFO_ID){
+        CurrentScrollPosition = $(window).scrollTop();
+        var url = "@Url.Action("DeleteMFO", "Maintenance")";
+        swal({
+            title: "System Notice!",
+            text: "This will DELETE your PPA MFO, Do you want to Continue?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "DELETE",
+            closeOnConfirm: false },
+            function(isConfirm){
+                if (isConfirm) {
+                    $.get(url, { PPA_MFO_ID: PPA_MFO_ID }, function(e){
+                        if(e == "success"){
+                            $("#grPPA").data("kendoGrid").dataSource.read();
+                            swal({
+                                title: "Success",
+                                text: "PPA MFO Deleted!",
+                                timer: 2000,
+                                type: "success",
+                                showConfirmButton: false
+                            });
+                            setTimeout(function(){ 
+                                $(window).scrollTop(CurrentScrollPosition);
+                            }, 2000);
+
+                        }else{
+                            swal({
+                                title: "Error",
+                                text: "PPA MFO failed to Delete!",
+                                timer: 2000,
+                                type: "error",
+                                showConfirmButton: false
+                            });
+                            setTimeout(function(){ 
+                                $(window).scrollTop(CurrentScrollPosition);
+                            }, 2000);
+                        }
+                    });
+                }
+                else {
+                    setTimeout(function(){ 
+                        $(window).scrollTop(CurrentScrollPosition);
+                    }, 100);
+                }
+            });
+    }
+
+    function DeleteData(PPA_ID, PPA_MFO_ID){
+        CurrentScrollPosition = $(window).scrollTop();
+        var url = "@Url.Action("DELETE_MFO_Breakdown", "Maintenance")";
+        swal({
+            title: "System Notice!",
+            text: "This will DELETE the MFO and its PPA's. Do you want to continue?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes",
+            closeOnConfirm: false },
+                function(isConfirm){
+                    if (isConfirm) {
+                        $.get(url, { PPA_ID: PPA_ID }, function(e){
+
+                            if(e == "success"){
+                                //var grName = "#gr"+PPA_ID;
+                                $("#grid_" +PPA_MFO_ID).data("kendoGrid").dataSource.read();
+                                swal({
+                                    title: "Success",
+                                    text: "PPA MFO Breakdown has been Deleted!",
+                                    timer: 2000,
+                                    type: "success",
+                                    showConfirmButton: false
+                                });
+                                setTimeout(function(){ 
+                                    $(window).scrollTop(CurrentScrollPosition);
+                                }, 2000);
+                            }else{
+                                swal({
+                                    title: "Error",
+                                    text: "PPA MFO Breakdown failed to Delete!",
+                                    timer: 2000,
+                                    type: "error",
+                                    showConfirmButton: false
+                                });
+                                setTimeout(function(){ 
+                                    $(window).scrollTop(CurrentScrollPosition);
+                                }, 2000);
+                            }
+                        });
+                    }
+                    else {
+                        setTimeout(function(){ 
+                            $(window).scrollTop(CurrentScrollPosition);
+                        }, 100);
+                    }
+                });
+    }
+
+    function onClose()
+    {
+        if ($("#FSSizeIndicator").val() == 0 && $("#ObjectiveSizeIndicator").val() == 0 && $("#PPASizeIndicator").val() == 0) {
+            document.documentElement.style.overflow = 'auto';  // firefox, chrome
+            document.body.scroll = "yes";
+        }
+        $(window).scrollTop(CurrentScrollPosition);
+    }
+
+
+    function onGridEditFS(){
+        setTimeout(function () {
+            $("#grFS").data("kendoGrid").dataSource.read();
+        }, 500);
+    }
+    function onGridEditObj(){
+        setTimeout(function () {
+            $("#grOBJ").data("kendoGrid").dataSource.read();
+        }, 500);
+    }
+    function onGridEditPPA(){
+        setTimeout(function () {
+            $("#grPPA").data("kendoGrid").dataSource.read();
+        }, 500);
+    }
+    function CopyPastYearData() {
+        var url = "@Url.Action("CopyLBP5Data", "Maintenance")";
+        swal({
+            title: "System Notice!",
+            text: "This Action will Copy the LBP5 Data from "+ @DateTime.Now.Year +" to "+ (@DateTime.Now.Year + 1) +".",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes Copy it!",
+            showLoaderOnConfirm: true,
+            closeOnConfirm: false },
+                function(){
+                    $.get(url, { OfficeID: @Account.UserInfo.Department }, function(e){
+                        if(e == "1"){
+                            $("#grPPA").data("kendoGrid").dataSource.read();
+                            swal({
+                                title: "Success",
+                                text: "Data Successfully Copied!",
+                                type: "success",
+                                showConfirmButton: true
+                            });
+
+
+                        }else{
+                            swal({
+                                title: "Error",
+                                text: e,
+                                type: "error",
+                                showConfirmButton: true
+                            });
+                        }
+
+                    });
+                });
+    }
+    function ResizeFSDIV() {
+        var DIVSize = $("#FSSizeIndicator").val();
+        var DIV_ID = 'FunctionalStatementDIV';
+        if(DIVSize == 0 ){
+            MaximizeDIV(DIV_ID);
+            document.getElementById('FSSizeIndicator').value = 1;
+            document.getElementById('FSSizeIcon').className ="fa fa-arrows";
+
+        }
+        else {
+            MinimizeDIV(DIV_ID);
+            document.getElementById('FSSizeIndicator').value = 0;
+            document.getElementById('FSSizeIcon').className ="fa fa-arrows-alt";
+            document.documentElement.style.overflow = 'auto';  // firefox, chrome
+            document.body.scroll = "yes";
+        }
+    }
+    function ResizeObjectiveDIV() {
+        var DIVSize = $("#ObjectiveSizeIndicator").val();
+        var DIV_ID = 'ObjectiveDIV';
+        if(DIVSize == 0 ){
+            MaximizeDIV(DIV_ID);
+            document.getElementById('ObjectiveSizeIndicator').value = 1;
+            document.getElementById('ObjectiveSizeIcon').className ="fa fa-arrows";
+
+        }
+        else {
+            MinimizeDIV(DIV_ID);
+            document.getElementById('ObjectiveSizeIndicator').value = 0;
+            document.getElementById('ObjectiveSizeIcon').className ="fa fa-arrows-alt";
+            document.documentElement.style.overflow = 'auto';  // firefox, chrome
+            document.body.scroll = "yes";
+        }
+    }
+    function ResizePPADIV() {
+        var DIVSize = $("#PPASizeIndicator").val();
+        var DIV_ID = 'PPADIV';
+        if(DIVSize == 0 ){
+            MaximizeDIV(DIV_ID);
+            $("#MFOBreakdownGrid").width($("#PPADIV").width() - 73);
+            document.getElementById('PPASizeIndicator').value = 1;
+            document.getElementById('PPASizeIcon').className ="fa fa-arrows";
+        }
+        else {
+            MinimizeDIV(DIV_ID);
+            $("#MFOBreakdownGrid").width($("#PPADIV").width() - 73);
+            document.getElementById('PPASizeIndicator').value = 0;
+            document.getElementById('PPASizeIcon').className ="fa fa-arrows-alt";
+            document.documentElement.style.overflow = 'auto';  // firefox, chrome
+            document.body.scroll = "yes";
+        }
+    }
+    function OnDetailExpand() {
+        $("#MFOBreakdownGrid").width($("#PPADIV").width() - 73);
+    }
+</script>
+<div style="margin-top:10px;margin-left:5px;">
+    <h2 style="display:inline-block"><i class="fa fa-cogs"></i> Configure LBP Form No. 5</h2>
+    <div style="float:right;display:inline-block" class="k-button" onclick="CopyPastYearData()"><span class="fa fa-files-o"></span> Copy Past Year's Data</div>
+</div>
+<div style="margin-top:15px;margin-left:5px;">
+    <p>Office/Department: <span id="OfficeName" style="font-weight:bold;font-size:18px"> @Account.UserInfo.OfficeName</span></p>
+</div>
+<div style="margin-top:15px;margin-left:5px;">
+    <p>Budget Year: <span id="BudgetYear"></span></p>
+</div>
+<div style="margin-top:20px;margin-left:5px;">
+    <div id="FunctionalStatementDIV">
+        <input type="hidden" value="0" id="FSSizeIndicator" />
+        <p><b>A. FUNCTIONAL STATEMENT</b></p>
+        @*<input type="text" id="LBP5_FS" name="LBP5_FS" style="width:85%;margin-top:5px;"/>
+            <div class="k-button k-state-active" onclick="FSUpdate()"> UPDATE</div>*@
+        @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.lbp5>()
+            .Name("grFS")
+            .Columns(col =>
+            {
+                col.Bound(m => m.FS_OrderBy).Title("Order No.").Width(15);
+                //col.Bound(m => m.FS_DESC).Title("FUNCTIONAL STATEMENT ").Width(700);
+                col.Template(@<text></text>)
+                    .Title("FUNCTIONAL STATEMENT  ")
+                    .Width(700)
+                    .HtmlAttributes(new { style = "font-weight:bold" })
+                    .ClientTemplate("<div>#=kendo.toString(FS_DESC)# </div>");
+                col.Bound(m => m.FS_ID).Title("OBJ ID").Hidden();
+                col.Template(@<text></text>)
+                        .ClientTemplate("<div class='k-button' title='EDIT DETAILS (?)' onclick='EDITFS(#=FS_ID#,#=FS_OrderBy#,\"#=FS_DESC#\")'> <span class='fa fa-edit'></span>EDIT</div>").Width(25);
+                col.Template(@<text></text>)
+                        .ClientTemplate("<div class='k-button' title='DELETE (X)' onclick='DeleteFS(#=FS_ID#)'> <span class='fa fa-close'></span>DELETE</div>").Width(100);
+            })
+            @*.ToolBar(t => t.Template(@<text>
+                <div style="float: right; height:28px;margin-top:2px;">
+                    <link href="~/Content/metroui/css/docs.css" rel="stylesheet" />
+                    <div class="k-button" onclick="AddFS()"><span class="fa fa-plus-circle"></span> Add New FS</div> @*<div class="k-button" onclick="SaveChanges('#=AccountID#')"><span class="fa fa-check"></span> Save Changes</div> <div class="k-button" onclick="CancelChanges('#=AccountID#')"><span class="fa fa-close"></span> Cancel Changes</div>*@
+                //     </div>
+                // </text>))*@
+                                                                            .ToolBar(toolbar =>
+                                                                                {
+                                                                                    toolbar.Custom().Text("<span id ='FSSizeIcon' class='fa fa-arrows-alt'> </span>").Name("ResizeFS").Url("javascript:void(0)").HtmlAttributes(new { onclick = "ResizeFSDIV()" });
+                                                                                    toolbar.Save();
+                                                                                    toolbar.Custom().Text("<span class='fa fa-plus-circle'> </span> Add New FS").Name("AddFS").Url("javascript:void(0)").HtmlAttributes(new { onclick = "AddFS()" });
+
+                                                                                }
+                                                                            )
+                                                                            .Editable(editable1 => editable1.Mode(GridEditMode.InCell))
+                                                                            .Pageable(page => page.Refresh(true)
+                                                                            .Enabled(true)
+                                                                            .ButtonCount(4)
+                                                                            .PreviousNext(true))
+                                                                            .Events(e => e.SaveChanges("onGridEditFS"))
+                                                                            .Selectable(selectable => selectable.Mode(GridSelectionMode.Single))
+                                                                            .DataSource(d => d
+                                                                            .Ajax()
+                                                                            .Batch(true)
+                                                                            .PageSize(10)
+                                                                            .Model(m => m.Id(i => i.FS_ID))
+                                                                            .Read(read => read.Action("LBP5_FS", "Maintenance").Data("LBP5_dataParam"))
+                                                                                    .Update("UpdateFSOrder", "Maintenance"))
+        )
+    </div>
+</div>
+<div style="margin-top:20px;margin-left:5px;">
+    <div id="ObjectiveDIV">
+        <input type="hidden" value="0" id="ObjectiveSizeIndicator" />
+        <p><b>B. OBJECTIVES</b></p>
+        <script>
+            var thisculture = kendo.culture();
+            thisculture.numberFormat.currency.symbol = '₱';
+
+            function LBP5_dataParam() {
+                var officeid = @Account.UserInfo.Department;
+                return {
+                    officeid: officeid
+                }
+            }
+        </script>
+        @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.lbp5>()
+            .Name("grOBJ")
+            .Columns(col =>
+            {
+                col.Bound(m => m.OBJ_OrderBy).Title("Order No.").Width(15);
+                col.Template(@<text></text>)
+                    .Title("Description ")
+                    .HtmlAttributes(new { style = "font-weight:bold" })
+                    .Width(700)
+                    .ClientTemplate("<div>#=kendo.toString(OBJ_Description)# </div>");
+                col.Bound(m => m.OBJ_ID).Title("OBJ ID").Hidden();
+                col.Template(@<text></text>)
+                        .ClientTemplate("<div class='k-button' title='EDIT DETAILS (?)' onclick='EDITOBJ(#=OBJ_ID#,\"#=OBJ_OrderBy#\",\"#=OBJ_Description#\")'> <span class='fa fa-edit'></span>EDIT</div>").Width(25);
+                col.Template(@<text></text>)
+                        .ClientTemplate("<div class='k-button' title='DELETE (X)' onclick='DeleteOBJ(#=OBJ_ID#)'> <span class='fa fa-close'></span>DELETE</div>").Width(100);
+
+            })
+            @*.ToolBar(t => t.Template(@<text>
+                <div style="float: right; height:28px;margin-top:2px;">
+                    <link href="~/Content/metroui/css/docs.css" rel="stylesheet" />
+                    <div class="k-button" onclick="AddOBJ()"><span class="fa fa-plus-circle"></span> Add New Objectives</div> @*<div class="k-button" onclick="SaveChanges('#=AccountID#')"><span class="fa fa-check"></span> Save Changes</div> <div class="k-button" onclick="CancelChanges('#=AccountID#')"><span class="fa fa-close"></span> Cancel Changes</div>*@
+                //    </div>
+                // </text>))*@
+                                                        .ToolBar(toolbar =>
+                                                            {
+                                                                toolbar.Custom().Text("<span id ='ObjectiveSizeIcon' class='fa fa-arrows-alt'> </span>").Name("ResizeObjective").Url("javascript:void(0)").HtmlAttributes(new { onclick = "ResizeObjectiveDIV()" });
+                                                                toolbar.Save();
+                                                                toolbar.Custom().Text("<span class='fa fa-plus-circle'> </span> Add New Objectives").Name("AddOBJ").Url("javascript:void(0)").HtmlAttributes(new { onclick = "AddOBJ()" });
+
+                                                            }
+                                                        )
+                                                        .Events(e => e.SaveChanges("onGridEditObj"))
+                                                        .Editable(editable1 => editable1.Mode(GridEditMode.InCell))
+                                                        .Pageable(page => page.Refresh(true)
+                                                        .Enabled(true)
+                                                        .ButtonCount(4)
+                                                        .PreviousNext(true))
+                                                        .Selectable(selectable => selectable.Mode(GridSelectionMode.Single))
+                                                        .DataSource(d => d
+                                                        .Ajax()
+                                                        .Batch(true)
+                                                        .PageSize(10)
+                                                        .Model(m => m.Id(i => i.OBJ_ID))
+                                                        .Read(read => read.Action("LBP5_Objectives", "Maintenance").Data("LBP5_dataParam"))
+                                                                .Update("UpdateOBJOrder", "Maintenance")
+                                                        )
+        )
+    </div>
+</div>
+<div style="margin-top:20px;margin-left:5px;">
+    <div id="PPADIV">
+        <input type="hidden" value="0" id="PPASizeIndicator" />
+        <p><b>C. PROGRAMS/PROJETCS/ACTIVITIES</b></p>
+
+            @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.lbp5>()
+            .Name("grPPA")
+            .Columns(col =>
+            {
+                col.Bound(m => m.PPA_MFOOrderBy)
+                    .Title("Order By")
+                    .Width(100)
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+                col.Bound(m => m.PPA_MFOOrderBy).Hidden();
+                col.Template(@<text></text>)
+                    .Title("Program/Activity/Project Description")
+                    .HtmlAttributes(new { style = "font-weight:bold" })
+                    .ClientTemplate("<div>#=kendo.toString(PPA_MFO_Description)# </div>");
+                col.Bound(m => m.PPA_MFO_ID).Title("Code Reference").Hidden();
+                col.Template(@<text></text>)
+                        .Title("Cost")
+                        .Width(120)
+                        .HtmlAttributes(new { style = "text-align:center" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible;" })
+                        .ClientTemplate("<div>#=kendo.toString(MFO_Cost, 'c2')# </div>");
+                col.Bound(m => m.MFO_Cost).Hidden();
+                col.Template(@<text></text>)
+                        .ClientTemplate("<div class='k-button' title='EDIT DETAILS (?)' onclick='EditMFO(#=PPA_MFO_ID#, #=PPA_MFOOrderBy#,\"#=PPA_MFO_Description#\",\"#=MFO_Cost#\")'> <span class='fa fa-edit'></span>EDIT</div>").Width(25);
+                col.Template(@<text></text>)
+                        .ClientTemplate("<div class='k-button' title='DELETE (X)' onclick='DeleteMFO( #=PPA_MFO_ID# )'> <span class='fa fa-close'></span>DELETE</div>").Width(100);
+
+
+            }).Events(e => e.DetailExpand("OnDetailExpand"))
+            @*.ToolBar(t => t.Template(@<text>
+                <div style="float: right; height:28px;margin-top:2pxMFO_Cost
+                    <link href="~/Content/metroui/css/docs.css" rel="stylesheet" />
+                    <div class="k-button" onclick="ADD_MFO('#=PPA_MFO_ID#')"><span class="fa fa-plus-circle"></span> Add New MFO</div> @*<div class="k-button" onclick="SaveChanges('#=AccountID#')"><span class="fa fa-check"></span> Save Changes</div> <div class="k-button" onclick="CancelChanges('#=AccountID#')"><span class="fa fa-close"></span> Cancel Changes</div>*@
+                    //   </div>
+                    //</text>))
+                                        .ToolBar(toolbar =>
+                                                        {
+                                                            toolbar.Custom().Text("<span id ='PPASizeIcon' class='fa fa-arrows-alt'> </span>").Name("ResizePPA").Url("javascript:void(0)").HtmlAttributes(new { onclick = "ResizePPADIV()" });
+                                                            toolbar.Save();
+                                                            toolbar.Custom().Text("<span class='fa fa-plus-circle'> </span> Add New MFO").Name("AddNewMFO").Url("javascript:void(0)").HtmlAttributes(new { onclick = "ADD_MFO('#=PPA_MFO_ID#')" });
+
+                                                        }
+                                                    )
+                                                                   .Events(e => e.SaveChanges("onGridEditPPA"))
+                                                                   .Editable(editable1 => editable1.Mode(GridEditMode.InCell))
+                                                                   .ClientDetailTemplateId("template")
+                                                                   .Pageable(page => page.Refresh(true)
+                                                                   .Enabled(true)
+                                                                   .ButtonCount(4)
+                                                                   .PreviousNext(true))
+                                                                   .Selectable(selectable => selectable.Mode(GridSelectionMode.Single))
+                                                                   .DataSource(d => d
+                                                                   .Ajax()
+                                                                   .Batch(true)
+                                                                   .PageSize(10)
+                                                                   .Model(m => m.Id(i => i.PPA_MFO_ID))
+                                                                   .Read(read => read.Action("PPA_MFO", "Maintenance").Data("LBP5_dataParam"))
+                                                                           .Update("UpdateMFOOrder", "Maintenance")
+                                                                   )
+            )
+        </div>
+    </div>
+
+<script id="template" type="text/kendo-tmpl">
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.lbp5>()
+            .Name("grid_#=PPA_MFO_ID#") // template expression, to be evaluated in the master context
+            .HtmlAttributes(new { style = "width:680px;overflow-y: scroll;" })
+            .Scrollable()
+            .Columns(columns =>
+            {
+                columns.Bound(e => e.PPA_ID).Hidden();
+                columns.Bound(e => e.PPA_MFO_ID).Hidden();
+                columns.Bound(e => e.Sub_PPA).Hidden();
+                columns.Bound(e => e.PPA_OrderBy)
+                    .Title("Order By")
+                    .Width(100)
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+                columns.Template(@<text></text>)
+                    .Title("Code Reference")
+                    .Width(100)
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                    .ClientTemplate("<div>\\#=kendo.toString(PPA_CodeRef)\\# </div>");
+                columns.Template(@<text></text>)
+                    .Title("Program/Activity/ Project Description")
+                    .Width(350)
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible;" })
+                    .ClientTemplate("<div>\\#=kendo.toString(PPA_Description)\\# </div>");
+                //columns.Bound(e => e.PPA_Cost)
+                //    .Title("Cost")
+                //    .Width(120)
+                //    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible;" });
+                columns.Template(@<text></text>)
+                        .Title("Cost")
+                        .Width(120)
+                        .HtmlAttributes(new { style = "text-align:center" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible;" })
+                        .ClientTemplate("<div>\\#=kendo.toString(PPA_Cost, 'c2')\\# </div>");
+                columns.Template(@<text></text>)
+                    .Title("Output Indicator")
+                    .Width(350)
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible;" })
+                    .ClientTemplate("<div>\\#=kendo.toString(PPA_Output_Indicator)\\#</div>");
+                columns.Template(@<text></text>)
+                    .Title("Target")
+                    .Width(100)
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible;" })
+                    .ClientTemplate("<div>\\#=kendo.toString(PPA_Target)\\#</div>");
+                columns.Template(@<text></text>)
+                    .Title("FROM")
+                    .Width(100)
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible;" })
+                    .ClientTemplate("<div>\\#=kendo.toString(PPA_Implement_FROM)\\#</div>");
+                columns.Template(@<text></text>)
+                    .Title("TO")
+                    .Width(100)
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible;" })
+                    .ClientTemplate("<div>\\#=kendo.toString(PPA_Implement_TO)\\#</div>");
+                columns.Template(@<text></text>)
+                        .ClientTemplate("<div class=\"k-button\" title=\"Edit Details (?)\" onclick=\"EditBreakdown(  \\#=PPA_ID\\#,'\\#=PPA_Description\\#','\\#=PPA_Output_Indicator\\#','\\#=PPA_Target\\#','\\#=PPA_Implement_FROM\\#','\\#=PPA_Implement_TO\\#','\\#=PPA_Cost\\#','\\#=PPA_CodeRef\\#',#=PPA_MFO_ID#,'\\#=Sub_PPA\\#' )\"> <span class='fa fa-edit' style='font-size: 12pt;'></span> Edit </div>").Width(85);
+                columns.Template(@<text></text>)
+                        .ClientTemplate("<div class='k-button' title='Delete (X)' onclick='DeleteData( \\#=PPA_ID\\#, #=PPA_MFO_ID# )'> <span class='fa fa-close' style='font-size: 12pt;'></span> Delete </div>").Width(100);
+
+
+                        })
+                        @*.ToolBar(t => t.Template(@<text>
+                                                        <div style="float: right; height:28px;margin-top:2px;">
+                                                            <link href="~/Content/metroui/css/docs.css" rel="stylesheet" />
+                                                            <div class="k-button" onclick="SubmitMFOBreakdown('#=PPA_MFO_ID#')"><span class="fa fa-plus-circle"></span> Add New MFO Breakdown</div>
+                                                        </div>
+                            </text>))*@
+.ToolBar(toolbar =>
+                                {
+                                    toolbar.Save();
+                                    toolbar.Custom().Text("<span class='fa fa-plus-circle'> </span> Add New MFO Breakdown").Name("SubmitMFOBreakdown").Url("javascript:void(0)").HtmlAttributes(new { onclick = "SubmitMFOBreakdown('#=PPA_MFO_ID#')" });
+
+                                }
+                            )
+
+
+                                                                            .Editable(editable => editable.Mode(GridEditMode.InCell))
+                                                                            .Selectable()
+                                                                            .Events(e => e.SaveChanges("onGridEditPPA"))
+                                                                            .Pageable(page => page.Refresh(true)
+                                                                                      .Enabled(true)
+                                                                                      .ButtonCount(4)
+                                                                                      .PreviousNext(true))
+                                                                            .DataSource(dataSource => dataSource
+                                                                            .Ajax()
+                                                                            .Batch(true)
+                                                                            .ServerOperation(true)
+                                                                            .PageSize(10)
+                                                                                .Model(m =>
+                                                                                    {
+                                                                                        m.Id(i => i.PPA_ID);
+
+                                                                                    })
+                                                                                                .Read(read => read.Action("MFO_Breakdown", "Maintenance", new { PPA_MFO_ID = "#=PPA_MFO_ID#" }))
+                                                                                                .Update("UpdateOrder", "Maintenance")
+                                                                                                )
+
+                                                                            .ToClientTemplate()
+    )
+</script>
+
+<div style="border-width:1px;border-color:#808080;border-style:solid;width:750px;margin-top:20px;margin-left:5px;"></div>
+<div style="margin-top:10px;margin-left:5px;">
+    @*<h2>Additional Info (OPIF)</h2>*@
+</div>
+<div style="margin-top:10px;margin-left:5px;">
+
+</div>
+<script>
+    $(document).ready(function () {
+
+        var d = new Date();
+        var YearDate = d.getFullYear() + 1;
+        document.getElementById("BudgetYear").innerHTML = YearDate;
+
+        @*var url = "@Url.Action("FSContent", "Maintenance")";
+        var OfficeIDparam = "@Account.UserInfo.Department";
+        $.get(url, {YearDate: YearDate, OfficeIDParam: OfficeIDparam}, function(e){
+            document.getElementById("LBP5_FS").value = e;
+        });*@
+
+
+
+    });
+    //$("#k-grid-SubmitMFOBreakdown").click(function(){
+    //    alert("Hello!");
+    //});
+</script>
+
+@(Html.Kendo().Window()
+    .Name("windowAddOBJ")
+    .Title("Add Objectives")
+    .Width(500)
+    .Height(230)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(true)
+    .AutoFocus(true)
+    .AutoFocus(true)
+    .Events(e => e.Close("onClose"))
+    .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        }))
+
+
+@(Html.Kendo().Window()
+    .Name("windowAddFS")
+    .Title("Add FS")
+    .Width(480)
+    .Height(230)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(true)
+    .AutoFocus(true)
+    .Events(e => e.Close("onClose"))
+    .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+
+            });
+        }))
+
+@(Html.Kendo().Window()
+    .Name("windowEditAddOBJ")
+    .Title("EDIT Objectives")
+    .Width(500)
+    .Height(230)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(true)
+    .AutoFocus(true)
+    .Events(e => e.Close("onClose"))
+    .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        }))
+
+@(Html.Kendo().Window()
+    .Name("windowAddMFO")
+    .Title("Add MFO")
+    .Width(500)
+    .Height(290)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(true)
+    .AutoFocus(true)
+    .Events(e => e.Close("onClose"))
+    .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        }))
+
+@(Html.Kendo().Window()
+    .Name("windowEditMFO")
+    .Title("Edit MFO")
+    .Width(500)
+    .Height(290)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(true)
+    .AutoFocus(true)
+    .Events(e => e.Close("onClose"))
+    .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        }))
+
+@(Html.Kendo().Window()
+    .Name("windowEditFS")
+    .Title("Edit FS")
+    .Width(480)
+        .Height(230)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(true)
+    .AutoFocus(true)
+    .Events(e => e.Close("onClose"))
+    .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        }))
+
+@(Html.Kendo().Window()
+    .Name("windowAddMFOBreakdown")
+    .Title("Add MFO")
+    .Width(850)
+    .Height(330)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(true)
+    .AutoFocus(true)
+    .Events(e => e.Close("onClose"))
+    .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        }))
+
+@(Html.Kendo().Window()
+    .Name("windowEditMFOBreakdown")
+    .Title("Add MFO")
+    .Width(850)
+    .Height(330)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(true)
+    .AutoFocus(true)
+    .Events(e => e.Close("onClose"))
+    .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        }))

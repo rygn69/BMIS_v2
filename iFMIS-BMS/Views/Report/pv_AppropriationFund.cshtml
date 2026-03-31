@@ -1,0 +1,32 @@
+﻿<h2 style="font-size:18px;">
+    <span class="fa fa-print"></span> Appropriation Per Fund (Procurement and Non-Procurement)
+</h2>
+<div style="display:inline-block;margin-top:20px;">
+    <label style="font-size:14px">Transaction Year :</label>
+</div>
+<div style="display:inline-block;margin-left:10px;">
+    @(Html.Kendo().DropDownList()
+        .Name("ddlYear")
+        .DataTextField("ProposalYear")
+        .DataValueField("ProposalYear")
+        .SelectedIndex(0)
+        .HtmlAttributes(new { @style = "width: 95px;" })
+        //.Events(e => e.Change("ocake"))
+        .SelectedIndex(0)
+        .DataSource(source => source.Read(read => read.Action("GetPropYearFund", "PYear")))
+    )
+</div>
+<div style="margin-left:120px;margin-top:15px;">
+    <div id="btnPrint" class="k-button k-button-icontext" style="background-color:cornflowerblue;border-radius:50px;color:white;width:100px;" onclick="reqPrint()"><span class="fa fa-print"></span> Preview</div>
+</div>
+
+<script>
+    function reqPrint() {
+        var year = $("#ddlYear").val()
+        $.ajax({
+            async: false,
+            dataType: 'html',
+            success: window.open("../Reports/ReportViewer.aspx?rid=40&year=" + year + "")
+        });
+    }
+</script>

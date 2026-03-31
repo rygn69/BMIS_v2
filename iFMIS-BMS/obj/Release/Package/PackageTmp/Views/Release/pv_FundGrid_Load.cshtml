@@ -1,0 +1,326 @@
+﻿
+<script>
+    var thisculture = kendo.culture();
+    thisculture.numberFormat.currency.symbol = '₱'; // Script For Changing The Currency Sign
+
+
+    function delete_float(release_float_id, code) {
+
+        var url = "@Url.Action("Delete_Flaot", "Release")";
+
+        swal({
+            title: "Are you sure?",
+            text: "This item will be removed!",
+            type: "info",
+            showCancelButton: true,
+            closeOnConfirm: false,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, Remove It!",
+            showLoaderOnConfirm: true,
+        }, function () {
+
+
+            $.get(url, { release_float_id: release_float_id, code:code }, function (d) {
+
+                $("#grd_Float").data("kendoGrid").dataSource.read();
+                if (d == "1") {
+                    swal({
+                        title: "Success!",
+                        text: "Float has been Removed.",
+                        timer: 2000,
+                        type: "success",
+                        showConfirmButton: false
+                    })
+                    $('#GeneralFund_Grid').data('kendoGrid').dataSource.read();
+                    $('#grd_Float').data('kendoGrid').dataSource.read();
+                } else {
+                    swal({
+                        title: "Error!",
+                        text: "System Error! Please try again.",
+                        timer: 2000,
+                        type: "error",
+                        showConfirmButton: false
+                    })
+                }
+            });
+        });
+    }
+
+    function Close() {
+        $('#grd_Float').data('kendoGrid').dataSource.read();
+    }
+
+    function fn_LoadFlaot() {
+        var office_id = $("#offs").val();
+        var program_id = $("#Progss").val();
+        var ooe_id = $("#ooe_id").val();
+        var account_id = $("#account_list").val();
+        var month_ = $("#Months").val();
+        var numeric_ = $("#numeric").val();
+        var year_ = $("#ddlYear").val();
+        var classtype = $("#classtype").val();
+
+        return {
+            office_id: office_id,
+            program_id: program_id,
+            ooe_id: ooe_id,
+            account_id: account_id,
+            month_: month_,
+            numeric_: numeric_,
+            year_: year_
+        }
+    }
+
+
+    function ReadData() {
+        return {
+            office_id: '@Session["office_id"]',
+            program_id: '@Session["program_id"]',
+            ooe_id: '@Session["ooe_id"]',
+            account_id: '@Session["account_id"]',
+            month_: '@Session["month_"] ',
+            numeric_: '@Session["numeric_"]',
+            year_: '@Session["year_"] '
+        }
+    }
+    setTimeout(function () {
+
+        okkk();
+
+
+    }, 1000);
+
+    function okkk(e) {
+        $("#Progss").data("kendoDropDownList").dataSource.read();
+    }
+
+
+    function refreshinggg() {
+        setTimeout(function () {
+
+            $("#float_offs_null").data("kendoComboBox").dataSource.read();
+            $("#float_Progss_null").data("kendoDropDownList").dataSource.read();
+            $("#float_ooe_id_null").data("kendoDropDownList").dataSource.read();
+            $("#float_account_list_null").data("kendoComboBox").dataSource.read();
+            $("#float_Months_null").data("kendoDropDownList").dataSource.read();
+
+        }, 500);
+    }
+
+    function edit_float(release_float_id) {
+        var ooe_id = $("#float_ooe_id_null").val();
+
+        var url = "@Url.Action("Edit_Flaot", "Release")";
+
+        $.get(url, { release_float_id: release_float_id, ooe_id: ooe_id }, function (d) {
+
+            $("#float_id").val(d.release_float_id);
+
+
+            if (d.ooe_ids == 1) {
+                $("#float_PS_nulls").val(d.Amount_release);
+            } else if (d.ooe_ids == 2) {
+                $("#float_MOOE_nulls").val(d.Amount_release);
+            } else if (d.ooe_ids == 3) {
+                $("#float_CO_nulls").val(d.Amount_release);
+            } else {
+                alert('error')
+            }
+
+        })
+
+    }
+
+    function CheckAll(e) {
+        $("#grd_Float tbody input:checkbox").prop("checked", e.checked);
+    }
+
+    function fn_checkbox(value) {
+
+        if (value == 1) {
+            return "<input type='checkbox' class='checkbox' disabled='disabled' checked/>";
+        }
+        else {
+            return "<input type='checkbox' class='checkbox' />";
+        }
+    }
+
+    function onDataBound(e) {
+        $(".k-hierarchy-cell").hide();
+        $(".k-hierarchy-col").hide();
+        var grid = $("#grd_Float").data("kendoGrid")
+        var ds = grid.dataSource.view();
+        var rows = e.sender.tbody.children();
+        var release_float_id = 0;
+        var gov_com = 0;
+        var comtag=0;
+
+        for (var i = 0; i < ds.length; i++) {
+            gov_com = ds[i].gov_com;
+            release_float_id=ds[i].release_float_id;
+            comtag = ds[i].comtag;
+
+            var row = $(rows[i]);
+
+            if (gov_com != 0) {
+                $('#deleteid' + release_float_id + '').css("display", "none");
+            }
+            if (comtag == 1) {
+                row.addClass("ChangeBackColor");
+            }
+            else if (comtag == 2) {
+                row.addClass("ChangeApprovedColor");
+                $('#deleteid' + release_float_id + '').css("display", "none");
+            }
+            else {
+                $('#viewdetailid' + release_float_id + '').css("display", "none");
+            }
+        }
+    }
+
+    function viewdetail(code, officeid, programid, accountid, particular, muncode, brgycode, Amount_release, YearOf) {
+        //alert(code)
+        //alert(officeid)
+        //alert(programid)
+        //alert(accountid)
+        //alert(particular)
+        //alert(muncode)
+        //alert(brgycode)
+        //alert(Amount_release)
+        
+            $(window).scrollTop(0);
+
+            var url = "@Url.Action("comdetails", "Release")";
+
+        $.get(url, { officeid: officeid, programid: programid, accountid: accountid, particular: particular, muncode: muncode, brgycode: brgycode, Amount_release: Amount_release, code: code, YearOf: YearOf }, function (d) {
+
+                $("#CommitmenDetail").html(d);
+            })
+             $('#CommitmenDetail').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Commitment Details").center().open();
+
+    }
+</script>
+
+@(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Release_Float_Model>()
+.Name("grd_Float")
+.Scrollable()
+.Columns(col =>
+{
+        col.Template(@<text></text>).Hidden().ClientTemplate("<div>#=release_float_id# </div>");
+        col.Template(@<text></text>).Hidden().ClientTemplate("<div>#=code# </div>");
+        col.Bound(m => m.Float_Flag)
+                     .ClientTemplate("#=fn_checkbox(Float_Flag)#")
+                     .Title("<input onclick=CheckAll(this) type='checkbox'   class='checkbox'/>")
+                     .Width(30)
+                     .HtmlAttributes(new { @onclick = "click", style = "align:center;float:none;text-align:center; font-size:12px; vertical-align: middle;" })
+                     .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Bound(m => m.amount_description)
+                    .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                    .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Account</div></text>)
+                        .Width(220)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Bound(m => m.Amount_release)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Amount</div></text>)
+                        .Width(118)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div>#=kendo.toString(Amount_release,'c2')# </div>");
+
+        col.Bound(m => m.MonthOf)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Month</div></text>)
+                        .Width(70)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Bound(m => m.YearOf)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Year</div></text>)
+                        .Width(50)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" }); ;
+        col.Bound(m => m.balance_amount)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Balance<br />Balance Amount</div></text>)
+                        .Hidden()
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div>#=kendo.toString(balance_amount,'c2')# </div>");
+
+        col.Bound(m => m.batch)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Batch</div></text>)
+        .Width(40)
+        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+
+        col.Template(t => { }).ClientTemplate(
+                    "<div class='k-button k-button-icontext'  id='viewdetailid#=release_float_id#' title='Click to view details!' style='border-radius:50px;color:white;background-color:cornflowerblue;' onclick='viewdetail(\"#=code#\",#=officeid#,#=programid#,#=accountid#,\"#=particular#\",#=muncode#,#=brgycode#,#=Amount_release#,#=YearOf#)'><span class='fa fa-list-alt' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'> </span>Details</div> "
+                ).HtmlAttributes(new { style = "vertical-align: top;" }).Width(105);
+
+        col.Template(t => { }).ClientTemplate(
+                    "<div class='k-button k-button-icontext' id='deleteid#=release_float_id#' style='border-radius:50px;color:\\#ffffff;background-color:\\#DE5555;' onclick='delete_float(#=release_float_id#,\"#=code#\")'><span class='fa fa-trash-o' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'> </span>Remove</div> "
+                ).HtmlAttributes(new { style = "vertical-align: top;" }).Width(108);
+
+        col.Bound(m => m.release_float_id)
+                .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Txn ID</div></text>)
+                        .Hidden()
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+    })
+
+        .Sortable()
+        .Scrollable()
+        .HtmlAttributes(new { style = "height:250px;" })
+        .Events(e => e.DataBound("onDataBound"))
+        .DataSource(d => d
+        .Ajax()
+        .PageSize(1000)
+        .Model(m => m.Id(i => i.release_float_id))
+        .Read(read => read.Action("Load_Float_List", "Release").Data("fn_LoadFlaot")))
+)
+
+@(Html.Kendo().Window()
+        .Name("CommitmenDetail")
+        .Title("Details")
+        .Width(840)
+        .Height(575)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+        .Events(e => e.Close("Close"))
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+                .Actions(a => { a.Close(); })
+)
+
+<style>
+    .ChangeBackColor {
+        background-color: #FFFF80;
+    }
+    .ChangeApprovedColor {
+        background-color:#00ff21;
+    }
+    .k-dropdown-wrap.k-state-default {
+        border-left-style: solid;
+    }
+</style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

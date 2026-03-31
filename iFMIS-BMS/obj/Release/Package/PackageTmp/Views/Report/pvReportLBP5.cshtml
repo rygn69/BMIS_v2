@@ -1,0 +1,69 @@
+﻿<script>
+    function onPrint(e) {
+        var OfficeID = $("#ddlOffices").val();
+        var YearOf = $("#ddlYear").val();
+        var OfficeName = $("#ddlOffices").data("kendoComboBox").text();
+        if (OfficeID != "") {
+            $.ajax({
+                async: false,
+                dataType: 'html',
+                success: window.open("../Reports/ReportViewer.aspx?rid=3&OfficeID=" + OfficeID + "&Year=" + YearOf + "&OfficeName=" + OfficeName + "")
+            });
+        }
+        else {
+            alert("Please Select Office and Program");
+        }
+    }
+</script>
+@*<h2><span class="fa fa-print"></span> Generate LBP5 Report</h2>*@
+<div style="width : 81.5%; margin-top: 0px;border-style: solid; border-color: #1fa67a;">
+    <div style="width:100%;height : 25px ; background-color:#1fa67a; color: white">
+        <label class="fa fa-file-text-o fa-lg" style="margin-left: 5px; display:inline-block">  PRINT LBP FORM 5 REPORT</label>
+    </div>
+    <div style="margin-top:20px;margin-left:5px;">
+        <label>Office Name</label>
+        @(Html.Kendo().ComboBox()
+                         .Name("ddlOffices")
+                         .DataTextField("OfficeName")
+                         .DataValueField("OfficeID")
+                         .Filter("contains")
+                         .MinLength(1)
+                         .Placeholder("Select Office...")
+                         .HtmlAttributes(new { @style = "width: 527px;" })
+                         .DataSource(source => source.Read(read => read.Action("ddlOffice", "User")))
+
+        )
+    </div>
+    <div style="margin-top:20px;margin-left:5px;">
+        <label>Budget Year</label>
+        @(Html.Kendo().DropDownList()
+                        .Name("ddlYear")
+                        .DataTextField("ProposalYear")
+                        .DataValueField("ProposalYear")
+                        .SelectedIndex(0)
+                        .HtmlAttributes(new { @style = "width: 90px;" })
+                        .DataSource(source => source.Read(read => read.Action("GetPropYear", "PYear")))
+
+        )
+    </div>
+    @*<div style="margin-top:20px;margin-left:5px;">
+        <div class="k-button k-state-active" onclick="onPrint()"> <span class="fa fa-print"></span> Print Report</div>
+        <div id="btnPrint" class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 80px;float:right; margin-top: 5px; margin-right:10px; margin-bottom:5px" onclick="reqPreview()">Preview</div>
+    </div>*@
+    <div style="display:inline-block;width:100%">
+
+        <div id="btnPrint" class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 80px;float:right; margin-top: 5px; margin-right:10px; margin-bottom:5px" onclick="onPrint()"> <span class="fa fa-print"></span> Preview</div>
+    </div>
+</div>
+    <script>
+        $(document).ready(function () {
+            if ('@Account.UserInfo.UserTypeDesc' == 'Budget In-Charge') {
+                $("#ddlOffices").data("kendoComboBox").value(@Account.UserInfo.Department);
+                $("#ddlOffices").data("kendoComboBox").enable(false);
+            }
+            else {
+                $("#ddlOffices").data("kendoComboBox").enable();
+                $("#ddlOffices").data("kendoComboBox").value("");
+            }
+        });
+    </script>

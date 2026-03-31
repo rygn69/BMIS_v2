@@ -1,0 +1,386 @@
+﻿<script src="~/Scripts/BMS/accounting.js"></script>
+<script src="~/Scripts/BMS/BudgetControl/OBRLogger.js"></script>
+<h2>Transaction Date: <b><span id="TransactionYear"></span></b></h2>
+<style>
+    .k-grid-content {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch; /* Improves scrolling on iOS */
+}
+
+/*.k-scrollbar {
+    width: 10px !important; /* Make it easier to touch */
+}*/
+    .container {
+        overflow: auto !important;
+    }
+</style>
+<div style="width : 100%; margin-top: 20px;border-style: solid; border-color: #1fa67a">
+
+    <div style="width:100%;height : 35px ; background-color:#1fa67a; color: white">
+        <h2 style="margin-left: 5px;color:white"><i class="fa fa-sliders"></i> List of OBR</h2>
+    </div>
+    <div style="padding:5px;width:100%;">
+        <div style="margin-top:20px;"></div>
+        <script>
+            $('title').html('IFMIS-BMS (OBR)');
+        var thisculture = kendo.culture();
+        thisculture.numberFormat.currency.symbol = '₱';
+
+        function searchOBR() {
+
+            var SearchOBRData = $("#SearchData").val();
+            $("#grOBR").data("kendoGrid").dataSource.filter({
+                logic: "or",
+                filters: [
+                    {
+                        field: "grOBRSeries",
+                        operator: "contains",
+                        value: SearchOBRData
+                    },
+                    {
+                        field: "grtrnno",
+                        operator: "contains",
+                        value: SearchOBRData
+                    }
+                    ,
+                    {
+                        field: "TAmount",
+                        operator: "contains",
+                        value: SearchOBRData
+                    }
+                    ,
+                    {
+                        field: "claimant",
+                        operator: "contains",
+                        value: SearchOBRData
+                    }
+                     ,
+                    {
+                        field: "grOBRNo",
+                        operator: "contains",
+                        value: SearchOBRData
+                    }
+                ]
+                });
+        }
+
+        $(function () {
+            $("#SearchData").keypress(function (e) {
+                if (e.keyCode == 13) {
+                    searchOBR();
+                }
+            });
+        });
+
+
+        function UserParam()
+        {
+            var User = "@Account.UserInfo.UserTypeDesc";
+            var Office = @Account.UserInfo.Department;
+            return {
+                User: User,
+                Office: Office
+            }
+        }
+
+        function AddNewTransaction() {
+
+                $(window).scrollTop(0);
+                var url="@Url.Action("transyearend", "BudgetControl")"
+                $.get(url, { year: $("#Years").val() }, function (e) {
+                    //  $("#yearendtrans").val(e)
+                    if (e==0) {
+                        swal("Warning","The financial transaction for C.Y. " + $("#Years").val()  +" was closed!","warning")
+                    } else {
+                        var url2 = "@Url.Action("AddNewOBR", "BudgetControl")";
+                        $.get(url2, function (d) {
+                            $('#AddNewOBR').html(d);
+                        });
+                        $('#AddNewOBR').data('kendoWindow').title("<i class='fa fa-clock-o'> </i> OBR Logger").center().open();
+                    }
+                })
+
+                
+
+            }
+            $("#grOBR").kendoTouch({
+            enableSwipe: true,
+            enableDrag: true
+        });
+        function deletelogid(id){
+           
+            swal({
+                title: "Delete the transaction number?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                closeOnConfirm: false,
+                showLoaderOnConfirm: true
+            },
+                function () {
+                    var url = "@Url.Action("deletelogid", "Report")";
+                    $.get(url, { id: id}, function (e) {
+                        if (e =='success'){
+                            swal("Success", "The transaction number has been deleted successfully.", "success")
+                            $("#grOBR").data("kendoGrid").dataSource.read()
+                        }
+                        else{
+                            swal("Error",e,"error")
+                        }
+                    })
+                })
+        }
+        function onDataBound(e) {
+            $(".k-hierarchy-cell").hide();
+            $(".k-hierarchy-col").hide();
+            var grid = $("#grOBR").data("kendoGrid")
+            var ds = grid.dataSource.view();
+            var rows = e.sender.tbody.children();
+            var obrno = "";
+            var trnno=0;
+            for (var i = 0; i < ds.length; i++) {
+                obrno = ds[i].grOBRNo;
+                trnno=ds[i].grOBRID;
+                if (obrno != "" ) {
+                    $('#deleteid' + trnno + '').css("display", "none");
+                }
+                
+            }
+        }
+        </script>
+
+        @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.BudgetControl.OBRLogger>()
+        .HtmlAttributes(new { style = "height:510px" })
+        .Name("grOBR")
+        //.Scrollable()
+        .Scrollable(scroll => scroll.Enabled(true).Virtual(false).Height(400))
+        .Columns(col =>
+        {
+        col.Bound(m => m.grtrnno).Title("#").Width(55);//.Locked(true).Lockable(false);
+                                                       //if ($("#cafoamode").val() == 1){ };
+        col.Bound(m => m.office).Hidden();
+        col.Bound(m => m.grOBRNo).Title("OBR No.").Width(160);
+        col.Bound(m => m.grOBRSeries).Title("Series No.").Width(150);
+        col.Bound(m => m.TAmount).Title("Amount").Width(100);
+        col.Bound(m => m.claimant).Title("Claimant").Width(200);
+        col.Template(t => { }).Title("In").ClientTemplate(
+        "# if (grUserIDIn == 0) { # " +
+        "<div> <span class='fa fa-times' style='color:red'></span> </div>" +
+        "# } else { # " +
+        "<div> <span class='fa fa-check' style='color:green'></span> </div>" +
+        "# } #"
+        ).HtmlAttributes(new { style = "margin-left:5px;" }).Width(35);
+        col.Template(t => { }).Title("Out").ClientTemplate(
+        "# if (grUserIDOut == 0) { # " +
+        "<div> <span class='fa fa-times' style='color:red'></span> </div>" +
+        "# } else { # " +
+        "<div> <span class='fa fa-check' style='color:green'></span> </div>" +
+        "# } #"
+        ).HtmlAttributes(new { style = "margin-left:5px;" }).Width(50);
+        col.Template(t => { }).Title("Verify").ClientTemplate(
+        "# if (verify_tag == 0) { # " +
+        "<div> <span class='fa fa-times' style='color:red'></span> </div>" +
+        "# } else { # " +
+        "<div> <span class='fa fa-check' style='color:green'></span> </div>" +
+        "# } #"
+        ).HtmlAttributes(new { style = "margin-left:5px;" }).Width(62);
+        col.Template(t => { }).Title("<div><span class='fa fa-trash'></span></div>")
+                .HeaderTemplate(@<text></text>)
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;" })
+                .ClientTemplate(
+                     "<div id='deleteid#=grOBRID#'  style='border-radius:50px;' onclick='deletelogid(#=grOBRID#)'><span class='fa fa-trash' title='Click here to delete the transaction number!' style='font-size: 16px;margin: 1px;margin-top: -1px;margin-left: 2px;margin-right: 2px;color:red;cursor:pointer'> </span></div> ")
+                .HtmlAttributes(new { style = "vertical-align: middle;text-align:center" })
+                .Width(30);
+        col.Template(t => { }).ClientTemplate(
+       "<div id='checkoutid#=grtrnno#' class='k-button' onclick='EaseCheckOut( #=grtrnno#, #=grUserIDOut#, #=OBRNowithFnCode#, #=grOBRID#, #=grOBRNo#,\"#=cttsno#\",1,#=employeeassign#,\"#=otherindividual#\")'><span class='fa fa-check-circle-o' style='color:green'></span> Check-Out </div>"
+       ).HtmlAttributes(new { style = "margin-left:5px;" }).Width(120);
+        col.Template(t => { }).ClientTemplate(
+           "<div class='k-button' onclick='ViewDetails(#=grtrnno#, #=grOBRID#,\"#=cttsno#\",#=office#,#=verify_tag#,#=officeassign#,\"#=program#\",#=employeeassign#,\"#=otherindividual#\",#=approveby#)'><span class='fa fa-search'></span> Details </div>"
+           ).HtmlAttributes(new { style = "margin-left:5px;" }).Width(100);
+        col.Template(@<text></text>)
+                .HeaderTemplate(@<text>cttsno</text>)
+                .Width(400)
+                .Hidden()
+                .HtmlAttributes(new { style = "text-align:left;" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;height:30px;", @class = "metro-header" })
+                 .ClientTemplate("<div>#=cttsno# </div>");
+        col.Template(@<text></text>)
+                .HeaderTemplate(@<text>verify tag</text>)
+                .Hidden()
+                .HtmlAttributes(new { style = "text-align:left;" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;height:30px;", @class = "metro-header" })
+                 .ClientTemplate("<div>#=verify_tag# </div>");
+        })
+        .ToolBar(t => t.Template(@<text>
+
+            <div style="float: left; width: 0; margin-top:-3px;margin-bottom:-100px;margin-left:-3px; height: 0; border-right: 0px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;">
+                <div style="float: left; width: 0; margin-top:0px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 37px solid #EEE; ">
+
+                    <div style="float: left; height:28px; margin-left:-59px; margin-top: 5px;">
+                        <i class="fa fa-tasks fa-2x fg-white"></i>
+                    </div>
+
+                </div>
+            </div>
+            <div style="float: right; height:28px;margin-top:2px;">
+                <link href="~/Content/metroui/css/docs.css" rel="stylesheet" />
+                <div class="k-button" style="margin-right:10px;float:left" onclick="AddNewTransaction()"><span class="fa fa-plus"></span> Add New OBR</div>
+                <div style="float: left;">
+                    @(Html.Kendo().DropDownList()
+                        .Name("Years")
+                        .DataTextField("ProposalYear")
+                        .DataValueField("ProposalYear")
+                        .OptionLabel("Year")
+                        .SelectedIndex(1)
+                        .Events(e => e.Change("ChangeTransactionYear"))
+                        .HtmlAttributes(new { @style = "width: 80px;text-align:left;margin-right:5px;" })
+                        .DataSource(source => source.Read(read => read.Action("GetPropYear4", "PYear")))
+
+                    )
+                </div>
+                <div style="background-color:white;border:solid;border-color:whitesmoke;border-width:thin;width:310px;height:33px;float:right;padding:0px;margin-top:-3px;" id="search">
+                    <input type="text" style="width:250px;border-collapse:collapse;border-color:white;margin:0px;margin-left:0px;height:70%;outline:none;border-left-style:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search..." id="SearchData" name="SearchData">
+                    <div class="k-button k-button-icontext" style="height:33px;width:40px;" onclick="searchOBR()"><span class="mif-search"></span></div>
+                </div>
+            </div>
+
+        </text>))
+        .Resizable(e => e.Columns(true))
+        .Pageable(page => page.Refresh(true)
+        .Enabled(true)
+        .ButtonCount(4)
+        .PreviousNext(true)
+                                                
+        )
+            .Selectable(selectable => selectable.Mode(GridSelectionMode.Single))
+            .AutoBind(false)
+            .Events(e => e.DataBound("onDataBound"))
+            .DataSource(d => d
+            .Ajax()
+                                                   
+            .PageSize(10)
+            .Model(m => m.Id(i => i.grtrnno))
+            .Read(read => read.Action("grOBRLogger", "BudgetControl").Data("YearParam"))
+            )
+        )
+    </div>
+
+
+</div>
+<div style="display:none">
+    <input type="number" id="cafoamode"/>
+    <input type="number" id="lguid" name="lguid" />
+</div>
+<script>
+
+    function CheckOutOBR() {
+        return '@Url.Action("CheckOutOBR", "BudgetControl")';
+    }
+    function CheckOutOBRv2() {
+        return '@Url.Action("CheckOutOBRv2", "BudgetControl")';
+    }
+    function ViewDetailsUrl(){
+        return '@Url.Action("ViewOBRDetails", "BudgetControl")';
+    }
+    function ViewFowardOffice(){    
+        return '@Url.Action("ViewFowardOffice", "BudgetControl")';
+    }
+    function CurrentDateUrl(){
+        return '@Url.Action("CurrentDate", "Global")';
+    }
+
+</script>
+
+<script src="~/Scripts/BMS/BudgetControl/OBRLogger.js"></script>
+
+<script>
+
+    $(document).ready(function () {
+        var returnDate = CurrentDate();
+        $("#TransactionYear").text(returnDate);
+
+        setTimeout(function (){
+            $("#grOBR").data("kendoGrid").dataSource.read();
+        }, 1000);
+
+        var grid = $('#grOBR').data('kendoGrid');
+      
+        var url="@Url.Action("getCAFOAmode", "Excess")"
+        $.get(url,function (e) {
+            if (e==1){
+                grid.hideColumn('grOBRNo');
+            }
+        })
+
+        var urlgu="@Url.Action("lgusystem", "Report")";
+        $.ajax({
+            type: "GET",
+            traditional: true,
+            url: "",
+            data: {
+            },
+            success: function (r) {
+                $.get(urlgu, function (e) {
+                    $("#lguid").val(e)
+                });
+
+                
+            }
+        })
+
+        setTimeout(function () {
+            var grid = $("#grOBR").data("kendoGrid");
+            grid.resize();
+        }, 1000);
+
+    });
+
+    function UpdateCTTSRefNo() {
+        return '@Url.Action("SaveRefno", "Home")';
+    }
+</script>
+
+@(Html.Kendo().Window()
+    .Name("AddNewOBR")
+    .Title("OBR Logger")
+    .Width(515)
+    .Height(758)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(true)
+//    .AutoFocus(true)
+        //.Events(e => e.Close("onClose"))
+    .Animation(a =>
+        {
+            a.Open(o => o.Fade(FadeDirection.In));
+            a.Close(c =>
+            {
+                c.Fade(FadeDirection.In);
+                c.Reverse(true);
+            });
+        }).Actions(a => { a.Close(); }))
+
+
+
+@(Html.Kendo().Window()
+    .Name("ForwardOffice")
+    .Title("Office")
+    .Width(455)
+    .Height(233)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(true)
+    //    .AutoFocus(true)
+    //.Events(e => e.Close("onClose"))
+    .Animation(a =>
+    {
+        a.Open(o => o.Fade(FadeDirection.In));
+        a.Close(c =>
+        {
+            c.Fade(FadeDirection.In);
+            c.Reverse(true);
+        });
+    }).Actions(a => { a.Close(); }))
+
+

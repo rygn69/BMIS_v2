@@ -1,0 +1,212 @@
+﻿<script>
+    function getwfpareroute() {
+
+        var showspco = $("#checkshowspco_review").val() == "" ? 0 : $("#checkshowspco_review").val()
+        var officeid= $("#officestatus").val() ==""? 0 : $("#officestatus").val()
+
+        var fundid = $("#gfid").val() == 1 ? 0 : 1
+        var mode_trans = $("#gf_currentid").val()@*// @Session["mode_trans"];*@
+        var year = $("#wfpyear").val()
+
+        return {
+            year: year,
+            showspco: showspco,
+            officeid:officeid,
+            fundid:fundid,
+            mode_trans:mode_trans
+        }
+    }
+    function wfpreroute_return(gov_sig, wfpno) {
+        var url = "@Url.Action("wfpreroute_return", "Report")";
+        var year = $("#wfpyear").val()
+        swal({
+            title: "Return WFP?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes",
+            closeOnConfirm: false,
+            showLoaderOnConfirm: true
+        },
+            function () {
+                $.post(url, { year: year, wfpno: wfpno, eid: gov_sig }, function (d) {
+                    if (d == 1) {
+                        swal({ title: "Success!", text: "WFP has been returned successfully!", timer: 1500, showConfirmButton: false, type: "success" });
+                        $("#grid_wfpreroute").data("kendoGrid").dataSource.read();
+                    }
+                    else {
+                        swal("Something Went Wrong!", d, "error");
+                    }
+                })
+            })
+    }
+    function wfpreroute_review( gov_sig, wfpno) {
+        var url = "@Url.Action("wfpreroute_review", "Report")";
+        var year = $("#wfpyear").val()
+        swal({
+            title: "Would you like to mark this WFP as reviewed??",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes",
+            closeOnConfirm: false,
+            showLoaderOnConfirm: true
+        },
+            function () {
+                $.post(url, {wfpno: wfpno, eid: gov_sig }, function (d) {
+                    if (d == 1) {
+                        swal({ title: "Success!", text: "WFP has been marked as reviewed!", timer: 1500, showConfirmButton: false, type: "success" });
+                        $("#grid_wfpreroute").data("kendoGrid").dataSource.read();
+                    }
+                    else {
+                        swal("Something Went Wrong!", d, "error");
+                    }
+                })
+            })
+    }
+</script>
+<div style="display:inline-block;width:100%;margin-top:-3px;">
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.WFPrepare>()
+            .Name("grid_wfpreroute")
+            .HtmlAttributes(new { style = "" })
+            .Scrollable()
+            .Columns(col =>
+            {
+                col.Template(@<text></text>)
+            .HeaderTemplate(@<text>Office</text>)
+            .Width(50)
+            .HtmlAttributes(new { style = "text-align:left;;font-size:12px" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=office# </div>");
+                col.Template(@<text></text>)
+            .HeaderTemplate(@<text>office id</text>)
+            .Width(0)
+            .Hidden()
+            .HtmlAttributes(new { style = "text-align:left;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=officeid# </div>");
+                col.Template(@<text></text>)
+            .HeaderTemplate(@<text>program id</text>)
+            .Width(0)
+            .Hidden()
+            .HtmlAttributes(new { style = "text-align:left;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=programid# </div>");
+                col.Template(@<text></text>)
+            .HeaderTemplate(@<text>account id</text>)
+            .Width(0)
+            .Hidden()
+            .HtmlAttributes(new { style = "text-align:left;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=accountid# </div>");
+                col.Template(@<text></text>)
+            .HeaderTemplate(@<text>Account</text>)
+            .Width(170)
+            .HtmlAttributes(new { style = "text-align:left;;font-size:12px" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=accountname# </div>");
+                col.Template(@<text></text>)
+            .HeaderTemplate(@<text>Date/Time <br />Submitted</text>)
+            .Width(90)
+            .HtmlAttributes(new { style = "text-align:left;;font-size:12px" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=datetimeentered# </div>");
+                col.Template(@<text></text>)
+            .HeaderTemplate(@<text>Year</text>)
+            .Width(0)
+            .Hidden()
+            .HtmlAttributes(new { style = "text-align:left;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=yearof# </div>");
+                col.Template(@<text></text>)
+            .HeaderTemplate(@<text>OOE</text>)
+            .Width(0)
+            .Hidden()
+            .HtmlAttributes(new { style = "text-align:left;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=ooe# </div>");
+                col.Template(@<text></text>)
+            .HeaderTemplate(@<text>ooe ID</text>)
+            .Width(0)
+            .Hidden()
+            .HtmlAttributes(new { style = "text-align:left;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=ooeid# </div>");
+                col.Bound(m => m.remarks)
+            .HeaderTemplate(@<text>Remark</text>)
+            .Width(100)
+            .HtmlAttributes(new { style = "text-align:left;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=remarks# </div>");
+            col.Bound(m => m.status)
+            .HeaderTemplate(@<text>Signature <br />Status</text>)
+            .Width(100)
+            .HtmlAttributes(new { style = "text-align:left;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=status# </div>");
+
+            col.Template(@<text></text>)
+            .HeaderTemplate(@<text></text>)
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:10px;color:beige;" })
+            .ClientTemplate(
+                "<div id='printwfpid#=accountid#' style='cursor:pointer' onclick='wfpreroute_return(#=gov_sig#,\"#=wfpno#\")'><span class='fa fa-rotate-left' title='Click to return the WFP!' style='font-size: 16px;margin-top: -1px;margin-left: 1px;margin-right:1px;text-align:center;cursor:pointer;zoom:1.5'></span></div> ")
+            .HtmlAttributes(new { style = "vertical-align: middle;text-align:center" })
+            .Width(35);
+
+            col.Template(@<text></text>)
+            .HeaderTemplate(@<text></text>)
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:10px;color:beige;" })
+            .ClientTemplate(
+                "<div id='printwfpid#=accountid#' style='color:cornflowerblue; cursor:pointer' onclick='wfpreroute_review(#=gov_sig#,\"#=wfpno#\")'><span  class='fa fa-check' title='Click to set the WFP as reviewed!' style='font-size: 16px;margin-top: -1px;margin-left: 1px;margin-right:1px;text-align:center;cursor:pointer;zoom:1.5'></span></div> ")
+            .HtmlAttributes(new { style = "vertical-align: middle;text-align:center" })
+            .Width(35);
+
+            col.Template(@<text></text>)
+            .HeaderTemplate(@<text></text>)
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:10px;color:beige;" })
+            .ClientTemplate(
+                "<div id='printwfpid#=accountid#' style='color:red;cursor:pointer' onclick='rtpwfp(\"#=status#\",#=docid#,#=gov_sig#)'><span class='fa fa-print' title='Click to preview WFP!' style='font-size: 16px;margin-top: -1px;margin-left: 1px;margin-right:1px;text-align:center;cursor:pointer;zoom:1.5'></span></div> ")
+            .HtmlAttributes(new { style = "vertical-align: middle;text-align:center" })
+            .Width(35);
+
+   
+            col.Template(@<text></text>)
+                    .HeaderTemplate(@<text>Gov Signature</text>)
+            .Width(0)
+            .Hidden()
+            .HtmlAttributes(new { style = "text-align:left;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=gov_sig# </div>");
+
+            col.Bound(m => m.docid)//Template(@<text></text>)
+            .HeaderTemplate(@<text>document ID</text>)
+            .Width(0)
+            .Hidden()
+            .HtmlAttributes(new { style = "text-align:left;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=docid# </div>");
+            })
+            .ToolBar(toolbar =>
+            {
+                toolbar.Custom().Text("<input id='checkshowspco_review' type='checkbox' value=0 style='zoom:1.2'  title='Ticked checkbox to set as reviewed!'  class='checkbox'/> Show Special Project & CO").Name("btnreview").Url("javascript:void(0)").HtmlAttributes(new { onclick = "btn_review_special_co()", id = "btn_review_special_co_id" });
+            })
+            .Editable(editable => editable.Mode(GridEditMode.InCell))
+            .Resizable(e => e.Columns(true))
+            .Pageable(pageable => pageable
+            .Refresh(true)
+            .ButtonCount(1))
+            //.HtmlAttributes(new { @class = "table-responsive", style = "height:410px;" })
+            .HtmlAttributes(new { @class = "table-responsive", style = "height:490px;" })
+            .Selectable()
+            //  .Events(e => e.DataBound("onDataBoundWFP"))
+            .DataSource(dataSource => dataSource
+            .Ajax()
+            .Batch(true)
+            .Model(m => m.Id(i => i.locationid))
+            .ServerOperation(false)
+            .PageSize(3000)
+            .Read(read => read.Action("GetWFPStatus_reroute", "Report").Data("getwfpareroute"))
+            )
+    )
+</div>
+

@@ -1,0 +1,484 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://tempuri.org/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://tempuri.org/">
+      <s:element name="GetReallignment">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="ProgramID" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="AcctID" type="s:long" />
+            <s:element minOccurs="1" maxOccurs="1" name="xYear" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetReallignmentResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="GetReallignmentResult" type="s:double" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetSupplemental">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="ProgramID" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="AcctID" type="s:long" />
+            <s:element minOccurs="1" maxOccurs="1" name="xYear" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetSupplementalResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="GetSupplementalResult" type="s:double" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetAccounts">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="ProgramID" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="ObjectID" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="xYear" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetAccountsResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetAccountsResult">
+              <s:complexType>
+                <s:sequence>
+                  <s:any minOccurs="0" maxOccurs="unbounded" namespace="http://www.w3.org/2001/XMLSchema" processContents="lax" />
+                  <s:any minOccurs="1" namespace="urn:schemas-microsoft-com:xml-diffgram-v1" processContents="lax" />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetPrograms">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="OfficeID" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="xYear" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetProgramsResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetProgramsResult">
+              <s:complexType>
+                <s:sequence>
+                  <s:any minOccurs="0" maxOccurs="unbounded" namespace="http://www.w3.org/2001/XMLSchema" processContents="lax" />
+                  <s:any minOccurs="1" namespace="urn:schemas-microsoft-com:xml-diffgram-v1" processContents="lax" />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetOffices">
+        <s:complexType />
+      </s:element>
+      <s:element name="GetOfficesResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetOfficesResult">
+              <s:complexType>
+                <s:sequence>
+                  <s:any minOccurs="0" maxOccurs="unbounded" namespace="http://www.w3.org/2001/XMLSchema" processContents="lax" />
+                  <s:any minOccurs="1" namespace="urn:schemas-microsoft-com:xml-diffgram-v1" processContents="lax" />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetAcctBudget">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="ProggramID" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="AcctCode" type="s:long" />
+            <s:element minOccurs="1" maxOccurs="1" name="BudgetYear" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetAcctBudgetResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="GetAcctBudgetResult" type="s:double" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetAcctBudgetRelease">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="ProggramID" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="AcctCode" type="s:long" />
+            <s:element minOccurs="1" maxOccurs="1" name="BudgetYear" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetAcctBudgetReleaseResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="GetAcctBudgetReleaseResult" type="s:double" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetAcctBudgetBalance">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="ProggramID" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="AcctCode" type="s:long" />
+            <s:element minOccurs="1" maxOccurs="1" name="BudgetYear" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetAcctBudgetBalanceResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="GetAcctBudgetBalanceResult" type="s:double" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetBallance">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="ProggramID" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="AcctCode" type="s:long" />
+            <s:element minOccurs="1" maxOccurs="1" name="BudgetYear" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetBallanceResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="GetBallanceResult" type="s:double" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetAccountDetails">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="ProgramID" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="AcctID" type="s:long" />
+            <s:element minOccurs="1" maxOccurs="1" name="xYear" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetAccountDetailsResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetAccountDetailsResult">
+              <s:complexType>
+                <s:sequence>
+                  <s:any minOccurs="0" maxOccurs="unbounded" namespace="http://www.w3.org/2001/XMLSchema" processContents="lax" />
+                  <s:any minOccurs="1" namespace="urn:schemas-microsoft-com:xml-diffgram-v1" processContents="lax" />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="GetReallignmentSoapIn">
+    <wsdl:part name="parameters" element="tns:GetReallignment" />
+  </wsdl:message>
+  <wsdl:message name="GetReallignmentSoapOut">
+    <wsdl:part name="parameters" element="tns:GetReallignmentResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetSupplementalSoapIn">
+    <wsdl:part name="parameters" element="tns:GetSupplemental" />
+  </wsdl:message>
+  <wsdl:message name="GetSupplementalSoapOut">
+    <wsdl:part name="parameters" element="tns:GetSupplementalResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetAccountsSoapIn">
+    <wsdl:part name="parameters" element="tns:GetAccounts" />
+  </wsdl:message>
+  <wsdl:message name="GetAccountsSoapOut">
+    <wsdl:part name="parameters" element="tns:GetAccountsResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetProgramsSoapIn">
+    <wsdl:part name="parameters" element="tns:GetPrograms" />
+  </wsdl:message>
+  <wsdl:message name="GetProgramsSoapOut">
+    <wsdl:part name="parameters" element="tns:GetProgramsResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetOfficesSoapIn">
+    <wsdl:part name="parameters" element="tns:GetOffices" />
+  </wsdl:message>
+  <wsdl:message name="GetOfficesSoapOut">
+    <wsdl:part name="parameters" element="tns:GetOfficesResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetAcctBudgetSoapIn">
+    <wsdl:part name="parameters" element="tns:GetAcctBudget" />
+  </wsdl:message>
+  <wsdl:message name="GetAcctBudgetSoapOut">
+    <wsdl:part name="parameters" element="tns:GetAcctBudgetResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetAcctBudgetReleaseSoapIn">
+    <wsdl:part name="parameters" element="tns:GetAcctBudgetRelease" />
+  </wsdl:message>
+  <wsdl:message name="GetAcctBudgetReleaseSoapOut">
+    <wsdl:part name="parameters" element="tns:GetAcctBudgetReleaseResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetAcctBudgetBalanceSoapIn">
+    <wsdl:part name="parameters" element="tns:GetAcctBudgetBalance" />
+  </wsdl:message>
+  <wsdl:message name="GetAcctBudgetBalanceSoapOut">
+    <wsdl:part name="parameters" element="tns:GetAcctBudgetBalanceResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetBallanceSoapIn">
+    <wsdl:part name="parameters" element="tns:GetBallance" />
+  </wsdl:message>
+  <wsdl:message name="GetBallanceSoapOut">
+    <wsdl:part name="parameters" element="tns:GetBallanceResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetAccountDetailsSoapIn">
+    <wsdl:part name="parameters" element="tns:GetAccountDetails" />
+  </wsdl:message>
+  <wsdl:message name="GetAccountDetailsSoapOut">
+    <wsdl:part name="parameters" element="tns:GetAccountDetailsResponse" />
+  </wsdl:message>
+  <wsdl:portType name="ServiceSoap">
+    <wsdl:operation name="GetReallignment">
+      <wsdl:input message="tns:GetReallignmentSoapIn" />
+      <wsdl:output message="tns:GetReallignmentSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetSupplemental">
+      <wsdl:input message="tns:GetSupplementalSoapIn" />
+      <wsdl:output message="tns:GetSupplementalSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetAccounts">
+      <wsdl:input message="tns:GetAccountsSoapIn" />
+      <wsdl:output message="tns:GetAccountsSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetPrograms">
+      <wsdl:input message="tns:GetProgramsSoapIn" />
+      <wsdl:output message="tns:GetProgramsSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetOffices">
+      <wsdl:input message="tns:GetOfficesSoapIn" />
+      <wsdl:output message="tns:GetOfficesSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetAcctBudget">
+      <wsdl:input message="tns:GetAcctBudgetSoapIn" />
+      <wsdl:output message="tns:GetAcctBudgetSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetAcctBudgetRelease">
+      <wsdl:input message="tns:GetAcctBudgetReleaseSoapIn" />
+      <wsdl:output message="tns:GetAcctBudgetReleaseSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetAcctBudgetBalance">
+      <wsdl:input message="tns:GetAcctBudgetBalanceSoapIn" />
+      <wsdl:output message="tns:GetAcctBudgetBalanceSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetBallance">
+      <wsdl:input message="tns:GetBallanceSoapIn" />
+      <wsdl:output message="tns:GetBallanceSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetAccountDetails">
+      <wsdl:input message="tns:GetAccountDetailsSoapIn" />
+      <wsdl:output message="tns:GetAccountDetailsSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="ServiceSoap" type="tns:ServiceSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="GetReallignment">
+      <soap:operation soapAction="http://tempuri.org/GetReallignment" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSupplemental">
+      <soap:operation soapAction="http://tempuri.org/GetSupplemental" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetAccounts">
+      <soap:operation soapAction="http://tempuri.org/GetAccounts" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetPrograms">
+      <soap:operation soapAction="http://tempuri.org/GetPrograms" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetOffices">
+      <soap:operation soapAction="http://tempuri.org/GetOffices" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetAcctBudget">
+      <soap:operation soapAction="http://tempuri.org/GetAcctBudget" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetAcctBudgetRelease">
+      <soap:operation soapAction="http://tempuri.org/GetAcctBudgetRelease" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetAcctBudgetBalance">
+      <soap:operation soapAction="http://tempuri.org/GetAcctBudgetBalance" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetBallance">
+      <soap:operation soapAction="http://tempuri.org/GetBallance" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetAccountDetails">
+      <soap:operation soapAction="http://tempuri.org/GetAccountDetails" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="ServiceSoap12" type="tns:ServiceSoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="GetReallignment">
+      <soap12:operation soapAction="http://tempuri.org/GetReallignment" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSupplemental">
+      <soap12:operation soapAction="http://tempuri.org/GetSupplemental" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetAccounts">
+      <soap12:operation soapAction="http://tempuri.org/GetAccounts" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetPrograms">
+      <soap12:operation soapAction="http://tempuri.org/GetPrograms" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetOffices">
+      <soap12:operation soapAction="http://tempuri.org/GetOffices" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetAcctBudget">
+      <soap12:operation soapAction="http://tempuri.org/GetAcctBudget" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetAcctBudgetRelease">
+      <soap12:operation soapAction="http://tempuri.org/GetAcctBudgetRelease" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetAcctBudgetBalance">
+      <soap12:operation soapAction="http://tempuri.org/GetAcctBudgetBalance" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetBallance">
+      <soap12:operation soapAction="http://tempuri.org/GetBallance" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetAccountDetails">
+      <soap12:operation soapAction="http://tempuri.org/GetAccountDetails" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="Service">
+    <wsdl:port name="ServiceSoap" binding="tns:ServiceSoap">
+      <soap:address location="https://pgas.ph/wsfmis/service.asmx" />
+    </wsdl:port>
+    <wsdl:port name="ServiceSoap12" binding="tns:ServiceSoap12">
+      <soap12:address location="https://pgas.ph/wsfmis/service.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

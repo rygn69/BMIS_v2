@@ -1,0 +1,117 @@
+﻿<script>
+    function reqUpdateReference() {
+        if ($('#UpdateReferenceSpinner').css("display") == 'none') {
+            $("#btnreqUpdateReference").attr('disabled', 'disabled');
+            $('#UpdateReferenceSpinner').css("display", "auto");
+            var url = "@Url.Action("UpdateAccountReference", "Maintenance")";
+            var grid = $("#grdExistingAccountWindow").data("kendoGrid");
+            var dataRows = grid.items();
+            var rowIndex = dataRows.index(grid.select());
+            var ds = grid.dataSource.view();
+            var ReferenceAccount = ds[rowIndex].AccountID;
+
+            if (ReferenceAccount != "") {
+                $.post(url, { ReferenceAccount: ReferenceAccount, SelectedAccounts: SelectedAccounts }, function (d) {
+                    if (d == "1") {
+                        swal({ title: "Success!", text: "Account Reference Updated", timer: 1000, showConfirmButton: false, type: "success" });
+                        $("#grNewCreatedAccounts").data("kendoGrid").dataSource.read();
+                        document.documentElement.style.overflow = 'auto';  // firefox, chrome
+                        document.body.scroll = "yes";
+                        $("#TargetAccountWindow").data("kendoWindow").close();
+                        ReferenceAccount = "";
+                        SelectedAccounts = [];
+                        $('#UpdateReferenceSpinner').css("display", "none");
+                        $("#btnreqUpdateReference").removeAttr('disabled');
+                        $("#btnUpdateReference").removeAttr('disabled');
+                        $('#UpdateButtonSpinner').css("display", "none");
+                        $('#updateButtonIcon').css("display", "auto");
+                        $("#grNewCreatedAccounts tbody input:checkbox").prop("checked", false);
+                    }
+                    else {
+                        swal({ title: "Error!", text: d, timer: 1000, showConfirmButton: false, type: "error" });
+                        $('#UpdateReferenceSpinner').css("display", "none");
+                        $("#btnreqUpdateReference").removeAttr('disabled');
+                    }
+                })
+            }
+            else {
+                swal({ title: "Error!", text: "No Account Selected", timer: 1000, showConfirmButton: false, type: "error" });
+                $('#UpdateReferenceSpinner').css("display", "none");
+                $("#btnreqUpdateReference").removeAttr('disabled');
+            }
+        }
+    }
+    function SearchExistingAccount() {
+        var SearchProgramData = $("#SearchExistingAccount").val();
+        var ProgramgGrid = $("#grdExistingAccountWindow").data("kendoGrid").dataSource;
+        ProgramgGrid.filter([
+            {
+                logic: "or",
+                filters: [{
+                    field: "AccountName",
+                    operator: "contains",
+                    value: SearchProgramData
+                }]
+            }
+        ]);
+    }
+    document.getElementById('SearchExistingAccount').onkeydown = function (event) {
+        if (event.keyCode == 13) {
+            SearchExistingAccount();
+        }
+    }
+    document.getElementById('SearchExistingAccount').onkeyup = function () {
+        if (($(this).val() == '' || $(this).val() == 'Search Account') && $(this).attr('type') != 'hidden') {
+            SearchExistingAccount()
+        }
+    }
+    function reqCloseReference() {
+        document.documentElement.style.overflow = 'auto';  // firefox, chrome
+        document.body.scroll = "yes";
+        $("#TargetAccountWindow").data("kendoWindow").close();
+        ReferenceAccount = "";
+        SelectedAccounts = [];
+        $("#btnUpdateReference").removeAttr('disabled');
+        $('#UpdateButtonSpinner').css("display", "none");
+        $('#updateButtonIcon').css("display", "auto");
+        $("#grNewCreatedAccounts tbody input:checkbox").prop("checked", false);
+    }
+</script>
+<div style="padding:5px;">
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.AccountsModel>()
+        .Name("grdExistingAccountWindow")
+        .Columns(columns =>
+        {
+            columns.Bound(c => c.AccountID).Hidden();
+            columns.Bound(c => c.AccountName).Title("Account Name").Width(200)
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        })
+        .HtmlAttributes(new { style = "height: 430px; width:100%" })
+        .Scrollable(s => s.Enabled(true))
+        .Selectable()
+        .Pageable(p => p.ButtonCount(4).Refresh(true).PreviousNext(true))
+        .DataSource(dataSource => dataSource
+            .Ajax()
+            .ServerOperation(false)
+            .PageSize(10)
+            .Read(read => read.Action("grTargetAccount", "Maintenance"))
+        )
+        .ToolBar(toolbar =>
+        {
+            toolbar.Template(@<text>
+                <div style="float: right; height:28px;margin-top:2px;">
+                    <link href="~/Content/metroui/css/docs.css" rel="stylesheet" />
+                    <div style="background-color:white;border:solid;border-color:whitesmoke;border-width:thin;width:310px;height:30px;float:right;padding:0px;margin-top:-3px;" id="search">
+                        <input type="text" style="width:260px;border-collapse:collapse;border-color:white;margin:0px;margin-left:-10px;height:70%;outline:none;border-left-style:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search Account" id="SearchExistingAccount" name="SearchExistingAccount">
+                        <div class="k-button k-button-icontext" style="height:29px;width:40px;margin-top:0.6px;" onclick="SearchExistingAccount()"><span class="mif-search"></span></div>
+                    </div>
+
+                </div>
+            </text>);
+        })
+    )
+</div>
+<div style="display:inline-block; float: right">
+    <div id="btnreqUpdateReference" class="k-button k-button-icontext" style="margin-bottom:5px;display:inline-block;width: 80px;clear:both; margin-top:5px;" onclick="reqUpdateReference()">Update <i id="UpdateReferenceSpinner" style="display:none" class="fa fa-spinner fa-spin"></i></div>
+    <div id="btnreqCloseReference" class="k-button k-button-icontext" style="margin-bottom:5px;display:inline-block;width: 80px;clear:both; margin-top:5px;" onclick="reqCloseReference()">Close</div>
+</div>

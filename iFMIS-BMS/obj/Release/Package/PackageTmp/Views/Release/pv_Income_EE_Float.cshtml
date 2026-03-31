@@ -1,0 +1,396 @@
+﻿<script>
+  
+    function fn_reqSave_Float_EE_Inc() {
+
+        var url = "@Url.Action("Save_Flaot_Inc", "Release")";
+
+        var office_id = $("#float_offs_EE_Inc").val();
+        var amount_inc = $("#amount_inc").val();
+        var month_ = $("#float_Months_EE_Inc").val();
+        var numeric_ = $("#float_numeric_EE_Inc").val();
+        var year_ = $("#float_ddlYear_EE_Inc").val();
+        var balance_amount = $("#available_inc").val();
+
+        if (balance_amount < 0 || balance_amount < 0 || balance_amount < 0) {
+            swal({
+                title: "Error!",
+                text: "System Error! Please Check Balance Amount.",
+                timer: 2000,
+                type: "error",
+                showConfirmButton: false
+            })
+        }
+        else {
+            swal({
+                title: "Are you sure?",
+                text: "This Float will be SAVED!",
+                type: "info",
+                showCancelButton: true,
+                closeOnConfirm: false,
+                confirmButtonColor: "#1fa67a",
+                confirmButtonText: "Yes, Save It!",
+                showLoaderOnConfirm: true,
+            }, function () {
+               
+                $.post(url, {
+                    office_id: office_id,
+                    amount_inc: amount_inc,
+                    month_: month_,
+                    numeric_: numeric_,
+                    year_: year_
+
+                }, function (e) {
+                    $("#float_PS_EE_Inc").val('');
+                    $("#float_MOOE_EE_Inc").val('');
+                    $("#float_CO_EE_Inc").val('');
+                   
+                    if (e == "1") {
+                        FundGrid_Load_EE_Inc();
+                        swal({
+                            title: "Success!",
+                            text: "Float has been Added.",
+                            timer: 2000,
+                            type: "success",
+                            showConfirmButton: false
+                        })
+                        $("#grd_Float_EE_inc").data("kendoGrid").dataSource.read();
+                        $('#EconomicEnterprise_Grid').data('kendoGrid').dataSource.read();
+                    } else {
+                        swal({
+                            title: "Error!",
+                            text: "System Error! Please try again.",
+                            timer: 2000,
+                            type: "error",
+                            showConfirmButton: false
+                        })
+                    }
+                });
+            });
+        }
+
+
+    }
+
+
+
+
+
+   
+
+
+    function addFloat_EE_Inc() {
+        var url = "@Url.Action("addFloat_Inc", "Release")";
+        var idsToSend = [];
+        var grid = $("#grd_Float_EE_inc").data("kendoGrid")
+        var ds = grid.dataSource.view();
+
+        for (var i = 0; i < ds.length; i++) {
+            var row = grid.table.find("tr[data-uid='" + ds[i].uid + "']");
+            var checkbox = $(row).find(".checkbox");
+            if (checkbox.is(":checked")) {
+                idsToSend.push(ds[i].incomerelease_float_id);
+            }
+            if (idsToSend == "") {
+                swal({ title: "Error!", text: "Please mark the accounts first", timer: 1000, showConfirmButton: false, type: "error" });
+            } else {
+
+                swal({
+                    title: "Are you sure?",
+                    text: "You want to Release this allotment as Float?",
+                    type: "info",
+                    showCancelButton: true,
+                    closeOnConfirm: false,
+                    confirmButtonColor: "#1fa67a",
+                    confirmButtonText: "Yes, Save It!",
+                    showLoaderOnConfirm: true,
+                }, function () {
+
+                    $.post(url, { incomerelease_float_id: idsToSend }, function (d) {
+                        if (d == 1) {
+                            swal({ title: "Success!", text: "Selected Float RELEASE!", timer: 1000, showConfirmButton: false, type: "success" });
+                            $("#grd_Float_EE_inc").data("kendoGrid").dataSource.read();
+                        }
+                        else {
+                            swal("Something Went Wrong!", d, "error");
+                        }
+                    });
+                });
+            }
+        } $("#grd_Float_EE_Inc").data("kendoGrid").dataSource.read();
+        $('#EconomicEnterprise_Grid').data('kendoGrid').dataSource.read();
+    }
+    function fn_refresher_float_EE_Inc() {
+
+        $("#float_offs_EE_Inc").val(null);
+        // $("#float_account_list_EE_Inc").val(null);
+        $("#float_ooe_id_EE_Inc").val(null);
+
+        $("#float_offs_EE_Inc").data("kendoComboBox").text(null);
+        $("#float_account_list_EE_Inc").data("kendoComboBox").text(null);
+        $("#float_ooe_id_EE_Inc").data("kendoDropDownList").text(null);
+
+        $("#float_Progss_EE_Inc").data("kendoDropDownList").dataSource.read();
+        $("#float_ooe_id_EE_Inc").data("kendoDropDownList").dataSource.read();
+        $("#float_account_list_EE_Inc").data("kendoComboBox").dataSource.read();
+        $("#grd_Float_EE_Inc").data("kendoGrid").refresh();
+        $("#grd_Float_EE_Inc").data("kendoGrid").dataSource.read();
+
+
+    }
+    setTimeout(function () {
+
+        FundGrid_Load_EE_Inc();
+
+    }, 1000);
+
+    function fn_grid_refresh_div_EE_Inc() {
+
+        setTimeout(function () {
+          
+            FundGrid_Load_EE_Inc();
+            fn_OfficesF_EE_Inc();
+            $("#grd_Float_EE_Inc").data("kendoGrid").refresh();
+            $("#grd_Float_EE_Inc").data("kendoGrid").dataSource.read();
+        }, 500);
+    }
+  
+    function FundGrid_Load_EE_Inc() {
+
+        var url = "@Url.Action("Float_Grid_EE_Inc", "Release")";
+        var office_id = $("#float_offs_EE_Inc").val();
+        var month_ = $("#float_Months_EE_Inc").val();
+        var numeric_ = $("#float_numeric_EE_Inc").val();
+        var year_ = $("#float_ddlYear_EE_Inc").val();
+        var classtype = $("#classtype").val();
+
+
+        $.get(url, { office_id: office_id, month_: month_, numeric_: numeric_, year_: year_ }, function (d) {
+            $("#FundGrid_id_EE_Inc").html(d);
+        })
+
+    }
+    function fn_dprefresher_fund_null_EE_Inc() {
+
+
+        setTimeout(function () {
+            getAvailable_inc();
+            $("#grd_Float_EE_inc").data("kendoGrid").dataSource.read();
+
+        }, 500);
+
+    }
+
+    function getAvailable_inc() {
+        var url = "@Url.Action("inc_available", "Release")"
+
+        var office_id = $("#float_offs_EE_Inc").val();
+        var year_ = $("#float_ddlYear_EE_Inc").val();
+            
+
+        $.get(url, { office_id: office_id, year_: year_ }, function (d) {
+            document.getElementById("available_inc").value = d;
+                           
+            //alert(d.balance_amount)
+        })
+    }
+
+</script>
+
+
+
+<div style="border: outset;clear:both;border-width:1px;border-color:#1fa67a; width: 739px; padding-left:0px;padding-right:0px;padding-top:0px;padding-bottom:7px;margin-top: 0px;">
+    <div style=" width: 0;height: 0; border-right: 5px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;margin-top: -1px; ">
+        <div style="float: left; width: 673px; margin-top:1px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 36px solid #1fa67a; ">
+            <div style="float: left; height:28px; margin-left:-59px; margin-top: 5px;">
+                <i class="fa fa-tasks fa-2x fg-white"></i>
+
+            </div>
+
+            <div style="text-align: right;float: right;margin-right:10px;margin-top:2px;">
+                
+
+                @(Html.Kendo().DropDownList()
+                        .Name("float_ddlYear_EE_Inc")
+                        .DataTextField("ProposalYear")
+                        .DataValueField("ProposalYear")
+                        .SelectedIndex(1)
+                        .HtmlAttributes(new { @style = "width: 70px;" })
+                        .Events(e => e.Change("fn_dprefresher_fund_null_EE_Inc"))
+                        .DataSource(source => source.Read(read => read.Action("GetPropYear2", "PYear")))
+                )
+
+
+
+
+            </div>
+            <div style="float: right;margin-right:10px;margin-top:2px;">
+                <i class="fa fa-calendar fa-2x #33333"></i>
+            </div>
+
+
+        </div>
+    </div>
+
+    <div class="demo-section k-content" style=" float:right;margin-top: 7px;margin-right:7px ">
+
+    </div>
+    <div id="FundGrid_id_EE_Inc" class="demo-section k-content">
+
+
+    </div>
+
+</div>
+
+
+
+
+
+<div style="float: none;clear:both;margin-top:12px;">
+    <div style="float: left;margin-right:10px;margin-top:2px;">
+        <label style="float:left;margin-left: 50px;">
+            Office    :
+        </label>
+    </div>
+    <div style="float: right;margin-right:60px;margin-top:0px;">
+
+
+        @(Html.Kendo().ComboBox()
+                            .Name("float_offs_EE_Inc")
+                            .DataTextField("OfficeName")
+                            .DataValueField("OfficeID")
+                            .Placeholder("Select office...")
+                            .Filter("contains")
+                            .MinLength(1)
+                            .HtmlAttributes(new { @style = "width: 500px;" })
+                            .Events(e => e.Change("fn_dprefresher_fund_null_EE_Inc"))
+                            .DataSource(source => source.Read(read => read.Action("GetOffice_EE", "Release")))
+        )
+
+
+
+    </div>
+
+    <div style="height:10px;">
+
+    </div>
+
+    <div id="MonthDepartment" style="float: none;clear:both; margin-top: 20px">
+
+        <div style="float:left;margin-left:50px;margin-top:5px;">
+            <label>
+                Release Month    :
+            </label>
+        </div>
+        <div style="float:left;margin-left:28px;margin-top:5px;">
+            @(Html.Kendo().DropDownList()
+                          .Name("float_Months_EE_Inc")
+                          .DataTextField("Text")
+                          .DataValueField("Value")
+                          .Events(e => e.Change("fn_grid_refresh_div_EE_Inc"))
+                          .BindTo(new List<SelectListItem>() {
+                              new SelectListItem() {
+                                  Text = "January",
+                                  Value = "1"
+                              },
+                              new SelectListItem() {
+                                  Text = "Febuary",
+                                  Value = "2"
+                              },
+                              new SelectListItem() {
+                                  Text = "March",
+                                  Value = "3"
+                              },
+                              new SelectListItem() {
+                                  Text = "April",
+                                  Value = "4"
+                              },
+                              new SelectListItem() {
+                                  Text = "May",
+                                  Value = "5"
+                              },
+                              new SelectListItem() {
+                                  Text = "June",
+                                  Value = "6"
+                              },
+                              new SelectListItem() {
+                                  Text = "July",
+                                  Value = "7"
+                              },
+                              new SelectListItem() {
+                                  Text = "August",
+                                  Value = "8"
+                              },
+                              new SelectListItem() {
+                                  Text = "September",
+                                  Value = "9"
+                              },
+                              new SelectListItem() {
+                                  Text = "October",
+                                  Value = "10"
+                              },
+                              new SelectListItem() {
+                                  Text = "November",
+                                  Value = "11"
+                              },
+                              new SelectListItem() {
+                                  Text = "December",
+                                  Value = "12"
+                              }
+                          })
+                          .Value(@ViewBag.MonthVaue)
+                          .HtmlAttributes(new { style = "width: 150px" })
+            )
+
+        </div>
+
+
+        <div style="float:right;margin-right:60px;margin-top:5px;">
+            @(Html.Kendo().NumericTextBox<double>()
+            .Name("float_numeric_EE_Inc")
+            .Value(1)
+            .Placeholder("Enter numeric value")
+            .HtmlAttributes(new { style = "width: 110px" })
+            )
+        </div>
+        <div style="float:right;margin-right:30px;margin-top:5px;">
+            <label>
+                Monthly Release Batch    :
+            </label>
+        </div>
+    </div>
+   
+    <div id="AmountDepartment" style="float: none;clear:both; margin-top: 20px">
+        <div style="float:left;margin-left:50px;margin-top:5px;">
+            <label>
+                Available   :
+            </label>
+        </div>
+        <div style="float:left;margin-left:68px;margin-top:5px;">
+            <input type="text" style="width:190px" name="available_inc" id="available_inc" placeholder="        Available Amount" disabled>
+        </div>
+
+
+        <div style="float:left;margin-left:-340px;margin-top:40px;">
+            <label>
+                Amount    :
+            </label>
+        </div>
+        <div style="float:left;margin-left:-201px;margin-top:40px;">
+            <input type="text" style="width:140px" name="amount_inc" id="amount_inc">
+        </div>
+     
+    </div>
+
+    <div class="k-button k-button-icontext" style="position: absolute; bottom: 55px; right: 220px;width: 80px;" onclick="fn_reqSave_Float_EE_Inc()">Add</div>
+    <div class="k-button k-button-icontext" style="position: absolute; bottom: 55px; right: 120px;width: 80px;" onclick="addFloat_EE_Inc()">Release</div>
+    <div class="k-button k-button-icontext" style="position: absolute; bottom: 55px; right: 20px;width: 80px;" onclick="fn_refresher_float_EE_Inc()">Clear</div>
+</div>
+
+
+
+
+<label style="height:120px">
+
+</label>
+
+

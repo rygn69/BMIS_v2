@@ -1,0 +1,295 @@
+﻿
+<script>
+    function getGridParam() {
+        var OfficeID = 0;
+        var Year = 0;
+        OfficeID = $("#offs").val();
+        Year = $("#ddlYear").val();
+        return {
+            OfficeID: OfficeID,
+            YearOf: Year,
+            isCasual:'@Session["isCasual"]'
+        }
+    }
+
+    function ReqMarkForCreation(ProposedItemID) {
+        var gridName = $('#grProposedPositionList').data('kendoGrid');
+        var dataRows = gridName.items();
+        var rowIndex = dataRows.index(gridName.select());
+        var ds = gridName.dataSource.view();
+        var Remark = ds[rowIndex].Remark;
+
+        swal({
+            title: "Are you sure?",
+            text: "This Action Will Automatically Mark the selected item as Verified.",
+            type: "info",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes!",
+            closeOnConfirm: false
+        }, function () {
+            var url = "@Url.Action("MarkForCreation", "Home")";
+            $.get(url, { ProposedItemID: ProposedItemID, Remark: Remark }, function (d) {
+                if (d == 1) {
+                    swal({
+                        title: "Success!",
+                        text: "Succesffuly Verified.",
+                        type: "success",
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    $("#grProposedPositionList").data("kendoGrid").dataSource.read();
+                }
+                else {
+                    swal({
+                        title: "Error!",
+                        text: d,
+                        type: "error",
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                }
+            });
+        });
+
+        }
+        function ReqMarkForFunding(ProposedItemID) {
+            var gridName = $('#grProposedPositionList').data('kendoGrid');
+            var dataRows = gridName.items();
+            var rowIndex = dataRows.index(gridName.select());
+            var ds = gridName.dataSource.view();
+            var Remark = ds[rowIndex].Remark;
+
+            swal({
+                title: "Are you sure?",
+                text: "This Action Will Automatically Mark the selected item as Verified.",
+                type: "info",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes!",
+                closeOnConfirm: false
+            }, function () {
+                var url = "@Url.Action("MarkForFunding", "Home")";
+                $.get(url, { ProposedItemID: ProposedItemID, Remark: Remark }, function (d) {
+                    if (d == 1) {
+                        swal({
+                            title: "Success!",
+                            text: "Succesffuly Verified.",
+                            type: "success",
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                        $("#grProposedPositionList").data("kendoGrid").dataSource.read();
+                    }
+                    else {
+                        swal({
+                            title: "Error!",
+                            text: d,
+                            type: "error",
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    }
+                });
+            });
+
+        }
+        function ReqVerified(ProposedItemID) {
+            var gridName = $('#grProposedPositionList').data('kendoGrid');
+            var dataRows = gridName.items();
+            var rowIndex = dataRows.index(gridName.select());
+            var ds = gridName.dataSource.view();
+            var Remark = ds[rowIndex].Remark;
+
+
+            swal({
+                title: "Are you sure?",
+                text: "This Action Will Automatically Mark the selected item as Verified.",
+                type: "info",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes!",
+                closeOnConfirm: false
+            }, function () {
+                var url = "@Url.Action("MarkVerified", "Home")";
+                $.get(url, { ProposedItemID: ProposedItemID, Remark: Remark }, function (d) {
+                    if (d == 1) {
+                        swal({
+                            title: "Success!",
+                            text: "Succesffuly Verified.",
+                            type: "success",
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                        $("#grProposedPositionList").data("kendoGrid").dataSource.read();
+                    }
+                    else {
+                        swal({
+                            title: "Error!",
+                            text: d,
+                            type: "error",
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    }
+                });
+            });
+        }
+        function ReqChangeDate(ProposedItemID) {
+            var url2 = "@Url.Action("ReqChangeproposedDate", "Home")";
+            $.post(url2, { ProposedItemID: ProposedItemID }, function (d) {
+                $(window).scrollTop(0);
+                $('#ChangeDateWindow').html(d);
+                $('#ChangeDateWindow').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Change Proposed Date").center().open();
+            })
+        }
+        function ReqRemove(ProposedItemID) {
+            swal({
+                title: "Are you sure?",
+                text: "Remove The Selected item from the Proposal.",
+                type: "info",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes!",
+                closeOnConfirm: false
+            }, function () {
+                var url = "@Url.Action("MarkRemove", "Home")";
+                $.get(url, { ProposedItemID: ProposedItemID}, function (d) {
+                    if (d == 1) {
+                        swal({
+                            title: "Success!",
+                            text: "Succesffully Removed.",
+                            type: "success",
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                        $("#grProposedPositionList").data("kendoGrid").dataSource.read();
+                      //  getProposedTotalAmount();
+                    }
+                    else {
+                        swal({
+                            title: "Error!",
+                            text: d,
+                            type: "error",
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    }
+                });
+            });
+        }
+</script>
+@(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.ForFundingModel>()
+        .Name("grProposedPositionList")
+        .Columns(columns =>
+        {
+            columns.Bound(c => c.GroupBY).Title("Group").Hidden()
+                .ClientGroupHeaderTemplate("<div style='display:inline-block'>#= value #</div>");
+            columns.Bound(c => c.ProposedItemID).Hidden();
+            columns.Template(@<text></text>)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" }).HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Position</div></text>)
+                        .Width(170)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate(
+                            "# if(GroupBY == 'Proposed Position') { #" +
+                            " <span class='fa fa-circle' style='color:green;' id='circle-id'></span> #=Position#" +
+                            "# } else { #" +
+                            " <span class='fa fa-circle' style='color:yellow;' id='circle-id'></span> #=Position#" +
+                            "# } #"
+                        );
+                        
+            columns.Template(@<text></text>)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" }).HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Salary Grade</div></text>)
+                        .Width(50)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div>#=SG# </div>");
+
+            columns.Template(@<text></text>)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" }).HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Salary</div></text>)
+                        .Width(60)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div>#=kendo.toString(Salary,'c2')# </div>");
+            columns.Template(@<text></text>)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" }).HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Proposed Effectivity Date</div></text>)
+                        .Width(60)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate(
+                        "<div class='k-button' onclick='ReqChangeDate(#=ProposedItemID#)' style='inline-block' title='Change Proposed Date'>#=SalaryEffectivityDate#</div>"
+                        );
+            columns.Template(@<text></text>)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" }).HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Specification</div></text>)
+                        .Width(80)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div>#=GroupTag# </div>");
+
+            columns.Bound(c => c.Remark).Title("Remark").Width(140)
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+
+            if (Account.UserInfo.UserTypeDesc == "HRMO In-Charge")
+            {
+                columns.Template(t => { }).ClientTemplate(
+                  "# if(GroupBY == 'Proposed Position') { #" +
+                  "<div class='k-button' onclick='ReqMarkForCreation(#=ProposedItemID#)' style='inline-block' title='Tag as For Creation'>For Creation</div>" +
+                  "<div class='k-button' onclick='ReqMarkForFunding(#=ProposedItemID#)' style='inline-block' title='Tag as For Funding'>For Funding</div>" +
+                  "# } else { #" +
+                  "<div class='k-button' onclick='ReqVerified(#=ProposedItemID#)' style='inline-block' title='Tag as Verified'>Verified</div>" +
+                  "# } #"
+                  ).Width(150);
+            }
+            else
+            {
+                if (Account.UserInfo.UserTypeDesc == "Budget Committee / Local Finance Committee")
+                {
+                    //hide kay la maapil ug update ang plantilla - xXx - 9/25/2019
+                    //  columns.Template(t => { }).ClientTemplate(
+                    //"<div class='k-button' onclick='ReqVerified(#=ProposedItemID#)' style='inline-block' title='Approve'>Approve</div>" +
+                    //"<div class='k-button' onclick='ReqRemove(#=ProposedItemID#)' style='inline-block' title='Remove'>Remove</div>"
+                    //).Width(150);
+                    columns.Template(t => { }).ClientTemplate(
+                 "<div class='k-button' onclick='ReqRemove(#=ProposedItemID#)' style='inline-block' title='Remove'>Remove</div>"
+                 ).Width(150);
+                }
+                else
+                {
+                    columns.Template(t => { }).ClientTemplate(
+                  "<div class='k-button' onclick='ReqVerified(#=ProposedItemID#)' style='inline-block' title='Tag as Verified'>Verified</div>"
+                  ).Width(150);
+                }
+            }
+        })
+        .HtmlAttributes(new { style = "height: 500px;" })
+        .Scrollable(s => s.Enabled(true))
+        .Selectable()
+        .Editable(editable => editable.Mode(GridEditMode.InCell))
+        .Pageable(page => page.Refresh(true)
+                                 .Enabled(true)
+                                 .ButtonCount(4)
+                                 .PreviousNext(true)
+                  )
+        .DataSource(dataSource => dataSource
+            .Ajax()
+            .Batch(true)
+            .ServerOperation(true)
+            .Model(m => m.Id(i => i.ProposedItemID))
+            .Read(read => read.Action("grGetProposedPosition", "Home").Data("getGridParam"))
+        )
+)
+
+@(Html.Kendo().Window()
+    .Name("ChangeDateWindow")
+    .Title("Change Proposed Effectivity Date")
+    .Width(300)
+    .Height(120)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(true)
+    .AutoFocus(true)
+    .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        }).Actions(a => { a.Close(); }))

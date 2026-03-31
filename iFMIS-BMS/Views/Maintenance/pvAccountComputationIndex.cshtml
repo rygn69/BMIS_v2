@@ -1,0 +1,290 @@
+﻿<style>
+    .btn-delete a {
+        color: #000000;
+        background-color: #ffffff;
+        border-style: solid;
+        border-color: #333333;
+        border-width: 1px;
+        /*height: auto;*/
+        /*width: auto;*/
+        padding: 3px;
+        padding-left: 5px;
+        padding-right: 5px;
+        cursor: pointer;
+        margin: auto;
+    }
+
+        .btn-delete a:hover {
+            color: #ffffff;
+            background-color: #000000;
+            border-style: solid;
+            border-color: #333333;
+            /*height: auto;
+            width: auto;*/
+        }
+</style>
+
+<script>
+    function GridParameters() {
+        var NewDate = new Date();
+        var CurrentYear = NewDate.getFullYear();
+        var YearActive = "";
+        if ($("#ddlYear").val() == "") {
+            YearActive = CurrentYear
+        }
+        else {
+            YearActive = $("#ddlYear").val();
+        }
+        return {
+            yearActive: YearActive
+        }
+    }
+    function LoadAccounts() {
+        $("#grdAccountComputation").data("kendoGrid").dataSource.read();
+    }
+    function AddNew() {
+        var url = "@Url.Action("AddNewComputation", "Maintenance")";
+        $.get(url, {}, function (pvData) {
+            $(window).scrollTop(0);
+            $('#NewComputation').html(pvData);
+            $('#NewComputation').data('kendoWindow').center().open();
+        })
+    }
+    function CopyPreviousData(AccountCode) {
+        var urlCheckIfExist = "@Url.Action("CheckAccountComputation", "Maintenance")";
+        var selectedYear = $("#ddlYear").val();
+        $.get(urlCheckIfExist, { AccountCode: AccountCode, YearActive: selectedYear }, function (d) {
+            if (d == "") {
+                swal({
+                    title: "Are you sure?",
+                    text: "Data of this Computation will be copied for next year's Computation!",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Yes, Copy It!",
+                    closeOnConfirm: false
+                }, function () {
+                    var url = "@Url.Action("SaveNewComputation", "Maintenance")";
+
+                    var gridName = $("#grdAccountComputation").data('kendoGrid');
+                    var dataRows = gridName.items();
+                    var rowIndex = dataRows.index(gridName.select());
+                    var ds = gridName.dataSource.view();
+
+                    var Amount = ds[rowIndex].strAmount;
+                    var noOfMonths = ds[rowIndex].Period;
+                    var Percentage = ds[rowIndex].Percentage;
+                    var isRoundoff = ds[rowIndex].RoundedOff;
+                    var MaxAmount = ds[rowIndex].MaxAmount;
+                    var EmployeeType = ds[rowIndex].EmpType;
+                    if (noOfMonths == "Monthly") {
+                        noOfMonths = 12
+                    }
+                    else if (noOfMonths == "Yearly") {
+                        noOfMonths = 1
+                    }
+                    if (isRoundoff == "No") {
+                        isRoundoff = 0
+                    }
+                    else if (isRoundoff == "Yes") {
+                        isRoundoff = 1
+                    }
+                    if (EmployeeType == "Regular") {
+                        EmployeeType = 1
+                    }
+                    else if (EmployeeType == "Casual") {
+                        EmployeeType = 2
+                    }
+                    else {
+                        EmployeeType = 3
+                    }
+
+                    $.get(url, {
+                        AccountCode: AccountCode, Amount: Amount, noOfMonths: noOfMonths, Percentage: Percentage,
+                        isRoundoff: isRoundoff, MaxAmount: MaxAmount, EmployeeType: EmployeeType, YearActive: parseInt(selectedYear,10)+ 1
+                    }, function (Result) {
+
+                        if (Result == "1") {
+                            swal({
+                                title: "Success!",
+                                text: "Previous Account Computation Successfully Copied.",
+                                type: "success",
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+
+                            $("#grdAccountComputation").data("kendoGrid").dataSource.read();
+                        } else {
+                            swal("Error!", Result, "error");
+                        }
+                    });
+                });
+            } else if (d == AccountCode) {
+                swal({ title: "Error!", text: "Cannot Complete Request! This Account Computation Already exist", type: "error", timer: 2000 });
+            }
+            else {
+                swal({ title: "Error!", text: d, type: "error", timer: 2000 });
+            }
+        });
+    }
+    function EditComputation() {
+        var selectedYear = $("#ddlYear").val();
+        var url = "@Url.Action("ReqUpdateComputation", "Maintenance")";
+        var gridName = $("#grdAccountComputation").data('kendoGrid');
+        var dataRows = gridName.items();
+        var rowIndex = dataRows.index(gridName.select());
+        var ds = gridName.dataSource.view();
+
+        var Amount = ds[rowIndex].strAmount;
+        var noOfMonths = ds[rowIndex].Period;
+        var Percentage = ds[rowIndex].Percentage;
+        var isRoundoff = ds[rowIndex].RoundedOff;
+        var MaxAmount = ds[rowIndex].MaxAmount;
+        var EmployeeType = ds[rowIndex].EmpType;
+        var ComputationID = ds[rowIndex].ComputationID;
+        var AccountCode = ds[rowIndex].AccountCode;
+        var AccountName = ds[rowIndex].AccountName;
+        if (Amount == "Salary Based") {
+            Amount = 0
+        }
+        if (noOfMonths == "Monthly") {
+            noOfMonths = 12
+        }
+        else if (noOfMonths == "Yearly") {
+            noOfMonths = 1
+        }
+        if (isRoundoff == "No") {
+            isRoundoff = 0
+        }
+        else if (isRoundoff == "Yes") {
+            isRoundoff = 1
+        }
+        if (EmployeeType == "Regular") {
+            EmployeeType = 1
+        }
+        else if (EmployeeType == "Casual") {
+            EmployeeType = 2
+        }
+        else {
+            EmployeeType = 3
+        }
+        $.get(url, {
+            ComputationID:ComputationID,AccountCode: AccountCode, Amount: Amount, noOfMonths: noOfMonths, Percentage: Percentage,
+            isRoundoff: isRoundoff, MaxAmount: MaxAmount, EmployeeType: EmployeeType, AccountName: AccountName
+        }, function (Result) {
+            $(window).scrollTop(0);
+            $('#NewComputation').html(Result);
+            $('#NewComputation').data('kendoWindow').center().open();
+        });
+    }
+    function DeleteComputation(ComputationID) {
+        swal({
+            title: "Are you sure?",
+            text: "This Action will deleted this Computation!",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, Delete It!",
+            closeOnConfirm: false
+        }, function () {
+            var url = "@Url.Action("ReqDeleteComputation", "Maintenance")";
+            $.get(url, { ComputationID: ComputationID }, function (Result) {
+                if (Result == "1") {
+                    swal({
+                        title: "Success!",
+                        text: "Account Computation Successfully Deleted.",
+                        type: "success",
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+
+                    $("#grdAccountComputation").data("kendoGrid").dataSource.read();
+                } else {
+                    swal("Error!", Result, "error");
+                }
+            });
+        });
+    }
+</script>
+
+
+
+<div style="border: outset;clear:both;border-width:1px;border-color:#1fa67a; width: 749px; padding-left:0px;padding-right:0px;padding-top:0px;padding-bottom:7px;margin-top: 10px;">
+    <div style=" width: 0;height: 0; border-right: 5px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;margin-top: -1px; ">
+        <div style="float: left; width: 678px; margin-top:1px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 36px solid #1fa67a; ">
+
+            <div style="float: left; height:28px; margin-left:-59px; margin-top: 5px;">
+                <i class="fa fa-tasks fa-2x fg-white">&nbsp;&nbsp;&nbsp;&nbsp;List Of Accounts With Computation</i>
+            </div>
+            <div style="float:right">
+                
+                <div style="text-align: right;float: right;margin-right:10px;margin-top:2px;">
+                    @(Html.Kendo().DropDownList()
+                        .Name("ddlYear")
+                        .DataTextField("ProposalYear")
+                        .DataValueField("ProposalYear")
+                        .SelectedIndex(1)
+                        .HtmlAttributes(new { @style = "width: 70px;" })
+                        .Events(e => e.Change("LoadAccounts"))
+                        .DataSource(source => source.Read(read => read.Action("GetPropYear2", "PYear")))
+                    )
+                </div>
+                <div style="float: right;margin-right:10px;margin-top:2px;">
+                    <i class="fa fa-calendar fa-2x #33333"></i>
+                </div>
+                <div style="float:right;margin-right:6px;margin-top:3px;">
+                    <div class="k-button k-button-icontext" onclick="AddNew()"> <i class="fa fa-plus-circle"></i> Add</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.AccountComputationModel>()
+        .Name("grdAccountComputation")
+        .Columns(columns =>
+        {
+            columns.Bound(c => c.ComputationID).Hidden();
+            columns.Bound(c => c.AccountCode).Title("Account Name").Width(130).Locked(true).Lockable(false);
+            columns.Bound(c => c.AccountName).Title("Account Code").Width(200).Locked(true);
+            columns.Bound(c => c.strAmount).Title("Amount").Width(120);
+            columns.Bound(c => c.Period).Title("Period").Width(120);
+            columns.Bound(c => c.Percentage).Title("Percentage").Width(120);
+            columns.Bound(c => c.RoundedOff).Title("Rounded Off").Width(120);
+            columns.Bound(c => c.MaxAmount).Title("Max Amount").Width(120);
+            columns.Bound(c => c.EmpType).Title("Employee Type").Width(150);
+            columns.Template(t => { }).ClientTemplate(
+            "<div class='btn-delete'style='inline-block; height: 15px;width:84px'> <a  title='Copy Data for Next Year' onclick='CopyPreviousData(#=AccountCode#)'><span class='fa fa-copy' style='font-size: 12pt;'></span></a>" +
+            "<a  title='Edit Coputation' onclick='EditComputation()'><span class='fa fa-pencil-square-o' style='font-size: 12pt;'></span></a>" +
+            "<a  title='Delete Computation' onclick='DeleteComputation(#=ComputationID#)'><span class='fa fa-trash' style='font-size: 12pt;'></span></a></div>"
+            ).HtmlAttributes(new { style = "margin-left:5px;" }).Width(100);
+        })
+        .HtmlAttributes(new { style = "height: 300px;" })
+        .Scrollable()
+        .Selectable()
+        .Pageable(pageable => pageable
+            .Refresh(true)
+            .ButtonCount(5))
+        .DataSource(dataSource => dataSource
+            .Ajax()
+            .Read(read => read.Action("grAccountComputationList", "Maintenance").Data("GridParameters"))
+            .PageSize(5)
+        )
+)    
+ </div>
+@(Html.Kendo().Window()
+    .Name("NewComputation")
+    .Title("Add New Computation")
+    .Width(565)
+    .Height(370)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(true)
+    .AutoFocus(true)
+    .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        }).Actions(a => { a.Close(); }))

@@ -1,0 +1,336 @@
+﻿<script>
+    function Close() {
+
+    }
+</script>
+<h2>Transaction Date: <b><span id="TransactionYear"></span></b></h2>
+
+<div style="width : 100%; margin-top: 20px;border-style: solid; border-color: #1fa67a">
+
+    <div style="width:100%;height : 35px ; background-color:#1fa67a; color: white">
+        <h2 style="margin-left: 5px;color:white"><i class="fa fa-sliders"></i> List of Obligated Budgets</h2>
+    </div>
+    <div  style="margin-left:5px;margin-top:5px;">
+        <div class="k-button k-button-icontext eeeewqwdqwd" style="border-radius:12px;color:red ;background-color:yellow;height:30px;width:200px;text-align:center" onclick="ObligationForApproval()" > <b><u>Transaction with no ObR No. </u></b></div>
+    </div>
+    <div style="padding:5px;">
+        <div style="margin-top:0px;"></div>
+        <script>
+
+            $('title').html('IFMIS-BMS (Current)');
+            var thisculture = kendo.culture();
+            thisculture.numberFormat.currency.symbol = '₱';
+
+
+            //function searchOBR() {
+
+            //    var SearchOBRData = $("#SearchData").val();
+            //    $("#grOBR").data("kendoGrid").dataSource.filter([
+            //        {
+            //            field: "OBRNo",
+            //            operator: "contains",
+            //            value: SearchOBRData
+            //        }
+            //    ]);
+            //}
+
+            function searchOBR() {
+                var $filter = new Array();
+                $filter = [];
+
+                if ($('#SearchData').val().length > 0) {
+                    $filter.push({ field: "OBRNo", operator: "contains", value: $('#SearchData').val() }),
+                    $filter.push({ field: "obrseries", operator: "contains", value: $('#SearchData').val() }),
+                    $filter.push({ field: "enduser", operator: "contains", value: $('#SearchData').val() }),
+                    //$filter.push({ field: "Amount", operator: "contains", value: $('#SearchData').val() }),
+                    $filter.push({ field: "OfficeName", operator: "contains", value: $('#SearchData').val() });
+                }
+
+                $('#grOBR').data('kendoGrid').dataSource.filter({
+                    logic: "or",
+                    filters: $filter
+                });
+
+            }
+
+            $(function () {
+                $("#SearchData").keypress(function (e) {
+                    if (e.keyCode == 13) {
+                        searchOBR();
+                    }
+                });
+            });
+
+
+            function UserParam()
+            {
+                var User = "@Account.UserInfo.UserTypeDesc";
+                var Office = @Account.UserInfo.Department;
+                return {
+                    User: User,
+                    Office: Office
+                }
+            }
+
+            function AddNewTransaction() {
+
+                $(window).scrollTop(0);
+
+                var url = "@Url.Action("AddNewTransaction", "BudgetControl")";
+                $.get(url, function (d) {
+                    //document.documentElement.style.overflow = 'hidden';  // firefox, chrome
+                    //document.body.scroll = "no";
+                    $('#AddNewTransaction').html(d);
+                });
+                $('#AddNewTransaction').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Budget Control").center().open();
+
+            }
+
+            function ViewOBRDetails(TransactionID,OBRNo){
+                $(window).scrollTop(0);
+                var fundobrno=OBRNo.split('-')
+                if (fundobrno[0] != "118" || @Account.UserInfo.lgu == 1)
+                {
+                    var url = "@Url.Action("EditTransaction", "BudgetControl")";
+                    $.get(url, { TransactionID: TransactionID }, function (d) {
+                        //document.documentElement.style.overflow = 'hidden';  // firefox, chrome
+                        //document.body.scroll = "no";
+                        console.log("TransactionID: "+TransactionID);
+                        $('#AddNewTransaction').html(d);
+                        //setTimeout(searchOBRNo(), 1500);
+                        searchOBRNo();
+                    });
+                    $('#AddNewTransaction').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Budget Control").center().open();
+                }
+                else{
+                    var urlppa = "@Url.Action("EditPPATransaction", "BudgetControl")";
+                    $.get(urlppa,{ TransactionID: TransactionID }, function (d) {
+
+                        $('#PPAControl').html(d);
+                        searchOBRDetails()
+                    });
+                    $('#PPAControl').data('kendoWindow').title("<i class='fa fa-navicon'> </i> PPA Control").center().open();
+                }
+
+            }
+
+            function ChangeTransactionYear()
+            {
+                $("#grOBR").data("kendoGrid").dataSource.read();
+            }
+
+            function PPAControl() {
+
+                $(window).scrollTop(0);
+
+                var url = "@Url.Action("PPAControl", "BudgetControl")";
+                $.get(url, function (d) {
+                    //document.documentElement.style.overflow = 'hidden';  // firefox, chrome
+                    //document.body.scroll = "no";
+                    $('#PPAControl').html(d);
+                });
+                $('#PPAControl').data('kendoWindow').title("<i class='fa fa-navicon'> </i> PPA Control").center().open();
+
+            }
+        </script>
+
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.BudgetControlModel>()
+    .HtmlAttributes(new { style = "height:540px" })
+    .Name("grOBR")
+    .Scrollable()
+    .Columns(col =>
+    {
+        col.Bound(m => m.transno).Title("Transaction #").Width(150).Locked(true).Lockable(false);
+        col.Bound(m => m.OBRNo).Title("ObR No.").Width(160);
+        col.Bound(m => m.obrseries).Title("Series No.").Width(150).Locked(true).Lockable(false);
+        col.Template(t => { }).Title("Amount").Width(100).ClientTemplate("<div> #=kendo.toString(Amount, 'c2')# </div>");
+        col.Bound(m => m.OfficeName).Title("Office").Width(330);
+        col.Bound(m => m.enduser).Title("Entered By").Width(200);
+        col.Bound(m => m.DateTimeEntered).Title("Date").Width(180);
+        col.Bound(m => m.TransactionNo).Title("TransactionNo").Width(300).Hidden();
+        col.Template(t => { }).ClientTemplate(
+        "<div class='k-button' onclick=\"ViewOBRDetails('#=TransactionNo#','#=OBRNo#')\"><span class='fa fa-search'></span> VIEW </div>"
+        ).HtmlAttributes(new { style = "margin-left:5px;" }).Width(90);
+
+    })
+    .ToolBar(t => t.Template(@<text>
+
+
+        <div style="float: left; width: 0; margin-top:-3px;margin-bottom:-100px;margin-left:-3px; height: 0; border-right: 0px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;">
+            <div style="float: left; width: 0; margin-top:0px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 37px solid #EEE; ">
+
+                <div style="float: left; height:28px; margin-left:-59px; margin-top: 5px;">
+                    <i class="fa fa-tasks fa-2x fg-white"></i>
+
+                </div>
+
+            </div>
+        </div>
+        <div style="float: right; height:28px;margin-top:2px;">
+            <link href="~/Content/metroui/css/docs.css" rel="stylesheet" />
+            <div class="k-button" style="margin-right:10px;float:left;display:none" id="PPAControlBTN" onclick="PPAControl()"><span class="fa fa-plus"></span> 20% PDF</div>
+            <div class="k-button" style="margin-right:10px;float:left" onclick="AddNewTransaction()"><span class="fa fa-plus"></span> Add New Transaction</div>
+            <div style="float: left;">
+                @(Html.Kendo().DropDownList()
+                        .Name("Years")
+                        .DataTextField("YearOf")
+                        .DataValueField("YearOf")
+                        .OptionLabel("Year")
+                        .SelectedIndex(1)
+                        .Events(e => e.Change("ChangeTransactionYear"))
+                        .HtmlAttributes(new { @style = "width: 80px;text-align:left;margin-right:5px;" })
+                        .DataSource(source => source.Read(read => read.Action("Years", "Dropdowns")))
+
+                )
+            </div>
+
+            <div style="background-color:white;border:solid;border-color:whitesmoke;border-width:thin;width:230px;height:33px;float:right;padding:0px;margin-top:-3px;" id="search">
+                <input type="text" style="width:180px;border-collapse:collapse;border-color:white;margin:0px;margin-left:0px;height:70%;outline:none;border-left-style:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search..." id="SearchData" name="SearchData">
+                <div class="k-button k-button-icontext" style="height:33px;width:40px;" onclick="searchOBR()"><span class="mif-search"></span></div>
+            </div>
+        </div>
+    </text>))
+
+    .Pageable(page => page.Refresh(true)
+    .Enabled(true)
+    .ButtonCount(4)
+    .PreviousNext(true)
+    )
+        .Selectable(selectable => selectable.Mode(GridSelectionMode.Single))
+        .AutoBind(false)
+        .DataSource(d => d
+        .Ajax()
+        .PageSize(10)
+        .Model(m => m.Id(i => i.OBRNo))
+                            .Read(read => read.Action("CurrentControl", "BudgetControl").Data("YearParam"))
+        )
+        )
+    </div>
+
+
+</div>
+<script>
+
+    function YearParam()
+    {
+        var Year = $("#Years").val();
+        return {
+            Year: Year
+        }
+    }
+
+    function CurrentDateUrl(){
+        return '@Url.Action("CurrentDate", "Global")';
+    }
+
+    $(document).ready(function () {
+
+        var returnDate = CurrentDate();
+        $("#TransactionYear").text(returnDate);
+        console.log(@Account.UserInfo.UserTypeID);
+        setTimeout(function (){
+            $("#grOBR").data("kendoGrid").dataSource.read();
+        }, 1000);
+
+        if(@Account.UserInfo.UserTypeID != 1){
+            $("#PPAControlBTN").show();
+        }
+        if(@Account.UserInfo.Department == 1 ||  @Account.UserInfo.Department == 63){
+            $("#PPAControlBTN").show();
+        }
+
+
+        var grid = $('#grOBR').data('kendoGrid');
+
+        var url="@Url.Action("getCAFOAmode", "Excess")"
+        $.get(url,function (e) {
+            if (e==1){
+                grid.hideColumn('OBRNo');
+            }
+            else{
+                grid.hideColumn('transno')
+            }
+        })
+
+    });
+    function ObligationForApproval() {
+        var url = "@Url.Action("ControlForApproval", "BudgetControl")";
+
+        if ($("#allrelease").val() == 0 && ($("#account_list").val() == 0 || $("#account_list").val()==""))
+        {
+            swal("Warning","Please select an account in the dropdown list!","warning")
+        }
+        else {
+            $.get(url, {
+                year_: $("#ddlYear").val()
+            }, function (d) {
+                $('#ControlForApproval').html(d);
+            })
+
+            $('#ControlForApproval').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Transactions with no generated ObR No. from the Accounting Office ").center().open();
+        }
+    }
+
+
+</script>
+
+@(Html.Kendo().Window()
+    .Name("AddNewTransaction")
+    .Title("Budget Control")
+    .Width(1280)
+    .Height(600)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(true)
+    .AutoFocus(true)
+        //.Events(e => e.Close("onClose"))
+    .Animation(a =>
+        {
+            a.Open(o => o.Fade(FadeDirection.In));
+            a.Close(c =>
+            {
+                c.Fade(FadeDirection.In);
+                c.Reverse(true);
+            });
+        }).Actions(a => { a.Close(); }))
+
+@(Html.Kendo().Window()
+    .Name("PPAControl")
+    .Title("20% PDF Control")
+    .Width(1280)
+    .Height(560)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(true)
+    .AutoFocus(true)
+    .Animation(a =>
+        {
+            a.Open(o => o.Fade(FadeDirection.In));
+            a.Close(c =>
+            {
+                c.Fade(FadeDirection.In);
+                c.Reverse(true);
+            });
+        }).Actions(a => { a.Close(); }))
+
+@(Html.Kendo().Window()
+        .Name("ControlForApproval")
+        //.Title("Release Summary")
+        .Width(1035)
+        .Height(580)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+        .Events(e => e.Close("Close"))
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+                .Actions(a => { a.Close(); })
+)

@@ -1,0 +1,41 @@
+﻿
+
+<div style="width:150px; min-height:60px;margin-top: -5px; height:auto; border-right: 0.5px solid #eee; float:left;">
+    <a class="fg-white" href="http://www.agusandelsur.gov.ph" target="_blank" style="text-align:left">
+        <div class="logos_40" style="margin-top:15px;"></div>
+        @*<div class="logos_41 lfloat" style="margin-top:5px;"></div>*@
+        <div style="float:left; margin-left:10px;margin-top:0px; ">
+            <div style="margin-left:35px; text-align:center;margin-top:0px; font-size:25px; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;vertical-align: baseline; " id="lgu_name">PGAS</div>
+            <div style="margin-left:35px;margin-top:-5px; text-align:left; font-size:9px; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;vertical-align: baseline; " id="lgu_site">www.agusandelsur.gov.ph</div>
+        </div>
+    </a>
+</div>
+
+<div style="width:400px; min-height:60px;margin:10px 5px 0 10px; height:auto;  float:left; text-align:left"> 
+    <div class="fg-white" style="display:inline-block; opacity:0.6;"><span style="font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;"><span id="lgu_province2"> Province of Agusan del Sur </span>  © 2017 - 2024. All Rights Reserved.</span></div>
+    <div style="display:inline-block; opacity:0.6"><span style="font-style:italic">Powered by:</span><span style="font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;" id="lgu_province"> Province of Agusan del Sur</span></div>
+    <div style="display:inline-block; opacity:0.6"><span style="font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">Best viewed using Mozilla Firefox & Google Chrome</span></div>
+</div>
+
+<div style="width:350px; min-height:60px;margin:10px 5px 0 10px; height:auto;  float:right; text-align:right"> 
+    @*<div class="fg-white" style="display:inline-block; opacity:0.6"><span class="italic"> Web Developer:  @("Ronald B. Maghilum" + " © " + "2015")  </span></div>*@
+    @*<div style="display:block; opacity:0.6"><span>Business Process Division (BPD)</span></div>
+    <div style="display:block; opacity:0.6"><span>Contact Us: <i class="fa fa-phone"></i> LANDLINE NO.: (085)-242-1061/1064<br />LOCAL: 312<br /></span></div>*@
+    <div style="display:inline-block; opacity:0.6"><span> </span></div>
+</div>
+    
+
+<script>
+    $(document).ready(function () {
+        @*if (@Account.UserInfo.lgu == 0) {
+                var url = "@Url.Action("loginfooteraddress", "LogIn")";
+                $.post(url, function(e) {
+                    document.getElementById("lgu_name").innerHTML = e.lgu_abbr;
+                    document.getElementById("lgu_site").innerHTML = e.lgu_site;
+                    document.getElementById("lgu_province").innerHTML = e.lgu;
+                    document.getElementById("lgu_province2").innerHTML = e.lgu;
+                });
+            }*@
+        $("#username").focus()
+    })
+</script>

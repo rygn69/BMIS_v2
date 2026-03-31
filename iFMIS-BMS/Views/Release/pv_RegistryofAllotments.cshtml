@@ -1,0 +1,568 @@
+﻿<script>    
+    
+    function sorting_() {
+
+        if (document.getElementById('is_sort').checked) {
+
+            document.getElementById("cake").value = 1;
+
+        } else {
+
+            document.getElementById("cake").value = 0;
+
+        }
+    }
+
+    function Nonothers_() {
+        if (document.getElementById('others_').checked) {
+    
+            document.getElementById("others_").value = 1;
+
+        } else {
+
+            document.getElementById("others_").value = 0;
+
+        }
+    }
+    function sorting_air() {
+       
+        if (document.getElementById('is_sort_air').checked) {
+            
+            document.getElementById("air").value = 1;
+
+        } else {
+
+            document.getElementById("air").value = 0;
+
+        }
+    }
+    
+    function includexcess() {
+
+        if (document.getElementById('is_includexcess').checked) {
+
+            document.getElementById("is_includexcess").value = 1;
+
+        } else {
+
+            document.getElementById("is_includexcess").value = 0;
+
+        }
+    }
+    function byYear() {
+
+        if (document.getElementById('byYear').checked) {
+
+            document.getElementById("byYear").value = 0;
+
+        } else {
+
+            document.getElementById("byYear").value = 1;
+
+        }
+        //$("#classtype").val(0);
+        //$("#changed_To").data("kendoComboBox").dataSource.read();
+    }
+    function Summary() {
+        if (document.getElementById('Summary').checked) {
+
+            document.getElementById("Summary").value = 1;
+
+        } else {
+
+            document.getElementById("Summary").value = 0;
+
+        }
+    }
+    function getooeid(){
+        var url = "@Url.Action("getooeid", "Report")";
+        $.post(url, { programID: $("#Progss").val(),accountID: $("#account_list").val(),year_:$("#ddlYear").val()}, function (dd) {
+            $("#ooe_id").val(dd);
+            //alert($("#ooe_id").val())
+        });
+    }
+    function reqPrint() {
+
+        var officeID = $("#offs").val();
+        var programID = $("#Progss").val();
+        var OOE_ID = $("#ooe_id").val();
+        var accountID = $("#account_list").val();
+        var year_ = $("#ddlYear").val();
+        var classtype = $("#classtype").val();
+        var sort_ = $("#cake").val();
+        var air = $("#air").val();
+        var others_ = $("#others_").val();
+        var includex = $("#is_includexcess").val();
+        var excessacctval = $("#changed_To").val();
+        var monthof = $("#RaoMonths").val();
+        var monthname = $("#RaoMonths").data("kendoComboBox").text();
+        var exmonhtofcessacct = $("#changed_To").data("kendoComboBox").text();
+        var byYear = $("#byYear").val();
+        var Summary = $("#Summary").val();
+        var monthofname = $("#RaoMonths").data("kendoComboBox").text();
+        var txtsearch = $("#txtsearch").val();
+        var rephistory = $("#rephistory").val();
+        //alert(monthofname);
+        //alert(excessacctval);
+        if ((accountID == 0 || accountID == null || accountID == '' || accountID == "") && rephistory== 0) {
+            swal({
+                title: "Error!",
+                text: "PLEASE Select Account",
+                timer: 3000,
+                type: "error",
+                showConfirmButton: false
+            })
+
+        } else {
+            if (Summary == 1) {
+                $.ajax({
+                    async: false,
+                    dataType: 'html',
+                    success: window.open("../Reports/ReportViewer.aspx?rid=29&Year=" + year_ + "&monof=" + monthof + "&monthofname="+ monthofname +" &excessacctval="+ excessacctval +"")
+                });
+            }
+            else {
+                if (others_ == 1) {
+                    if (officeID == 43 && (accountID == 334 || accountID == 336 || accountID == 342)) {
+                        $.ajax({
+                            async: false,
+                            dataType: 'html',
+                            success: window.open("../Reports/ReportViewer.aspx?rid=96&OfficeID=" + officeID + "&programID=" + programID + "&OOE_ID=" + OOE_ID + "&accountID=" + accountID + "&Year=" + year_ + "&classtype=" + classtype + "&sort_=" + sort_ + "&air=" + air + "")
+                        });
+
+                    } else {
+                        $.ajax({
+                            async: false,
+                            dataType: 'html',
+                            success: window.open("../Reports/ReportViewer.aspx?rid=69&OfficeID=" + officeID + "&programID=" + programID + "&OOE_ID=" + OOE_ID + "&accountID=" + accountID + "&Year=" + year_ + "&classtype=" + classtype + "&sort_=" + sort_ + "&air=" + air + "&includex=" + includex + "&txtsearch=" + txtsearch + "")
+                        });
+                    }
+                }
+                else {
+                    $.ajax({
+                        async: false,
+                        dataType: 'html',
+                        success: window.open("../Reports/ReportViewer.aspx?rid=69&OfficeID=" + officeID + "&programID=" + programID + "&OOE_ID=" + OOE_ID + "&accountID=" + accountID + "&Year=" + year_ + "&classtype=" + classtype + "&sort_=" + sort_ + "&air=" + air + "&includex=" + includex + "&excessacctval=" + excessacctval + "&monthof=" + monthof + "&exmonhtofcessacct=" + exmonhtofcessacct + "&byYear=" + byYear + "&txtsearch=" + txtsearch + "&repxmlhistory=" + rephistory + "&monthname=" + monthname + "")
+                    });
+                }
+            }
+        }
+    }
+
+
+    setTimeout(function () {
+        var todayDate = kendo.toString(kendo.parseDate(new Date()), 'MMMM');
+       // $("#datepicker_desu").data("kendoDatePicker").value(todayDate);
+    }, 100);
+
+
+   
+
+
+    var thisculture = kendo.culture();
+    thisculture.numberFormat.currency.symbol = '₱'; // Script For Changing The Currency Sign
+
+
+
+
+    setTimeout(function () {
+       $("#offs").data("kendoComboBox").dataSource.read();
+    }, 100);
+
+
+    function ocake() {
+        setTimeout(function () {
+
+            fn_Offices();
+            //alert($("#account_list").val());
+            if ($("#account_list").val() != 0 )
+            {
+                getooeid();
+            }
+        }, 1000);
+    }
+   
+
+    function repris() {
+        $("#offs").data("kendoComboBox").dataSource.read();
+        $("#changed_To").data("kendoComboBox").dataSource.read();
+        }
+
+    function Select_Office() {
+       
+        var classtype = $("#classtype").val();
+     
+        if (classtype == null || classtype == "") {
+           
+            return { classtype: 2 }
+        }
+        else { 
+            return { classtype: classtype }
+        }
+        }
+    function fn_dprefresherOOied() {
+        $("#account_list").data("kendoComboBox").dataSource.read();
+    }
+    function fn_dprefresherprogs() {
+        //$("#ooe_id").data("kendoDropDownList").dataSource.read();
+        $("#account_list").data("kendoComboBox").dataSource.read();
+    }
+     
+    function fn_dprefresher() {
+
+        ocake();
+        $("#Progss").data("kendoDropDownList").dataSource.read();
+        //$("#ooe_id").data("kendoDropDownList").dataSource.read();
+        $("#account_list").data("kendoComboBox").dataSource.read();
+        $("#rephistory").data("kendoComboBox").dataSource.read();
+        $("#rephistory").data("kendoComboBox").value("");
+
+    }
+    function ExpenseClassOnChange() {
+        $("#grd_BudgetApprovalBudget").data("kendoGrid").dataSource.read();
+    }
+    function resetExcessAccount() {
+        $("#changed_To").data("kendoComboBox").dataSource.read();
+    }
+    function selectedyear() {
+        return {
+            type: 2,
+            office: $("#offs").val(),
+            year: $("#ddlYear").val(),
+            saaotag: 0
+        }
+    }
+</script>
+
+<h2><span class="fa fa-print"></span> Generate Registry of Allotments and Obligations Report</h2>
+<br /><br />
+
+<div style="float: none;clear:both;">
+    <div style="float: left;margin-right:10px;margin-top:2px;">
+        <label style="float:left;margin-left: 50px;">
+            Office    :
+        </label>
+    </div>
+   
+    <div style="float: right;margin-right:70px;margin-top:0px;">
+
+
+        @(Html.Kendo().ComboBox()
+                            .Name("offs")
+                            .DataTextField("OfficeName")
+                            .DataValueField("OfficeID")
+                            .Placeholder("Select office...")
+                            .Filter("contains")
+                            .MinLength(1)
+                            .HtmlAttributes(new { @style = "width: 500px;" })
+                            .Events(e => e.Change("fn_dprefresher"))
+                            .DataSource(source => source.Read(read => read.Action("GetOffice_MO", "Release").Data("Select_Office")))
+        )
+
+
+
+    </div>
+
+    <div style="height:10px;">
+
+    </div>
+
+    <div id="ProgramAndExpenseClassDiv" style="float: none;clear:both; margin-top: 25px">
+
+        <div style="float: left;margin-right:10px;margin-top:2px;">
+            <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                Program :
+            </label>
+        </div>
+        <div style="float: right;margin-right:70px;margin-top:0px;">
+            <script>
+              function fn_Offices() {
+                  var proyy = $("#ddlYear").val();
+                  var off_id = $("#offs").val();
+                 // var ooe_id = $("#ooe_id").val();
+
+                  return {
+                      propYear: proyy,
+                      office_ID: off_id
+                     // ooe_id: ooe_id
+                  }
+              }
+            </script>
+
+            @(Html.Kendo().DropDownList()
+                            .Name("Progss")
+                            .DataTextField("ProgramDescription")
+                            .DataValueField("ProgramID")
+                            .OptionLabel("Select programs...")
+                            .HtmlAttributes(new { @style = "width: 500px;" })
+                            .Events(e => e.Change("fn_dprefresherprogs"))
+                   .DataSource(source => source.Read(read => read.Action("GetPrograms2", "dpPrograms").Data("fn_Offices")))
+            )
+
+        </div>
+
+       @* <div style="float: left;margin-right:0px;margin-top:10px;">
+            <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                Expense Class    : 
+            </label>
+        </div>*@
+        @*<div style="float: right;margin-right:70px;margin-top: 5px;">
+            @(Html.Kendo().DropDownList()
+                        .Name("ooe_id")
+                        .DataTextField("OOEName")
+                        .DataValueField("OOEID")
+                        .OptionLabel("Select Expenses...")
+                        .HtmlAttributes(new { @style = "width: 500px;" })
+                        .Events(e => e.Change("fn_dprefresherOOied"))
+                        .DataSource(source => source.Read(read => read.Action("dp_OOE", "Dropdowns")))
+            )
+        </div>*@
+        <div style="float: left;margin-right:10px;margin-top:10px;">
+            <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                Account    :
+            </label>
+        </div>
+        <div style="float: right;margin-right:70px;margin-top:5px;">
+            <script>
+                    function fn_ForAccount() {
+                        var propYear = $("#ddlYear").val();
+                        var office_ID = $("#offs").val();
+                        //var ooe_id = $("#ooe_id").val();
+                        var prog_id = $("#Progss").val();
+                        return {
+                            propYear: propYear,
+                            office_ID: office_ID,
+                            prog_id: prog_id,
+                            //ooe_id: ooe_id,
+                        }
+                    }
+            </script>
+
+            @(Html.Kendo().ComboBox()
+                        .Name("account_list")
+                        .DataTextField("account_name")
+                        .DataValueField("account_id")
+                        .Filter("contains")
+                        .MinLength(1)
+                        .Placeholder("Select Account...")
+                        .HtmlAttributes(new { @style = "width: 500px;" })
+                        .Events(e => e.Change("ocake"))
+                        .DataSource(source => source.Read(read => read.Action("MOS_AccountNoEXP", "Dropdowns").Data("fn_ForAccount")))
+            )
+        </div>
+
+
+    </div>
+
+    <div id="MonthDepartment" style="float: none;clear:both; margin-top: 20px">
+
+        <div style="float:left;margin-left:50px;margin-top:5px;">
+            <label>
+                Fund Type     :
+            </label>
+        </div>
+        <div style="float:left;margin-left:54px;margin-top:5px;">
+  
+            @(Html.Kendo().DropDownList()
+                              .Name("classtype")
+                              .DataTextField("Class_Type")
+                              .DataValueField("Class_ID")
+                              .SelectedIndex(0)
+                              .HtmlAttributes(new { @style = "width: 160px;" })
+                              .DataSource(source => source.Read(read => read.Action("ddlClasses", "Dropdowns")))
+                              .Events(e => e.Change("repris"))
+            )
+        </div>
+        <div style="float: left;margin-left:-298px;margin-top:40px;">
+            <label>
+                Excess Account :
+            </label>
+        </div>
+        <div style="float: left;margin-left:-160px;margin-top:40px;">
+            <script>
+                function Fund_Flag() {
+
+                    var fund_type = $("#classtype").val();
+                return {
+                    fund_type: fund_type
+                }
+            }
+            </script>
+            @(Html.Kendo().ComboBox()
+                .Name("changed_To")
+                .DataTextField("Account_Name")
+                .DataValueField("TransactionNo")
+                .Placeholder("Select excess account...")
+                .Filter("contains")
+                .MinLength(1)
+                .HtmlAttributes(new { @style = "width: 500px;" })
+                @*.CascadeFrom("classtype")*@
+                .SelectedIndex(-1)
+                .DataSource(source => {
+                    source.Read(read =>
+                    {
+                        read.Action("Changed_To", "Release").Data("Fund_Flag");
+                    })
+                    .ServerFiltering(false);
+                })
+            )
+            
+        </div>
+ @*.DataSource(source => source.Read(read => read.Action("Changed_To", "Release").Data("Fund_Flag")))*@
+        <div style="float:left;margin-left:-638px;margin-top:70px;">
+            <div style="float:left;margin-left:0px;margin-top:5px;">
+                <label>
+                    Year :
+                </label>
+
+            </div>
+            <div style="float:left;margin-left:97px;margin-top:5px;">
+                
+                @(Html.Kendo().DropDownList()
+                                    .Name("ddlYear")
+                                    .DataTextField("ProposalYear")
+                                    .DataValueField("ProposalYear")
+                                    .SelectedIndex(0)
+                                    .HtmlAttributes(new { @style = "width: 160px;" })
+                                    .Events(e => e.Change("ocake"))
+                                    .DataSource(source => source.Read(read => read.Action("GetPropYear3", "PYear")))
+                )
+
+            </div>
+            
+        </div>
+        <div style="float:left;margin-left:-638px;margin-top:110px;">
+            <label>
+                As Of Month :
+            </label>
+
+        </div>
+        <div style="float:left;margin-left:-501px;margin-top:110px;">
+
+            @(Html.Kendo().ComboBox()
+            .Name("RaoMonths")
+            .DataTextField("Text")
+            .DataValueField("Value")
+                    //.Events(e => e.Change("change"))
+            .BindTo(new List<SelectListItem>() {
+                new SelectListItem() {
+                    Text = "January",
+                    Value = "1"
+                },
+                new SelectListItem() {
+                    Text = "Febuary",
+                    Value = "2"
+                },
+                new SelectListItem() {
+                    Text = "March",
+                    Value = "3"
+                },
+                new SelectListItem() {
+                    Text = "April",
+                    Value = "4"
+                },
+                new SelectListItem() {
+                    Text = "May",
+                    Value = "5"
+                },
+                new SelectListItem() {
+                    Text = "June",
+                    Value = "6"
+                },
+                new SelectListItem() {
+                    Text = "July",
+                    Value = "7"
+                },
+                new SelectListItem() {
+                    Text = "August",
+                    Value = "8"
+                },
+                new SelectListItem() {
+                    Text = "September",
+                    Value = "9"
+                },
+                new SelectListItem() {
+                    Text = "October",
+                    Value = "10"
+                },
+                new SelectListItem() {
+                    Text = "November",
+                    Value = "11"
+                },
+                new SelectListItem() {
+                    Text = "December",
+                    Value = "12"
+                }
+            })
+            .Value(@ViewBag.MonthVaue)
+            .HtmlAttributes(new { style = "width: 160px" })
+            )
+
+        </div>
+       
+        <div style="float:left;margin-left:-638px;margin-top:150px;">
+            <label>Description :</label>
+            <label style="font-size:10px;font-style:italic;color:#ff0000">(Optional)</label>
+        </div>
+       <div  style="float:left;margin-left:-501px;margin-top:145px;">
+           <input type="text" style="width:490px;height:25px" name="txtsearch" id="txtsearch" />
+       </div>
+        <div style="float:left;margin-left:-638px;margin-top:195px">
+            <label>
+                Report History     :
+            </label>
+        </div>
+        <div style="float:left;margin-left:-501px;margin-top:187px">
+            @(Html.Kendo().ComboBox()
+                            .Name("rephistory")
+                            .DataTextField("dateprinted")
+                            .DataValueField("rprtid")
+                            .Placeholder("Report history...")
+                            .Filter("contains")
+                            .MinLength(1)
+                            .HtmlAttributes(new { @style = "width: 250px;" })
+                            .DataSource(source => source.Read(read => read.Action("rephistory", "Report").Data("selectedyear")))
+            )
+        </div>
+    </div>
+
+    <div  style="float:left;margin-top:155px;">
+
+        <div style="float:left;margin-left:210px;margin-top:10px;">
+            <input type='checkbox' class='checkbox' id="is_sort" onclick=sorting_() /> <font style="font-size:15px">PGO Control</font>
+        </div>
+        <div style="float:left;margin-left:-103px;margin-top:40px;">
+            <input type='checkbox' class='checkbox' id="is_sort_air" onclick=sorting_air() /> <font style="font-size:15px">Include Earmark</font>
+        </div>
+        <div style="float:left;margin-left:30px;margin-top:10px;">
+            <input type='checkbox' class='checkbox' id="others_" onclick=Nonothers_() /> <font style="font-size:15px">Non-Office Other</font>
+        </div>
+        <div style="float:left;margin-left:26px;margin-top:10px;">
+            <input type='checkbox' class='checkbox' id="is_includexcess" onclick=includexcess() /> <font style="font-size:15px">Include Excess</font>
+        </div>
+        <div style="float:left;margin-left:-278px;margin-top:40px;">
+            <input type='checkbox' class='checkbox' id="byYear" onclick=byYear() /> <font style="font-size:15px">By Year</font>
+        </div>
+        @*<div style="float:left;margin-left:95px;margin-top:10px;">
+            <input type='checkbox' class='checkbox' id="Summary" onclick=Summary() /> <font style="font-size:15px">Summary</font>
+        </div>     *@
+
+        <div id="btnPrint" class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 90px;float:right; margin-top: 40px; margin-right:73px; margin-bottom:5px;background-color:cornflowerblue;color:white;border-radius:50px;" onclick="reqPrint()"><span class="mif-printer"></span> Preview</div>
+
+    </div>
+</div>
+
+
+<div style="float:left;margin-left:474px;margin-top:-5px;">
+    <input type="text" style="width:140px" name="cake" id="cake" value="0" hidden disabled>
+    <input type="text" style="width:140px" name="air" id="air" value="0" hidden disabled>
+    <input type="text" style="width:140px" name="others_" id="others_" value="0" hidden disabled>
+    <input type="text" style="width:140px" name="ooe_id" id="ooe_id" value="0" hidden disabled>
+</div>
+
+<script>
+    $(document).ready(function () {
+        resetExcessAccount()
+        document.getElementById("byYear").value = 1;
+    }, 1000);
+</script>

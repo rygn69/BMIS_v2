@@ -1,0 +1,466 @@
+﻿@model iFMIS_BMS.BusinessLayer.Models.BudgetControl.OBRLogger
+<style>
+        input[type="radio"] {
+        width: auto;
+    }
+                /*textarea:focus, input:focus, input[type]:focus, .uneditable-input:focus {
+            border-color: rgba(0, 128, 0, 0.8);
+            box-shadow: 0 1px 1px rgba(0, 128, 0, 0.075) inset, 0 0 8px rgba(0, 128, 0, 0.6);
+            outline: 0 none;
+        }*/
+</style>
+<script src="~/Scripts/BMS/BudgetControl/OBRLogger.js"></script>
+<script>
+    function chkcafoa() {
+        if (document.getElementById("chkcafoa").checked) {
+            document.getElementById("chkcafoa").value = "1"
+            $("#cttsno").focus()
+        }
+        else {
+            document.getElementById("chkcafoa").value = "0"
+            $("#TransactionNo").focus()
+        }
+    }
+    function chkverify() {
+        if (document.getElementById("verid").checked) {
+            document.getElementById("verid").value = "1"
+        }
+        else {
+            document.getElementById("verid").value = "0"
+        }
+   
+        var obrno = $("#OBRNo").val()
+        if (obrno.length != 19) {
+            swal("Warning", "The transaction number has not yet been utilized in OBR.", "warning")
+            document.getElementById("verid").value = "0";
+            document.getElementById("verid").checked = false;
+        }
+        else {
+            if (@Model.verify_tag == 1)  { //undo the process
+                swal({
+                    title: "This control has already been verified. Do you want to reverse the process?",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Proceed",
+                    closeOnConfirm: false,
+                    showLoaderOnConfirm: true
+                },
+                   function (isConfirm) {
+                       if (isConfirm) {
+                           var url = "@Url.Action("VerifytransDisprove", "BudgetControl")";
+                           $.get(url, { obrno: obrno }, function (e) {
+
+                               if (e == "success") {
+                                   swal("Success", "Transaction has been disprove!", "success");
+                                   $("#grOBR").data("kendoGrid").dataSource.read();
+                               } else {
+                                   swal("Warning", e, "warning");
+                                   document.getElementById("verid").value = "1";
+                                   document.getElementById("verid").checked = true;
+                               }
+                           });
+                       }
+                       else {
+                           document.getElementById("verid").value = "1";
+                           document.getElementById("verid").checked = true;
+                       }
+                   })
+            }
+            else{
+                swal({
+                    title: "Would you like to mark the transaction as verified?",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Proceed",
+                    closeOnConfirm: false,
+                    showLoaderOnConfirm: true
+                },
+                function (isConfirm) {
+                    if (isConfirm) {
+                        var url = "@Url.Action("Verifytrans", "BudgetControl")";
+                        $.get(url, { obrno: obrno }, function (e) {
+
+                            if (e == "success") {
+                                swal("Success", "Transaction has been verified!", "success");
+                                $("#grOBR").data("kendoGrid").dataSource.read();
+                            } else {
+                                swal("Warning", e, "warning");
+                                document.getElementById("verid").value = "0";
+                                document.getElementById("verid").checked = false;
+                            }
+                        });
+                    }
+                    else {
+                        document.getElementById("verid").value = "0";
+                        document.getElementById("verid").checked = false;
+                    }
+                })
+            }
+        }
+    }
+    function setforwardofficev2() {
+        var OfficeForward = $("#OfficeForward").val() == "" ? 0 : $("#OfficeForward").val()
+        var url="@Url.Action("setforwardoffice", "BudgetControl")"
+        if (OfficeForward != 0) {
+            $.get(url, { TransactionNo: @Model.trnno, OfficeForward:OfficeForward }, function (e) {
+                if (e.type == "success") {
+                    $("#grOBR").data("kendoGrid").dataSource.read();
+                    $("#UserOutTimeStamp").val(e.UserOutTimeStamp);
+                }
+                $("#EmployeeForward").data("kendoComboBox").dataSource.read();
+                swal(e.title, e.message, e.type);
+            });
+        }
+    }
+    function viewmoreid_click(){
+        $("#documentsendid").show()
+        $("#viewmoreid").hide()
+        $("#viewlessid").show()
+        $('#AddNewOBR').height(900);
+    }
+    function viewlessid_click(){
+        $("#documentsendid").hide()
+        $("#viewmoreid").show()
+        $("#viewlessid").hide()
+        $('#AddNewOBR').height(745);
+    }
+    function getuseid(){
+        return{
+            officeid: '@Account.UserInfo.Department'
+        }
+    }
+</script>
+<div id="obrloggerid" style="border-color:gray;border-width:1px;border-style:solid;width:auto;margin-top:8px;">
+    <div style="width:110px;background-color:#ffffff;border-style:solid;border-color:black;border-width:1px;padding:3px;margin-top:-15px;margin-left:15px;">
+        <span style="font-size:18px;font-weight:bold">MODE : <span id="mode-status" style="color:green">IN</span></span>
+    </div>
+    <div style="display:none;margin-left:170px;margin-bottom:5px;">
+        <input type="radio" id="radioIn" disabled checked style="zoom:1.2">
+        <span style="font-size:12px"> Current</span>
+        <input type="radio" style="margin-left:30px;zoom:1.2" id="radiOut" disabled />
+        <span style="font-size:12px"> Continuing</span>
+    </div>
+    <div style="float:left;margin-left:170px;margin-bottom:8px;margin-top:-10px">
+        <div style="width:120px;display:inline-block;"><input type="radio" id="TransactionModeIN" name="TransactionMode" value="1" onclick="incoming()"> <span style="margin-left:10px;color:green"><b>IN</b> </span></div>
+        <div style="width:120px;display:inline-block;"><input type="radio" id="TransactionModeOUT" name="TransactionMode" value="2" onclick="outgoing()"> <span style="margin-left:10px;color:red"><b>OUT</b> </span></div>
+    </div>
+    <div id="cttsid" style="padding:5px;">
+        <div style="margin-top:5px;">
+            <div style="width:120px;display:inline-block;"><span style="">QR No.:</span></div>
+            <div style="width:120px;display:inline-block;"><input type="text" id="cttsno" name="cttsno" style="background-color:#405b43;color:whitesmoke;font-size:large;text-align:center" value="@Model.cttsno"/> </div>
+         @*   <div style="width:0px;margin-right:25px;margin-top:-2px;font-size: 1.7em;float:right" id="unlockcttsid"> <i class="fa fa-unlock-alt" onclick="unlockctts()"></i> </div>*@
+        </div>
+    </div>
+    <div style="padding:5px;">
+        <div style="margin-top:0px;">
+            <div style="width:120px;display:inline-block;"><span style="">Transaction No.:</span></div>
+            <div style="width:120px;display:inline-block;"><input type="text" id="TransactionNo" name="TransactionNo" value="@Model.TransactionNo" /> </div>
+        </div>
+    </div>
+    <div style="padding:5px;">
+        <div style="margin-top:0px;">
+            <div style="width:120px;display:inline-block;"><span style="">Reference No.:</span></div>
+            <div style="width:120px;display:inline-block;"><input type="text" id="RefNo" name="RefNo" /> </div>
+        </div>
+    </div>
+    <div style="padding:5px;">
+        <div style="margin-top:0px;">
+            <div style="width:120px;display:inline-block;"><span style="">Fund Type:</span></div>
+            <div style="width:120px;display:inline-block;">
+                @(Html.Kendo().ComboBox()
+                                    .Name("FundType")
+                                    .DataTextField("FundTypeName")
+                                    .DataValueField("FundTypeID")
+                                    .Placeholder("Please select fund!")
+                                    .Filter("contains")
+                                    .MinLength(3)
+                                    //   .Events(e => e.Change("GenerateOBR"))
+                                    .HtmlAttributes(new { @style = "width: 310px;" })
+                                    .DataSource(source => source.Read(read => read.Action("ddlFundTypeControl", "Dropdowns")))
+                )
+            </div>
+        </div>
+    </div>
+    <div style="padding:5px;">
+        <div style="margin-top:0px;">
+            <div style="width:120px;display:inline-block;"><span style="">OBR No:</span></div>
+            <div style="width:120px;display:inline-block;"><input type="text" id="OBRNo" name="OBRNo" style="color:gray" readonly /> </div>
+        </div>
+    </div>
+    <div style="padding:5px;">
+        <div style="margin-top:0px;">
+            <div style="width:120px;display:inline-block;"><span style="">Office:</span></div>
+            <div style="width:120px;display:inline-block;">
+
+                @(Html.Kendo().ComboBox()
+                                    .Name("Office")
+                                    .DataTextField("office_name")
+                                    .DataValueField("office_id")
+                                    .Placeholder("Please select office!")
+                                    .Filter("contains")
+                                    .MinLength(3)
+                                    .HtmlAttributes(new { @style = "width: 311.5px;" })
+                                    .Value(@Model.office.ToString())
+                                    .DataSource(source => source.Read(read => read.Action("ddlOfficeControl", "Dropdowns")))
+                )
+                <input type="text" id="OfficeID" name="OfficeID" style="display:none;">
+            </div>
+        </div>
+        <div style="margin-top:8px;">
+            <div style="width:120px;display:inline-block;"><span style="">Program:</span></div>
+            <div style="width:120px;display:inline-block;"><input type="text" id="Program" name="Program" value="@Model.program" style="color:gray" readonly /> </div>
+        </div>
+        <div style="margin-top:8px;">
+            <div style="width:120px;display:inline-block;"><span style="">Account:</span></div>
+            <div style="width:120px;display:inline-block;"><textarea id="Account" name="Account"  style="color:gray;width:300px" readonly> </textarea></div>
+     
+        </div>
+        <div style="margin-top:8px;">
+            <div style="width:120px;display:inline-block;"><span style="">Particular:</span></div>
+            <div style="width:120px;display:inline-block;"><input type="text" id="Particular" name="Particular" /> </div>
+        </div>
+    </div>
+    <div style="padding:5px;">
+        <div style="margin-top:0px;">
+            <div style="width:120px;display:inline-block;"><span style="">Amount:</span></div>
+            <div style="width:120px;display:inline-block;"><input type="text" id="Amount" name="Amount" style="color:gray" readonly /> </div>
+        </div>
+    </div>
+    <div style="padding:5px;">
+        <div style="margin-top:0px;">
+            <div style="width:120px;display:inline-block;"><span style="">Claimant:</span></div>
+            <div style="width:120px;display:inline-block;"><input type="text" id="Claimant" name="Claimant" style="color:gray" readonly /> </div>
+        </div>
+    </div>
+    <label id="viewmoreid" onclick="viewmoreid_click()" style="font-size:10px;margin-left:250px;"><u> View More <span class="fa fa-arrow-down"></span></u></label>
+    <div id="documentsendid"style="display:none; border-color:gray;border-width:1px;border-style:solid;width:450px;margin-top:15px;float:left;height:133px;margin-left:5px;margin-bottom:5px;">
+        <div style="background-color:white;width:130px;margin-top:-15px;margin-left:15px;"><span style="font-size:14px;margin-left:5px;">Document Send To</span></div>
+        <div style="display:inline-block;margin-left:170px;margin-bottom:5px;">
+            <input type="radio" id="radiolgu" value="1"  onclick="lguclick()" checked style="zoom:1">
+            <span style="font-size:12px"> LGU</span>
+            <input type="radio" id="radiotherindiv"  style="margin-left:30px;zoom:1" onclick="otherclick()"  />
+            <span style="font-size:12px"> Other Individual</span>
+        </div>
+        <div style=" padding:5px;">
+                <div style="margin-top:0px;">
+                    <div style="width:120px;display:inline-block;"><span style="">Office:</span></div>
+                    <div style="width:120px;display:inline-block;margin-left:-5.5px;">
+
+                        @(Html.Kendo().ComboBox()
+                                    .Name("OfficeForward")
+                                    .DataTextField("office_name")
+                                    .DataValueField("office_id")
+                                    .Placeholder("Please select office!")
+                                    .Filter("contains")
+                                    .MinLength(3)
+                                    .HtmlAttributes(new { @style = "width: 311px;" })
+                                    .Events(e => e.Change("setforwardofficev2"))
+                                    .Value(@Model.officeassign.ToString())
+                                    .DataSource(source => source.Read(read => read.Action("ddlOfficeControl", "Dropdowns")))
+                        )
+                    </div>
+                </div>
+                <div style="margin-top:5px;">
+                    <div style="width:120px;display:inline-block;"><span style="">Employee:</span></div>
+                    <div style="width:120px;display:inline-block;margin-left:-5px;">
+
+                        @(Html.Kendo().ComboBox()
+                                    .Name("EmployeeForward")
+                                    .DataTextField("EmpName")
+                                    .DataValueField("eid")
+                                    .Placeholder("Please select employee!")
+                                    .Filter("contains")
+                                    .MinLength(3)
+                                    .HtmlAttributes(new { @style = "width: 311px;" })
+                                     .Value(@Model.employeeassign.ToString())
+                                    .DataSource(source => source.Read(read => read.Action("getEmployee", "BudgetControl").Data("getoffice")))
+                        )
+                    </div>
+                </div>
+                <div style="margin-top:5px;">
+                    <div style="width:120px;display:inline-block;"><span style="">Other Individual:</span></div>
+                    <div style="width:120px;display:inline-block;margin-left:-5px;">
+                        <input type="text" id="otherindiv_id" readonly  value="@Model.otherindividual.ToString()" style="width:300px;" />
+                    </div>
+                </div>
+        </div>
+    </div>
+    <label id="viewlessid" onclick="viewlessid_click()" style="float:left; font-size:10px;margin-left:250px;"><u>View Less <span class="fa fa-arrow-up"></span></u></label>
+    
+    <div style="clear:both"></div>
+    <div style="padding:5px;">
+        <div style="margin-top:0px;">
+            <div style="width:120px;display:inline-block;">Time IN:</div>
+            <div style="width:120px;display:inline-block;"><input type="text" id="UserInTimeStamp" name="UserInTimeStamp" style="color:gray" /> </div>
+        </div>
+    </div>
+    <div style="padding:5px;">
+        <div style="margin-top:0px;">
+            <div style="width:120px;display:inline-block;">Time OUT:</div>
+            <div style="width:120px;display:inline-block;"><input type="text" id="UserOutTimeStamp" name="UserOutTimeStamp" style="color:gray" /> </div>
+        </div>
+    </div>
+    <div style="padding:5px;">
+        <div style="margin-top:0px;">
+            <div style="width:120px;display:inline-block;">Time Verified:</div>
+            <div style="width:120px;display:inline-block;"><input type="text" id="VerifiedTimeStamp" name="VerifiedTimeStamp" readonly style="color:gray" /> </div>
+        </div>
+    </div>
+    <div style="padding:5px;">
+        <div style="margin-top:0px;">
+            <div style="width:120px;display:inline-block;"><span style="">Approve by:</span></div>
+            <div style="width:120px;display:inline-block;">
+                @(Html.Kendo().ComboBox()
+                        .Name("approveby")
+                        .DataTextField("EmpName")
+                        .DataValueField("eid")
+                        .Placeholder("Please select employee!")
+                        .Filter("contains")
+                        .MinLength(3)
+                        //   .Events(e => e.Change("GenerateOBR"))
+                        .Value(@Model.approveby.ToString())
+                        .HtmlAttributes(new { @style = "width: 312px;" })
+                        .DataSource(source => source.Read(read => read.Action("dllgetEmployee", "Dropdowns").Data("getuseid")))
+                )
+            </div>
+        </div>
+    </div>
+    <div style="padding:5px">
+        <div style="margin-top:2px;">
+            <div id="labelpastyear" style="width:120px;display:inline-block;"><input type="checkbox" id="isPastYear" name="isPastYear" value="1" style="zoom:1.3"> <span style="margin-left:10px;"><b>Is Past Year?</b> </span></div>
+            <div style="margin-left:10px;display:inline-block"><input type="checkbox" id="chkcafoa" name="chkcafoa" value="0" style="zoom:1.3" onclick="chkcafoa()"> <span><b>CAFOA QR Code</b> </span></div>
+            <div style="margin-left:15px;display:inline-block"><input type="checkbox" id="verid" name="verid" value="0" style="zoom:1.3" onclick="chkverify()"> <span><b>Verify</b> </span></div>
+        </div>
+
+    </div>
+  
+    <div id="linkbelowid" style="padding:5px;display:none">
+        <label style="font-size:12px;margin-top:4px">Click the link below to view transaction history :</label>
+        <label onclick="translink()" id="translinkid" style="margin-left: 50px; font-size:13px;font-style:italic;color:blue;margin-bottom: 20px">
+        </label>
+    </div>
+    <div style="margin-top:15px;padding:8px;margin-left:150px;display:inline-block;">
+        <div class="k-button" style="padding:2px;width:99px;margin-top:-10px;border-radius:50px;background-color:cornflowerblue;color:white;" id="Save" onclick="Save(2)" ><span class="fa fa-save"></span> SAVE</div>
+        <div class="k-button" style="padding:2px;width:99px;margin-top:-10px;border-radius:50px;display:none" id="Update" onclick="Update()"><span class="fa fa-edit"></span> Update</div>
+        <div class="k-button" style="padding:2px;width:99px;margin-top:-10px;border-radius:50px;margin-left:5px;" id="Clear" onclick="Clear(2)"><span class="fa fa-times"></span> Clear</div>
+        <div class="k-button" style="padding:2px;width:99px;margin-top:-10px;border-radius:50px;background-color:indianred;color:white " id="Update" onclick="Close()"><span class="fa fa-close"></span> Close</div>
+    </div>
+
+    <div style="display:none">
+        <input type="text" id="UserID" name="UserID" value="@Account.UserInfo.eid" />
+        <input type="text" id="trnno" name="trnno" value="@Model.trnno" />
+        <input type="text" id="UserIDOut" name="UserIDOut" />
+        <input type="text" id="OBRNowithFnCode" name="OBRNowithFnCode" />
+        <input type="text" id="cttsaccessid" name="UserIDOut"/>
+        <input type="number" id="cttsenabled" name="cttsenabled" />
+       <input type="number" id="OfficeForward_tmp"/>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        //$("#Save").prop("disabled", true)
+        $("#viewlessid").hide()
+        $("#linkbelowid").css("display", "none");
+        document.getElementById("UserInTimeStamp").readOnly = true;
+        document.getElementById("UserOutTimeStamp").readOnly = true;
+        document.getElementById("Amount").readOnly = true;
+        document.getElementById("Claimant").readOnly = true;
+        document.getElementById("Particular").readOnly = false ;
+        //document.getElementById("OBRNo").readOnly = true;
+    
+        //document.getElementById("TransactionNo").readOnly = true;
+        $("#FundType").data("kendoComboBox").enable(false);
+        $("#OfficeForward_tmp").val(@Model.officeassign)
+       
+        $("#OBRNo").attr('disabled', true)
+        if (@Model.verify_tag == 1) {
+            document.getElementById("Particular").style.color = "gray"
+            $("#Particular").attr('disabled', true)
+            document.getElementById("verid").checked=true;
+            document.getElementById("verid").value="1"
+        }
+        else {
+            $("#Particular").attr('disabled', false)
+            document.getElementById("verid").checked=false;
+            document.getElementById("verid").value="0"
+        }
+
+        if ($("#cttsno").val() != "0" && $("#cttsno").val() != "") {
+            document.getElementById("chkcafoa").value = "1";
+            document.getElementById("chkcafoa").checked = true;
+        }
+        else {
+            document.getElementById("chkcafoa").value = "0";
+            document.getElementById("chkcafoa").checked = false;
+        }
+        $.get("@Url.Action("CTTSEnable", "Home")", function (e) {
+
+            if (e == "True") {
+                $("#cttsenabled").val(1)
+                $("#cttsid").show();
+                document.getElementById("chkcafoa").value = "1";
+                document.getElementById("chkcafoa").checked = true;
+            }else
+            {
+                $("#cttsenabled").val(0)
+                $("#cttsid").hide();
+            }
+            $("#cttsaccessid").val(e)
+        });
+        $('#cttsno').focus();
+
+        var url="@Url.Action("transyearend", "BudgetControl")"
+        $.get(url, { year: $("#Years").val() - 1 }, function (e) {
+            //  $("#yearendtrans").val(e)
+            if (e==0) {
+                document.getElementById("labelpastyear").style.display = "none"
+            } else {
+                document.getElementById("labelpastyear").style.display = "normal"
+            }
+        })
+
+    });
+
+    function OBRUserTime() {
+        return '@Url.Action("OBRUserTime", "BudgetControl")';
+    }
+    function CheckInOBR() {
+        return '@Url.Action("CheckInOBR", "OBR")';
+    }
+    function CheckOutOBR() {
+        return '@Url.Action("CheckOutOBR", "BudgetControl")';
+    }
+    function CheckOBRData() {
+        return '@Url.Action("CheckOBRData", "BudgetControl")';
+    }
+    function searchOBRData() {
+        return '@Url.Action("SearchOBRData", "BudgetControl")';
+    }
+    function SearchIfReferenceExistURL() {
+        return '@Url.Action("SearchIfReferenceExist", "BudgetControl")';
+    }
+    function UpdateOBRURL() {
+        return '@Url.Action("UpdateOBR","BudgetControl")';
+    }
+    function GetCTTSRefNo() {
+        return '@Url.Action("GetRefno", "Home")';
+    }
+    function SaveCTTSRefNo() {
+        return '@Url.Action("SaveRefno", "Home")';
+    }
+    function LogTrans() {
+        return '@Url.Action("LogTrans", "Home")';
+    }
+    function LogTransLink() {
+        return '@Url.Action("LogTransLink", "Home")';
+    }
+    function gethascode() {
+        return '@Url.Action("generateHash", "Home")';
+    }
+    function OutgoingQR() {
+        return '@Url.Action("OutgoingQR", "Home")';
+    }
+</script>

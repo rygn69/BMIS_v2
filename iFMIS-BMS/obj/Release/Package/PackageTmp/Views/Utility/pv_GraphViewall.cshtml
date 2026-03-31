@@ -1,0 +1,201 @@
+﻿@model IEnumerable<iFMIS_BMS.BusinessLayer.Models.AllLineGraph_Model>
+
+
+<script>
+    setTimeout(function () {
+
+        get_data();
+
+
+
+    }, 1000);
+    function get_data() {
+        var Year_Of = $("#LineYearGraph").val();
+        var OOE_ID = $("#LineOOEGraph").val();
+
+
+        return {
+            Year_Of: Year_Of,
+            OOE_ID: OOE_ID
+
+        }
+    }
+
+    function fn_dprefresher() {
+        $("#LineOOEGraph").data("kendoDropDownList").dataSource.read();
+        $("#accountsss").data("kendoComboBox").dataSource.read();
+
+    }
+
+    function fn_dprefresher2() {
+
+        $("#accountsss").data("kendoComboBox").dataSource.read();
+
+    }
+    function fn_dprefresher3() {
+
+        var url = "@Url.Action("GraphViewData", "Utility")";
+        var Year_Of = $("#LineYearGraph").val();
+        var OOE_ID = $("#LineOOEGraph").val();
+        var ACC_ID = $("#accountsss").val();
+       
+        $.get(url, { Year_Of: Year_Of, OOE_ID: OOE_ID, ACC_ID: ACC_ID }, function (d) {
+            $("#LineChart").html(d);
+        })
+
+    }
+
+
+    function fn_change() {
+
+      
+        var separate_id = $("#separate").val();
+
+        if (separate_id == 1) {
+            $("#dropDown_desu").css("visibility", "visible")
+            $("#dropDown_desu_ni").css("visibility", "hidden")
+        } else {
+            $("#dropDown_desu").css("visibility", "hidden")
+            $("#dropDown_desu_ni").css("visibility", "visible")
+        }
+        $("#LineOOEGraph").data("kendoDropDownList").dataSource.read();
+        $("#accountsss").data("kendoComboBox").dataSource.read();
+       
+    }
+
+    $(document).ready(function () {
+        $(".options").bind("change", refresh);
+    });
+
+    function refresh() {
+        var chart = $("#chartLine").data("kendoChart");
+        chart.options.series[1].visible(false);
+        chart.refresh();
+
+    }
+
+
+   
+   
+</script>
+
+
+
+
+    <div style=" width: 0;height: 0; border-right: 5px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;margin-top: -5px;margin-bottom: 0px;margin-left:-14px; ">
+        <div style="float: left; width: 970px; margin-top:1px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 36px solid #1fa67a; ">
+
+            <div style="float: left; height:28px; margin-left:-59px; margin-top: 5px;">
+                <i class="fa fa-tasks fa-2x fg-white">  &nbsp;&nbsp; </i>
+
+            </div>
+
+            <div style="text-align: right;float: right;margin-right:30px;margin-top:2px;">
+                @(Html.Kendo().ComboBox()
+                              .Name("LineYearGraph")
+                              .DataTextField("ProposalYear")
+                              .DataValueField("ProposalYear")
+                              .Filter("contains")
+                              .SelectedIndex(0)
+                              .MinLength(1)
+                              .HtmlAttributes(new { @style = "width: 90px;" })
+                              .DataSource(source => source.Read(read => read.Action("LineYear", "Utility")))
+                              .Events(e => e.Change("fn_dprefresher"))
+                )
+            </div>
+            <div style="float: right;margin-right:10px;margin-top:2px;">
+                <i class="fa fa-calendar fa-2x #33333"></i>
+            </div>
+
+        </div>
+
+    </div>
+
+
+   
+
+    <label></label>
+
+
+
+    <label></label>
+
+
+
+    @*@(Html.Kendo().DropDownList()
+                        .Name("separate")
+                        .DataTextField("per_Desc")
+                        .DataValueField("per_ID")
+                        .SelectedIndex(0)
+                        .HtmlAttributes(new { @style = "width: 150px;" })
+                        .Events(e => e.Change("fn_change"))
+                        .DataSource(source => source.Read(read => read.Action("separate", "Utility"))))*@
+<div style="float:left;margin-left:50px;margin-top:0px;visibility:visible" id="dropDown_desu">
+    @(Html.Kendo().DropDownList()
+                        .Name("LineOOEGraph")
+                        .DataTextField("ooe_name")
+                        .DataValueField("ooe_id")
+                        .OptionLabel("Select Object of Expenditures...")
+                        .HtmlAttributes(new { @style = "width: 300px;" })
+                        .Events(e => e.Change("fn_dprefresher2"))
+                        .DataSource(source => source.Read(read => read.Action("ddlOOENonOfficeLevel", "Dropdowns")))
+    )
+
+
+    <div style="float:left;margin-left:310px;margin-top:-29px;width: 500px;">
+
+        @(Html.Kendo().ComboBox()
+                            .Name("accountsss")
+                            .DataTextField("AccountName")
+                            .DataValueField("AccountID")
+                            .Placeholder("Select Account...")
+                            .Filter("contains")
+                            .MinLength(1)
+                            .HtmlAttributes(new { @style = "width: 400px;" })
+                            .Events(e => e.Change("fn_dprefresher3"))
+                           .DataSource(source => source.Read(read => read.Action("getAccountID", "Utility").Data("get_data")))
+        )
+        <div class="k-button" onclick="hideSeriesAll()"> hide</div>
+        <div class="k-button" onclick="showSeriesAll()"> show</div>
+    </div>
+</div>
+
+@*<div style="float:left;margin-left:150px;margin-top:-29px;visibility:hidden" id="dropDown_desu_ni">
+    @(Html.Kendo().DropDownList()
+                        .Name("LineOOEGraphOff")
+                        .DataTextField("ooe_name")
+                        .DataValueField("ooe_id")
+                        .OptionLabel("Select Object of Expenditures...")
+                        .HtmlAttributes(new { @style = "width: 300px;" })
+                        .Events(e => e.Change("fn_dprefresher2"))
+                        .DataSource(source => source.Read(read => read.Action("ddlOOENonOfficeLevel", "Dropdowns")))
+    )
+
+
+    <div style="float:left;margin-left:310px;margin-top:-29px;width: 500px;">
+
+        @(Html.Kendo().ComboBox()
+                            .Name("officess")
+                            .DataTextField("AccountName")
+                            .DataValueField("AccountID")
+                            .Placeholder("Select Office...")
+                            .Filter("contains")
+                            .MinLength(1)
+                            .HtmlAttributes(new { @style = "width: 400px;" })
+                            .Events(e => e.Change("fn_dprefresher3"))
+                           .DataSource(source => source.Read(read => read.Action("getAccountID", "Utility").Data("get_data")))
+        )
+        <div class="k-button" onclick="hideSeriesAll()"> hide</div>
+        <div class="k-button" onclick="showSeriesAll()"> show</div>
+    </div>
+</div>*@
+
+
+
+    <label></label>
+
+
+    <div class="demo-section k-content wide" id="LineChart" style="margin-left:20px;margin-top:30px;">
+
+</div>
+

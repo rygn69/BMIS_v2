@@ -1,0 +1,1532 @@
+﻿<style>
+    .dialog-overlay {
+        background-color: #000000;
+        opacity: 0.4;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        min-height: 100%;
+        min-width: 100%;
+        z-index: 99999;
+    }
+
+
+
+    .btn-delete a {
+        color: #000000;
+        background-color: #ffffff;
+        border-style: solid;
+        border-color: #333333;
+        border-width: 1px;
+        padding: 3px;
+        padding-left: 5px;
+        padding-right: 5px;
+        cursor: pointer;
+        margin: auto;
+    }
+
+        .btn-delete a:hover {
+            color: #ffffff;
+            background-color: #000000;
+            border-style: solid;
+            border-color: #333333;
+        }
+ 
+</style>
+
+<script>
+    var CeilingStatus = 0;
+    var OfficeCieling = 0;
+    var TotalProposed = 0;
+    function getOfficeCeiling() {
+        if ($("#OfficeTotalCieling").attr("class") != 'fa fa-spinner fa-pulse fa-spin fa-fw') {
+            document.getElementById("OfficeTotalCieling").innerHTML = "";
+            $("#OfficeTotalCieling").attr('class', 'fa fa-spinner fa-pulse fa-spin fa-fw');
+            var OfficeID = @Session["selectedOfficeID"];
+            var ProgramID = @Session["ProgID1"];
+            var YearOf = $("#propsYears").val();
+            var url = "@Url.Action("getOfficeTotalCieling", "Maintenance")";
+            $.get(url, {OfficeID:OfficeID, YearOf: YearOf, ProgramID: ProgramID  }, function (d) {
+                document.getElementById("OfficeTotalCieling").innerHTML = '₱ '+ formatCurrency(d);
+                $("#totalceilingamount").val(d)
+                if (CeilingStatus == "0") {
+                    if (OfficeID == 37 || OfficeID == 38 || OfficeID == 41){
+                        OfficeCieling = 999999999;
+                    }
+                    else{
+                        OfficeCieling=0;
+                    }
+                }
+                else {
+                    OfficeCieling = parseFloat(formatCurrency(d).replace(/,/g,''));
+                }
+                GetDifference();
+                $("#OfficeTotalCieling").removeClass('fa fa-spinner fa-pulse fa-spin fa-fw');
+            });
+        }
+    }
+    function getTotalProposed() {
+       // if ($("#OfficeTotalProposed").attr("class") != 'fa fa-spinner fa-pulse fa-spin fa-fw') {
+            document.getElementById("OfficeTotalProposed").innerHTML = "";
+            $("#OfficeTotalProposed").attr('class', 'fa fa-spinner fa-pulse fa-spin fa-fw');
+            var OfficeID = @Session["selectedOfficeID"];
+            var YearOf = $("#propsYears").val();
+            var ProgramID = @Session["ProgID1"];
+            var ProgramDescription='@Session["ProgramDescription"]';
+            var url = "@Url.Action("getTotalProposedPerOffice", "Maintenance")";
+         
+            $.get(url, {OfficeID:OfficeID, YearOf: YearOf,ProgramID:ProgramID,ProgramDescription:ProgramDescription}, function (d) {
+
+                document.getElementById("OfficeTotalProposed").innerHTML = '₱ '+ formatCurrency(d)
+                $("#totalproposalamount").val(d)
+                if (CeilingStatus == "0") {
+                    if (OfficeID == 37 || OfficeID == 38 || OfficeID == 41){
+                        TotalProposed = parseFloat(formatCurrency(d).replace(/,/g,''));
+                    }
+                    else{
+                        TotalProposed = 0;
+                    }
+                }
+                else {
+                    TotalProposed = parseFloat(formatCurrency(d).replace(/,/g,''));
+                }
+
+                //if (OfficeCieling - TotalProposed > 0) {
+                //    $("#OfficeTotalProposed").css('color','green')
+                //}
+                //else {
+                //    $("#OfficeTotalProposed").css('color','indianred')
+                //}
+                GetDifference()
+                $("#OfficeTotalProposed").removeClass('fa fa-spinner fa-pulse fa-spin fa-fw');
+            });
+      //  }
+    }
+    function UpdateTotalProposed() {
+        //if ($("#OfficeTotalProposed").attr("class") != 'fa fa-spinner fa-pulse fa-spin fa-fw') {
+            document.getElementById("OfficeTotalProposed").innerHTML = "";
+            $("#OfficeTotalProposed").attr('class', 'fa fa-spinner fa-pulse fa-spin fa-fw');
+            var OfficeID = @Session["selectedOfficeID"];
+            var YearOf = $("#propsYears").val();
+            var ProgramID = @Session["ProgID1"];
+            var url = "@Url.Action("UpdateTotalProposed", "Maintenance")";
+            var ProgramDescription='@Session["ProgramDescription"]';
+        $.get(url, {OfficeID:OfficeID, YearOf: YearOf,ProgramID:ProgramID,ProgramDescription:ProgramDescription}, function (d) {
+                //document.getElementById("OfficeTotalProposed").innerHTML = '₱ '+ formatCurrency(d)
+            if (d == 1) {
+                if (OfficeID == 37 || OfficeID == 38 || OfficeID == 41){
+                    OfficeCieling = 999999999;
+                    document.getElementById("OfficeTotalCieling").innerHTML = '₱ '+ formatCurrency(OfficeCieling);
+                }
+                getTotalProposed();
+                
+            }
+            else {
+                document.getElementById("OfficeTotalProposed").innerHTML = d;
+                $("#totalproposalamount").val(d)
+            }
+            $("#OfficeTotalProposed").removeClass('fa fa-spinner fa-pulse fa-spin fa-fw');
+            });
+       // }
+    }
+    function GetDifference() {
+        //var diff = (OfficeCieling - TotalProposed);
+        var diff =Number($("#totalceilingamount").val()- $("#totalproposalamount").val());
+        var result = "";
+     
+        $("#totalproposalid").val(diff);
+        if (diff == 0) {
+            result = "0.00";
+        }
+        else {
+            result = formatCurrency(diff)
+        }
+        document.getElementById("CielingAndTotalDifference").innerHTML = '₱ '+ result;
+        if (diff > 0) {
+            $("#CielingAndTotalDifference").css('color','green')
+        }
+        else {
+            $("#CielingAndTotalDifference").css('color','red')
+        }
+    }
+    function newAccount() {
+        $(window).scrollTop(0);
+        var url = "@Url.Action("newAccounts", "BudgetPreparation")";
+        var ooe_id = $("#ddlOOE").val();
+        $.get(url,{ooe_id:ooe_id}, function (d) {
+            $('#newAccounts').html(d);
+        })
+        $('#newAccounts').data('kendoWindow').title("<i class='fa fa-navicon'> </i>").center().open();
+    }
+    function FilterByOOE() {
+        $("#AccountsGrid").data("kendoGrid").dataSource.read();
+        getOfficeCeiling()
+        UpdateTotalProposed();
+        GetDifference();
+    }
+
+    function showDialog(id) {
+        var dialog = $(id).data('dialog');
+        dialog.open();
+    }
+    function GetProgramID() {
+        var ProposalYear = $("#propsYears").val();
+        return{
+            OfficeID: '@Session["selectedOfficeID"]',
+            ProgramID : '@Session["ProgID1"]',
+            ProposalYear : ProposalYear
+        }
+    }
+    function SubmitAllNonOfficeAccunts(id) {
+        swal({
+            title: "System Notice!",
+            text: "This will Submit all unsubmitted non-office accounts this action will also make the Total Proposed Amount of each Account equal to past year's amount if the proposed amount is less than the past year's amount",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, Submit It!",
+            closeOnConfirm: false
+        }, function(){
+            var url = "@Url.Action("SubmitAllNonOffice", "BudgetPreparation")";
+            var dialog = $(id).data('dialog');
+            dialog.open();
+            $.get(url, { ProposalYearParam: $("#propsYears").val()}, function(e){
+                if(e == "1"){
+                    dialog.close();
+                    swal("Success!", "Non-Office Accounts Successfully Submitted!", "success");
+                    $("#AccountsGrid").data("kendoGrid").dataSource.read();
+                }else{
+                    dialog.close();
+                    swal("Error!", e, "error");
+                    $("#AccountsGrid").data("kendoGrid").dataSource.read();
+                }
+            });
+        });
+    }
+
+    function onDataBound(e) {
+        $(".k-hierarchy-cell").hide();
+        $(".k-hierarchy-col").hide();
+        var grid = $("#AccountsGrid").data("kendoGrid")
+        var ds = grid.dataSource.view();
+        var AccountIDParam = 0;
+        var refYear = $("#propsYears").val() -1;
+        var AccountID = 0;
+        var EnableSubmit='@Session["EnableSubmit"]';
+        var ProgramDescription='@Session["ProgramDescription"]';
+        var ooeid=$("#ddlOOE").val();
+        for (var i = 0; i < ds.length; i++)
+        {
+            AccountID = ds[i].AccountID;
+            if (refYear <= 2016) {
+                AccountIDParam = ds[i].AccountCode;
+            }
+            else {
+                AccountIDParam = AccountID
+            }
+            if (ds[i].isProposed != 1 || AccountID == 0) {
+                $('#Remove' + AccountID + '').css("display", "none");
+            }
+            if (ds[i].CheckComp != 0) {
+                $('#Copy' + AccountID + '').css("display", "none");
+            }
+            if (@Session["selectedOfficeID"] == 1 && AccountID == 311) {
+                $('#Copy' + AccountID + '').css("display", "inline-block");
+            }
+            if ( EnableSubmit=="True"){
+                $('#SubmitID' + AccountID + '').css("display", "normal");
+                //$('#vwdtail' + AccountID + '').css("display", "normal");
+            }
+            //else{
+            //    $('#SubmitID' + AccountID + '').css("display", "none");
+            //    $('#vwdtail' + AccountID + '').css("display", "none");
+            //}
+
+            else{
+                if (@Account.UserInfo.eid == 2635  || @Account.UserInfo.eid == 5580 || @Account.UserInfo.eid == 695 || @Account.UserInfo.UserTypeID >= 4){ //lfc access rights
+                    $('#SubmitID' + AccountID + '').css("display", "normal");
+                    //$('#vwdtail' + AccountID + '').css("display", "normal");
+                }
+                else {
+                    $('#SubmitID' + AccountID + '').css("display", "none");
+                    //$('#vwdtail' + AccountID + '').css("display", "none");
+                }
+            }
+        }
+    }
+    function openAccountLink(ProgramID,AccountID,ProposalYear){
+        //(window).scrollTop(0);
+        var url = "@Url.Action("newAccountLink", "BudgetPreparation")";
+        //var ooe_id = $("#ddlOOE").val();
+        $.get(url,{ProgramID:ProgramID,AccountID:AccountID,ProposalYear}, function (d) {
+            $('#newAccountsLink').html(d);
+        })
+        $('#newAccountsLink').data('kendoWindow').title("<i class='fa fa-navicon'> </i> &nbsp Account Linkage").center().open();
+    }
+
+    function transferprogram(ProgramID,AccountID,ProposalYear){
+
+        var url = "@Url.Action("transferprogram", "BudgetPreparation")";
+
+        $.get(url,{ProgramID:ProgramID,AccountID:AccountID}, function (d) {
+            $('#transferprogram').html(d);
+        })
+        $('#transferprogram').data('kendoWindow').title("<i class='fa fa-navicon'> </i> &nbsp Account Transfer").center().open();
+    }
+    function searchAccount() {
+        var $filter = new Array();
+        $filter = [];
+
+        if ($('#SearchData').val().length > 0) {
+            $filter.push({ field: "AccountName", operator: "contains", value: $('#SearchData').val() });
+        }
+
+        $('#AccountsGrid').data('kendoGrid').dataSource.filter({
+            logic: "or",
+            filters: $filter
+        });
+
+    }
+
+    $(function () {
+        $("#SearchData").keypress(function (e) {
+            if (e.keyCode == 13) {
+                searchAccount();
+            }
+        });
+    });
+    //function suppletag(){
+    //    if (document.getElementById("supplementalaipid").checked)
+    //    {
+    //        document.getElementById("supplementalaipid").value="1";
+    //    }
+    //    else{
+    //        document.getElementById("supplementalaipid").value="0";
+    //    }
+    //}
+</script>
+<div data-role="dialog" data-overlay="true" data-close-button="false" data-width="350px" data-height="150px" id="dialog" class="dialog">
+    <div>
+        <h2 style="text-shadow:none;padding-left:20px;padding-top:30px;">Please wait. . . <i class="fa fa-refresh fa-spin fa-3x" style="font-size:30px;"></i> </h2>
+    </div>
+</div>
+<div style="width:60%;display:inline-block">
+    
+        @*@if (@Account.UserInfo.eid == 5580 || @Account.UserInfo.eid == 695 || @Account.UserInfo.eid  == 2635){
+            <div>
+                 <label style="color:red; font-size:12px; margin-bottom: 10px">* Note: If you click the submit button marked with "<span class="fa fa-check"></span>" it will automatically submit into the budget office for consolidation! </label>
+            </div>
+        }*@
+  
+    <div style="margin-top:5px;margin-bottom:5px;">
+        <span class="fa fa-circle" style="color:blue"></span> Copied from PPMP <span class="fa fa-circle" style="color:red"></span> Propose Accounts <span class="fa fa-circle" style="color:yellow"></span> <span>Total Per Office</span>
+    </div>
+</div>
+<div id="CeilingDiv" style="width:38%;display:inline-block">
+    <div style="margin-top:5px;margin-bottom:5px;">
+        <label id="ceilingamountid" onclick="getOfficeCeiling()" style="color:black; font-size:14px; margin-bottom: 0px"> Ceiling Amount (MOOE) : <span id="OfficeTotalCieling" style="color:cornflowerblue;float:right;font-size:18px;margin-right:10px"></span></label>
+    </div>
+    <div style="display:inline-block">
+        <label onclick="UpdateTotalProposed()" style="color:black; font-size:14px; margin-bottom: 5px"> Total Proposed Amount (MOOE) : <span id="OfficeTotalProposed" style="float: right; font-size: 18px;margin-left:22.5px"></span></label>
+        @*<label style="color:black; font-size:14px; margin-bottom: 5px"> Total Proposed Amount (MOOE) : <span id="OfficeTotalProposed" style="float: right; font-size: 18px;margin-left:22.5px"></span></label>*@
+    </div>
+    <div style="margin-top:5px;margin-bottom:10px;display:inline-block">
+        <label style="color:black; font-size:14px; margin-bottom: 0px"> Difference : <span id="CielingAndTotalDifference" style="float: right; font-size: 18px; color: green;margin-left:152px;margin-top:-5px"></span></label>
+    </div>
+    <div style="display:none">
+        <input type="text" id ="AIPTotalAmount" name="AIPTotalAmount" value="0" />
+        <input type="text" id="TotAmountExpClass" name="TotAmountExpClass" value="0" />
+        <input type="number" id="AmountPerAccount" name="AmountPerAccount" value="0" />
+    </div>
+</div>
+<br />
+<div style="border: outset;border-width:1px;border-color:#038603; width: 930px; padding-left:0px;padding-right:0px;padding-top:0px;padding-bottom:7px;margin-top: 25px;">
+    <div style=" width: 0;height: 0; border-right: 5px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;margin-top: -1px; ">
+        <div style="width: 863px; margin-top:1px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 37px solid #1fa67a; ">
+            <div style="float: left; height:28px; margin-left:-59px; margin-top: 5px;">
+                <i class="fa fa-tasks fa-2x fg-white"> &nbsp;&nbsp;</i>
+            </div>
+            @*<div style="float:left;margin-left:10px;margin-top:5px;">
+                <input type="checkbox" id="supplementalaipid" onclick="suppletag()" style="zoom:1.2"  value="0" />
+                <label style="font-size:14px;display:inline-block;color:white">Supplemental</label>
+            </div>*@
+            <div style="float:right">
+                @*Account.UserInfo.eid == 5580 || Account.UserInfo.UserTypeDesc != "Budget In-Charge"*@
+                @if (Account.UserInfo.eid == 695 || Account.UserInfo.eid == 2635 || Account.UserInfo.eid == 5580 || Account.UserInfo.eid == 314122 || Account.UserInfo.eid == 365221)
+                {
+
+                    <div style="float:right;margin-right:6px;margin-top:5px;">
+                        <button class="k-button k-button-icontext" onclick="newAccount()"  style="border-radius:7px"> <i class="fa fa-plus-circle"></i> Propose Account</button>
+                    </div>
+                }
+                @*<div style="float:right;margin-right:7px;margin-top:5px;">
+                    <button class="k-button k-button-icontext" onclick="DownloadAIP()" style="border-radius:7px"> <i class="fa fa-download" aria-hidden="true"></i> Download AIP Breakdown</button>
+                </div>*@
+                <div style="float:right">
+                    @*@if (Account.UserInfo.UserTypeDesc != "Budget In-Charge")
+                    {*@
+                        @*<div style="float:right;margin-right:6px;margin-top:5px;">
+                                <button class="k-button k-button-icontext" onclick="SubmitAllNonOfficeAccunts('#dialog')"> <i class="fa fa-check"></i> Submit All Non-Office Accounts</button>
+                            </div>*@
+
+                   @* }
+                    else
+                    {
+                        <div style="float:right;margin-right:6px;margin-top:5px;">
+                            <button class="k-button k-button-icontext" onclick="UpdatePPMPAmount('#dialog')"> <i class="fa fa-refresh"></i> Update PPMP Amount</button>
+                        </div>
+                    }*@
+                    <script>
+                        function UpdatePPMPAmount(id){
+
+                            var ProposalYearParam = $("#propsYears").val();
+                            var OfficeDataIDParam = @Session["selectedOfficeID"];
+                            var url = "@Url.Action("UpdatePPMPData", "BudgetPreparation")";
+                            swal({
+                                title: "System Notice!",
+                                text: "This will copy all of your PPMP Amount Data on its respective Account. Are you sure you want to Continue?",
+                                type: "warning",
+                                showCancelButton: true,
+                                confirmButtonColor: "#DD6B55",
+                                confirmButtonText: "Yes, Update It!",
+                                closeOnConfirm: false
+                            }, function(){
+                                var dialog = $(id).data('dialog');
+                                dialog.open();
+                                $.get(url, { ProposalYearParam: ProposalYearParam, OfficeDataIDParam: OfficeDataIDParam }, function(e){
+                                    if(e == "success"){
+                                        dialog.close();
+                                        swal("Success!", "PPMP has been successfully copied!", "success");
+                                        getTotalProposed();
+                                        $("#AccountsGrid").data("kendoGrid").dataSource.read();
+                                    }else{
+                                        dialog.close();
+                                        swal("Error!", "PPMP has been failed to copied!", "error");
+                                        $("#AccountsGrid").data("kendoGrid").dataSource.read();
+                                    }
+                                });
+                            });
+                        }
+                    </script>
+                </div>
+                <div style="float:left">
+                    <div style="float:left;margin-right:6px;margin-top:4px;">
+
+                        <label style="float:left; margin-right: 10px;margin-top:5px;font-size:14px" class="fg-white"  id="header-label">Expense Class :</label>
+                        @(Html.Kendo().DropDownList()
+                        .Name("ddlOOE")
+                        .DataTextField("ooe_name")
+                        .DataValueField("ooe_id")
+                        .OptionLabel("Select ...")
+                        .SelectedIndex(0)
+                        .HtmlAttributes(new { @style = "width: 200px;" })
+                        .Events(e => e.Change("FilterByOOE"))
+                        .DataSource(source => source.Read(read => read.Action("filtered_ddlOOE", "Dropdowns").Data("GetProgramID")))
+                        )
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var thisculture = kendo.culture();
+        thisculture.numberFormat.currency.symbol = '₱';
+
+        function SaveChanges(e) {
+            url = "@Url.Action("Insert_AccountDenomination", "Test")";
+            $.post(url, function (d) {
+                if (d == "success") {
+                    swal({
+                        title: "Success!",
+                        text: "Changes has been successfully save.",
+                        type: "success",
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                } else {
+                    swal({
+                        title: "Error!",
+                        text: d,
+                        type: "error",
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                }
+            });
+        }
+
+        function GetGridParameter() {
+
+            var grid = $('#AccountsGrid').data('kendoGrid');
+            var proYe = $("#propsYears").val();
+            var ProgramID =$("#ddlOOE").val();
+            var officeID = @Session["selectedOfficeID"];
+            return {
+                officeID : officeID,
+                propYear1: proYe,
+                ProgramID:ProgramID,
+                suppletag: $("#supplementalaipid").val()
+            }
+            dataBound: gridDataBound
+
+        }
+        function CopyAllAmount() {
+            var grid = $("#AccountsGrid").data("kendoGrid");
+            var dataSource = grid.dataSource;
+            var totalRecords = dataSource.total();
+            var OfficeID = @Session["selectedOfficeID"];
+
+            if (totalRecords > 0) {
+                swal({
+                    title: "Are you sure?",
+                    text: "All Previous Amount Will be Copied And It Will Be Automaticaly Submitted into the Budget Office for consolidation!",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Yes, Copy It!",
+                    closeOnConfirm: false
+                }, function () {
+                    var url = "@Url.Action("CopyAllAmount", "BudgetPreparation")";
+
+                    var selectedProgram = ProgramID
+                    var selectedYear = $("#propsYears").val();
+
+                    $.get(url, { ProgramID: selectedProgram, Year: selectedYear, OfficeID:OfficeID }, function (d) {
+
+                        if (d == "1") {
+                            swal({
+                                title: "Success!",
+                                text: "All Previous Amount Successfully Copied.",
+                                type: "success",
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+
+                            $("#AccountsGrid").data("kendoGrid").dataSource.read();
+                        } else {
+                            swal("Error!", d, "error");
+                        }
+                    });
+                });
+            } else {
+                $.Notify({
+                    caption: 'Cannot Complete Request',
+                    content: 'No data to copy',
+                    type: 'warning'
+                });
+            }
+        }
+        function onSaveChanges(e) {
+
+            if ($("#AccountsGrid").data("kendoGrid").dataSource.hasChanges() == false) {
+                swal({
+                    title: "Notice!",
+                    text: "No Changes Made",
+                    type: "info",
+                    showCancelButton: false,
+                    confirmButtonColor: "#1fa67a",
+                    confirmButtonText: "OK!",
+                    closeOnConfirm: true,
+                }, function () {
+                    $("#AccountsGrid").data("kendoGrid").dataSource.read();
+                });
+            }
+            else {
+                swal({
+                    title: "Success!",
+                    text: "Successfully Save",
+                    type: "success",
+                    showCancelButton: false,
+                    confirmButtonColor: "#1fa67a",
+                    confirmButtonText: "OK!",
+                    closeOnConfirm: true,
+                }, function () {
+                    $("#AccountsGrid").data("kendoGrid").dataSource.read();
+                });
+            }
+        }
+
+        function gridDataBound(e) {
+            var grid = e.sender;
+            if (grid.dataSource.total() == 0) {
+                var colCount = grid.columns.length;
+                $(e.sender.wrapper)
+                    .find('tbody')
+                    .append('<tr class="kendo-data-row"><td colspan="' + colCount + '" class="no-data">Sorry, no data :(</td></tr>');
+            }
+        };
+        var BudgetYear = $("#propsYears").val();
+        var PastYear = BudgetYear - 2;
+        var CurrentYear = BudgetYear - 1;
+        document.getElementById("BudgetYear").innerHTML = BudgetYear;
+        document.getElementById("PastYear").innerHTML = PastYear;
+        document.getElementById("CurrentYear").innerHTML = CurrentYear;
+
+        function EditData(AccountID,AccountDenominationID,DenominationName,DenominationAmount,TotalAmount,QuantityPercentage,DenominationMonth,isPPMP) {
+
+            var DenominationAmount_Var = DenominationAmount.replace("₱","")
+            var TotalAmount_Var = TotalAmount.replace("₱","")
+            var url = "@Url.Action("EditData", "BudgetPreparation")";
+            //$('#EditDetails').html("<div style='text-align:center;height:100%;width:100%;margin:auto;'><span class='fa fa-spinner fa-pulse fa-spin fa-fw fa-2x'></span>Please Wait ...</div>");
+            $('#EditDetails').html("<div class='center'><span class='fa fa-spinner fa-pulse fa-spin fa-fw fa-2x'></span>Please Wait ...</div>");
+
+            $.get(url, { AccountDenominationID: AccountDenominationID, DenominationName: DenominationName, DenominationAmount: DenominationAmount_Var.replace(/,/g,""), AccountID: AccountID, TotalAmount: TotalAmount_Var.replace(/,/g,""), QuantityPercentage: QuantityPercentage,DenominationMonth:DenominationMonth ,isPPMP:isPPMP}, function (d) {
+                document.documentElement.style.overflow = 'hidden';  // firefox, chrome
+                document.body.scroll = "no";
+                $('#EditDetails').html(d);
+            })
+            $('#EditDetails').data('kendoWindow').title("<i class='fa fa-navicon'> </i>").center().open();
+        }
+
+        function DeleteData(AccountID,AccountDenominationID,Amount) {
+            var gridName = "#grid_" + AccountID;
+            swal({
+                title: "Are you sure?",
+                text: "This will Delete your Denomination Account.",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes, delete it!",
+                closeOnConfirm: false,
+                showLoaderOnConfirm:true
+            }, function () {
+                var url = "@Url.Action("DeleteAccountDenomination", "BudgetPreparation")";
+                $.get(url, { AccountDenominationID: AccountDenominationID,OfficeID:@Session["selectedOfficeID"],Amount:Amount }, function (d) {
+                    if (d == "success") {
+                        getTotalProposed();
+                        //$(grid).data("kendoGrid").dataSource.read();
+                        var grid = $(gridName).data("kendoGrid")
+                        var ds = grid.dataSource.view();
+                        for (var i = 0; i < ds.length; i++) {
+                            var row = grid.table.find("tr[data-uid='" + ds[i].uid + "']");
+                            var checkbox = $(row).find(".checkbox");
+                            if (AccountDenominationID == ds[i].AccountDenominationID) {
+                                $(gridName).data("kendoGrid").dataSource.remove($(gridName).data("kendoGrid").dataSource.data()[i]);
+                                break;
+                            }
+                        }
+                        swal({
+                            title: "Success!",
+                            text: "Account Denomination Deleted.",
+                            type: "success",
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    }
+                })
+            });
+        }
+
+        function onGridEdit(arg) {
+            var gridName = $('#AccountsGrid').data('kendoGrid');
+            var dataRows = gridName.items();
+            var rowIndex = dataRows.index(gridName.select());
+            var ds = gridName.dataSource.view();
+            var checker = ds[rowIndex].checker;
+            var OOEID = ds[rowIndex].OOEID;
+
+            if (checker != '0' || checker == '0') {
+                this.closeCell();
+            }
+        }
+
+
+        function CopyPreviousAmount(AccountCode,AccountID,ProgramID) {
+
+            var url = "@Url.Action("CheckComputationDetails", "BudgetPreparation")";
+            var AccountCode = AccountCode;
+            var ProgramID=ProgramID;
+            var AccountID=AccountID;
+            var refYear = $("#propsYears").val() -1;
+            var ProposalYear = $("#propsYears").val();
+            var ppmpaccount =  "@Url.Action("getPPMPAccount", "BudgetPreparation")";
+            var OfficeID = @Session["selectedOfficeID"];
+            var YearOf = $("#propsYears").val();
+            var ooeid=$("#ddlOOE").val();
+
+            var urlExAmount = "@Url.Action("getTotalExpAmount", "BudgetPreparation")";
+            $.post(urlExAmount ,{OfficeID:OfficeID,YearOf:YearOf,ooeid:ooeid, ProgramDescription:'@Session["ProgramDescription"]'}, function (xXx) {
+                $("#AIPTotalAmount").val(xXx);
+                totPAmount= $("#AccountsGrid .k-footer-template").text().split("₱");
+                totPAmount= totPAmount[1].replace(",", "").replace(",","").replace(",","");
+                $("#TotAmountExpClass").val(totPAmount);
+
+            })
+
+            $.get(ppmpaccount ,{OfficeID:OfficeID,ProgramID:ProgramID,AccountID:AccountID,YearOf:ProposalYear}, function (yyy) {
+                $("#ppmpaccountid").val(yyy);
+                if ($("#ppmpaccountid").val() != 0 )
+                {
+                    swal({
+                        title: "Warning!",
+                        text: "Please be reminded that you're not allowed to copy appropriation to all account(s) with PPMP !",
+                        timer: 5000,
+                        type: "warning",
+                        showConfirmButton: true
+                    })
+                }
+                else
+                {
+                    $.post(url, {AccountID:AccountCode,refYear:refYear} , function (d) {
+                        if (d == AccountCode) {
+                            swal({ title: "Notice!", text: "This Account Has A Computation! You can't Copy the past year Amount", timer: 1000, showConfirmButton: false, type: "info" });
+                        }
+                        else {
+                            swal({
+                                title: "Are you sure?",
+                                text: "Previous amount of this account will be copied for the propose budget. Do you want to proceed?",
+                                type: "warning",
+                                showCancelButton: true,
+                                confirmButtonColor: "#DD6B55",
+                                confirmButtonText: "Yes",
+                                closeOnConfirm: false,
+                                showLoaderOnConfirm:true
+                            }, function () {
+                                var url = "@Url.Action("CopyPreviousAmount", "BudgetPreparation")";
+                                var gridName = $('#AccountsGrid').data('kendoGrid');
+                                var dataRows = gridName.items();
+                                var rowIndex = dataRows.index(gridName.select());
+                                var ds = gridName.dataSource.view();
+                                var PreviousAmount = ds[rowIndex].CurrentProposalAmount;
+                                var AccountID = ds[rowIndex].AccountID;
+                                var ProgramID = ds[rowIndex].ProgramID;
+                                var ProposalYear = ds[rowIndex].ProposalYear;
+                                var AccountName = ds[rowIndex].AccountName;
+                                var OfficeID = @Session["selectedOfficeID"];
+
+                                var TotAmountExpClass=$("#TotAmountExpClass").val();
+                                var AIPTotalAmount=$("#AIPTotalAmount").val();
+                                var t1=Number(AIPTotalAmount) - (Number(TotAmountExpClass) + Number(PreviousAmount))
+                                if (Number(t1) < 0 && $("#fundid").val() != 201){
+                                    swal({
+                                        title: "Error ! ! !",
+                                        text: "You can't copy the previous amount! \nThe proposed budget must not be greater than the approved AIP.",
+                                        type: "error",
+                                        showCancelButton: false,
+                                        confirmButtonColor: "#1fa67a",
+                                        timer: 4200,
+                                        showConfirmButton:true,
+                                        confirmButtonText: "OK",
+                                        closeOnConfirm: true
+                                    });
+                                }
+                                else{
+                                    $.get(url, { PreviousAmount: PreviousAmount, AccountID: AccountID, ProgramID: ProgramID, ProposalYear: ProposalYear,OfficeID:OfficeID, AccountName: AccountName }, function (d) {
+
+                                        if (d == "success") {
+                                            getTotalProposed();
+                                            SubmitDenomination(AccountID,ProgramID);
+                                            swal({
+                                                title: "Success!",
+                                                text: "Previous Amount Successfully Copied.",
+                                                type: "success",
+                                                timer: 2000,
+                                                showConfirmButton: false
+                                            });
+                                            //$("#AccountsGrid").data("kendoGrid").dataSource.read();
+                                        } else {
+                                            swal("Error!", "Something went wrong!", "error");
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    })
+                }
+            })
+        }
+
+        function NewAccountsDenomination(AccountID, ProgramID, ProposalYear) {
+
+            var totPAmount=0;
+            var ProgramID = ProgramID;
+            var AccountID = AccountID;
+            var ProposalYear = ProposalYear;
+            var ppmpaccount =  "@Url.Action("getPPMPAccount", "BudgetPreparation")";
+            var OfficeID = @Session["selectedOfficeID"];
+
+            $.get(ppmpaccount ,{OfficeID:OfficeID,ProgramID:ProgramID,AccountID:AccountID,YearOf:ProposalYear}, function (yyy) {
+                //temporary hide-to allow add particular with ppmp breakdown - 8/26/2020
+                //$("#ppmpaccountid").val(yyy);
+                $("#ppmpaccountid").val(0);
+                //temporary hide-to allow add particular with ppmp breakdown - 8/26/2020
+
+                if ($("#ppmpaccountid").val() != 0 )
+                {
+                    swal({
+                        title: "Warning!",
+                        text: "Please be reminded that you're not allowed to add particular to all account(s) with PPMP !",
+                        timer: 5000,
+                        type: "warning",
+                        showConfirmButton: true
+                    })
+                }
+                else if (OfficeCieling - TotalProposed <= 0) {
+                    swal({
+                        title: "Sorry Cannot Complete Request!",
+                        text: "The total proposed amount exceeded the Ceiling amount.",
+                        type: "error",
+                        showConfirmButton: true
+                    });
+                }
+                else {
+                    $(window).scrollTop(0);
+                    //var ProgramID = ProgramID;
+                    //var AccountID = AccountID;
+                    //var ProposalYear = ProposalYear;
+                    //var OfficeID = @Session["selectedOfficeID"];
+                    var url = "@Url.Action("NewAccountDenomination", "BudgetPreparation")";
+                    $('#CreateNewDenominationAccount').html("<div class='center'><span class='fa fa-spinner fa-pulse fa-spin fa-fw fa-2x'></span>Please Wait ...</div>");
+                    $.get(url, { ProgramID: ProgramID, AccountID: AccountID, ProposalYear: ProposalYear, OfficeID: OfficeID }, function (d) {
+                        document.documentElement.style.overflow = 'hidden';  // firefox, chrome
+                        document.body.scroll = "no";
+                        $('#CreateNewDenominationAccount').html(d);
+                    });
+                    $('#CreateNewDenominationAccount').data('kendoWindow').title("<i class='fa fa-navicon'> </i>").center().open();
+                }
+            })
+        }
+        function SubmitDenomination(AccountID, ProgramID) {
+
+            var OfficeID = @Session["selectedOfficeID"];
+            var ProposalYear = $("#propsYears").val();
+            @*var totPAmount=0;
+            var ppmpaccount =  "@Url.Action("getPPMPAccount", "BudgetPreparation")";
+
+            $.get(ppmpaccount ,{OfficeID:OfficeID,ProgramID:ProgramID,AccountID:AccountID,YearOf:ProposalYear}, function (yyy) {
+                $("#ppmpaccountid").val(yyy);
+            })
+
+            if ($("#ppmpaccountid").val() != 0 )
+            {*@
+
+                if ($("#btnUpdateAmountIcon").attr('class') == 'fa fa-cloud-upload') {
+                    $("#btnUpdateAmountIcon").removeClass('fa fa-cloud-upload').addClass('fa fa-spinner fa-pulse fa-spin fa-fw');
+                    var url = "@Url.Action("UpdateTotalAmount", "BudgetPreparation")";
+                    $.get(url, { AccountID: AccountID, ProgramID: ProgramID, OfficeID: OfficeID, ProposalYear: ProposalYear }, function (d) {
+                        var grid = $("#AccountsGrid").data("kendoGrid")
+                        var ds = grid.dataSource.view();
+                        for (var i = 0; i < ds.length; i++) {
+                            var row = grid.table.find("tr[data-uid='" + ds[i].uid + "']");
+                            var checkbox = $(row).find(".checkbox");
+                            if (AccountID == ds[i].AccountID) {
+                                var SelectedAccount = $('#AccountsGrid').data().kendoGrid.dataSource.data()[i];
+                                SelectedAccount.set('setProposalAllotedAmount',d);
+                                $("#btnUpdateAmountIcon").removeClass('fa fa-cloud-upload').addClass('fa fa-spinner fa-pulse fa-spin fa-fw');
+                                break;
+                            }
+                        }
+                    });
+                }
+
+           // }
+
+            //else
+            //{
+            //    swal({
+            //        title: "Warning!",
+            //        text: "Please be reminded that the account(s) with PPMP are not available to add proposal!",
+            //        timer: 2000,
+            //        type: "warning",
+            //        showConfirmButton: false
+            //    })
+            //}
+        }
+        function viewComputation(AccountCode,NewAccountID,ProgramID,setProposalAllotedAmount) {
+
+            var OfficeID = @Session["selectedOfficeID"];
+            var YearOf = $("#propsYears").val();
+            var ooeid=$("#ddlOOE").val();
+            var totPAmount=0;
+            var isPPMP=0;
+            var urlExAmount = "@Url.Action("getTotalExpAmount", "BudgetPreparation")";
+            $("#AmountPerAccount").val(setProposalAllotedAmount)
+            $.post(urlExAmount ,{OfficeID:OfficeID,YearOf:YearOf,ooeid:ooeid, ProgramDescription:'@Session["ProgramDescription"]',ProgramID:ProgramID,AccountID:NewAccountID}, function (xXx) {
+
+                $("#AIPTotalAmount").val(xXx);
+                totPAmount= $("#AccountsGrid .k-footer-template").text().split("₱");
+                totPAmount= totPAmount[1].replace(",", "").replace(",","").replace(",","");
+                $("#TotAmountExpClass").val(totPAmount);
+
+            })
+
+            if (NewAccountID == "0" && $("#supplementalaipid").val() == 0) {
+                var url2 = "@Url.Action("viewForFundingDetails", "BudgetPreparation")";
+                $.post(url2 ,{AccountID:NewAccountID}, function (d) {
+                    $(window).scrollTop(0);
+                    $('#ForFundingDetail').html(d);
+                    $('#ForFundingDetail').data('kendoWindow').title("<i class='fa fa-navicon'> </i> For Funding Details").center().open();
+                })
+            }
+            else {
+                var url = "@Url.Action("CheckComputationDetails", "BudgetPreparation")";
+                var AccountIDParam = 0;
+                var OfficeID = @Session["selectedOfficeID"];
+                var refYear = $("#propsYears").val() -1;
+                var ProposalYear = $("#propsYears").val();
+                if (refYear <= 2016) {
+                    AccountIDParam = AccountCode;
+                }
+                else {
+                    AccountIDParam = NewAccountID;
+                }
+
+                var AccountsGrid = $('#AccountsGrid').data('kendoGrid');
+                var ds = AccountsGrid.dataSource.view();
+                var allMasterRows = AccountsGrid.tbody.find('>tr.k-master-row');
+
+                //Loop through each row, if a row has a detail row following it then collapse that master row
+                for (var i = 0; i < allMasterRows.length; i++)
+                {
+                    if (allMasterRows.eq(i).next('tr.k-detail-row').length > 0 && NewAccountID != ds[i].NewAccountID)
+                    {
+                        AccountsGrid.collapseRow(allMasterRows.eq(i));
+                    }
+                }
+
+                $('#ComputationDetails').html('<div style="width: 100%;height:100%;"><img src="@Url.Content("~/Content/images/loading.gif")" alt="Loading..." style="position: absolute;top: 20%;left: 30%;margin-top: 0px;margin-left: 0px;" /></div>');
+                $.post(url, {AccountID:AccountIDParam,refYear:refYear} , function (d) {
+                    if (d == NewAccountID  && $("#supplementalaipid").val() == 0) {
+                        console.log(NewAccountID)
+                        if (@Session["selectedOfficeID"] == 1 && NewAccountID == 311) {
+                            var $this = $("a." + NewAccountID + "").parent();
+                            var $Button = $this.parent();
+                            var $td = $Button.parent();
+                            var $tr = $td.parent();
+                            var $link = $td.find(".k-hierarchy-cell .k-icon");
+
+                            $link.click();  // just fire the click event of the kendo detail row icon
+                            $tr.find(".k-hierarchy-cell").hide();  //fix detail row spacing due to missing icon
+                            //swal({ title: "Notice!", text: "No Computation Available in this Account!", timer: 1000, showConfirmButton: false, type: "info" });
+                        }
+                        else {
+                            console.log("sdf")
+                            $(window).scrollTop(0);
+                            var url2 = "@Url.Action("viewComputationDetails", "BudgetPreparation")";
+                            $.get(url2, {AccountID:AccountIDParam, OfficeID:OfficeID, refYear:refYear,ProposalYear: ProposalYear} ,function (pvData) {
+                                $('#ComputationDetails').html(pvData);
+                            })
+                            $('#ComputationDetails').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Computation Details").center().open();
+                        }
+                    }
+                    else {
+
+                        var $this = $("a." + NewAccountID + "").parent();
+                        var $Button = $this.parent();
+                        var $td = $Button.parent();
+                        var $tr = $td.parent();
+                        var $link = $td.find(".k-hierarchy-cell .k-icon");
+                        $link.click();  // just fire the click event of the kendo detail row icon
+                        $tr.find(".k-hierarchy-cell").hide();  //fix detail row spacing due to missing icon
+                        //swal({ title: "Notice!", text: "No Computation Available in this Account!", timer: 1000, showConfirmButton: false, type: "info" });
+                    }
+                })
+            }
+        }
+
+        function RemoveProposal(AccountID, isProposed,ProgramID,ProposalYear){
+            if(isProposed == 0){
+                swal({
+                    title: "Error!",
+                    text: "Only Proposed Account can be Deleted!",
+                    timer: 2000,
+                    type: "warning",
+                    showConfirmButton: false
+                })
+            }
+            else{
+                var url = "@Url.Action("RemoveProposal", "BudgetPreparation")";
+                swal({
+                    title: "System Notice!",
+                    text: "This will remove your Proposed Account. This Action can't be undone. Are you sure you want to Proceed?",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Yes, Remove it!",
+                    cancelButtonText: "Cancel",
+                    closeOnConfirm: false
+                }, function(){
+                    $.get(url, { AccountID: AccountID,ProgramID: ProgramID,ProposalYear:ProposalYear }, function(e){
+                        if (e == "success") {
+                            swal({
+                                title: "Success!",
+                                text: "Proposed Account has been Removed.",
+                                timer: 2000,
+                                type: "success",
+                                showConfirmButton: false
+                            })
+                            $("#AccountsGrid").data("kendoGrid").dataSource.read();
+                        }else{
+                            swal({
+                                title: "Error!",
+                                text: "System Error! Please try again.",
+                                timer: 2000,
+                                type: "error",
+                                showConfirmButton: false
+                            })
+                        }
+                    });
+
+                });
+            }
+        }
+        function SubmitProposal(AccountID,setProposalAllotedAmount,NewProgramID) {
+            var totalproposalid= $("#totalproposalid").val();
+            var ooeid=$("#ddlOOE").val();
+            var regularaipid=$("#regularaipid").val()
+            
+            //if (parseFloat(Number(OfficeCieling) - Number(TotalProposed)).toFixed(2) >= 0 && totalproposalid > 0) {
+                if ((@Session["selectedOfficeID"] != 43 || "@Account.UserInfo.UserTypeDesc" == "Budget In-Charge") && $("#ddlOOE").val() > 4) {
+                    swal({
+                        title: "Cannot Complete Request!",
+                        text: "You Can Prepare Non-Office Accounts But Only the Budget Office Staff Can Submit those Accounts.",
+                        type: "info",
+                        timer: 2000,
+                        showConfirmButton: true
+                    });
+                }
+                //else if (parseFloat(Number(OfficeCieling) - Number(TotalProposed)).toFixed(2) < 0 && Number(totalproposalid) < 0 && ooeid == 2)
+                //{
+                //    swal({
+                //        title: "Cannot Complete Request!",
+                //        text: "The total proposed MOOE amount surpassed the maximum limit.",
+                //        type: "warning",
+                //        showConfirmButton: false,
+                //        timer:3000
+                //    });
+                //}
+                    //temporary hide -to submit proposed budget with zero amount for LBP 2 compared SAAO - 8/16/2019
+                    //else if (setProposalAllotedAmount == 0){
+                    //    swal({
+                    //        title: "Warning!",
+                    //        text: "Sorry! You can't submit account without proposed budget. Please check you entry.",
+                    //        type: "warning",
+                    //        timer: 5000,
+                    //        showConfirmButton: true
+                    //    });
+                    //}
+                    //temporary hide -to submit proposed budget with zero amount for LBP 2 compared SAAO - 8/16/2019
+                else {
+                    var officeID = @Account.UserInfo.Department.ToString();
+                    var propyear = $("#propsYears").val();
+                    var url1="@Url.Action("Checkpsaccount", "BudgetPreparation")";
+                    $.get(url1, { officeID: officeID, propyear: propyear }, function (d) {
+                        if (d == "success") {
+                            if (AccountID == 0) {
+                                var url = "@Url.Action("SubmitProposalForHR", "BudgetPreparation")";
+                                var gridName = $('#AccountsGrid').data('kendoGrid');
+                                var dataRows = gridName.items();
+                                var rowIndex = dataRows.index(gridName.select());
+                                var ds = gridName.dataSource.view();
+                                var ProposalYear = ds[rowIndex].ProposalYear;
+                                var OfficeID = @Session["selectedOfficeID"];
+                                swal({
+                                    title: "Are you sure?",
+                                    text: "This action will submit the proposed position for funding to the Human Resource Office for consolidation! Do you want to proceed?",
+                                    type: "warning",
+                                    showCancelButton: true,
+                                    confirmButtonColor: "#DD6B55",
+                                    confirmButtonText: "Yes, Submit It!",
+                                    closeOnConfirm: false,
+                                    showLoaderOnConfirm: true
+                                }, function () {
+                                    $.get(url, { ProposalYear: ProposalYear, OfficeID:OfficeID }, function (d) {
+                                        if (d == "success") {
+                                            swal({
+                                                title: "Success!",
+                                                text: "Amount Successfully Submitted.",
+                                                type: "success",
+                                                timer: 2000,
+                                                showConfirmButton: true
+                                            });
+                                            $("#AccountsGrid").data("kendoGrid").dataSource.read();
+                                        } else {
+                                            swal("Error!", "Something went wrong!", "error");
+                                        }
+                                    });
+                                });
+                            }
+                            else {
+                                var url = "@Url.Action("SubmitProposal", "BudgetPreparation")";
+                                var gridName = $('#AccountsGrid').data('kendoGrid');
+                                var dataRows = gridName.items();
+                                var rowIndex = dataRows.index(gridName.select());
+                                var ds = gridName.dataSource.view();
+                                //var Amount = ds[rowIndex].setProposalAllotedAmount;
+                                var Amount = setProposalAllotedAmount;
+                                var ProgramID = NewProgramID;//ds[rowIndex].NewProgramID;
+                                var ProposalYear = ds[rowIndex].ProposalYear;
+                                var OfficeID = @Session["selectedOfficeID"];
+                                swal({
+                                    title: "Are you sure?",
+                                    text: "This action will submit the proposed budget to the budget office for consolidation! Do you want to proceed?",
+                                    type: "warning",
+                                    showCancelButton: true,
+                                    confirmButtonColor: "#DD6B55",
+                                    confirmButtonText: "Yes",
+                                    closeOnConfirm: false,
+                                    showLoaderOnConfirm: true
+                                }, function () {
+                                    $.get(url, { Amount: Amount, AccountID: AccountID, ProgramID: ProgramID, ProposalYear: ProposalYear, OfficeID:OfficeID, regularaipid:regularaipid }, function (d) {
+
+                                        if (d == "success") {
+                                            swal({
+                                                title: "Success!",
+                                                text: "Proposed budget successfully submitted.",
+                                                type: "success",
+                                                timer: 5000,
+                                                showConfirmButton: true
+                                            });
+                                            $("#AccountsGrid").data("kendoGrid").dataSource.read();
+                                        } else {
+                                            swal("Warning!",d, "warning");
+                                        }
+                                    });
+                                });
+                            }
+                        }
+                        else{
+                            swal("","Proposed budget for PS must have at least thirteen(13) accounts!","error")
+                        }
+                    })
+                }
+
+            //else {
+            //    swal({
+            //        title: "Cannot Complete Request!",
+            //        text: "The total proposed amount for MOOE exceeded the ceiling amount.",
+            //        type: "error",
+            //        showConfirmButton: false,
+            //        timer:3000
+            //    });
+            //}
+        }
+        function sendAdditionalData(e) {
+            //var parentGrid = $("#AccountsGrid").data("kendoGrid"); // Parent grid
+            //var selectedRow = parentGrid.select(); // Get selected row
+
+            var parentGrid = $("#AccountsGrid").data("kendoGrid"); // Replace with actual grid ID
+            var selectedRow = parentGrid.select(); // Get selected row
+            var rowData = parentGrid.dataItem(selectedRow); // Get dataItem from the selected row
+
+            console.log(rowData.NewProgramID)
+            console.log(rowData.NewAccountID)
+
+            return {
+                ProgramID: rowData.NewProgramID , // From parent grid
+                AccountID: rowData.NewAccountID , // From child grid
+                ProposalYear: rowData.ProposalYear , // From child grid.ProposalYear,
+                OfficeID: '@Session["selectedOfficeID"]',
+                suppletag: $("#supplementalaipid").val()
+            };
+        }
+        //.Read(read => read.Action("Proposal_AccountDenomination", "BudgetPreparation", new { ProgramID = "#=NewProgramID#", AccountID = "#=NewAccountID#", ProposalYear = "#=ProposalYear#", OfficeID = Session["selectedOfficeID"], suppletag = $("#supplementalaipid").GetValue }))
+    </script>
+    <div id="searchAccountid" style="height: 30px; margin-top: -68px; float: right; margin-left: 200px;">
+        <input type="text" style="width:400px;border-collapse:collapse;margin:0px;border-style:solid;border-color:gray;border-right:none;margin-left:0px;height:70%;outline:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search account..." id="SearchData" name="SearchData">
+        <div class="k-button k-button-icontext" style="height:31px;width:40px;border-color:gray;border-left:none;" onclick="searchAccount()"><span class="mif-search"></span></div>
+    </div>
+    <div style="display:inline-block;width:auto">
+        @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.AccountsModel>()
+    .Name("AccountsGrid")
+    .Columns(col =>
+    {
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;">Account</div></text>)
+                        .HtmlAttributes(new { style = "text-align:left" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("# if(isProposed == 1) { #" +
+                                       " <span class='fa fa-circle' style='color:red;' id='circle-id'></span> #=AccountName# " +
+                                       "# } else{ #" +
+                                       "#=AccountName# " +
+                                       "# } #").Width(520);
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;">Account <br> Code</div></text>)
+                        .Width(50)
+                        .HtmlAttributes(new { style = "text-align:center" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div>#=AccountCode# </div>")
+                        .Hidden();
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;">Past Year<br><span id="PastYear"></span><br>(Actual)</div></text>)
+                        .Width(75)
+                        .HtmlAttributes(new { style = "text-align:left" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div>#=kendo.toString(PastProposalAmmount, 'c2')# </div>");
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;">Current Year<br><span id="CurrentYear"></span><br>(Estimates)</div></text>)
+                        .Width(75)
+                        .HtmlAttributes(new { style = "text-align:left" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div>#=kendo.toString(CurrentProposalAmount, 'c2')# </div>");
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;">Year</div></text>)
+                        .Width(150)
+                        .HtmlAttributes(new { style = "text-align:left" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div>#=ProposalYear# </div>").Hidden();
+        col.Bound(m => m.setProposalAllotedAmount).HtmlAttributes(new { style = "text-align:left;" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;">Budget Year<br><span id="BudgetYear"></span><br>(Proposal)</div></text>)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" }).Width(75)
+                        .ClientTemplate("<div>#=kendo.toString(setProposalAllotedAmount, 'c2')# " +
+                        " </div>")
+                        .ClientFooterTemplate("<div style='text-align:center;color:darkgreen'><label>#=kendo.toString(sum, 'c2')# </label></div>");
+        col.Bound(m => m.checker).Title("Checker").Hidden();//.ClientFooterTemplate("<div style='text-align:center;color:darkgreen'><label>#=kendo.toString(sum,'c2')# </label></div>");
+        col.Bound(m => m.AccountID).Title("Account ID").Hidden();
+        col.Bound(m => m.ProgramID).Title("Program ID").Hidden();
+        col.Bound(m => m.NewProgramID).Title("New Program ID").Hidden();
+        col.Bound(m => m.NewAccountID).Title("New Account ID").Hidden();
+        col.Bound(m => m.PastProposalAmmount).Title("Past Proposal Amount").Hidden();
+        col.Bound(m => m.OOEName).Title("OOE Name").Hidden();
+        col.Bound(m => m.OOEID).Title("OOE ID").Hidden();
+        col.Bound(m => m.ProgramDescription).Title("Program Description").Hidden();
+        col.Bound(m => m.isProposed).Title("IsProposed").Hidden();
+        col.Template(t => { }).ClientTemplate(
+                            "<div class='btn-delete'style='inline-block; height: 15px;width:150px;'> " +
+                            "<a id='vwdtail#=AccountID#'  class='#=NewAccountID#'  title='View Detail' onclick='viewComputation(#=AccountCode#,#=NewAccountID#,#=ProgramID#,#=setProposalAllotedAmount#)' style='margin-left:2px;'><span class='fa fa-search-plus' style='font-size: 12pt;'></span></a>" +
+                            "<a id='SubmitID#=AccountID#' title='Submit' onclick='SubmitProposal(#=NewAccountID#,\"#=setProposalAllotedAmount#\",#=NewProgramID#)' style='margin-left:2px;display:none;'><span class='fa fa-check' style='font-size: 12pt;'></span></a>" +
+                            //"<a  id='Copy#=AccountID#' title='Copy Previous Amount' onclick='CopyPreviousAmount(#=AccountCode#,#=AccountID#,#=ProgramID#)' style='margin-left:2px;'><span class='fa fa-copy' style='font-size: 12pt;'></span></a>" +
+                            //"<a  title='Link Project/Account' onclick='openAccountLink(#=ProgramID#,#=AccountID#,#=ProposalYear#)' style='margin-left:2px;'><span class='fa fa-link' style='font-size: 12pt;'></span></a>" +
+                            //"<a  title='Transfer program' onclick='transferprogram(#=NewProgramID#,#=NewAccountID#,#=ProposalYear#)' style='margin-left:2px;'><span class='fa fa-exchange' style='font-size: 12pt;'></span></a>" +
+                            //"<a  id='Remove#=AccountID#' title='Remove' onclick='RemoveProposal(#=AccountID#, #=isProposed#,#=ProgramID#,#=ProposalYear#)' style='margin-left:2px;'><span class='fa fa-remove' style='font-size: 12pt;'></span></a>
+                            "</div>"
+                            ).HtmlAttributes(new { style = "margin-left:5px;" }).Width(120);
+    })
+                .ClientDetailTemplateId("template")
+                .Pageable(page => page.Refresh(true)
+                    .Enabled(true)
+                    .ButtonCount(4)
+                    .PreviousNext(true)
+                )
+                .Events(e => e.SaveChanges("onSaveChanges").Edit("onGridEdit").DataBound("onDataBound"))
+                .Selectable()
+                .AutoBind(false)
+                .DataSource(d => d
+                    .Ajax()
+                    .Batch(true)
+                    .ServerOperation(false)
+                    .Aggregates(a =>
+                    {
+                        a.Add(c => c.setProposalAllotedAmount).Sum();
+                    })
+                    .PageSize(10)
+                    .Model(m => m.Id(i => i.AccountID))
+                    .Read(read => read.Action("grOfficeAccounts", "BudgetPreparation").Data("GetGridParameter"))
+                ))
+    </div>
+</div>
+<script id="template" type="text/kendo-tmpl">
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.AccountDenomination>()
+            .Name("grid_#=AccountID#") // template expression, to be evaluated in the master context
+            .Columns(columns =>
+            {
+         columns.Template(@<text></text>)
+                        .HeaderTemplate(@<text>
+        <div style="font-weight:600;">Specific <br />Activity</div></text>)
+                        .HtmlAttributes(new { style = "text-align:left" })
+                        .HeaderHtmlAttributes(new { style = "text-align:left" })
+                        .ClientTemplate("<div>\\#=specificactivity\\# </div>").Width(160);
+
+        columns.Template(@<text></text>)
+                        .HeaderTemplate(@<text>
+        <div style="font-weight:600;">Particular Name</div></text>)
+                        .HeaderHtmlAttributes(new { style = "text-align:left" })
+                        .HtmlAttributes(new { style = "text-align:left" })
+                        .Width(200)
+                        .ClientTemplate(
+                         "\\# if( isPPMP == 1) { \\# " +
+                        "<div> <span class='fa fa-circle' style='color:blue'></span> \\#=DenominationName\\# </div>" +
+                        "\\# } else if(isPPMP == 0){ \\#" +
+                        "<div>\\#=DenominationName\\# </div>" +
+                        "\\# } else if(isPPMP == 2){ \\#" +
+                        "<div> <span class='fa fa-circle' style='color:yellow'></span> \\#=DenominationName\\# </div>" +
+                        "\\# } \\#");
+                columns.Bound(e => e.AccountDenominationID).Hidden();
+                columns.Template(@<text></text>)
+                    .HeaderTemplate(@<text>
+        <div style="font-weight:600;">Qty/%</div></text>)
+                        .HtmlAttributes(new { style = "text-align:center" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div>\\#=kendo.toString(QuantityPercentage)\\# </div>").Width(40);
+                columns.Template(@<text></text>)
+                        .HeaderTemplate(@<text>
+        <div style="font-weight:600;">Months</div></text>)
+                        .HtmlAttributes(new { style = "text-align:center" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div>\\#=kendo.toString(DenominationMonth)\\# </div>").Width(40);
+                columns.Template(@<text></text>)
+                        .HeaderTemplate(@<text>
+        <div style="font-weight:600;">Rate/Amount</div></text>)
+                        .Width(80)
+                        .HtmlAttributes(new { style = "text-align:left" })
+                        .HeaderHtmlAttributes(new { style = "text-align:left" })
+                        .ClientTemplate("<div style='float:right'>\\#=kendo.toString(DenominationAmount, 'c2')\\# </div>");
+                columns.Template(@<text></text>)
+                        .HeaderTemplate(@<text>
+        <div style="font-weight:600;">Total Amount</div></text>)
+                                .Width(80)
+                                .HtmlAttributes(new { style = "text-align:left" })
+                                .HeaderHtmlAttributes(new { style = "text-align:left" })
+                                .ClientTemplate("<div style ='float:right'>\\#=kendo.toString(TotalDenominationAmount, 'c2')\\# </div>");
+    
+                columns.Template(@<text></text>)
+                        .ClientTemplate(
+                         "\\# if( isPPMP == 9) { \\# " +
+                        "<div class='k-button k-state-disabled' title='Edit Details (?)' '> <span class='fa fa-edit' style='font-size: 12pt;'></span> Edit </div>" +
+                        "\\# } else if(isPPMP == 0 || isPPMP == 1){ \\#" +
+                        "<div style=\"font-size: 8.5pt;\" class=\"k-button\" title=\"Edit Details (?)\" onclick=\"EditData( #=AccountID#,\\#=AccountDenominationID\\#,'\\#=DenominationName\\#','\\#=DenominationAmount\\#','\\#=TotalDenominationAmount\\#','\\#=QuantityPercentage\\#','\\#=DenominationMonth\\#','\\#=isPPMP\\#')\"> <span class='fa fa-edit'></span> Edit </div>" +
+                        "\\# } else if(isPPMP == 2){ \\#" +
+                        "<div class='k-button k-state-disabled' title='Edit Details (?)' '> <span class='fa fa-edit' style='font-size: 12pt;'></span> Edit </div>" +
+                        "\\# } \\#").Width(30);
+     
+            })
+            .ToolBar(t => t.Template(@<text>
+                <div style="float: right; height:28px;margin-top:2px;">
+
+                    <link href="~/Content/metroui/css/docs.css" rel="stylesheet" />
+
+                    <div class="k-button k-state-enabled" onclick="SubmitDenomination('#=NewAccountID#','#=NewProgramID#')"><span id="btnUpdateAmountIcon" class="fa fa-cloud-upload"></span> <b>Save Particulars</b></div>
+                    @*@if (@Account.UserInfo.eid == 2635 || @Account.UserInfo.eid == 5580 || @Account.UserInfo.eid == 695 || @Account.UserInfo.UserTypeID == 4 || @Account.UserInfo.eid == 7043 || @Account.UserInfo.eid == 6689 || @Account.UserInfo.eid == 6073) {
+                    <div class="k-button" onclick="NewAccountsDenomination('#=NewAccountID#', '#=NewProgramID#', '#=ProposalYear#')"><span class="fa fa-plus-circle"></span> Add New Particular </div> 
+                    }*@
+    @*<div class="k-button" onclick="SaveChanges('#=AccountID#')"><span class="fa fa-check"></span> Save Changes</div> <div class="k-button" onclick="CancelChanges('#=AccountID#')"><span class="fa fa-close"></span> Cancel Changes</div>*@
+                   
+                </div>
+</text>    ))
+                .Selectable()
+                .Resizable(e => e.Columns(true))
+                .Pageable(page => page.Refresh(true)
+                            .Enabled(true)
+                            .ButtonCount(4)
+                            .PreviousNext(true))
+                .DataSource(dataSource => dataSource
+                    .Ajax()
+                    .ServerOperation(false)
+
+                    .PageSize(10)
+                    .Model(m =>
+                    {
+                        m.Id(i => i.AccountDenominationID);
+
+                    })
+            //.Read(read => read.Action("Proposal_AccountDenomination", "BudgetPreparation", new { ProgramID = "#=NewProgramID#", AccountID = "#=NewAccountID#", ProposalYear = "#=ProposalYear#", OfficeID = Session["selectedOfficeID"], suppletag = $("#supplementalaipid").GetValue }))
+            .Read(read => read.Action("Proposal_AccountDenomination", "BudgetPreparation").Data("sendAdditionalData"))
+            .Destroy(update => update.Action("EditingPopup_Destroy", "Grid"))
+                )
+                .Pageable()
+                .ToClientTemplate()
+    )
+</script>
+<div style="display:none">
+    <input type="number" id="ppmpaccountid" name="ppmpaccountid" value="0" style="display:none;">
+    <input type="number" id="totalproposalid" value="=0"/>
+    <input type="number" id="totalproposalid" value="=0" />
+    <input type="number" id="totalproposalamount" value="=0" />
+    <input type="number" id="totalceilingamount" value="=0" />
+</div>
+@(Html.Kendo().Window()
+    .Name("ComputationDetails")
+    .Title("Computation Details")
+    .Width(500)
+    .Height(600)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(true)
+    .AutoFocus(true)
+    .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        }).Actions(a => { a.Close(); }))
+@(Html.Kendo().Window()
+    .Name("ForFundingDetail")
+    .Title("For Funding Details")
+    .Width(1000)
+    .Height(600)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(true)
+    .AutoFocus(true)
+    .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        }).Actions(a => { a.Close(); }))
+
+@(Html.Kendo().Window()
+    .Name("newAccounts")
+    .Title("Propose Account")
+    .Width(850)
+    .Height(510)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(false)
+    .AutoFocus(true)
+    .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        }).Actions(a => { a.Close(); }))
+
+@(Html.Kendo().Window()
+    .Name("CreateNewDenominationAccount")
+    .Title("Create New Denomination Account")
+    .Width(600)
+    .Height(250)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(true)
+    .AutoFocus(true)
+    .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        }).Actions(a => { a.Close(); }))
+
+@(Html.Kendo().Window()
+    .Name("EditDetails")
+    .Title("Edit Account Denomination")
+    .Width(600)
+    .Height(250)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(true)
+    .AutoFocus(true)
+    .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        }).Actions(a => { a.Close(); }))
+
+@(Html.Kendo().Window()
+    .Name("newAccountsLink")
+    .Title("Account Linkage")
+    .Width(600)
+    .Height(445)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(true)
+    .AutoFocus(true)
+    .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        }).Actions(a => { a.Close(); }))
+@(Html.Kendo().Window()
+    .Name("transferprogram")
+    .Title("Change Program Description")
+    .Width(600)
+    .Height(325)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(false)
+    .AutoFocus(true)
+    .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        }).Actions(a => { a.Close(); }))
+<script>
+    $(document).ready(function () {
+        var OfficeID = @Session["selectedOfficeID"];
+        var proyear = $("#propsYears").val()
+        
+        var url = "@Url.Action("getOffiCeiling", "Maintenance")";
+        
+        $('#SubmitID').css("display", "none");
+        
+        if (OfficeID == 37 || OfficeID == 38 || OfficeID == 41){
+            document.getElementById("ceilingamountid").innerHTML ="Ceiling Amount ";
+        }
+       
+        $.get(url, {OfficeID:OfficeID,proyear:proyear}, function (d) {
+            CeilingStatus = d
+           
+            if (d == "1") {
+                getOfficeCeiling();
+                getTotalProposed();
+                //UpdateTotalProposed();
+                $("#CeilingDiv").css("display","inline-block");
+            }
+            else {
+                $("#CeilingDiv").css("display","none");
+                //OfficeCieling - TotalProposed <= 0
+                if (OfficeID == 37 || OfficeID == 38 || OfficeID == 41){
+                    OfficeCieling = 999999999;
+                }
+                else{
+                    OfficeCieling = 1;
+                    TotalProposed = 0;
+                }
+            }
+        });
+        //  FilterByOOE()
+        var check_Program = @Session["ProgID1"];
+        if(check_Program == 43){
+            document.getElementById("header-label").innerHTML = "Program :";
+        }
+    });
+    function DownloadAIP(){
+        var OfficeID=@Session["selectedOfficeID"]
+        var ProgramID=@Session["ProgID1"]
+        var proyear = $("#propsYears").val();
+        swal({
+            title: "System Notice!",
+            text: "This will download the AIP breakdown and reset all linked accounts. Do you want to proceed?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes",
+            closeOnConfirm: false
+        }, function(){
+            var url = "@Url.Action("DownloadAIP", "BudgetPreparation")";
+            $.get(url,{ OfficeID: OfficeID,proyear:proyear }, function(d){
+                $("#AccountsGrid").data("kendoGrid").dataSource.read();
+                if (d=='1'){
+                    swal("Success","AIP successfully downloaded from the SPMS!","success")
+                }
+                else{
+                    swal("Error","Something went wrong! There might be some accounts that already been submitted for budget consolidattion.","error")
+                }
+            });
+        })
+    }
+
+</script>
+<style>
+    .center {
+        padding: 1% 0;
+        text-align: center;
+    }
+</style>

@@ -1,0 +1,201 @@
+﻿
+<script>
+    var thisculture = kendo.culture();
+    thisculture.numberFormat.currency.symbol = '₱'; // Script For Changing The Currency Sign
+
+
+    function delete_float_EE_inc(release_float_id) {
+
+
+        var url = "@Url.Action("Delete_Flaot_Inc", "Release")";
+
+
+
+        swal({
+            title: "Are you sure?",
+            text: "This item will be removed!",
+            type: "info",
+            showCancelButton: true,
+            closeOnConfirm: false,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, Remove It!",
+            showLoaderOnConfirm: true,
+        }, function () {
+
+
+            $.get(url, { release_float_id: release_float_id }, function (d) {
+              
+              
+                if (d == "1") {
+                    swal({
+                        title: "Success!",
+                        text: "Float has been Removed.",
+                        timer: 2000,
+                        type: "success",
+                        showConfirmButton: false
+                    })
+                    getAvailable_inc();
+                    acc_availble_mount();
+                    income_available_();
+                    subsidy_available_();
+                    $("#grd_Float_EE_inc").data("kendoGrid").dataSource.read();
+                    $('#EconomicEnterprise_Grid').data('kendoGrid').dataSource.read();
+                } else {
+                    swal({
+                        title: "Error!",
+                        text: "System Error! Please try again.",
+                        timer: 2000,
+                        type: "error",
+                        showConfirmButton: false
+                    })
+                }
+            });
+        });
+    }
+
+    function fn_LoadFlaot_EE_inc() {
+
+        var office_id = $("#offs").val();
+        var ooe_id = $("#ooe_id").val();
+        var month_ = $("#Months").val();
+        var numeric_ = $("#numeric").val();
+        var year_ = $("#ddlYear").val();
+
+
+        return {
+            office_id: office_id,
+            ooe_id: ooe_id,
+            month_: month_,
+            numeric_: numeric_,
+            year_: year_
+        }
+    }
+
+
+    function ReadData_EE_inc() {
+        return {
+            office_id: '@Session["office_id"]',
+            month_: '@Session["month_"] ',
+            numeric_: '@Session["numeric_"]',
+            year_: '@Session["year_"] '
+        }
+    }
+   
+    function CheckAll_EE_inc(e) {
+        $("#grd_Float_EE_inc tbody input:checkbox").prop("checked", e.checked);
+    }
+
+
+    //function refreshinggg_EE_inc() {
+    //    setTimeout(function () {
+
+    //        $("#float_offs_EE_Inc").data("kendoComboBox").dataSource.read();
+    //        $("#float_Months_EE_Inc").data("kendoDropDownList").dataSource.read();
+
+    //    }, 500);
+    //}
+
+
+    function fn_checkbox_EE_inc(value) {
+        if (value == 1) {
+            //setTimeout(function () {
+            //    document.getElementById("dadoda").disabled = true;
+            //}, 500);
+            return "<input type='checkbox' id='dadoda' class='checkbox' checked disabled='disabled'/>";
+        }
+        else {
+            return "<input type='checkbox' class='checkbox'/>";
+        }
+
+    }
+</script>
+
+
+
+
+
+
+@(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Monthly_SubInc>()
+    .Name("grd_Float_EE_inc")
+    .Scrollable()
+    .Columns(col =>
+    {
+        col.Bound(m => m.Float_Flag)
+
+            .ClientTemplate("#=fn_checkbox_EE_inc(Float_Flag)#")
+                        .Title("<input onclick=CheckAll_EE_inc(this) type='checkbox'   class='checkbox'/>")
+                        .Width(30)
+                        .HtmlAttributes(new { @onclick = "click", style = "align:center;float:none;text-align:center; font-size:12px; vertical-align: middle;" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+
+        col.Bound(m => m.amount_description)
+                         .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                         .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Account</div></text>)
+                        .Width(210)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Bound(m => m.Amount)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Amount</div></text>)
+                        .Width(100)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div>#=kendo.toString(Amount,'c2')# </div>");
+
+        col.Bound(m => m.MonthOf)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Month</div></text>)
+                        .Width(80)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Bound(m => m.YearOf)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Year</div></text>)
+                        .Width(60)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" }); ;
+        col.Bound(m => m.balance_amount)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Balance<br />Amount</div></text>)
+                        .Width(100)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div>#=kendo.toString(balance_amount,'c2')# </div>");
+
+        col.Bound(m => m.Batch)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Batch</div></text>)
+                        .Width(60)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+
+
+        col.Template(t => { }).ClientTemplate(
+                                     //"<div class='btn-delete'style='inline-block; height: 15px;width:65px;margin-left:5px;'> " +
+                                     //"<a  title='Submit' onclick='edit_float_EE_inc(#=subsidyrelease_float_id#)' style='margin-left:2px;'><span class='fa fa-search-plus' style='font-size: 12pt;'></span></a>" +
+
+                                     // " </div>" +
+                                      //"<div class='btn-delete'style='inline-block; height: 15px;width:65px;margin-left:30px;'> " +
+                                      //"<a  title='remove'     onclick='delete_float_EE_inc(#=release_float_id#)' style='margin-left:2px;'><span class='fa fa-remove' style='font-size: 12pt;'></span></a>" +
+                                      //" </div>"
+
+                        "<div class='k-button k-button-icontext' style='border-radius:50px;color:\\#ffffff;background-color:\\#DE5555;'   onclick='delete_float_EE_inc(#=release_float_id#)'   ><span class='fa fa-trash-o' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'> </span>del</div> "
+
+                                    ).HtmlAttributes(new { style = "vertical-align: top;" }).Width(70);
+    })
+
+        .Sortable()
+        .Scrollable()
+        .HtmlAttributes(new { style = "height:220px;" })
+                        .DataSource(d => d
+                        .Ajax()
+                        .PageSize(1000)
+                        .Model(m => m.Id(i => i.release_float_id))
+                        .Read(read => read.Action("Load_Float_Inc", "Release").Data("fn_LoadFlaot_EE_inc")))
+)
+
+
+
+
+
+
+
+
+
+
+
+

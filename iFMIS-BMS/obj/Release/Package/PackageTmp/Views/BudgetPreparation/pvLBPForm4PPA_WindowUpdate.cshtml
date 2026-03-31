@@ -1,0 +1,302 @@
+﻿<script>
+    var SeriesID = 0;
+  
+    function CheckAmount(txtID) {
+        var AmountMax = $("#txtBAlAmountTempEdit").val();
+        var AmountEdit = $("#txtPSAmountEdit").val().replace(",", "").replace(",","");
+        var AmountOrig = $('#txtAmount_origEdit').val();
+        var childtotamount = $('#txtTotAmountChild').val();
+        AmountMax = parseFloat((Number(AmountMax) + Number(AmountOrig)) - Number(AmountEdit)).toFixed(2)
+        if (AmountMax < 0) {
+            swal({
+                title: "Warning!",
+                text: "Cannot complete request, amount must be lesser than or equal to balance amount!",
+                type: "warning",
+                showConfirmButton: true
+            });
+            $("#txtPSAmountEdit").val(MoneyFormat(AmountOrig));
+        }
+        else if (Number(parseFloat(AmountEdit).toFixed(2)) < Number(parseFloat(childtotamount).toFixed(2))) {
+            swal({
+                title: "Warning!",
+                text: "Cannot complete request, amount must be greater than or equal to PPA's total breakdown amount!",
+                type: "warning",
+                showConfirmButton: true
+            });
+            $("#txtPSAmountEdit").val(MoneyFormat(AmountOrig));
+        }
+    }
+    function reqSaveForm4PPAUpdate() {
+            
+        var txtOrderNoEdit = $("#txtOrderNoEdit").val();
+        var txtMajorFinalOutputEdit = $("#txtMajorFinalOutputEdit").val();
+        var txtPerformanceIndicatorEdit = $("#txtPerformanceIndicatorEdit").val();
+        var txtTargetEdit = $("#txtTargetEdit").val();
+        var txtPSAmountEdit = $("#txtPSAmountEdit").val() == "" ? 0 : $("#txtPSAmountEdit").val().replace(",", "").replace(",", "");
+        var txtMOOEAmount = $("#txtMOOEAmount").val() == "" ? 0 : $("#txtMOOEAmount").val().replace(",", "").replace(",", "");
+        var txtCOAmount = $("#txtCOAmount").val() == "" ? 0 : $("#txtCOAmount").val().replace(",", "").replace(",", "");
+        var cbisBoldEdit = document.getElementById("cbisBoldEdit").checked;
+        var initiative = $("#InitiativeEdit").val()
+        var subinitiative = $("#txtsubinitiativeEdit").val()
+        var year = $("#propsYears").val()
+        var trnnoEdit = $('#trnnoEdit').val();
+        var url = "@Url.Action("AddInitiative", "BudgetPreparation")";
+        if (initiative <= 0 && $('#aiptagEdit').val() == 0 ) {
+            swal("Warning","There is nothing to save! Please select PPA's from the dropdown list.","warning")
+        }
+        
+        else {
+            $.post(url, {
+                OrderNo: txtOrderNoEdit,
+                MajorFinalOutput: txtMajorFinalOutputEdit, PerformanceIndicator: txtPerformanceIndicatorEdit,
+                Target: txtTargetEdit, PSAmount: txtPSAmountEdit, MOOEAmount: txtMOOEAmount, COAmount: txtCOAmount, isBold: cbisBoldEdit, initiative: initiative, subinitiative: subinitiative, year: year, mode: 2, trnno: trnnoEdit, aiptag: $('#aiptagEdit').val()
+            }, function (d) {
+                if (d == 'success') {
+                    swal({
+                        title: "Success!",
+                        text: "AIP successfully updated!",
+                        type: "success",
+                        showConfirmButton: true
+                    });
+                    reqClear()
+                    $('#grdPPA').data('kendoGrid').dataSource.read();
+                    $('#InitiativeEdit').data('kendoComboBox').dataSource.read();
+                  //  CloseKendoWindow('pvLBPForm4PPA_WindowNew');
+                }
+                else {
+                    swal({
+                        title: "Error!",
+                        text: d,
+                        type: "error",
+                        showConfirmButton: true
+                    });
+                }
+            })
+        }
+    }
+    function getParam() {
+        return {
+            officeid: $("#ddlAIPOffices").val(),
+            year:$("#propsYears").val()
+        }
+    }
+    function CloseKendoWindowUpdate() {
+        $("#LBPForm4PPADataWindowUpdate").data("kendoWindow").close();
+    }
+    function getAIPamount() {
+        var url = "@Url.Action("getAIPamount", "BudgetPreparation")";
+        var initID = $("#InitiativeEdit").val();
+        var year = $("#propsYears").val();
+
+        $.get(url, { id: initID, year: year }, function (x) {
+            $("#txtAIPAmountEdit").val(MoneyFormat(x.appropriation))
+            $("#txtAIPAmountNewTempEdit").val(x.appropriation)
+            $("#txtTotAmountEdit").val(MoneyFormat(x.breakdownamount))
+            $("#txtTotAmountTempEdit").val(x.breakdownamount)
+            $("#txtBAlAmountEdit").val(MoneyFormat(x.balance))
+            $("#txtBAlAmountTempEdit").val(x.balance)
+        });
+    }
+</script>
+<div>
+    
+    @*<div style="display:inline-block">
+        <label>
+            PPA Description :<br /> <textarea id="txtPPADesc" style="width:450px; height:100px;"></textarea>
+        </label>
+    </div>*@
+   
+    <div style="display:inline-block">
+        <label style="display:inline-block">
+            PPA :&nbsp;&nbsp;&nbsp;&nbsp;
+        </label>
+        <label style="display:inline-block">
+            @(Html.Kendo().ComboBox()
+                         .Name("InitiativeEdit")
+                         .DataTextField("initiative")
+                         .DataValueField("id")
+                         .Filter("contains")
+                         .MinLength(1)
+                         .Placeholder("Select PPA's...")
+                         .HtmlAttributes(new { @style = "width: 462px;" })
+                         .DataSource(source => source.Read(read => read.Action("ReadInitiativeEdit", "BudgetPreparation").Data("getParam")))
+                         .Events(e => e.Change("getAIPamount"))
+            )
+            </label>
+    </div>
+    <div style="display:inline-block;margin-top:5px;">
+        <label style="display:inline-block">
+            AIP Amount :
+        </label><br />
+        <label style="display:inline-block;margin-top:0px;">
+            <input type="text" id="txtAIPAmountEdit" value="0.00" style="width:140px;color:blue;font-size:20px;" disabled="disabled">
+        </label>
+    </div>
+    <div style="display:inline-block;margin-top:0px;margin-left:28px">
+        <label style="display:inline-block">
+            Total Breakdown(less:) :&nbsp;&nbsp;&nbsp;
+        </label><br />
+        <label style="display:inline-block">
+            <input type="text" id="txtTotAmountEdit" value="0.00" style="width:140px;color:indianred;font-size:20px;" disabled="disabled">
+        </label>
+    </div>
+    <div style="display:inline-block;margin-top:0px;">
+        <label style="display:inline-block">
+            Balance : &nbsp;&nbsp;&nbsp;&nbsp;
+        </label><br />
+        <label style="display:inline-block">
+            <input type="text" id="txtBAlAmountEdit" value="0.00" style="width:140px;color:forestgreen;font-size:20px;" disabled="disabled">
+        </label>
+    </div>
+    <div style="display:none">
+        <input type="number" id="txtAIPAmountOrig"/>
+    </div>
+    <div style="display:inline-block;margin-top:5px">
+        <label style="display:inline-block">
+            PPA Breakdown : <br /> <textarea id="txtsubinitiativeEdit" style="width:508px;"></textarea>
+        </label>
+       
+    </div>
+
+    <div style="display:inline-block">
+      @*  <div style="border-color:gray;border-width:.5px;border-style:dashed;width:517px;margin-top:10px;float:left;height:130px">*@
+         @*   <div style="background-color:white;width:90px;margin-top:-10px;margin-left:-3px;"><span style="font-size:18px;margin-left:5px;font-weight:bold">Amount :</span></div>*@
+            
+            <label style="float:left;margin-top:5px;">
+                Amount : &nbsp; &nbsp;
+                <br />
+                <input id="txtPSAmountEdit" onkeyup="OnKeyUpConvertToCurrency(event, 'txtPSAmountEdit')" onblur="CheckAmount('txtPSAmountEdit')" onkeydown="FilterNumericOnly(event)" placeholder="0.00" style="width:140px" />
+
+            </label>
+            <br />
+            <label style="float:left;margin-left:37.5px;display:none">
+                MOOE : &nbsp; &nbsp;
+                <input id="txtMOOEAmount" onkeyup="OnKeyUpConvertToCurrency(event, 'txtMOOEAmount')" onblur="CheckAmount('txtMOOEAmount')" onkeydown="FilterNumericOnly(event)" placeholder="0.00" style="width:140px" />
+            </label>
+            <br />
+            <label style="float:left;margin-left:63px;display:none">
+                CO : &nbsp; &nbsp;
+                <input id="txtCOAmount" onkeyup="OnKeyUpConvertToCurrency(event, 'txtCOAmount')" onblur="CheckAmount('txtCOAmount')" onkeydown="FilterNumericOnly(event)" placeholder="0.00" style="width:140px" />
+            </label>
+        @*</div>*@
+    </div>
+    <br />
+    <div style="display:inline-block;margin-top:5px">
+        <label style="display:inline-block">
+            Major Final Output :<br /> <textarea id="txtMajorFinalOutputEdit" style="width:215px;"></textarea>
+        </label>
+        <label style="display:inline-block;margin-left:30px">
+            Performance Indicator :<br /> <textarea id="txtPerformanceIndicatorEdit" style="width:215px;"></textarea>
+        </label>
+    </div>
+    <div style="display:inline-block;margin-top:5px">
+        <label style="display:inline-block">
+            Target For The Budget Year :<br /> <textarea id="txtTargetEdit" style="width:507px;"></textarea>
+        </label>
+    </div>
+    <div style="display:inline-block;margin-top:5px;">
+        <label>
+            @* AIP Ref Code : <input disabled id="txtRefCode" style="width:140px" />*@
+            Order No : &nbsp; &nbsp;<br /> <input id="txtOrderNoEdit" style="width:70px" value="0" />
+        </label>
+    </div>
+    </div>
+<div style="float:left;margin-top: 15px;width:50%">
+    <input style="display:inline-block;" type="checkbox" id="cbisBoldEdit" class="k-checkbox">
+    <label style="display:inline-block" class="k-checkbox-label" for="cbisBoldEdit">Font(Bold)</label>
+</div>
+<div style="float:left; margin-top: 40px;margin-left:220px">
+    <div style="display:inline-block;border-radius:50px;width:90px" class="k-button k-button-icontext" onclick="reqClear()"> <i class="fa fa-eraser"></i> <span id="btnClear">Clear</span> </div>
+    <div style="display:inline-block;background-color:cornflowerblue;color:white;border-radius:50px;width:90px" class="k-button k-button-icontext" onclick="reqSaveForm4PPAUpdate()"> <i class="fa fa-save"></i> <span id="btnAddext">Update</span> </div>
+    <div style="display:inline-block;background-color:indianred;border-radius:50px;width:90px;color:white" class="k-button k-button-icontext" onclick="CloseKendoWindowUpdate()"> <i class="fa fa-times"></i> Close </div>
+</div>
+<div style="display:none">
+    <input type="number" id="txtAIPAmountNewTempEdit" />
+    <input type="number" id="txtTotAmountTempEdit" />
+    <input type="number" id="txtBAlAmountTempEdit" />
+    <input type="number" id="txtAmount_origEdit" />
+    <input type="number" id="trnnoEdit" />
+    <input type="number" id="txtTotAmountChild" />
+    <input type="number" id="aiptagEdit" />
+</div>
+<style>
+    <style > textarea {
+        resize: none;
+    }
+</style>
+<script>
+    $(document).ready(function () {
+        var transno = '@ViewBag.transno';
+        var OfficeID = $("#ddlAIPOffices").val();
+        var transyear = $("#propsYears").val();
+        
+        var url = "@Url.Action("GetForm4PPASelectedForEdit", "BudgetPreparation")";
+        $.post(url, {OfficeID:OfficeID,transyear:transyear, transno: transno }, function (d) {
+            document.getElementById("btnAddext").innerHTML = "Update";
+            $('#txtOrderNoEdit').val(d[5]);
+            $('#txtMajorFinalOutputEdit').val(d[0]);
+            $('#txtPerformanceIndicatorEdit').val(d[1]);
+            //alert(MoneyFormat(d[3]))
+            $('#txtPSAmountEdit').val(MoneyFormat(d[3]));
+            $('#txtAmount_origEdit').val(d[3])
+            $('#trnnoEdit').val(d[9])
+            $('#txtsubinitiativeEdit').val(d[10]);
+            PSMax = d[6]
+            MOOEMax = d[7]
+            COMax = d[8]
+            $('#InitiativeEdit').data('kendoComboBox').value(d[12]);
+            $('#InitiativeEdit').data('kendoComboBox').enable(false);
+            $('#txtTargetEdit').val(d[13])
+            $('#txtTotAmountChild').val(d[14])
+            $('#aiptagEdit').val(@ViewBag.aiptag)
+            getAIPamount();
+            if (d[4] == "1") {
+                document.getElementById("cbisBoldEdit").checked = true;
+            }
+            if ($('#aiptagEdit').val() == 1) {
+               // swal("Note:","You can only update the 'ORDER No. or Target' to this AIP!","warning")
+                //$('#txtMajorFinalOutputEdit').prop('disabled', 'disabled');
+                //$('#txtPerformanceIndicatorEdit').prop('disabled', 'disabled');
+                $('#txtPSAmountEdit').prop('disabled', 'disabled');
+                $('#txtsubinitiativeEdit').prop('disabled', 'disabled');
+               // $('#txtTargetEdit').prop('disabled', 'disabled');
+                $('#txtOrderNoEdit').focus();
+            }
+            else {
+                $('#txtMajorFinalOutputEdit').prop('disabled', 'disabled');
+                //$('#txtPerformanceIndicatorEdit').prop('disabled', false);
+                $('#txtPSAmountEdit').prop('disabled', false);
+                $('#txtsubinitiativeEdit').prop('disabled', false);
+                $('#txtTargetEdit').prop('disabled', false);
+            }
+            if(@Account.UserInfo.UserTypeID == 4){
+                $('#txtPerformanceIndicatorEdit').prop('disabled', false);
+            }
+            else{
+                $('#txtPerformanceIndicatorEdit').prop('disabled', 'disabled');
+            }
+        })
+        //}
+    });
+    function reqClear() {
+        $("#txtMajorFinalOutputEdit").val("")
+        $("#txtPerformanceIndicatorEdit").val("")
+        $("#txtTargetEdit").val("")
+        $("#InitiativeEdit").data("kendoComboBox").value("")
+        $("#txtsubinitiativeEdit").val("")
+        $("#txtPSAmountEdit").val("")
+        $("#txtMOOEAmount").val("")
+        $("#txtCOAmount").val("")
+        $("#txtOrderNoEdit").val(0)
+        $("#cbisBoldEdit").prop("checked", false)
+        $("#txtAIPAmountEdit").val(0)
+        $("#txtAIPAmountNewTempEdit").val(0)
+        $("#txtTotAmountEdit").val(0)
+        $("#txtTotAmountTempEdit").val(0)
+        $("#txtBAlAmountEdit").val(0)
+        $("#txtBAlAmountTempEdit").val(0)
+        $('#txtAmount_origEdit').val(0);
+        $('#trnnoEdit').val(0);
+        $('#txtTotAmountChild').val(0);
+    }
+</script>

@@ -1,0 +1,181 @@
+﻿<script>
+
+//ss
+    function reqPrint(e) {
+        var officeID = $("#ddlOffices").val()
+        var Year = $("#ddlYear").val()
+        var isNonOffice = 0;
+        var reloadlbp4 = $("#reloadlbp4").val();
+        var url = "@Url.Action("CheckLBP4header", "Report")";
+
+        if ($("#cbNonOffice").is(':checked') == true) {
+            isNonOffice = 1;
+        }
+        else {
+            isNonOffice = 0;
+        }
+        $.get(url, { officeID: officeID, Year: Year }, function (e) {
+            if ((e >= 4 && officeID != "") || officeID == 0) {
+                if (officeID != "") {
+                    $.ajax({
+                        async: false,
+                        dataType: 'html',
+                        success: window.open("../Reports/ReportViewer.aspx?rid=23&OfficeID=" + officeID + "&Year=" + Year + "&isNonOffice=" + isNonOffice + "&reloadlbp4=" + reloadlbp4 + "")
+                    });
+                }
+            }
+            else if (officeID == "") {
+                alert("Please Select Office!");
+            }
+            else {
+                swal("Warning!", "Please fill out completely the office mandate, vision, mission and organizational outcome!", "warning");
+            }
+        });
+        
+    }
+    function reloadlbp4() {
+
+        if (document.getElementById("reloadlbp4").checked) {
+            document.getElementById("reloadlbp4").value = 1;
+        }
+        else {
+            document.getElementById("reloadlbp4").value = 0;
+        }
+    }
+</script>
+
+<div style="width : 81.5%; margin-top: 0px;border-style: solid; border-color: #1fa67a;">
+    <div style="width:100%;height : 25px ; background-color:#1fa67a; color: white">
+        <label class="fa fa-file-text-o fa-lg" style="margin-left: 5px; display:inline-block">  PRINT LBP4 REPORT</label>
+    </div>
+    <div style="margin-left: 5px; margin-bottom:5px">
+        <label style="margin-left: 45px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px; display : inline-block">
+            Office :&nbsp;&nbsp;&nbsp;
+            @(Html.Kendo().DropDownList()
+                         .Name("ddlOffices")
+                         .DataTextField("OfficeName")
+                         .DataValueField("OfficeID")
+                         .Filter("contains")
+                         .MinLength(1)
+                         .OptionLabel("Select Office...")
+                         .HtmlAttributes(new { @style = "width: 427px;" })
+                         .DataSource(source => source.Read(read => read.Action("ddlOfficeWithAll", "User")))
+            )
+
+        </label>
+        <label style="margin-left: 0px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px; display : inline-block">
+            Budget Year :&nbsp;&nbsp;&nbsp;
+             @(Html.Kendo().DropDownList()
+                        .Name("ddlYear")
+                        .DataTextField("ProposalYear")
+                        .DataValueField("ProposalYear")
+                        .SelectedIndex(0)
+                        .HtmlAttributes(new { @style = "width: 90px;" })
+                        .DataSource(source => source.Read(read => read.Action("GetPropYear", "PYear")))
+            )
+        </label>
+
+        <div style="float:right;margin-top:0px;margin-right:180px">
+            <input type='checkbox' class='checkbox' style="zoom:1.5;margin-top:-15px;float:left;margin-left:8px;" id="reloadlbp4" value="1" checked onclick=reloadlbp4() />
+            <label style="float:left;margin-top:-24px;width:160px;margin-left:35px;">Update LBP Form 4</label>
+        </div>
+
+        <label style="display:none">
+            <input id='cbNonOffice' type='checkbox' class='checkbox' /> Non-Office
+        </label>
+    </div>
+    <div style="display:inline-block;width:100%">
+        @*<div id="" class="k-button k-button-icontext" style=" bottom: 15px; right: 25px;width: 160px;float:left; margin-top: 5px;background-color:cornflowerblue;color:white;border-radius:50px; margin-left:340px; margin-bottom:5px" onclick="reqPrintStatus()"><span class=""></span>&nbsp;DGSign Status</div>*@
+        @*<div id="btnPrintDGsign" class="k-button k-button-icontext" style="   bottom: 15px; right: 25px;width: 160px;float:left; margin-top: 5px;background-color:cornflowerblue;color:white;border-radius:50px; margin-left:340px; margin-bottom:5px" onclick="reqPrintDGsign()"><span class="fa fa-search"></span>&nbsp;Preview Via DGSign</div>*@
+        <div id="btnPrint" class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 100px;float:right; margin-top: 5px; margin-right:10px; margin-bottom:5px;border-radius:50px;background-color:cornflowerblue;color:white" onclick="reqPrint()"><span class="fa fa-search"></span> Preview</div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        if ('@Account.UserInfo.UserTypeDesc' == 'Budget In-Charge') {
+            $("#ddlOffices").data("kendoDropDownList").value(@Account.UserInfo.Department);
+            $("#ddlOffices").data("kendoDropDownList").enable(false);
+        }
+        else {
+            $("#ddlOffices").data("kendoDropDownList").enable();
+            $("#ddlOffices").data("kendoDropDownList").value("");
+        }
+    });
+    function reqPrintDGsign(){
+        var officeID = $("#ddlOffices").val()
+        var ReportType = 5;//$('input[name=ReportTypeRadioButton]:checked').val();
+        var Year = $("#ddlYear").val()
+        var reloadlbp4 = $("#reloadlbp4").val();
+        var url = "@Url.Action("dgsignreport", "Report")";
+        swal({
+            title: "Confirmation!",
+            text: "Would you like to create a document for digital signature?",
+            type: "info",
+            showCancelButton: true,
+            closeOnConfirm: false,
+            confirmButtonColor: "#1fa67a",
+            confirmButtonText: "Yes",
+            showLoaderOnConfirm: true,
+        },
+            function (isConfirm) {
+                if (isConfirm) {
+                    $.post(url, { YearOf: Year, OfficeID: officeID, ReportTypeID: ReportType, docuid: 2, reloadlbp4: reloadlbp4 }, function (d) {
+                        if (d != "") {
+                            //swal.close();
+                            //success: window.open(d)
+                            swal("Success", "A Local Budget Preparation Form 2 or 4 (LBP Form) is pending your signature in the Dgsign App.", "success")
+                        }
+                        else {
+                            swal("Something Went Wrong!", d, "error");
+                        }
+                    })
+                }
+            })
+    }
+    function reqPrintStatus() {
+        $(window).scrollTop(0);
+        var url = "@Url.Action("LBPDGSiginstatus", "Report")";
+        var office = $("#ddlOffices").val();
+        var program = 0
+        var account = 0
+        var tyear = $("#ddlYear").val();
+
+
+        $.get(url,
+            {
+                office: $("#ddlOffices").val(),
+                program:program,
+                account:account,
+                tyear: tyear,
+                docuid : 5
+            },
+        function (d) {
+            $('#LBPstatusform').html(d);
+        })
+        $('#LBPstatusform').data('kendoWindow').title("<i class='fa fa-navicon'> </i> LBP DGsign Status").center().open();
+
+    }
+</script>
+
+
+@(Html.Kendo().Window()
+        .Name("LBPstatusform")
+        //.Title("")
+        .Width(1010)
+        .Height(625)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+        //  .Events(e => e.Close("closewfpapproved_lce"))
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+                .Actions(a => { a.Close(); })
+)

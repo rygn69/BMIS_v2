@@ -1,0 +1,137 @@
+﻿<script>
+    function fn_param(){
+        return {
+            officeid:'@Session["officeid"]',
+            proyear:'@Session["proyear"]'
+        }
+    }
+    //function onDataBound() {
+    //    this.expandRow(this.tbody.find("tr.k-master-row").first());
+    //}
+    function onGridEdit(arg) {
+      //  var gridName = $('#grd_utilizationsum').data('kendoGrid');
+        
+        var entityGrid = $("#grd_utilizationsum").data("kendoGrid");
+        var selectedItem = entityGrid.dataItem(entityGrid.select());
+      //  $("#EDIT_Amount").val(coma_sepa(selectedItem.Amount_release));
+
+        var officeid = selectedItem.OfficeID
+        var ooeid = selectedItem.ooeid_uti
+        var proyear = $("#ddlYear").val()
+
+        var url = "@Url.Action("utilization_summary_detail", "Home")";
+      
+        $.get(url, { officeid: officeid, proyear: proyear, ooeid: ooeid }, function (d) {
+            $('#viewutilization_detail').html(d);
+        })
+        $('#viewutilization_detail').data('kendoWindow').center().open();
+        $('#viewutilization_detail').data('kendoWindow').title(selectedItem.OOE_Name);
+    }
+
+</script>
+<div>
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.BudgetControlModel>()
+        .Name("grd_utilizationsum")
+        .HtmlAttributes(new { style = "height:400px;" })
+        .Scrollable()
+    .Columns(col =>
+    {
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;">Expense Class</div></text>)
+                        .Width(270)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div>#=OOE_Name# </div>")
+                        .ClientFooterTemplate("<div style='text-align:center;font-weight:bold'> TOTAL </div>");
+        col.Bound(m => m.app1)
+                        .HtmlAttributes(new { style = "font-weight:600;text-align:right; vertical-align: middle; overflow: visible; white-space: normal;" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Appropriation <br /> 2021</div></text>    )
+                    .HeaderHtmlAttributes(new { style = "text-align:center" })
+                    .Width(150)
+                    .ClientTemplate("<div>#=kendo.toString(app1,'c2')# </div>")
+                    .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> </label><label> #=kendo.toString(sum, 'c2')#</label></div>");
+        col.Bound(m => m.allot1)
+                        .HtmlAttributes(new { style = "font-weight:600;text-align:right; vertical-align: middle; overflow: visible; white-space: normal;" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Allotment <br /> 2021</div></text>    )
+                    .HeaderHtmlAttributes(new { style = "text-align:center" })
+                    .Width(150)
+                    .ClientTemplate("<div>#=kendo.toString(allot1,'c2')# </div>")
+                    .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> </label><label> #=kendo.toString(sum, 'c2')#</label></div>");
+        col.Bound(m => m.obligate1)
+                        .HtmlAttributes(new { style = "font-weight:600;text-align:right; vertical-align: middle; overflow: visible; white-space: normal;" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Obligation <br /> 2021</div></text>    )
+                    .HeaderHtmlAttributes(new { style = "text-align:center;" })
+                    .Width(150)
+                    .ClientTemplate("<div>#=kendo.toString(obligate1,'c2')# </div>")
+                    .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> </label><label> #=kendo.toString(sum, 'c2')#</label></div>");
+        col.Bound(m => m.app_per1)
+                        .HtmlAttributes(new { style = "font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;background-color:cornflowerblue;color:white" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Appropriation Pct. <br /> 2021</div></text>    )
+                    .HeaderHtmlAttributes(new { style = "text-align:center;background-color:cornflowerblue;color:white" })
+                    .Width(120)
+                    .ClientTemplate("<div>#=kendo.toString(app_per1,'N2')#%</div>");
+        col.Bound(m => m.allot_per1)
+                        .HtmlAttributes(new { style = "font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;background-color:chocolate;color:white;" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Allotment Pct. <br /> 2021</div></text>    )
+                    .HeaderHtmlAttributes(new { style = "text-align:center;background-color:chocolate;color:white" })
+                    .Width(120)
+                    .ClientTemplate("<div>#=kendo.toString(allot_per1,'N2')#% </div>");
+
+       
+        col.Bound(m => m.OfficeID).Title("office").Hidden();
+        col.Bound(m => m.ooeid_uti).Title("ooe ID").Hidden();
+
+
+        //
+
+    })
+         .AutoBind(false)
+         .Pageable(page => page.Refresh(true)
+            .Enabled(true)
+            .ButtonCount(4)
+            .PreviousNext(true)
+         )
+         // .ClientDetailTemplateId("template_table")
+         .Selectable()
+          .Events(e => e.Change("onGridEdit"))
+
+           .Scrollable()
+
+         .DataSource(d => d
+         .Ajax()
+         .Batch(true)
+         .ServerOperation(false)
+         .Aggregates(a =>
+         {
+             a.Add(c => c.app1).Sum();
+             a.Add(c => c.allot1).Sum();
+             a.Add(c => c.obligate1).Sum();
+         })
+         .PageSize(8)
+         .Model(m => m.Id(i => i.ooeid_uti))
+         .Read(read => read.Action("proposal_utilizationsum", "Home").Data("fn_param"))
+         )
+    )
+</div>
+    <script>
+        $(document).ready(function () {
+            $("#grd_utilizationsum").data("kendoGrid").dataSource.read()
+        });
+    </script>
+
+@(Html.Kendo().Window()
+    .Name("viewutilization_detail")
+    @*.Title("$("#offs").data('kendoComboBox').text()")*@
+    .Width(955)
+    .Height(610)
+    .Modal(true)
+    .AutoFocus(true)
+    .Draggable(true)
+    // .Height(550)
+    .Animation(a => { a.Open(o => o.SlideIn(SlideDirection.Down)); a.Close(c => { c.SlideIn(SlideDirection.Down); c.Reverse(true); }); }).Actions(a => { a.Close(); })
+    // .Width(1200)
+    .Scrollable(true)
+    .Visible(false)
+    .Actions(actions => actions.Close())
+
+)

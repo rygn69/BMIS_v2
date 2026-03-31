@@ -1,0 +1,218 @@
+﻿<script>
+    function refresh_grid(e) {
+        if (e.errors) {
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "\n";
+                    });
+                }
+            });
+            alert(message);
+        }
+        $("#Legal_Basis").data("kendoGrid").dataSource.read();
+    }
+    setTimeout(function () {
+
+        $("#Legal_Basis").data("kendoGrid").dataSource.read();
+
+    }, 1000);
+
+    function refreshgrid222223235346789() {
+
+        setTimeout(function () {
+
+            $("#projected_revenue").data("kendoGrid").dataSource.read();
+
+        }, 500);
+    }
+
+    function sample() {
+        // alert('tae')
+    }
+
+    function ocake() {
+        setTimeout(function () {
+            $("#projected_revenue").data("kendoGrid").dataSource.read();
+        }, 1000);
+    }
+
+</script>
+
+<div style="border: outset;clear:both;border-width:1px;border-color:#1fa67a; width: 749px; padding-left:0px;padding-right:0px;padding-top:0px;padding-bottom:7px;margin-top: 0px;">
+    <div style=" width: 0;height: 0; border-right: 5px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;margin-top: -1px; ">
+        <div style="float: left; width: 683px; margin-top:1px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 36px solid #1fa67a; ">
+            <div style="float: left; height:28px; margin-left:-59px; margin-top: 5px;">
+                <i class="fa fa-tasks fa-2x fg-white"></i>
+
+            </div>
+
+            <div style="text-align: right;float: right;margin-right:10px;margin-top:2px;">
+
+
+                @(Html.Kendo().DropDownList()
+                        .Name("ddlYear")
+                        .DataTextField("ProposalYear")
+                        .DataValueField("ProposalYear")
+                        .SelectedIndex(1)
+                        .HtmlAttributes(new { @style = "width: 70px;" })
+                        .Events(e => e.Change("ocake"))
+                        .DataSource(source => source.Read(read => read.Action("GetPropYear2", "PYear")))
+                )
+
+
+
+
+            </div>
+
+        </div>
+    </div>
+<div>
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Projected_RevenuesModel>()
+    .Name("projected_revenue")
+    .Columns(columns =>
+    {
+
+        columns.Bound(m => m.Particular).Title("Particular").Width(200);
+        columns.Bound(m => m.Amount_1).Title("Forcast").Width(100);
+        columns.Bound(m => m.Amount_2).Title("Forcast").Width(100);
+        columns.Bound(m => m.Amount_3).Title("Forcast").Width(100);
+        columns.Bound(m => m.Amount_4).Title("Forcast").Width(100);
+
+        //columns.Command(command => { command.Edit(); command.Destroy(); }).Width(140);
+        columns.Command(command =>
+        {
+            command.Edit()
+                .CancelText(" ")
+                .Text(" ")
+                .UpdateText(" ")
+                .HtmlAttributes(new { style = "border-radius:10px;color:\\#000000;background-color:\\#dcdcdc;width:-11px" });
+
+            command.Destroy()
+                .Text(" ")
+                .HtmlAttributes(new { style = "border-radius:10px;color:\\#000000;background-color:\\#F1A8A8;" });
+
+        }).Width(90);
+    })
+    .ToolBar(toolbar => toolbar.Create())
+    .Editable(editable => editable.Mode(GridEditMode.InLine))
+    .Events(e =>
+    {
+        e.SaveChanges("refreshgrid222223235346789");
+        e.Save("refreshgrid222223235346789");
+        e.Change("refreshgrid222223235346789");
+
+
+    })
+
+    .Sortable()
+    .Scrollable()
+    .HtmlAttributes(new { style = "height:380px;" })
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .PageSize(1000)
+            .Events(events => events.Error("refresh_grid"))
+        .Model(model => model.Id(p => p.Projected_Revenue_ID))
+        .Create(update => update.Action("Projectd_Revenues_Create", "Release"))
+        .Read(read => read.Action("Projectd_Revenues", "Release"))
+        .Update(update => update.Action("Projectd_Revenues_Update", "Release").Data(""))
+        .Destroy(update => update.Action("LegalBasis_Destroy", "Release"))
+    )
+    )
+
+</div>
+
+    <div style=" width: 0;height: 0; border-right: 5px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;margin-top: 25px; ">
+        <div style="float: left; width: 683px; margin-top:1px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 36px solid #1fa67a; ">
+            <div style="float: left; height:28px; margin-left:-59px; margin-top: 5px;">
+                <i class="fa fa-tasks fa-2x fg-white"></i>
+
+            </div>
+
+        </div>
+    </div>
+
+    <div style="margin-right:0px;margin-top:0px;">
+        @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Projected_RevenuesModel>()
+    .Name("projected_revenue2")
+    .Columns(columns =>
+    {
+
+        columns.Bound(m => m.Particular).Title("Particular").Width(200);
+        columns.Bound(m => m.Amount_1).Title("Forcast").Width(100);
+        columns.Bound(m => m.Amount_2).Title("Forcast").Width(100);
+        columns.Bound(m => m.Amount_3).Title("Forcast").Width(100);
+        columns.Bound(m => m.Amount_4).Title("Forcast").Width(100);
+
+        //columns.Command(command => { command.Edit(); command.Destroy(); }).Width(140);
+        columns.Command(command =>
+        {
+            command.Edit()
+                .CancelText(" ")
+                .Text(" ")
+                .UpdateText(" ")
+                .HtmlAttributes(new { style = "border-radius:10px;color:\\#000000;background-color:\\#dcdcdc;width:-11px" });
+
+            command.Destroy()
+                .Text(" ")
+                .HtmlAttributes(new { style = "border-radius:10px;color:\\#000000;background-color:\\#F1A8A8;" });
+
+        }).Width(90);
+    })
+    .ToolBar(toolbar => toolbar.Create())
+    .Editable(editable => editable.Mode(GridEditMode.InLine))
+    .Events(e =>
+    {
+        e.SaveChanges("refreshgrid222223235346789");
+        e.Save("refreshgrid222223235346789");
+        e.Change("refreshgrid222223235346789");
+
+
+    })
+
+    .Sortable()
+    .Scrollable()
+    .HtmlAttributes(new { style = "height:380px;" })
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .PageSize(1000)
+            .Events(events => events.Error("refresh_grid"))
+        .Model(model => model.Id(p => p.Projected_Revenue_ID))
+        .Create(update => update.Action("Projectd_Revenues_Create_2", "Release"))
+        .Read(read => read.Action("Projectd_Revenues_2", "Release"))
+        .Update(update => update.Action("Projectd_Revenues_Update_2", "Release").Data(""))
+        .Destroy(update => update.Action("LegalBasis_Destroy", "Release"))
+    )
+        )
+
+    </div>
+
+
+
+</div>
+@*<style>
+    .k-button .k-button-icontext .k-grid-edit 
+{
+  
+   width:1px;
+  
+   background-color:black;
+   
+}
+    .k-grid .k-delete
+{
+background-position: 0 0 ;
+   
+ }
+   
+</style>*@
+
+<style type="text/css">
+    .k-grid tbody .k-button {
+        min-width: 12px;
+        width: 30px;
+        background-position : bottom;
+        background-image:url(..);
+    }
+</style>

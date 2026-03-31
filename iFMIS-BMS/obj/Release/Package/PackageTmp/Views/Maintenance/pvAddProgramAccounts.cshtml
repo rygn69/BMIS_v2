@@ -1,0 +1,293 @@
+﻿
+<style>
+    .btn-delete a {
+        color: #000000;
+        background-color: #ffffff;
+        border-style: solid;
+        border-color: #333333;
+        border-width: 1px;
+        /*height: auto;*/
+        /*width: auto;*/
+        padding: 3px;
+        padding-left: 5px;
+        padding-right: 5px;
+        cursor: pointer;
+        margin: auto;
+    }
+
+        .btn-delete a:hover {
+            color: #ffffff;
+            background-color: #000000;
+            border-style: solid;
+            border-color: #333333;
+            /*height: auto;
+            width: auto;*/
+        }
+</style>
+<script>
+    function reqSave() {
+        if ($("#btnSpinner").attr("class") != 'fa fa-spinner fa-spin') {
+            $("#btnSpinner").attr('class', 'fa fa-spinner fa-spin');
+            $("#ProposalYear").val($("#YearOf").val())
+            $("#AccountID").val($("#account").val())
+            $("#account_name").val($("#account").data("kendoComboBox").text())
+            var url = "@Url.Action("AddProgramAccounts", "Maintenance")";
+            var frmData = $('#formProgram').serialize();
+            $.post(url, frmData, function (d) {
+                if (d == "Success") {
+                    swal({
+                        title: "Success",
+                        text: "Program Accounts has been Build-up",
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    ClearFields();
+                    $("#grAccountList").data("kendoGrid").dataSource.read();
+                    $("#btnSpinner").removeClass('fa fa-spinner fa-spin');
+                } else {
+                    swal("Error!", d, "error")
+                    $("#btnSpinner").removeClass('fa fa-spinner fa-spin');
+                }
+            })
+        }
+    }
+
+    function onChange() {
+       $("#grAccountList").data("kendoGrid").dataSource.read();
+    }
+
+    function SearchProposed() {
+        var OfficeID = $("#office_id").val();
+        var YearOf = $("#YearOf").val();
+        return {
+            OfficeID: OfficeID,
+            YearOf: YearOf
+        }
+    }
+    function ClearFields() {
+        $("#AccountID").val("");
+        $("#account_name").val("");
+        $("#AccountCode").val("");
+        $("#program_id").data("kendoDropDownList").value("");
+        $("#ooe_id").data("kendoDropDownList").value("");
+        $("#account").data("kendoDropDownList").value("");
+        $("#ref_account_id").val("");
+        $("#isProposed").val("");
+        $("#orderBy").data("kendoDropDownList").value("");
+        $("#YearOf").data("kendoDropDownList").enable(true);
+    }
+    function RemoveProgramAccount(ProgramAccountID) {
+        swal({
+            title: "Are you sure?",
+            text: "This item will be removed!",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, Remove It!",
+            closeOnConfirm: false,
+            showLoaderOnConfirm: true
+        }, function () {
+            var url = "@Url.Action("RemoveProgramAccount", "Maintenance")";
+            $.get(url, { ProgramAccountID: ProgramAccountID }, function (d) {
+                if (d == "1") {
+                    swal({
+                        title: "Success!",
+                        text: "Item Succesffuly Removed.",
+                        type: "success",
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+
+                    $("#grAccountList").data("kendoGrid").dataSource.read();
+                } else {
+                    swal("Error!", d, "error");
+                }
+            });
+        });
+    }
+    function btnSelectAccountsClick() {
+        var OfficeID = $("#office_id").val();
+        var ProgramID = $("#program_id").val();
+        var OOEID = $("#ooe_id").val();
+        var YearOf = $("#YearOf").val();
+        if ($("#btnSpinner").attr("class") != 'fa fa-spinner fa-spin') {
+            $("#btnSpinner").attr('class', 'fa fa-spinner fa-spin');
+            $("#btnSpinner").removeClass('fa fa-spinner fa-spin');
+            if (OfficeID == "" || ProgramID == "" || OOEID == "" || YearOf == "") {
+                 alert('All Fields Required')
+            }
+            else {
+                var url = "@Url.Action("pvChartOfAccounts", "Maintenance")";
+                $('#ChartOfAccountsWindow').html('<div style="width: 100%;height:100%;"><img src="@Url.Content("~/Content/images/loading.gif")" alt="Loading..." style="position: absolute;top: 20%;left: 30%;margin-top: 0px;margin-left: 0px;" /></div>');
+                $.post(url, {ProgramID: ProgramID, OOEID: OOEID, YearOf: YearOf }, function (pvData) {
+                    $(window).scrollTop(0);
+                    $('#ChartOfAccountsWindow').html(pvData);
+                    $('#ChartOfAccountsWindow').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Chart of Accounts").center().open();
+                })
+            }
+        }
+    }
+</script>
+<form id="formProgram" method="post">
+    <div style="display:inline-block;margin-top:20px; width:48%">
+        <div>
+            <label>Office</label>
+            <script>                
+            </script>
+            @(Html.Kendo().DropDownList()
+                                    .Name("office_id")
+                                    .DataTextField("office_name")
+                                    .Filter("contains")
+                                    .MinLength(2)
+                                    .OptionLabel("Select Office . .")
+                                    .DataValueField("office_id")
+                                            .HtmlAttributes(new { @style = "width: 100%;" }).Events(e =>
+                                                            {
+                                                                e.Change("onChange");
+                                                            })
+                                    .DataSource(source => { source.Read(read => { read.Action("ddlOffice", "Dropdowns"); }); })
+            )
+        </div>
+    </div>
+    <div style="display:inline-block;margin-top:20px; width:48%">
+        <div>
+            <label>Program</label>
+            @(Html.Kendo().DropDownList()
+
+                                    .Name("program_id")
+                                    .DataTextField("program_name")
+                                    .Filter(FilterType.Contains)
+                                    .MinLength(2)
+                                    .OptionLabel("Select Program ...")
+                                    .DataValueField("program_id")
+                                    .HtmlAttributes(new { @style = "width: 100%;" })
+
+                                                    .DataSource(source =>
+                                                    {
+                                                        source.Read(read =>
+                                                            {
+                                                                read.Action("ddlCascadeProgram", "Dropdowns")
+                                                                    .Data("filterProgram");
+                                                            })
+                                                            .ServerFiltering(true);
+                                                    })
+                                    .Enable(false)
+                                    .AutoBind(false)
+                                    .CascadeFrom("office_id")
+            )
+            <script>
+                function filterProgram() {
+                    var OfficeDropdown = $("#office_id").val();
+                    var YearOf = $("#YearOf").val();
+                    return {
+                        OfficeDropdown: OfficeDropdown,
+                        YearOf: YearOf
+                    }
+                }
+            </script>
+        </div>
+    </div>
+    <div style="display:inline-block;margin-top:10px; width:48%">
+        <label>Obj. of Expenditure</label>
+        @(Html.Kendo().DropDownList()
+                                    .Name("ooe_id")
+                                    .DataTextField("ooe_name")
+                                    .OptionLabel("Select OOE . .")
+                                    .Filter("contains")
+                                    .MinLength(1)
+                                    .DataValueField("ooe_id")
+                                    .HtmlAttributes(new { @style = "width: 100%;" })
+                                    .DataSource(source => { source.Read(read => { read.Action("ddlOOE", "Dropdowns"); }); })
+
+        )
+    </div>
+    <div style="display:inline-block;margin-top:10px; width:48%">
+        <label>Proposal Year:</label>
+        @(Html.Kendo().DropDownList()
+                              .Name("YearOf")
+                              .DataTextField("ProposalYear")
+                              .DataValueField("ProposalYear")
+                              .Filter("contains")
+                              .SelectedIndex(0)
+                              .MinLength(1)
+                              .Events(e => e.Change("onChange"))
+                              .HtmlAttributes(new { @style = "width: 150px;height:110%" })
+                              .DataSource(source => source.Read(read => read.Action("ddlProposalYear", "Dropdowns")))
+        )
+    </div>
+</form>
+<div style="width:100%;display:block;">
+    <div class="k-button k-button-icontext" onclick="btnSelectAccountsClick()" style="padding:10px;"><span id="btnSpinner"></span> Select Accounts</div>
+</div>
+<div style="margin-top:10px;">
+
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.ProgramAccountsModel>()
+            .Name("grAccountList")
+            .HtmlAttributes(new { style = "height:500px;" })
+            .Columns(col =>
+            {
+                col.Bound(c => c.ProgramDescription).Hidden()
+                .ClientGroupHeaderTemplate("<div style='display:inline-block'>#= value #</div>");
+                col.Bound(c => c.OOEDesciption).Hidden()
+                .ClientGroupHeaderTemplate("<div style='display:inline-block'>#= value #</div>");
+                col.Bound(c => c.ObjectOfExpendetureID).Hidden()
+                .ClientGroupHeaderTemplate("<div style='display:none'>#= value #</div>");
+                col.Bound(m => m.AccountDescripttion).Title("Account Name")
+                    .Width(250).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+                col.Template(t => { }).ClientTemplate(
+                    "<div class='btn-delete'style='inline-block; height: 15px;width:110px;''> <a  id='Remove#=ProgramAccountID#' title='Remove Account' onclick='RemoveProgramAccount(#=ProgramAccountID#)' style='margin-left:2px;'><span class='fa fa-times' style='font-size: 12pt;'></span></a>").Width(50);
+                col.Bound(m => m.ObjectOfExpendetureID).Title("OOE ID").Hidden();
+                col.Bound(m => m.AccountID).Title("Account ID").Hidden();
+                col.Bound(m => m.OfficeProgramID).Title("ProgramID").Hidden();
+                col.Bound(m => m.OfficeProgramID).Title("OfficeID").Hidden();
+                col.Bound(m => m.ProgramAccountID).Title("ProposalID").Hidden();
+                col.Bound(m => m.OrderNo).Title("OrderNo").Hidden();
+            })
+            .ToolBar(t => t.Template(@<text>
+
+
+                <div style="float: left; width: 0; margin-top:-3px;margin-bottom:-100px;margin-left:-3px; height: 0; border-right: 0px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;">
+                    <div style="float: left; width: 0; margin-top:0px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 37px solid #EEE; ">
+                        <div style="float: left; height:28px; margin-left:-59px; margin-top: 5px;">
+                            <i class="fa fa-tasks fa-2x fg-white"></i>
+                        </div>
+                    </div>
+                </div>
+                <div style="float: right; height:28px;margin-top:2px;">
+                    <link href="~/Content/metroui/css/docs.css" rel="stylesheet" />
+                </div>
+            </text>))
+            .Scrollable(s => s.Enabled(true))
+            .Selectable(selectable => selectable.Mode(GridSelectionMode.Single))
+            .DataSource(d => d
+                .Ajax()
+                .Model(m => m.Id(i => i.ProgramAccountID))
+                .Read(read => read.Action("getOfficeAccounts", "Maintenance").Data("SearchProposed"))
+                .Group(g =>
+                {
+                    g.Add(c => c.ProgramDescription);
+                    g.Add(c => c.ObjectOfExpendetureID);
+                    g.Add(c => c.OOEDesciption);
+                })
+                )
+    )
+</div>
+@(Html.Kendo().Window()
+    .Name("ChartOfAccountsWindow")
+    .Title("Chart of Accounts")
+    .Width(540)
+    .Height(500)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(true)
+    .AutoFocus(true)
+    .Animation(a =>
+    {
+    a.Open(o => o.SlideIn(SlideDirection.Down));
+    a.Close(c =>
+    {
+        c.SlideIn(SlideDirection.Down);
+        c.Reverse(true);
+    });
+}).Actions(a => { a.Close(); }))

@@ -1,0 +1,292 @@
+﻿<script>
+    function CloseDetails() {
+        $("#CommitmenDetail").data("kendoWindow").close();
+        //$("grd_Float").data("kendoGrid").dataSource.read();
+    }
+    function munsel() {
+        //$("#barangaydet").data("kendoComboBox").value("");
+        $("#barangaydet").data("kendoComboBox").dataSource.read()
+    }
+
+    function xxxdet() {
+
+        fn_computebalancedet()
+
+    }
+    function fn_computebalancedet()
+    {
+        //alert(1)
+        //var year = $("#ddlYear").val()
+        var Progid = $("#ProgramDet").val() == "" ? 0 : $("#ProgramDet").val();
+        var accountid = $("#accountDet").val()
+        //var ppaid = $("#subppa_list").val() == "" ? 0 : $("#subppa_list").val();
+        //var chargeofficeid = $("#charge_office").val() == "" ? 0 : $("#charge_office").val();
+        var excess = $("#excessid_temp").val();
+        var url = "@Url.Action("CommComp", "Release")"
+        $.get(url, { year: @Session["YearOf"], Progid: Progid, accountid: accountid, excess: 0 }, function (d) {
+            $("#appamountdet").val(MoneyFormat(d.Appropriation));
+            $("#totrelamountdet").val(MoneyFormat(d.AllotedAmount));
+            $("#balamountdet").val(MoneyFormat(d.BalanceAllotment));
+            //$("#appamount_temp").val(d.Appropriation);
+            //$("#totrelamount_temp").val(d.AllotedAmount);
+            //$("#balamount_temp").val(d.BalanceAllotment);
+            //$("#totreserveamount").val(MoneyFormat(d.totreserveapp));
+            //$("#totreserveamount_temp").val(d.totreserveapp);
+            //    $("#cafgrid").data("kendoGrid").dataSource.read();
+        });
+
+    }
+    function fn_dprefresherdet() {
+        $("#ProgramDet").data("kendoComboBox").dataSource.read();
+        $("#accountDet").data("kendoComboBox").value("");
+
+    }
+    function fn_dprefresherprogsdet() {
+        $("#accountDet").data("kendoComboBox").dataSource.read();
+    }
+    function fn_Offices() {
+        var proyy = $("#ddlYear").val();
+        var off_id = $("#officeDet").val();
+        
+        return {
+            propYear: proyy,
+            office_ID: off_id
+        }
+    }
+  
+    var thisculture = kendo.culture();
+    thisculture.numberFormat.currency.symbol = ' ';
+</script>
+
+<div style="float: none;clear:both;margin-top:20px;">
+   
+    <div style="margin-top:17px">
+
+
+        <div id="officelabel" style="float: left; margin-left: 130px; margin-top: 10px;">
+            <label style="display:inline-block">
+                Offices    :
+            </label>
+        </div>
+        <div id="officeidlabel" style="float: right; margin-right: 196.5px; margin-top: 5px; display: inline;">
+            
+            @(Html.Kendo().ComboBox()
+        .Name("officeDet")
+        .DataTextField("OfficeName")
+        .DataValueField("OfficeID")
+        .Placeholder("Select office...")
+        .Filter("contains")
+        .MinLength(1)
+        .HtmlAttributes(new { @style = "width: 400px;" })
+        .Events(e => e.Change("fn_dprefresherdet"))
+        .DataSource(source => source.Read(read => read.Action("GetOffice_MO", "Release").Data("Select_Office")))
+            )
+        </div>
+        <div id="programlabel" style="float: left; margin-left: -110.5px; margin-top: 45px; display: inline;">
+            <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;font-size:14px;">
+                Program :
+            </label>
+        </div>
+        <div id="programidlabel" style="float: left;margin-left:36.5px;margin-top:5px;">
+       
+            @(Html.Kendo().ComboBox()
+        .Name("ProgramDet")
+        .DataTextField("ProgramDescription")
+        .DataValueField("ProgramID")
+        .Placeholder("Select programs...")
+        .HtmlAttributes(new { @style = "width: 400px;" })
+        .Events(e => e.Change("fn_dprefresherprogsdet"))
+        .DataSource(source => source.Read(read => read.Action("GetPrograms2", "dpPrograms").Data("fn_Offices")))
+            )
+        </div>
+
+        <div style="float:right;margin-right:635.5px;margin-top:10px">
+            <label style="">
+                Account    :
+            </label>
+        </div>
+        <div style="float:left;margin-left:229px;margin-top:-28px">
+            <script>
+                function fn_ForAccount() {
+                    var propYear = $("#ddlYear").val();
+                    var prog_id = $("#ProgramDet").val() == "" ? 0 : $("#ProgramDet").val();
+                    var excess = $("#excessid_temp").val();
+                    return {
+                        propYear: propYear,
+                        prog_id: prog_id,
+                        excess: excess
+                    }
+                }
+            </script>
+            @(Html.Kendo().ComboBox()
+                        .Name("accountDet")
+                        .DataTextField("account_name")
+                        .DataValueField("account_id")
+                        .Filter("contains")
+                        .MinLength(1)
+                        .Placeholder("Select Account...")
+                        .HtmlAttributes(new { @style = "width: 400px;" })
+                        .Events(e => e.Change("xxxdet"))
+                        .SelectedIndex(-1)
+                        .DataSource(source => source.Read(read => read.Action("commitment", "Dropdowns").Data("fn_ForAccount")))
+            )
+        </div>
+
+        <div style="float: left;margin-left:-584px;margin-top:9px;">
+            <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;font-size:14px;">
+                Appropriation    :
+            </label>
+        </div>
+        <div style="float: left;margin-left:-399.7px;margin-top:9px;">
+            <input id="appamountdet" name="appamountdet" value="0.00" type="text" min="0" disabled style="width:139px;height:100%;font-size:16px;color:blue" class="form-control">
+        </div>
+        <div style="float: left;margin-left:-632.5px;margin-top:40px;">
+            <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;font-size:14px;">
+                Total Release Amount    :
+            </label>
+
+        </div>
+        <div style="float:right;margin-right:445px;margin-top:40px;">
+            <input id="totrelamountdet" name="totrelamountdet" value="0.00" type="text" min="0" disabled style="width:139px;height:100%;font-size:16px;color:red" class="form-control">
+        </div>
+        <div style="float: right;margin-right:631px;margin-top:5px;">
+            <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;font-size:14px;">
+                Balance    :
+            </label>
+        </div>
+
+        <div style="float: right;margin-right:445px;margin-top:-20px;">
+            <input id="balamountdet" name="balamountdet" value="0.00" type="text" min="0" disabled style="width:139px;height:100%;font-size:16px;color:green" class="form-control">
+        </div>
+
+        <div style="border-color:black;border-style:dashed;border-width:1px;width:700px;margin-left:20px;margin-top:10px;display:inline-block;padding:5px;">
+            <div style="background-color:white;width:110px;margin-top:-15px;margin-left:15px;"><span style="background-color:white;font-size:16px;width:70px;margin-top:-19px;margin-left:15px;font-style:italic">Details</span></div>
+
+            <div style="float:right;margin-right:540px;margin-top:10px">
+                <label style="font-size:14px">
+                    City/Municipality    :
+                </label>
+            </div>
+            <div style="float:left;margin-left:202px;margin-top:-28px">
+                @(Html.Kendo().ComboBox()
+                        .Name("municipaldet")
+                        .DataTextField("municipal")
+                        .DataValueField("citymunCode")
+                        .Filter("contains")
+                        .MinLength(1)
+                        .Placeholder("Select municipality...")
+                        .HtmlAttributes(new { @style = "width: 400px;" })
+                        .Events(e => e.Change("munsel"))
+                        .SelectedIndex(-1)
+                        .DataSource(source => source.Read(read => read.Action("getmunicipality", "Dropdowns")))
+                )
+            </div>
+            <div style="float:right;margin-right:540px;margin-top:10px">
+                <label style="font-size:14px">
+                    Barangay    :
+                </label>
+            </div>
+            <div style="float:left;margin-left:202px;margin-top:-28px">
+                <script>
+                    function fn_barangay() {
+
+                        var munid = $("#municipaldet").val();
+                    return {
+                        munid: munid
+                    }
+                }
+                </script>
+
+                @(Html.Kendo().ComboBox()
+                        .Name("barangaydet")
+                        .DataTextField("brgyDesc")
+                        .DataValueField("brgyCode")
+                        .Filter("contains")
+                        .MinLength(1)
+                        .Placeholder("Select barangay...")
+                        .HtmlAttributes(new { @style = "width: 400px;" })
+                        .SelectedIndex(-1)
+                        .DataSource(source => source.Read(read => read.Action("getbarangay", "Dropdowns").Data("fn_barangay")))
+                )
+            </div>
+      
+            <div style="float: right;margin-right:431.5px;margin-top:10px;;">
+                <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;font-size:14px;width:160px">
+                    Amount    :
+                </label>
+            </div>
+            <div style="float: left;margin-left:201.5px;margin-top:-27px;">
+                <input id="relamountdet" name="relamountdet" value="0.00" type="text" min="0" style="width:139px;height:100%;font-size:16px;color:black" onkeyup="sync()" class="form-control">
+            </div>
+            <div style="float: left;margin-left:-268.5px;margin-top:12px;">
+                <label style="margin-left: 0px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;font-size:14px;">
+                    Description    :
+                </label>
+            </div>
+            <div style="float: left;margin-left:-150px;margin-top:6px;">
+                <textarea id="particulardet" name="particulardet" type="text" placeholder="Enter description here..." style="width:390px;height:100%;font-size:16px;color:black" class="form-control"> </textarea>
+            </div>
+            <div style="float: right;margin-right:493.5px;margin-top:5px; width:100px">
+                <label style="font-size:14px">
+                    Remark    :
+                </label>
+            </div>
+            <div style="float: left;margin-left:202.5px;margin-top:-22px;">
+                <textarea id="remarkdet" name="remarkdet" type="text" style="width:390px;height:100%;font-size:16px;color:black" disabled class="form-control"> </textarea>
+            </div>
+            <div style="float: right;margin-right:505.5px;margin-top:5px; width:100px">
+                <label style="font-size:14px">
+                    Code No.    :
+                </label>
+            </div>
+            <div style="float: right;margin-right:386.5px;margin-top:-22px;margin-bottom:5px">
+                <input id="codenodet" name="codenodet" type="text" style="width:100px;font-size:16px;color:black;background-color:cornsilk" disabled class="form-control">
+            </div>
+        </div>
+
+
+    </div>
+</div>
+
+<div style="float: none;clear:both;margin-top:-5px;">
+    <div style="float:left;margin-top:26px;margin-left:624px">
+        <div class="k-button k-button-icontext" style=" bottom: 15px; right: 220px;width: 80px; border-radius:50px;color:#ffffff;background-color:#DE5555;" onclick="CloseDetails()"><span class='fa fa-times' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'></span> Close</div>
+    </div>
+ 
+</div>
+<script>
+    $(document).ready(function () {
+        //$("#txtfields").hide();
+        $("#municipaldet").data("kendoComboBox").dataSource.read();
+        $("#officeDet").data("kendoComboBox").value(@Session["officeid"]);
+        fn_dprefresherdet()
+        $("#ProgramDet").data("kendoComboBox").dataSource.read();
+        $("#ProgramDet").data("kendoComboBox").value(@Session["programid"]);
+        $("#accountDet").data("kendoComboBox").dataSource.read();
+        $("#accountDet").data("kendoComboBox").value(@Session["accountid"]);
+        xxxdet()
+        $("#municipaldet").data("kendoComboBox").value(@Session["muncode"]);
+        munsel()
+        $("#barangaydet").data("kendoComboBox").value(@Session["brgycode"]);
+        $("#relamountdet").val(MoneyFormat('@Session["Amount_release"]'))
+        $("#particulardet").val('@Session["particular"]')
+        $("#codenodet").val('@Session["code"]')
+   
+
+    });
+    function Select_Office() {
+        var classtype = $("#classtype").val();
+
+        if (classtype == null || classtype == "") {
+
+            return { classtype: 2 }
+        }
+        else {
+            return { classtype: classtype }
+        }
+    }
+   
+   
+</script>
+
+

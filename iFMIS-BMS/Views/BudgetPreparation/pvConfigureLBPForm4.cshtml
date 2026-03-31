@@ -1,0 +1,265 @@
+﻿<script>
+
+    function GridParameters() {
+        var OfficeID = $("#ddlAIPOffices").val();
+        var transyear=$("#propsYears").val();
+
+        return {
+            OfficeID: OfficeID,
+            transyear:transyear
+        }
+
+    }
+    function AddNewItem() {
+        var Mode = "Add"
+        var url = "@Url.Action("ShowAIPWindow", "BudgetPreparation")";
+        $('#AddNewAIPWindow').html('<div style="width: 100%;height:100%;"><img src="@Url.Content("~/Content/images/loading.gif")" alt="Loading..." style="position: absolute;top: 20%;left: 30%;margin-top: 0px;margin-left: 0px;" /></div>');
+        $.post(url,{Mode:Mode,AIPID:'NONE'}, function (pvData) {
+            $(window).scrollTop(0);
+            $('#AddNewAIPWindow').html(pvData);
+            $('#AddNewAIPWindow').data('kendoWindow').title("<i class='fa fa-navicon'> </i> New PPA Breakdown").center().open();
+        })
+    }
+    function OnddlAIPOfficesChange() {
+        var SelectedTabIndex = $("#tabstrip").data("kendoTabStrip").select().index();
+        if (SelectedTabIndex == 0) {
+            $("#grdPPA").data("kendoGrid").dataSource.read();
+        }
+        else if(SelectedTabIndex == 1){
+            $("#grdLBPForm4OtherData").data("kendoGrid").dataSource.read();
+        }
+    }
+    function getAIPGridFooterTotal() {
+        var url = "@Url.Action("getLBPForm4GridFooterTotal", "BudgetPreparation")";
+        var OfficeID = $("#ddlAIPOffices").val();
+        var ReturnValue = "";
+        var grid = $("#grdPPA").data("kendoGrid")
+        var ds = grid.dataSource.view();
+        var aiptag = 0;
+        var transno=0;
+        //$.get(url,{OfficeID: OfficeID}, function (d) {
+        //    document.getElementById('GridFooterTotal').innerHTML = d;
+        //})
+        for (var i = 0; i < ds.length; i++)
+        {
+            aiptag = ds[i].aiptag;
+            transno= ds[i].transno;
+
+            ////Edit/Remove all ppa's
+            //if (aiptag == 1){
+            //    $('#editid' + transno + '').css("display", "none");
+            //    $('#removeid' + transno + '').css("display", "none");
+            //}
+            //else {
+                $('#editid' + transno + '').css("display", "normal");
+                $('#removeid' + transno + '').css("display", "normal");
+            // }
+            ////Edit/Remove all ppa's
+        }
+
+    }
+    function OnAIPGridEdit(arg) {
+        //var inputName = arg.container.find('input').attr("name");
+        //if (inputName == "OrderNo") {
+        //    var myInput = arg.container.find('input[name="OrderNo"]');
+        //    setTimeout(function () {
+        //        myInput.select();
+        //    },25);
+        //}
+        if (arg.container.find("input[name=OrderNo]").length <= 0) {
+            $("#grdPPA").data("kendoGrid").closeCell(arg.container)
+        }
+
+        var gridName = $('#grdPPA').data('kendoGrid');
+        var ds = gridName.dataSource.data();
+        var dataRows = gridName.items();
+        var AIP_ID = "";
+
+        var input = arg.container.find("input[name=OrderNo]");
+        var value = input.val();
+        var OldValue = input.val();
+
+        input.keyup(function () {
+            value = input.val();
+        });
+        input.blur(function () {
+            var rowIndex = dataRows.index(gridName.select());
+            AIP_ID = ds[rowIndex].AIPID;
+            if (value != OldValue) {
+                var url = "@Url.Action("UpdateAIPOrderNo", "BudgetPreparation")";
+                $.post(url, { AIP_ID: AIP_ID, OrderNo: value }, function (d) {
+                    if (d == "1") {
+                        $("#grdPPA").data("kendoGrid").dataSource.read();
+                    }
+                    else {
+                        swal({
+                            title: "Error!",
+                            text: d,
+                            type: "error",
+                            showConfirmButton: true
+                        });
+                    }
+                })
+            }
+        });
+
+    }
+    function reqEditAIP(AIPID) {
+        var Mode = "Edit"
+        var url = "@Url.Action("ShowAIPWindow", "BudgetPreparation")";
+        $('#AddNewAIPWindow').html('<div style="width: 100%;height:100%;"><img src="@Url.Content("~/Content/images/loading.gif")" alt="Loading..." style="position: absolute;top: 20%;left: 30%;margin-top: 0px;margin-left: 0px;" /></div>');
+        $.post(url,{Mode:Mode,AIPID :AIPID}, function (pvData) {
+            $(window).scrollTop(0);
+            $('#AddNewAIPWindow').html(pvData);
+            $('#AddNewAIPWindow').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Update Item - AIP").center().open();
+        })
+    }
+    function reqRemoveAIP(AIPID) {
+        var url = "@Url.Action("RemoveAIP", "BudgetPreparation")";
+        $.post(url, { AIP_ID: AIPID}, function (d) {
+            if (d == "1") {
+                swal({
+                    title: "Success!",
+                    text: "AIP Item Successfuly Removed",
+                    type: "success",
+                    showConfirmButton: true
+                });
+                $("#grdPPA").data("kendoGrid").dataSource.read();
+            }
+            else {
+                swal({
+                    title: "Error!",
+                    text: d,
+                    type: "error",
+                    showConfirmButton: true
+                });
+            }
+        })
+    }
+    function DownloadAIPData() {
+        var url = "@Url.Action("DownloadAIPLump", "BudgetPreparation")";
+        swal({
+            title: "System Notice!",
+            text: "This will generate/update data into this LBP form 4 from the approved AIP. Do you want to proceed?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes",
+            showLoaderOnConfirm: true,
+            closeOnConfirm: false },
+                function(){
+                    $.get(url, { OfficeID: $("#ddlAIPOffices").val(),proyear:$("#propsYears").val() }, function(e){
+                        if(e == "1"){
+                            $("#grdPPA").data("kendoGrid").dataSource.read();
+                            swal({
+                                title: "Success",
+                                text: "Data successfully generated!",
+                                type: "success",
+                                showConfirmButton: true
+                            });
+                        }else{
+                            swal({
+                                title: "Error",
+                                text: e,
+                                type: "error",
+                                showConfirmButton: true
+                            });
+                        }
+
+                    });
+                });
+    }
+    function OnTabstripActivate() {
+        var SelectedTabIndex = $("#tabstrip").data("kendoTabStrip").select().index();
+        var OfficeID = $("#ddlAIPOffices").val();
+        if (OfficeID != '') {
+            if (SelectedTabIndex == 0) {
+                  $("#grdPPA").data("kendoGrid").dataSource.read();
+            }
+            else if(SelectedTabIndex == 1){
+                $("#grdLBPForm4OtherData").data("kendoGrid").dataSource.read();
+            }
+        }
+    }
+</script>
+
+<div style="width : 100%;height:125px; border-style: solid; border-color: #1fa67a">
+    <div style="width:100%;height : 25px ; background-color:#1fa67a; color: white">
+        <label class="fa fa-file-powerpoint-o fa-lg" style="margin-left: 5px; display:inline-block">  LBP Form 4 Preparation</label>
+    </div>
+    <label style="margin-left: 0px;margin-left: 10px;margin-top: 10px;margin-bottom: 2px; display : inline-block">
+        Office :&nbsp;&nbsp;&nbsp;&nbsp;
+        @(Html.Kendo().ComboBox()
+                         .Name("ddlAIPOffices")
+                         .DataTextField("OfficeName")
+                         .DataValueField("OfficeID")
+                         .Filter("contains")
+                         .MinLength(1)
+                         .Placeholder("Select Office...")
+                         .HtmlAttributes(new { @style = "width: 527px;" })
+                         .DataSource(source => source.Read(read => read.Action("ddlOfficeUP", "User")))
+                         .Events(e => e.Change("OnddlAIPOfficesChange"))
+        )<br />
+        <br />
+    </label>
+    <label style="text-align: right;float: left;margin-left:10px;margin-top:-10px;">
+        Year : <span style="float:right;margin-left:35px;">
+        @(Html.Kendo().ComboBox()
+                      .Name("propsYears")
+                      .DataTextField("ProposalYear")
+                      .DataValueField("ProposalYear")
+                      .Filter("contains")
+                      .SelectedIndex(0)
+                      .MinLength(1)
+                      .HtmlAttributes(new { @style = "width: 90px;" })
+                      .DataSource(source => source.Read(read => read.Action("ddlProposalYearNew", "Dropdowns")))
+        ) </span>
+    </label>
+    <label style="text-align: left;float: left;margin-left:0px;margin-top:15px;">
+        @(Html.Kendo().TabStrip()
+          .Name("tabstrip")
+          .Navigatable(false)
+          .Animation(animation =>
+              animation.Open(effect =>
+              effect.Fade(FadeDirection.In)))
+          .Events(e => e.Activate("OnTabstripActivate"))
+          .Items(tabstrip =>
+          {
+              tabstrip.Add().Text("PPA's").Selected(true).LoadContentFrom("pvLBPForm4PPA_Tab", "BudgetPreparation");//.Enabled(false);
+              tabstrip.Add().Text("Other Data").LoadContentFrom("pvLBPForm4OtherData_Tab", "BudgetPreparation");
+
+          })
+        )
+    </label>
+</div>
+@(Html.Kendo().Window()
+    .Name("AddNewAIPWindow")
+    .Title("New PPA Breakdown")
+    .Width(570)
+    .Height(630)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(true)
+    .AutoFocus(true)
+    .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        }).Actions(a => { a.Close(); }))
+<script>
+    $(document).ready(function () {
+        if (@Account.UserInfo.UserTypeID == 1) {
+            $("#ddlAIPOffices").data("kendoComboBox").value(@Account.UserInfo.Department.ToString());
+            $("#ddlAIPOffices").data("kendoComboBox").enable(false);
+        }
+        else {
+            $("#ddlAIPOffices").data("kendoComboBox").value(@Account.UserInfo.Department.ToString());
+            $("#ddlAIPOffices").data("kendoComboBox").enable(true);
+        }
+        OnTabstripActivate();
+    });
+</script>

@@ -1,0 +1,49 @@
+﻿@model IEnumerable<iFMIS_BMS.BusinessLayer.Models.LineGraph_Model>
+
+
+@*@section HeadContent {
+    <style>
+    #chart {
+        background: center no-repeat url('@Url.Content("~/Content/shared/world-map.png")')
+    }
+    </style>
+}*@
+
+<div class="demo-section k-content wide" style="color:#ffd800">
+    @(Html.Kendo().Chart(Model)
+        .Name("chart")
+        .Title((string)ViewBag.accountName)
+        .Legend(legend => legend
+            .Position(ChartLegendPosition.Bottom)
+        )
+        //.ChartArea(chartArea => chartArea
+        //    .Background("transparent")
+        //)
+        .SeriesDefaults(seriesDefaults =>
+            seriesDefaults.Line().Style(ChartLineStyle.Normal)
+        )
+        .Series(series =>
+        {
+            series.Line(s => s.amount2).Name("Appropriation").Color("#0094ff");
+            series.Line(s => s.amount1).Name("Obligation").Color("#ffd800").Visible(false);
+            series.Line(s => s.amount3).Name("Continuing").Color("#1fa67a").Visible(false);
+            series.Line(s => s.amount4).Name("Current Obligation With Continuing").Color("#FF0404");
+
+        })
+        .CategoryAxis(axis => axis
+            .Categories("2021","2022","2023","2024","2025","2026")
+            .MajorGridLines(lines => lines.Visible(false))
+        )
+        .ValueAxis(axis => axis
+            .Numeric().Labels(labels => labels.Format("{0:C2}"))
+            .Line(line => line.Visible(false))
+            .AxisCrossingValue(-10)
+        )
+        .Tooltip(tooltip => tooltip
+            .Visible(true)
+            .Format("{0:C2}")
+        )
+
+    //   .Legend(legend => legend.Position(ChartLegendPosition.Bottom).Labels(x => x.Font(font: "bold 12px Arial,Helvetica,sans-serif").Template("History Amount")))
+    )
+</div>

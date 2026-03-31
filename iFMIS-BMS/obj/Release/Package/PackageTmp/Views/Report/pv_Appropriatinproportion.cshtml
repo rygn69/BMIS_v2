@@ -1,0 +1,358 @@
+﻿
+@model IEnumerable<iFMIS_BMS.BusinessLayer.Models.ReportModel>
+
+<style>
+     .dialog-overlay {
+        background-color: #000000;
+        opacity: 0.4;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        min-height: 100%;
+        min-width: 100%;
+        z-index: 99999;
+    }
+</style>
+    <script>
+
+        function fnyear(){
+            setTimeout(function () {
+                $("#PropDetails").data("kendoGrid").dataSource.read();
+                if ($("#Account").val() == 342) { //gasoline
+                    $("#BarAppropriationComparison").show();
+                    $("#BarAppropriationComparison2").hide();
+                    $("#BarAppropriationComparison").data("kendoChart").dataSource.read();
+                    document.getElementById("headerid").innerHTML = "Per Vehicle";
+
+                }
+                else {
+                    $("#BarAppropriationComparison2").show();
+                    $("#BarAppropriationComparison").hide();
+                    $("#BarAppropriationComparison2").data("kendoChart").dataSource.read();
+                    document.getElementById("headerid").innerHTML = "Per Employee";
+                }
+            },500);
+        }
+
+        function getParam() {
+            return {
+                yearof: $("#ProposalYear").val(),
+                accountid: $("#Account").val()
+            }
+        }
+
+        function SelAccount() {
+            setTimeout(function () {
+                $("#PropDetails").data("kendoGrid").dataSource.read();
+                if ($("#Account").val() == 342) { //gasoline
+                    $("#BarAppropriationComparison").show();
+                    $("#BarAppropriationComparison2").hide();
+                    $("#BarAppropriationComparison").data("kendoChart").dataSource.read();
+                    document.getElementById("headerid").innerHTML = "Per Vehicle";
+                    
+                }
+                else
+                {
+                    $("#BarAppropriationComparison2").show();
+                    $("#BarAppropriationComparison").hide();
+                    $("#BarAppropriationComparison2").data("kendoChart").dataSource.read();
+                    document.getElementById("headerid").innerHTML = "Per Employee";
+                }
+                
+            }, 500);
+        }
+        var thisculture = kendo.culture();
+
+        function reqReload() {
+            $("#PropDetails").data("kendoGrid").dataSource.read();
+            if ($("#Account").val() == 342) { //gasoline
+                $("#BarAppropriationComparison").show();
+                $("#BarAppropriationComparison2").hide();
+                $("#BarAppropriationComparison").data("kendoChart").dataSource.read();
+                document.getElementById("headerid").innerHTML = "Per Vehicle";
+
+            }
+            else {
+                $("#BarAppropriationComparison2").show();
+                $("#BarAppropriationComparison").hide();
+                $("#BarAppropriationComparison2").data("kendoChart").dataSource.read();
+                document.getElementById("headerid").innerHTML = "Per Employee";
+            }
+        }
+        //function Close() {
+        //    $("#PropDetails").data("kendoGrid").dataSource.read();
+        //    $("#BarAppropriationComparison").data("kendoChart").dataSource.read();
+        //}
+
+        thisculture.numberFormat.currency.symbol = '    ';
+    </script>
+
+    <h2><span class="fa fa-print"></span> Expense Per Capita </h2>
+
+    @*<font size="3"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>Note:</strong> You can generate report with or without Office </font>*@
+    <br />
+
+   
+
+    <div style="float: left;margin-right:10px;margin-top:2px;">
+        <label style="float:left;margin-left: 50px;">
+            Account    :
+        </label>
+    </div>
+    <div style="float:left;margin-left:44px;width:500px">
+        @(Html.Kendo().ComboBox()
+            .Name("Account")
+                .DataTextField("Text")
+                .DataValueField("Value")
+                .Events(e => e.Select("SelAccount"))
+                .BindTo(new List<SelectListItem>() {
+                    new SelectListItem() {
+                        Text = "Gasoline, Oil and Lubricants Expenses",
+                        Value = "342"
+                    },
+                    new SelectListItem() {
+                        Text = "Office Supplies Expenses",
+                        Value = "336"
+                    },
+                    new SelectListItem() {
+                        Text = "Training Expenses",
+                        Value = "334"
+                    }
+                })
+                .Value(@ViewBag.MonthVaue)
+                .HtmlAttributes(new { style = "width:100%; height:100%", @class = "form-control autoselect" })
+                .SelectedIndex(-1)
+        )
+    </div>
+
+    <div style="float: left;margin-right:10px;margin-top:10px;">
+        <label style="float:left;margin-left: 50px;">
+            Year    :
+        </label>
+    </div>
+    <div style="float:left;margin-left:72px;width:100px;margin-top:10px;">
+        @(Html.Kendo().ComboBox()
+                .Name("ProposalYear")
+                .DataTextField("ProposalYear")
+                .DataValueField("ProposalYear")
+                .SelectedIndex(0)
+                .Events(e => e.Select("fnyear"))
+                .HtmlAttributes(new { style = "width:100%; height:100%", @class = "form-control autoselect" })
+
+                .DataSource(source => source.Read(read => read.Action("GetPropYear3", "PYear")))
+        )
+
+    </div>
+    
+   
+
+
+    <div style="display:none">
+        <input type="text" id="officeid" name="officeid" value="0" style="display:none;">
+        <input type="text" id="programid" name="programid" value="0" style="display:none;">
+        <input type="text" id="accountid" name="accountid" value="0" style="display:none;">
+    </div>
+
+    <div style="float:left;margin-left:500px;width:300px;margin-top:10px;">
+     
+        <div id="btnPrint" class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: auto;float:right; margin-top: 14px; margin-right:42px;background-color:ButtonShadow;color:white; margin-bottom:0px" onclick="reqReload()"><i class="fa fa-retweet"></i> Reload Data</div>
+    </div>
+
+    <div style="width:100%;float:left;margin-top:10px;">
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.ReportModel>()
+            .Name("PropDetails")
+            .HtmlAttributes(new { style = "height:520px;" })
+            .Scrollable()
+            .Columns(col =>
+            {
+        col.Template(@<text></text>)
+                                @*.Hidden()*@
+            .HeaderTemplate(@<text>No.</text>)
+            .Width(40)
+            .HtmlAttributes(new { style = "text-align:center;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;height:30px;", @class = "metro-header" })
+                @*.HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal"})*@
+                    .ClientTemplate("<div>#=trnno# </div>");
+        col.Template(@<text></text>)
+                                    .HeaderTemplate(@<text>Account</text>)
+        .Width(280)
+        .HtmlAttributes(new { style = "text-align:left;" })
+        .HeaderHtmlAttributes(new { style = "text-align:center;height:30px;", @class = "metro-header" })
+        .ClientTemplate("<div>#=OfficeName# </div>");
+
+        col.Bound(c => c.appropriation)
+                .HeaderTemplate(@<text>Appropriation</text>)
+                .Width(150)
+                .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;height:30px;", @class = "metro-header" })
+                .ClientTemplate("<div>#=kendo.toString(appropriation,'c2')# </div>");
+        col.Bound(c => c.proportion)
+                .HeaderTemplate(@<text><span id="headerid"></span> </text>)
+                .Width(150)
+                .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;height:30px;", @class = "metro-header" })
+                .ClientTemplate("<div>#=kendo.toString(proportion,'c2')# </div>");
+
+                col.Bound(m => m.OfficeID).Width(0).Hidden();
+
+            })
+                //.Editable(editable => editable.Mode(GridEditMode.InCell))
+                .Pageable(pageable => pageable
+                .Refresh(true)
+                .ButtonCount(4))
+                .Selectable()
+                //     .Events(e => e.Change("WFPgrid"))
+                .DataSource(dataSource => dataSource
+                .Ajax()
+                .Batch(true)
+                .Model(m => m.Id(i => i.trnno))
+                .ServerOperation(false)
+
+
+                //.Aggregates(a =>
+                //{
+                //    a.Add(c => c.Amount).Sum();
+                //})
+                .PageSize(10)
+                .Read(read => read.Action("GetAppProportionDetail", "Report").Data("getParam"))
+                )
+)
+        </div>
+
+       <div style="float:left;width:100%;border-color:#808080;border-style:solid;border-width:2px;margin-top:5px;">
+        <div style="width:100%;height:auto;">
+
+            @(Html.Kendo().Chart(Model)
+                    .Name("BarAppropriationComparison")
+                    .Legend(legend => legend
+                        .Visible(false)
+                        .Position(ChartLegendPosition.Bottom)
+                    )
+
+                    .Series(series =>
+                    {
+                        series.Bar(m => m.proportion).Name("OfficeName").CategoryField("OfficeName");
+                    })
+                    .CategoryAxis(axis => axis
+                        .Categories(m=>m.OfficeName)
+                        .MajorGridLines(lines => lines.Visible(false))
+                    )
+                    .ValueAxis(axis => axis
+                        .Numeric()
+                        .Max(1000000)
+                        .Line(line => line.Visible(false))
+                        .MajorGridLines(lines => lines.Visible(true))
+                    )
+                    .Tooltip(tooltip => tooltip
+                        .Visible(true)
+                        @*.BackColor("#050303")*@
+                        @* .Color("#D40000")*@
+                        .Format("{0:c2}")
+                    )
+                    .Events(events => events.SeriesClick("BarClick"))
+                    .HtmlAttributes(new { style = "height:600px;width:100%" })
+                    .DataSource(source => source.Read(read => read.Action("BarAppropriationComparison", "Utility").Data("getParam")))
+            )
+            @*     <span id="BarChartComparisonTotal" style="font-weight:600;margin-left: 150px; font-size:15px;"></span>*@
+        </div>
+
+    </div>
+
+    <div style="float:left;width:100%;border-color:#808080;border-style:solid;border-width:2px;margin-top:5px;">
+        <div style="width:100%;height:auto;">
+
+            @(Html.Kendo().Chart(Model)
+                        .Name("BarAppropriationComparison2")
+                        .Legend(legend => legend
+                            .Visible(false)
+                            .Position(ChartLegendPosition.Bottom)
+                        )
+
+                        .Series(series =>
+                        {
+                            series.Bar(m => m.proportion).Name("OfficeName").CategoryField("OfficeName");
+                        })
+                        .CategoryAxis(axis => axis
+                            .Categories(m => m.OfficeName)
+                            .MajorGridLines(lines => lines.Visible(false))
+                        )
+                        .ValueAxis(axis => axis
+                            .Numeric()
+                            .Max(20000)
+                            .Line(line => line.Visible(false))
+                            .MajorGridLines(lines => lines.Visible(true))
+                        )
+                        .Tooltip(tooltip => tooltip
+                            .Visible(true)
+                            @*.BackColor("#050303")*@
+                            @* .Color("#D40000")*@
+                            .Format("{0:c2}")
+                        )
+                        .Events(events => events.SeriesClick("BarClick"))
+                        .HtmlAttributes(new { style = "height:600px;width:100%" })
+                        .DataSource(source => source.Read(read => read.Action("BarAppropriationComparison", "Utility").Data("getParam")))
+            )
+            @*     <span id="BarChartComparisonTotal" style="font-weight:600;margin-left: 150px; font-size:15px;"></span>*@
+        </div>
+
+    </div>
+
+@(Html.Kendo().Window()
+        .Name("viewPropDetails")
+        .Title("Proposal Details")
+        .Width(500)
+        .Height(450)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+       //   .Events(e => e.Close("Close"))
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+                .Actions(a => { a.Close(); })
+)
+    <script>
+        function BarClick(e) {
+            
+            //  alert(e.category);
+           // $(window).scrollTop(0);
+            var url = "@Url.Action("ProportionDetails", "Utility")";
+            var offname = e.category;
+            var acctnameid = $("#Account").val();
+            var yearof = $("#ProposalYear").val();
+        
+            $.get(url, { offname: offname, acctnameid: acctnameid, yearof: yearof }, function (d) {
+                $('#viewPropDetails').html(d);
+            })
+            //$('#viewPropDetails').data('kendoWindow').center().open();
+            $('#viewPropDetails').data('kendoWindow').title("<i class='fa fa-navicon'> </i> " + e.category + " ").center().open();
+        }
+
+
+        $(document).ready(function () {
+
+            $("#BarAppropriationComparison").hide();
+            $("#BarAppropriationComparison2").hide();
+
+        }, 1000);
+    </script>
+
+    <style>
+        .pageContent {
+            border: 1px solid #dadada;
+            padding: 5px;
+            margin-top: 7px;
+            height: 1320px;
+            background-color: #fff;
+            padding: 10px;
+        }
+    </style>

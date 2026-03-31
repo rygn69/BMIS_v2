@@ -1,0 +1,131 @@
+﻿<div id="PlantillaGridDiv" style="margin-right:10px">
+    <div id="legendDIV" style="display:none">
+        <label style="margin-left: 0px;margin-right: 5px;margin-top: -10px;margin-bottom: 0px; display : inline-block">
+            Legend :
+            <span class='fa fa-circle' style='color:yellow;' id='circle-id'></span> Proposed New Position For Funding
+            <span class='fa fa-user-times' style='color:red; margin-left:154px' id='circle-id'></span> Included on Hazard Pay Or Subsistence
+            <br /> <span class='fa fa-circle' style='color:red; margin-left:67px' id='circle-id'></span> Proposed New Position For Funding(Submitted)
+            <span class='fa fa-user-plus' style='color:green; margin-left:67px' id='circle-id'></span> Excluded on Hazard Pay Or Subsistence
+        </label>
+    </div>
+    <input type="hidden" value="0" id="GridSizeIndicator" />
+    <div style="border: outset;clear:both;border-width:1px;border-color:#1fa67a; width: 100%; padding-left:0px;padding-right:0px;padding-top:0px;padding-bottom:7px;margin-top: 10px;">
+        <div style=" width: 91.5%;height: 100%; border-right: 0px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;margin-top: -1px; ">
+            <div style="float: left; width: 100%; margin-top:1px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 36px solid #1fa67a; ">
+
+                <div style="float: left; height:28px; margin-left:-59px; margin-top: 5px;">
+                    <i class="fa fa-tasks fa-2x fg-white">&nbsp;&nbsp;&nbsp;&nbsp;Plantilla</i>
+                </div>
+                <div style="float:right">
+                    <div style="float:right;margin-right:6px;margin-top:5px;">
+                        <button  class="k-button k-button-icontext" onclick="ResizePlantillaDIV()" id="plantitleid" title="Maximize"> <i id="platillanmaxid" class="fa fa-arrows-alt"> </i> </button>
+                     @*   <button class="k-button k-button-icontext" onclick="AddNewCasual()"> <i class="fa fa-plus-circle"></i> Add Casual </button>*@
+                        @if (Account.UserInfo.eid == 5580 || Account.UserInfo.eid == 695 || Account.UserInfo.eid == 2635)
+                        {
+                            <button class="k-button k-button-icontext" onclick="AddNew()"> <i class="fa fa-plus-circle"></i> Propose New Position </button>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Maintenance.PlantillaModel>()
+        .Name("grdPlantillaList")
+        .Columns(columns =>
+        {
+            columns.Bound(c => c.SeriesID).Hidden();
+            columns.Bound(c => c.DivName).Hidden()
+                .ClientGroupHeaderTemplate("<div style='display:inline-block'>#= value #</div>");
+            columns.Template(t => { }).ClientTemplate(
+                  "<div class='btn-delete'style='inline-block; height: 15px;width:110px;' onmouseover='Sample(#=SeriesID#)''> <a  id='Transferbtn#=SeriesID#' title='Transfer to Child Office' onclick='btnTransfer(#=SeriesID#,#=ForStepIncrement#)' style='margin-left:2px;'><span class='fa fa-copy' style='font-size: 12pt;'></span></a>").Width(50);
+            columns.Bound(c => c.ItemNo).Title("Item No.").Width(70)
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                .ClientTemplate(
+                                       "# if(ForStepIncrement == 1) { #" +
+                                       " #=ItemNo# " +
+                                       "# } else if(ForStepIncrement == 2 || ForStepIncrement == 3) { #" +
+                                       "<span class='fa fa-circle' style='color:yellow;' id='circle-id'></span> #=ItemNo# " +
+                                       "# } else if(ForStepIncrement == 4) { #" +
+                                       "<span class='fa fa-circle' style='color:red;' id='circle-id'></span> #=ItemNo# " +
+                                       "# } else{ #" +
+                                       "#=ItemNo# " +
+                                       "# } #"
+                                       );
+            columns.Bound(c => c.ItemNoNew).Title("New Item No.").Width(70)
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+            columns.Bound(c => c.Position).Title("Position Title").Width(220)
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                .ClientFooterTemplate("<div style='text-align:center;color:darkgreen'><label>Total No. of Employee(s) : #=count# </label></div>");
+            columns.Bound(c => c.EmployeeName).Title("Employee Name").Width(150)
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+            columns.Bound(c => c.AppointmentDate).Title("Appointment Date / Proposed Date").Width(120)
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+            columns.Bound(c => c.sg).Title("Grade").Width(70)
+                .ClientTemplate("# if(sg != oldSG) { #" +
+                  "#=oldSG# </br> #=sg#" +
+                  "# } else {#" +
+                  "#=sg#" +
+                  "#}#"
+                  )
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+            columns.Bound(c => c.StepNew ).Title("Step").Width(70)
+                .ClientTemplate("# if(StepNew != step) { #" +
+                  "#=step# </br> #=StepNew#" +
+                  "# } else {#" +
+                  "#=step#" +
+                  "#}#"
+                  )
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+            columns.Bound(c => c.ProposedSalary).Title("Proposed Salary").Width(100)
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                .HtmlAttributes(new { style = "text-align:right" })
+                .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label>Total : </label></div>");
+            columns.Bound(c => c.YearlySalary).Title("Proposed Salary (Annual)").Width(150)
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                .HtmlAttributes(new { style = "text-align:right" })
+                .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label>#=kendo.toString(sum, 'c2')# </label></div>");
+            columns.Template(t => { }).ClientTemplate(
+                  "# if(ForStepIncrement == 2 || ForStepIncrement == 3) { #" +
+                  "<div class='k-button' onclick='reqEdit(#=ForStepIncrement#,#=SeriesID#)' style='inline-block' title='Edit Item (?)'> <span class='fa fa-edit'></span> Edit</div>" +
+                  "<div class='k-button' onclick='reqRemove(#=ForStepIncrement#,#=SeriesID#)' style='inline-block' title='Remove Item'> <span class='fa fa-times'></span>Remove</div>" +
+                  "# } #"
+                  ).HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                  .Title("Edit/Remove")
+                  .Width(170);
+            columns.Template(t => { }).ClientTemplate("<div id='#=SeriesID#' onclick='GetButton(#=SeriesID#,\"#=EmployeeName#\")'></div>")
+                  .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                  .Title("Exclude/Include").Width(220);
+
+        })
+        .HtmlAttributes(new { style = "height: 525px;" })
+        .Scrollable(s => s.Enabled(true))
+        .Selectable()
+        .Pageable(p => p.PreviousNext(false).PageSizes(false).Refresh(true).Numeric(false))
+        .Events(e => e.DataBound("OnGridDataBound"))
+        .AutoBind(false)
+
+        .DataSource(dataSource => dataSource
+            .Ajax()
+            .Batch(true)
+            .ServerOperation(true)
+            .AutoSync(true)
+            .Aggregates(a =>
+            {
+                a.Add(c => c.YearlySalary).Sum();
+                a.Add(c => c.Position).Count();
+            })
+            .Read(read => read.Action("grPlantillaList", "Maintenance").Data("GridParameters"))
+            .Group(g =>
+            {
+                g.Add(c => c.GroupOrder);
+                g.Add(c => c.DivName);
+            })
+            .Sort(s =>
+            {
+                s.Add(c => c.PlantillaOrdering);
+            })
+            .PageSize(10000000)
+        )
+        )
+    </div>
+</div>
+

@@ -1,0 +1,121 @@
+﻿@model iFMIS_BMS.BusinessLayer.Models.ReportModel
+<script>
+
+
+    function reqPrint(e) {
+        var urlShowReport = "@Url.Action("PrintReport", "Report")"
+        var urlSendData = "@Url.Action("PrintReportData", "Report")"
+        if ($("#ddlOffices").val() != "" && $("#ddlProgram").val() != "") {
+            if (document.getElementById("cbPrintApproved").checked == true) {
+                var ReportID = 'ApprovedReport';
+                var officeID = $("#ddlOffices").val()
+                var officeName = $("#ddlOffices").data("kendoComboBox").text();
+                var Year = $("#ddlYear").val()
+
+                $.ajax({
+                    url: urlSendData,
+                    async: false,
+                    dataType: 'html',
+                    data: { OfficeID: officeID, OfficeName: officeName, Year: Year, ReportID: ReportID },
+                    success: window.open("Reports/ReportViewer.aspx?rid=8&OfficeID=" + officeID + "&OfficeName=" + officeName + "&Year=" + Year + "&ReportID=" + ReportID + "")
+                });
+            }
+            else if (document.getElementById("cbPrintApproved").checked == false && document.getElementById("cbPrintPrepared").checked == true) {
+                var ReportID = 'PreparedReport';
+                var officeID = $("#ddlOffices").val()
+                var officeName = $("#ddlOffices").data("kendoComboBox").text();
+                var Year = $("#ddlYear").val()
+
+                $.ajax({
+                    url: urlSendData,
+                    async: false,
+                    dataType: 'html',
+                    data: { OfficeID: officeID, OfficeName: officeName, Year: Year, ReportID: ReportID },
+                    success: window.open("Reports/ReportViewer.aspx?rid=1&OfficeID=" + officeID + "&OfficeName=" + officeName + "&Year=" + Year + "&ReportID=" + ReportID + "")
+                });
+            }
+            else {
+                alert("Please Select Report to Print")
+            }
+            
+        }
+        else {
+            alert("Please Select Office and Program");
+        }
+    }
+
+
+
+
+    function ProgramData() {
+        var proyy = $("#ddlYear").val();
+        var off_id = $("#ddlOffices").val();
+
+        return {
+            propYear: proyy,
+            office_ID: off_id,
+        }
+    }
+    function ChangeCheckApproved() {
+            document.getElementById("cbPrintPrepared").checked = false
+    }
+    function ChangeCheckPrepared() {
+            document.getElementById("cbPrintApproved").checked = false
+    }
+</script>
+<div style="width : 81.5%; margin-top: 0px;border-style: solid; border-color: #1fa67a;">
+    <div style="width:100%;height : 25px ; background-color:#1fa67a; color: white">
+        <label class="fa fa-file-text-o fa-lg" style="margin-left: 5px; display:inline-block">  PRINT REPORT</label>
+    </div>
+    <div style="margin-left: 5px; margin-bottom:5px">
+        <label style="margin-left: 0px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px; display : inline-block">
+            Office :&nbsp;&nbsp;&nbsp;&nbsp;
+            @(Html.Kendo().ComboBox()
+                         .Name("ddlOffices")
+                         .DataTextField("OfficeName")
+                         .DataValueField("OfficeID")
+                         .Filter("contains")
+                         .MinLength(1)
+                         .Placeholder("Select Office...")
+                         .HtmlAttributes(new { @style = "width: 527px;" })
+                         .DataSource(source => source.Read(read => read.Action("ddlOfficeUP", "User")))
+            )
+
+        </label>
+        <label style="margin-left: 0px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px; display : inline-block">
+            Budget Year : @(Html.Kendo().DropDownList()
+                        .Name("ddlYear")
+                        .DataTextField("ProposalYear")
+                        .DataValueField("ProposalYear")
+                        .SelectedIndex(0)
+                        .HtmlAttributes(new { @style = "width: 90px;" })
+                        .DataSource(source => source.Read(read => read.Action("GetPropYear", "PYear")))
+            )
+        </label>
+    </div>
+    <div style="float:left; margin-left: 5px">
+        <input type="checkbox" id="cbPrintApproved" class="k-checkbox" onclick="ChangeCheckApproved()">
+        <label class="k-checkbox-label" for="cbPrintApproved">Print Approved</label>
+    </div>
+    <div style="float:left; margin-left: 5px">
+        <input type="checkbox" id="cbPrintPrepared" class="k-checkbox" onclick="ChangeCheckPrepared()">
+        <label class="k-checkbox-label" for="cbPrintPrepared">Print Proposed</label>
+    </div>
+    <div style="display:inline-block;width:100%">
+        <div id="btnPrint" class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 80px;float:right; margin-top: 5px; margin-right:10px; margin-bottom:5px" onclick="reqPrint()">Print</div>
+        @*<div id="btnPrint" class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 80px;float:right; margin-top: 5px; margin-right:10px; margin-bottom:5px" onclick="reqPrintNon()">PrintNon</div>*@
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        document.getElementById("cbPrintPrepared").checked = true;
+        if ('@Model.UserTypeDesc' == 'Budget In-Charge') {
+            $("#ddlOffices").data("kendoComboBox").value(@Model.OfficeID);
+            $("#ddlOffices").data("kendoComboBox").enable(false);
+        }
+        else {
+            $("#ddlOffices").data("kendoComboBox").enable();
+            $("#ddlOffices").data("kendoComboBox").value("");
+        }
+    });
+</script>

@@ -1,0 +1,103 @@
+﻿<script>
+    function CheckAll(e) {
+        $("#grAccountsToCombine tbody input:checkbox").prop("checked", e.checked);
+        var CheckBoxAllValue = $("#grAccountsToCombine tbody input:checkbox").prop("checked");
+        var isCombine = 0;
+        if (CheckBoxAllValue == true) {
+            isCombine = 1
+        }
+        else {
+            isCombine = 0
+        }
+        var url = "@Url.Action("SetMergeStatus", "Maintenance")";
+        $.post(url, { SeriesID: 0, isCombine: isCombine });
+
+    }
+    function OnCheckBoxChange(e) {
+        var grid = $("#grAccountsToCombine").data("kendoGrid")
+        var ds = grid.dataSource.data();
+        var datasourceItemCount = grid.dataSource.total()
+        var isCheckAll = "";
+        for (var i = 0; i < datasourceItemCount; i++) {
+            var row = grid.table.find("tr[data-uid='" + ds[i].uid + "']");
+            var checkbox = $(row).find(".checkbox");
+            if (checkbox.is(":checked")) {
+                isCheckAll = "yes"
+            }
+        }
+        for (var i = 0; i < datasourceItemCount; i++) {
+            var row = grid.table.find("tr[data-uid='" + ds[i].uid + "']");
+            var checkbox = $(row).find(".checkbox");
+            if (checkbox.is(":checked")) {
+
+            }
+            else {
+                isCheckAll = "no"
+            }
+        }
+        if (isCheckAll == "yes") {
+            $("#grAccountsToCombine thead input:checkbox").prop("checked", true);
+        }
+        else {
+            $("#grAccountsToCombine thead input:checkbox").prop("checked", false);
+        }
+
+    }
+    function OnGridDataBound() {
+        OnCheckBoxChange()
+    }
+    function OnCheckBoxClick(SeriesID) {
+        var isChecked = document.getElementById("CB_" + SeriesID).checked;
+        var isCombine = 0;
+        if (isChecked == true) {
+            isCombine = 1
+        }
+        else {
+            isCombine = 0
+        }
+        var url = "@Url.Action("SetMergeStatus", "Maintenance")";
+        $.post(url, { SeriesID: SeriesID, isCombine: isCombine });
+    }
+</script>
+<div style="width : 100%; margin-top: 0px;border-style: solid; border-color: #1fa67a">
+    <div style="width:100%;height : 25px ; background-color:#1fa67a; color: white">
+        <label class="fa fa-clipboard fa-lg" style="margin-left: 5px; display:inline-block">  Merge Non-Office and MOOE Accounts</label>
+    </div>
+    <span style="color:red; margin-left:5px;margin-top:5px;">
+        *Note : if the checkbox is checked it means the account is merged
+    </span>
+    <div style="margin-top:10px">
+        @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Maintenance.AccountsToCombineModel>()
+                .Name("grAccountsToCombine")
+                .Columns(columns =>
+                {
+                    columns.Bound(c => c.SeriesID).Hidden();
+                    columns.Template(@<text></text>)
+                        .ClientTemplate(
+                            "# if(isCombineWithNonOffice == 0) { #" +
+                            "<input id='CB_#=SeriesID#' onchange=OnCheckBoxChange(this) onclick=OnCheckBoxClick(#=SeriesID#) type='checkbox' class='checkbox'/>" +
+                            "# } else { #" +
+                            "<input id='CB_#=SeriesID#' onchange=OnCheckBoxChange(this) onclick=OnCheckBoxClick(#=SeriesID#) type='checkbox' class='checkbox' checked/>" +
+                            "# } #"
+                        )
+                        .Title("<input onclick=CheckAll(this) type='checkbox'   class='checkbox'/>")
+                        .Width(30)
+                        .HtmlAttributes(new { @onclick = "click", style = "align:center;float:none;text-align:center; vertical-align: middle;" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+                    columns.Bound(c => c.AccountName).Title("Account").Width(350)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+                })
+                .HtmlAttributes(new { style = "height: 300px;" })
+                .Scrollable(s => s.Enabled(true))
+                .Selectable()
+                .Events(e => e.DataBound("OnGridDataBound"))
+                .DataSource(dataSource => dataSource
+                        .Ajax()
+                        .Batch(true)
+                        .ServerOperation(false)
+                        .Model(m => m.Id(i => i.SeriesID))
+                        .Read(read => read.Action("grAccountsToCombine", "Maintenance"))
+                )
+        )
+    </div>
+</div>

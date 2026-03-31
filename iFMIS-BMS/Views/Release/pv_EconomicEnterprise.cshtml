@@ -1,0 +1,1749 @@
+﻿
+<script>
+    $("#debayd_PS_EE").keyup(function (event) {
+
+        if (event.keyCode == 13) {
+
+            if (document.getElementById('is_float_EE').checked) {
+                $("#Release_GG_FLOAT_EE").click();
+            } else {
+                $("#Release_GG_EE").click();
+            }
+        }
+    });
+    $("#debayd_MOOE_EE").keyup(function (event) {
+        if (event.keyCode == 13) {
+            if (document.getElementById('is_float_EE').checked) {
+                $("#Release_GG_FLOAT_EE").click();
+            } else {
+                $("#Release_GG_EE").click();
+            }
+        }
+    });
+
+    $("#debayd_CO_EE").keyup(function (event) {
+        if (event.keyCode == 13) {
+            if (document.getElementById('is_float_EE').checked) {
+                $("#Release_GG_FLOAT_EE").click();
+            } else {
+                $("#Release_GG_EEB").click();
+            }
+        }
+    });
+
+
+    function commaSeparateNumberRealignmentEE(val) {
+    
+
+        val = val.toString().replace(/,/g, ''); //remove existing commas first
+        //var valSplit = val.toFixed(2).split('.'); //then separate decimals
+
+        var valSplit = val.split('.'); //then separate decimals
+        while (/(\d+)(\d{3})/.test(valSplit[0].toString())) {
+            valSplit[0] = valSplit[0].toString().replace(/(\d+)(\d{3})/, '$1' + ',' + '$2');
+        }
+
+        if (valSplit.length == 2) { //if there were decimals
+            val = valSplit[0] + "." + valSplit[1]; //add decimals back
+        } else {
+            val = valSplit[0];
+        }
+
+        return val;
+    }
+
+    function commaSeparateNumberRealignment(val) {
+   
+        val = val.toString().replace(/,/g, ''); //remove existing commas first
+        //var valSplit = val.toFixed(2).split('.'); //then separate decimals
+
+        var valSplit = val.split('.'); //then separate decimals
+        while (/(\d+)(\d{3})/.test(valSplit[0].toString())) {
+            valSplit[0] = valSplit[0].toString().replace(/(\d+)(\d{3})/, '$1' + ',' + '$2');
+        }
+
+        if (valSplit.length == 2) { //if there were decimals
+            val = valSplit[0] + "." + valSplit[1]; //add decimals back
+        } else {
+            val = valSplit[0];
+        }
+
+        return val;
+    }
+
+
+
+    setTimeout(function () {
+
+        var ooe_id = $("#ooe_id").val();
+
+        if (ooe_id == 1) {
+           
+            document.getElementById("debayd_PS_EE").disabled = false;
+            document.getElementById("debayd_MOOE_EE").disabled = true;
+            document.getElementById("debayd_CO_EE").disabled = true;
+
+        } else if (ooe_id == 2) {
+            
+            document.getElementById("debayd_PS_EE").disabled = true;
+            document.getElementById("debayd_MOOE_EE").disabled = false;
+            document.getElementById("debayd_CO_EE").disabled = true;
+
+        }
+        if (ooe_id == 3) {
+            
+            document.getElementById("debayd_PS_EE").disabled = true;
+            document.getElementById("debayd_MOOE_EE").disabled = true;
+            document.getElementById("debayd_CO_EE").disabled = false;
+
+        } 
+
+
+    }, 100);
+        function OnGridDataBound_EE(e) {
+            var rows = e.sender.tbody.children();
+
+            for (var j = 0; j < rows.length; j++) {
+                var row = $(rows[j]);
+                var dataItem = e.sender.dataItem(row);
+
+                if (dataItem.get("subjects") == 'Reserve' || dataItem.get("subjects") == 'Realigned From' || dataItem.get("subjects") == 'Float' || dataItem.get("subjects") == 'Release' || dataItem.get("subjects") == 'Reversion From') {
+                    row.addClass("Minus_desu_EE");
+
+                }
+                    //else if (dataItem.get("subjects") == 'Realigned From' || dataItem.get("subjects") == 'Supplemental') {
+                // row.addClass("ChangeStepIncrementBackColor");
+                    //}
+                else {
+
+                }
+            }
+        }
+    //--------------------------------------------------
+    var thisculture = kendo.culture();
+    thisculture.numberFormat.currency.symbol = '₱'; // Script For Changing The Currency Sign
+    //--------------------------------------------------
+    function fn_reqSave_Float_EE() {
+         
+        
+        var url = "@Url.Action("Save_Flaot_Sub", "Release")";
+        var lur = "@Url.Action("Save_Flaot_Inc", "Release")";
+
+
+
+
+        var date_ = $('#datepicker_desu').val()
+        //alert000000000000000000000000000000000000000+(date_desu)
+
+        var date_desu = $("#datepicker_desu").data("kendoDatePicker").value();
+        //alert((date_desu.getMonth() + 1));
+
+
+
+        var office_id = $("#offs").val();
+        var program_id = $("#Progss").val();
+        var ooe_id = $("#ooe_id").val();
+        var account_id = $("#account_list").val();
+        //var month_ = $("#Months").val();
+        var numeric_ = $("#numeric").val();
+        var year_ = $("#ddlYear").val();
+        var indicator_ = $("#WithSubsidyFlag").val();
+
+
+        var release_ps = $("#debayd_PS_EE").val() == "" ? 0.00 : $("#debayd_PS_EE").val();
+        var release_mooe = $("#debayd_MOOE_EE").val() == "" ? 0.00 : $("#debayd_MOOE_EE").val();
+        var release_co = $("#debayd_CO_EE").val() == "" ? 0.00 : $("#debayd_CO_EE").val();
+
+   
+        var acc_available_EE = $("#available_EEOK").val();
+
+        var income_Available = $("#income_Available").val();
+        var subsidy_Available = $("#subsidy_Available").val();
+        //alert(income_Available)
+        // OOE 1 _________________________________________________________________________
+     
+        if (ooe_id == 1) {
+            var remainPS = Number(acc_available_EE) - Number(ConvertCommasToEmpty(release_ps));
+            var remainMOOE = 0;
+            var remainCO = 0;
+            var release_mooe = 0;
+            var release_co = 0;
+
+
+
+
+            if (Number(ConvertCommasToEmpty(release_ps)) == 0) {
+
+                swal({
+                    title: "Oppss!",
+                    text: "Please fill in the amount.",
+                    timer: 2000,
+                    type: "error",
+                    showConfirmButton: false
+                })
+            }
+            else {
+
+                if (Number(acc_available_EE) < Number(ConvertCommasToEmpty(release_ps))) {
+                    swal({
+                        title: "Oppss!",
+                        text: "System Error! Please Check Balance Amount.",
+                        timer: 2000,
+                        type: "error",
+                        showConfirmButton: false
+                    })
+                }
+                else {
+                    if (indicator_ == 1) { //subsidy
+
+
+                       
+                        swal({
+                            title: "Are you sure?",
+                            text: "This Float will be SAVED!",
+                            type: "info",
+                            showCancelButton: true,
+                            closeOnConfirm: false,
+                            confirmButtonColor: "#1fa67a",
+                            confirmButtonText: "Yes, Save It!",
+                            showLoaderOnConfirm: true,
+                        }, function () {
+                            $.post(url, {
+                                office_id: office_id,
+                                program_id: program_id,
+                                ooe_id: ooe_id,
+                                account_id: account_id,
+                                month_: date_desu.getMonth() + 1,
+                                numeric_: numeric_,
+                                year_: year_,
+                                release_ps: ConvertCommasToEmpty(release_ps),
+                                release_mooe: ConvertCommasToEmpty(release_mooe),
+                                release_co: ConvertCommasToEmpty(release_co),
+                                remainPS: remainPS,
+                                remainMOOE: remainMOOE,
+                                remainCO: remainCO,
+                                indicator_: indicator_,
+                                date_: date_,
+                                subsidy_Available: subsidy_Available
+                                
+                            }, function (e) {
+                                $("#float_PS_EE_Sub").val('');
+                                $("#float_MOOE_EE_Sub").val('');
+                                $("#float_CO_EE_Sub").val('');
+
+                                if (e == "1") {
+                                   
+                                    swal({
+                                        title: "Success!",
+                                        text: "Float has been Added.",
+                                        timer: 2000,
+                                        type: "success",
+                                        showConfirmButton: false
+                                    })
+                                    // $("#grd_Float_EE_sub").data("kendoGrid").dataSource.read();
+                                    $('#EconomicEnterprise_Grid').data('kendoGrid').dataSource.read();
+                                    acc_availble_mount();
+                                    income_available_();
+                                    subsidy_available_();
+
+                                }
+                                else if (e == "5") {
+                                    swal({
+                                        title: "Error!",
+                                        text: "Please Check Subsidy balance.",
+                                        timer: 2000,
+                                        type: "error",
+                                        showConfirmButton: false
+                                    })
+                                }
+
+
+                                else {
+                                    swal({
+                                        title: "Error!",
+                                        text: "System Error! Please try again.",
+                                        timer: 2000,
+                                        type: "error",
+                                        showConfirmButton: false
+                                    })
+                                }
+                            });
+                        });
+                    } else if (indicator_ == 0) { //Incomde
+
+
+       
+                        swal({
+                            title: "Are you sure?",
+                            text: "This Float will be SAVED!",
+                            type: "info",
+                            showCancelButton: true,
+                            closeOnConfirm: false,
+                            confirmButtonColor: "#1fa67a",
+                            confirmButtonText: "Yes, Save It!",
+                            showLoaderOnConfirm: true,
+                        }, function () {
+                            $.post(lur, {
+                                office_id: office_id,
+                                program_id: program_id,
+                                ooe_id: ooe_id,
+                                account_id: account_id,
+                                month_: date_desu.getMonth() + 1,
+                                numeric_: numeric_,
+                                year_: year_,
+                                release_ps: ConvertCommasToEmpty(release_ps),
+                                release_mooe: ConvertCommasToEmpty(release_mooe),
+                                release_co: ConvertCommasToEmpty(release_co),
+                                remainPS: remainPS,
+                                remainMOOE: remainMOOE,
+                                remainCO: remainCO,
+                                indicator_: indicator_,
+                                date_: date_,
+                                income_Available: income_Available
+                            }, function (e) {
+                                $("#float_PS_EE_Sub").val('');
+                                $("#float_MOOE_EE_Sub").val('');
+                                $("#float_CO_EE_Sub").val('');
+
+                                if (e == "1") {
+                                   // getAvailable_inc();
+                                    swal({
+                                        title: "Success!",
+                                        text: "Float has been Added.",
+                                        timer: 2000,
+                                        type: "success",
+                                        showConfirmButton: false
+                                    })
+                                    // $("#grd_Float_EE_inc").data("kendoGrid").dataSource.read();
+                                    $('#EconomicEnterprise_Grid').data('kendoGrid').dataSource.read();
+                                    acc_availble_mount();
+                                    income_available_();
+                                    subsidy_available_();
+                                } else if (e == "5") {
+                                //    alert(e)
+                                    swal({
+                                        title: "Error!",
+                                        text: "Please Check Income balance.",
+                                        timer: 2000,
+                                        type: "error",
+                                        showConfirmButton: false
+                                    })
+                                }
+
+                                else {
+                                    swal({
+                                        title: "Error!",
+                                        text: "System Error! Please try again.",
+                                        timer: 2000,
+                                        type: "error",
+                                        showConfirmButton: false
+                                    })
+                                }
+                            });
+                        });
+
+
+
+                    } else {
+                        swal({
+                            title: "Error!",
+                            text: "Please select if its Subsidy or Income",
+                            timer: 3000,
+                            type: "error",
+                            showConfirmButton: false
+                        })
+
+                    }
+
+
+                }
+                //--
+            }
+        }
+
+
+
+            // OOE 2_________________________________________________________________________
+
+
+        else if (ooe_id == 2) {
+           
+            var remainPS = 0;
+            var remainMOOE = parseFloat(Number(ConvertCommasToEmpty(acc_available_EE)) - Number(ConvertCommasToEmpty(release_mooe))).toFixed(2);
+            var remainCO = 0;
+            var release_ps = 0.00;
+            var release_co = 0.00;
+
+            //alert(release_ps)
+            //alert(release_mooe)
+            //alert(release_co)
+            //alert(remainMOOE)
+            if ( Number(ConvertCommasToEmpty(release_mooe)) == 0 ) {
+            
+                swal({
+                    title: "Oppss!",
+                    text: "Please fill in the amount.",
+                    timer: 2000,
+                    type: "error",
+                    showConfirmButton: false
+                })
+            }
+            else {
+                
+                if (Number(acc_available_EE) < Number(ConvertCommasToEmpty(release_mooe))) {
+                    swal({
+                        title: "Oppss!",
+                        text: "System Error! Please Check Balance Amount.",
+                        timer: 2000,
+                        type: "error",
+                        showConfirmButton: false
+                    })
+                }
+                else {
+               //     alert(indicator_)
+                    if (indicator_ == 1) { //subsidy
+
+
+
+                        swal({
+                            title: "Are you sure?",
+                            text: "This Float will be SAVED!",
+                            type: "info",
+                            showCancelButton: true,
+                            closeOnConfirm: false,
+                            confirmButtonColor: "#1fa67a",
+                            confirmButtonText: "Yes, Save It!",
+                            showLoaderOnConfirm: true,
+                        }, function () {
+                            $.post(url, {
+                                office_id: office_id,
+                                program_id: program_id,
+                                ooe_id: ooe_id,
+                                account_id: account_id,
+                                month_: date_desu.getMonth() + 1,
+                                numeric_: numeric_,
+                                year_: year_,
+                                release_ps: ConvertCommasToEmpty(release_ps),
+                                release_mooe: ConvertCommasToEmpty(release_mooe),
+                                release_co: ConvertCommasToEmpty(release_co),
+                                remainPS: remainPS,
+                                remainMOOE: remainMOOE,
+                                remainCO: remainCO,
+                                indicator_: indicator_,
+                                date_: date_,
+                                //income_Available: income_Available
+                                subsidy_Available: subsidy_Available
+
+                            }, function (e) {
+                                $("#float_PS_EE_Sub").val('');
+                                $("#float_MOOE_EE_Sub").val('');
+                                $("#float_CO_EE_Sub").val('');
+
+                                if (e == "1") {
+
+                                    swal({
+                                        title: "Success!",
+                                        text: "Float has been Added.",
+                                        timer: 2000,
+                                        type: "success",
+                                        showConfirmButton: false
+                                    })
+                                    // $("#grd_Float_EE_sub").data("kendoGrid").dataSource.read();
+                                    $('#EconomicEnterprise_Grid').data('kendoGrid').dataSource.read();
+                                    acc_availble_mount();
+                                    income_available_();
+                                    subsidy_available_();
+
+                                }
+                                else if (e == "5") {
+                                    swal({
+                                        title: "Error!",
+                                        text: "Please Check Subsidy balance.",
+                                        timer: 2000,
+                                        type: "error",
+                                        showConfirmButton: false
+                                    })
+                                }
+
+
+                                else {
+                                    swal({
+                                        title: "Error!",
+                                        text: "System Error! Please try again.",
+                                        timer: 2000,
+                                        type: "error",
+                                        showConfirmButton: false
+                                    })
+                                }
+                            });
+                        });
+                    } else if (indicator_ == 0) { //income
+                        swal({
+                            title: "Are you sure?",
+                            text: "This Float will be SAVED!",
+                            type: "info",
+                            showCancelButton: true,
+                            closeOnConfirm: false,
+                            confirmButtonColor: "#1fa67a",
+                            confirmButtonText: "Yes, Save It!",
+                            showLoaderOnConfirm: true,
+                        }, function () {
+                            $.post(lur, {
+                                office_id: office_id,
+                                program_id: program_id,
+                                ooe_id: ooe_id,
+                                account_id: account_id,
+                                month_: date_desu.getMonth() + 1,
+                                numeric_: numeric_,
+                                year_: year_,
+                                release_ps: ConvertCommasToEmpty(release_ps),
+                                release_mooe: ConvertCommasToEmpty(release_mooe),
+                                release_co: ConvertCommasToEmpty(release_co),
+                                remainPS: remainPS,
+                                remainMOOE: remainMOOE,
+                                remainCO: remainCO,
+                                indicator_: indicator_,
+                                date_: date_,
+                                income_Available: income_Available
+                                //subsidy_Available: subsidy_Available
+
+                            }, function (e) {
+                                $("#float_PS_EE_Sub").val('');
+                                $("#float_MOOE_EE_Sub").val('');
+                                $("#float_CO_EE_Sub").val('');
+
+                                if (e == "1") {
+                                    // getAvailable_inc();
+                                    swal({
+                                        title: "Success!",
+                                        text: "Float has been Added.",
+                                        timer: 2000,
+                                        type: "success",
+                                        showConfirmButton: false
+                                    })
+                                    // $("#grd_Float_EE_inc").data("kendoGrid").dataSource.read();
+                                    $('#EconomicEnterprise_Grid').data('kendoGrid').dataSource.read();
+                                    acc_availble_mount();
+                                    income_available_();
+                                    subsidy_available_();
+                                } else if (e == "5") {
+                                    swal({
+                                        title: "Error!",
+                                        text: "Please Check Income balance.",
+                                        timer: 2000,
+                                        type: "error",
+                                        showConfirmButton: false
+                                    })
+                                }
+
+                                else {
+                                    swal({
+                                        title: "Error!",
+                                        text: "System Error! Please try again.",
+                                        timer: 2000,
+                                        type: "error",
+                                        showConfirmButton: false
+                                    })
+                                }
+                            });
+                        });
+
+
+
+                    } else {
+                        swal({
+                            title: "Error!",
+                            text: "Please select if its Subsidy or Income",
+                            timer: 3000,
+                            type: "error",
+                            showConfirmButton: false
+                        })
+
+                    }
+
+
+                }
+                //--
+            }
+
+
+
+            // OOE 3_________________________________________________________________________
+
+        } else if (ooe_id == 3) {
+
+            var remainPS = 0;
+            var remainMOOE = 0;
+            var remainCO = parseFloat(Number(ConvertCommasToEmpty(acc_available_EE)) - Number((ConvertCommasToEmpty(release_co)))).toFixed(2);
+            var release_ps = 0;
+            var release_mooe = 0;
+
+            if (Number(ConvertCommasToEmpty(release_co)) == 0) {
+
+                swal({
+                    title: "Ooppss!",
+                    text: "Please fill in the amount.",
+                    timer: 2000,
+                    type: "error",
+                    showConfirmButton: false
+                })
+            }
+            else {
+
+                if (Number(acc_available_EE) < Number(ConvertCommasToEmpty(release_co))) {
+                    swal({
+                        title: "Oppss!",
+                        text: "System Error! Please Check Balance Amount.",
+                        timer: 2000,
+                        type: "error",
+                        showConfirmButton: false
+                    })
+                }
+                else {
+                    if (indicator_ == 1) {
+
+
+
+
+                        swal({
+                            title: "Are you sure?",
+                            text: "This Float will be SAVED!",
+                            type: "info",
+                            showCancelButton: true,
+                            closeOnConfirm: false,
+                            confirmButtonColor: "#1fa67a",
+                            confirmButtonText: "Yes, Save It!",
+                            showLoaderOnConfirm: true,
+                        }, function () {
+                            $.post(url, {
+                                office_id: office_id,
+                                program_id: program_id,
+                                ooe_id: ooe_id,
+                                account_id: account_id,
+                                month_: date_desu.getMonth() + 1,
+                                numeric_: numeric_,
+                                year_: year_,
+                                release_ps: ConvertCommasToEmpty(release_ps),
+                                release_mooe: ConvertCommasToEmpty(release_mooe),
+                                release_co: ConvertCommasToEmpty(release_co),
+                                remainPS: remainPS,
+                                remainMOOE: remainMOOE,
+                                remainCO: remainCO,
+                                indicator_: indicator_,
+                                date_: date_,
+                                subsidy_Available: subsidy_Available
+                            }, function (e) {
+                                $("#float_PS_EE_Sub").val('');
+                                $("#float_MOOE_EE_Sub").val('');
+                                $("#float_CO_EE_Sub").val('');
+
+                                if (e == "1") {
+
+                                    swal({
+                                        title: "Success!",
+                                        text: "Float has been Added.",
+                                        timer: 2000,
+                                        type: "success",
+                                        showConfirmButton: false
+                                    })
+                                    // $("#grd_Float_EE_sub").data("kendoGrid").dataSource.read();
+                                    $('#EconomicEnterprise_Grid').data('kendoGrid').dataSource.read();
+                                    acc_availble_mount();
+                                    income_available_();
+                                    subsidy_available_();
+
+                                }
+                                else if (e == "5") {
+                                    swal({
+                                        title: "Error!",
+                                        text: "Please Check Subsidy balance.",
+                                        timer: 2000,
+                                        type: "error",
+                                        showConfirmButton: false
+                                    })
+                                }
+
+
+                                else {
+                                    swal({
+                                        title: "Error!",
+                                        text: "System Error! Please try again.",
+                                        timer: 2000,
+                                        type: "error",
+                                        showConfirmButton: false
+                                    })
+                                }
+                            });
+                        });
+                    } else if (indicator_ == 0) {
+
+
+
+
+                        swal({
+                            title: "Are you sure?",
+                            text: "This Float will be SAVED!",
+                            type: "info",
+                            showCancelButton: true,
+                            closeOnConfirm: false,
+                            confirmButtonColor: "#1fa67a",
+                            confirmButtonText: "Yes, Save It!",
+                            showLoaderOnConfirm: true,
+                        }, function () {
+                            $.post(lur, {
+                                office_id: office_id,
+                                program_id: program_id,
+                                ooe_id: ooe_id,
+                                account_id: account_id,
+                                month_: date_desu.getMonth() + 1,
+                                numeric_: numeric_,
+                                year_: year_,
+                                release_ps: ConvertCommasToEmpty(release_ps),
+                                release_mooe: ConvertCommasToEmpty(release_mooe),
+                                release_co: ConvertCommasToEmpty(release_co),
+                                remainPS: remainPS,
+                                remainMOOE: remainMOOE,
+                                remainCO: remainCO,
+                                indicator_: indicator_,
+                                date_: date_,
+                                income_Available: income_Available
+                                
+                            }, function (e) {
+                                $("#float_PS_EE_Sub").val('');
+                                $("#float_MOOE_EE_Sub").val('');
+                                $("#float_CO_EE_Sub").val('');
+
+                                if (e == "1") {
+                                    // getAvailable_inc();
+                                    swal({
+                                        title: "Success!",
+                                        text: "Float has been Added.",
+                                        timer: 2000,
+                                        type: "success",
+                                        showConfirmButton: false
+                                    })
+                                    // $("#grd_Float_EE_inc").data("kendoGrid").dataSource.read();
+                                    $('#EconomicEnterprise_Grid').data('kendoGrid').dataSource.read();
+                                    acc_availble_mount();
+                                    income_available_();
+                                    subsidy_available_();
+                                } else if (e == "5") {
+                                    swal({
+                                        title: "Error!",
+                                        text: "Please Check Income balance.",
+                                        timer: 2000,
+                                        type: "error",
+                                        showConfirmButton: false
+                                    })
+                                }
+
+                                else {
+                                    swal({
+                                        title: "Error!",
+                                        text: "System Error! Please try again.",
+                                        timer: 2000,
+                                        type: "error",
+                                        showConfirmButton: false
+                                    })
+                                }
+                            });
+                        });
+
+
+
+                    } else {
+                        swal({
+                            title: "Error!",
+                            text: "Please select if its Subsidy or Income",
+                            timer: 3000,
+                            type: "error",
+                            showConfirmButton: false
+                        })
+
+                    }
+
+
+                }
+                //--
+            }
+        }
+
+    }
+
+    $(':radio[name=release_rad]').change(function () {
+        if ($('input[name=release_rad]:checked').val() == 'Subsidy') {
+            document.getElementById("radios").value = 1;
+
+           
+        } else {
+            document.getElementById("radios").value = 0;
+           
+        }
+    });
+
+   
+
+
+
+
+    function checktest_EE() {
+
+        if (document.getElementById('is_float_EE').checked) {
+            document.getElementById('Rel_EE').style.visibility = 'hidden';
+            document.getElementById('Rel_float_EE').style.visibility = 'visible';
+
+        } else {
+            document.getElementById('Rel_float_EE').style.visibility = 'hidden';
+            document.getElementById('Rel_EE').style.visibility = 'visible';
+        }
+    }
+    function Close_EE() {
+        $('#EconomicEnterprise_Grid').data('kendoGrid').dataSource.read();
+        acc_availble_mount();
+        income_available_();
+        subsidy_available_();
+    }
+
+     
+    function Release_Na_EE() {
+        var url = "@Url.Action("Release_na_EE", "Release")";
+
+
+        var office_id = $("#offs").val();
+        var program_id = $("#Progss").val();
+        var ooe_id = $("#ooe_id").val();
+        var account_id = $("#account_list").val();
+        var month_ = $("#Months").val();
+        var numeric_ = $("#numeric").val();
+        var year_ = $("#ddlYear").val();
+        var subsIn = $("#WithSubsidyFlag").val();
+
+        var income_Available =  $("#income_Available").val();
+        var subsidy_Available = $("#subsidy_Available").val();
+
+        var release_ps = $("#debayd_PS_EE").val();
+        var release_mooe = $("#debayd_MOOE_EE").val();
+        var release_co = $("#debayd_CO_EE").val();
+
+
+        var date_ = $('#datepicker_desu').val()
+        //alert(1)
+        
+        var date_desu = $("#datepicker_desu").data("kendoDatePicker").value();
+        //alert(date_desu.getMonth() + 1);
+
+        var acc_available = $("#available_EEOK").val();
+
+        var type_desu = $("#WithSubsidyFlag").val();
+
+        if (type_desu == 1) { 
+        if (Number(ConvertCommasToEmpty(release_ps)) > Number(ConvertCommasToEmpty(subsidy_Available)) || Number(ConvertCommasToEmpty(release_ps)) > Number(ConvertCommasToEmpty(acc_available))) {
+          
+            swal({
+                title: "Error!",
+                text: "System Error! Please Check Balance of Appropriation",
+                timer: 2000,
+                type: "error",
+                showConfirmButton: false
+            })
+
+        } else if (Number(ConvertCommasToEmpty(release_mooe)) > Number(ConvertCommasToEmpty(subsidy_Available)) || Number(ConvertCommasToEmpty(release_mooe)) > Number(ConvertCommasToEmpty(acc_available))) {
+            swal({
+                title: "Error!",
+                text: "System Error! Please Check Balance of Appropriation",
+                timer: 2000,
+                type: "error",
+                showConfirmButton: false
+            })
+        } else if (Number(ConvertCommasToEmpty(release_co)) > Number(ConvertCommasToEmpty(subsidy_Available)) || Number(ConvertCommasToEmpty(release_co)) > Number(ConvertCommasToEmpty(acc_available))) {
+           
+            swal({
+                title: "Error!",
+                text: "System Error! Please Check Balance of Appropriation",
+                timer: 2000,
+                type: "error",
+                showConfirmButton: false
+            })
+        } else {
+
+            if (ooe_id == 1) {
+                var remainPS = Number(ConvertCommasToEmpty(subsidy_Available)) - Number(ConvertCommasToEmpty(release_ps));
+                var remainMOOE = 0;
+                var remainCO = 0;
+                var release_mooe = 0;
+                var release_co = 0;
+            } else if (ooe_id == 2) {
+                var remainPS = 0;
+                var remainMOOE = Number(ConvertCommasToEmpty(subsidy_Available)) - Number(ConvertCommasToEmpty(release_mooe));
+                var remainCO = 0;
+                var release_ps = 0;
+                var release_co = 0;
+            } else if (ooe_id == 3) {
+                var remainPS = 0;
+                var remainMOOE = 0;
+                var remainCO = Number(ConvertCommasToEmpty(subsidy_Available)) - Number(ConvertCommasToEmpty(release_co));
+                var release_ps = 0;
+                var release_mooe = 0;
+            } else {
+                var remainPS = 0;
+                var remainMOOE = 0;
+                var remainCO = 0;
+                var release_ps = 0;
+                var release_mooe = 0;
+                var release_co = 0;
+            }
+        
+            swal({
+                title: "Are you sure?",
+                text: "You want to RELEASE this Amount?",
+                type: "info",
+                showCancelButton: true,
+                closeOnConfirm: false,
+                confirmButtonColor: "#1fa67a",
+                confirmButtonText: "Yes, Save It!",
+                showLoaderOnConfirm: true,
+            }, function () {
+                $.get(url, {
+                    office_id: office_id,
+                    program_id: program_id,
+                    ooe_id: ooe_id,
+                    account_id: account_id,
+                    month_: date_desu.getMonth() + 1,
+                    numeric_: numeric_,
+                    year_: year_,
+                    release_ps: ConvertCommasToEmpty(release_ps),
+                    release_mooe: ConvertCommasToEmpty(release_mooe),
+                    release_co: ConvertCommasToEmpty(release_co),
+                    remainPS: remainPS,
+                    remainMOOE: remainMOOE,
+                    remainCO: remainCO,
+                    subsIn: subsIn,
+                    date_: date_,
+                    income_Available: income_Available,
+                    subsidy_Available: subsidy_Available
+                }, function (d) {
+
+
+                    if (d == "1") {
+
+                        swal({
+                            title: "Success!",
+                            text: "Release.",
+                            timer: 2000,
+                            type: "success",
+                            showConfirmButton: false
+                        })
+                        document.getElementById("debayd_PS_EE").value = "";
+                        document.getElementById("debayd_MOOE_EE").value = "";
+                        document.getElementById("debayd_CO_EE").value = "";
+                        $('#EconomicEnterprise_Grid').data('kendoGrid').dataSource.read();
+                        subsidy_Available_();
+                        subsidy_available_();
+                        acc_availble_mount();
+                    } else if (d == "3") {
+                        swal({
+                            title: "Error!",
+                            text: "System Error! Please Check Available Amount in Income",
+                            timer: 2000,
+                            type: "error",
+                            showConfirmButton: false
+                        })
+                    }
+                    else if (d == "4") {
+                        swal({
+                            title: "Error!",
+                            text: "System Error! Please Check Available Amount in Subsidy",
+                            timer: 2000,
+                            type: "error",
+                            showConfirmButton: false
+                        })
+                    }
+                    else {
+                        swal({
+                            title: "Error!",
+                            text: "System Error! Please try again.",
+                            timer: 2000,
+                            type: "error",
+                            showConfirmButton: false
+                        })
+                    }
+                })
+            });
+        }
+
+
+        } else { 
+
+            if (Number(ConvertCommasToEmpty(release_ps)) > Number(ConvertCommasToEmpty(income_Available)) || Number(ConvertCommasToEmpty(release_ps)) > Number(ConvertCommasToEmpty(acc_available))) {
+             
+            swal({
+                title: "Error!",
+                text: "System Error! Please Check Balance of Appropriation",
+                timer: 2000,
+                type: "error",
+                showConfirmButton: false
+            })
+
+            } else if (Number(ConvertCommasToEmpty(release_mooe)) > Number(ConvertCommasToEmpty(income_Available)) || Number(ConvertCommasToEmpty(release_mooe)) > Number(ConvertCommasToEmpty(acc_available))) {
+           
+            swal({
+                title: "Error!",
+                text: "System Error! Please Check Balance of Appropriation",
+                timer: 2000,
+                type: "error",
+                showConfirmButton: false
+            })
+            } else if (Number(ConvertCommasToEmpty(release_co)) > Number(ConvertCommasToEmpty(income_Available)) || Number(ConvertCommasToEmpty(release_co)) > Number(ConvertCommasToEmpty(acc_available))) {
+           
+            swal({
+                title: "Error!",
+                text: "System Error! Please Check Balance of Appropriation",
+                timer: 2000,
+                type: "error",
+                showConfirmButton: false
+            })
+            } else {
+
+                if (ooe_id == 1) {
+                    var remainPS = Number(ConvertCommasToEmpty(income_Available)) - Number(ConvertCommasToEmpty(release_ps));
+                    var remainMOOE = 0;
+                    var remainCO = 0;
+                    var release_mooe = 0;
+                    var release_co = 0;
+                } else if (ooe_id == 2) {
+                    var remainPS = 0;
+                    var remainMOOE = Number(ConvertCommasToEmpty(income_Available)) - Number(ConvertCommasToEmpty(release_mooe));
+                    var remainCO = 0;
+                    var release_ps = 0;
+                    var release_co = 0;
+                } else if (ooe_id == 3) {
+                    var remainPS = 0;
+                    var remainMOOE = 0;
+                    var remainCO = Number(ConvertCommasToEmpty(income_Available)) - Number(ConvertCommasToEmpty(release_co));
+                    var release_ps = 0;
+                    var release_mooe = 0;
+                } else {
+                    var remainPS = 0;
+                    var remainMOOE = 0;
+                    var remainCO = 0;
+                    var release_ps = 0;
+                    var release_mooe = 0;
+                    var release_co = 0;
+                }
+        
+                swal({
+                    title: "Are you sure?",
+                    text: "You want to RELEASE this Amount?",
+                    type: "info",
+                    showCancelButton: true,
+                    closeOnConfirm: false,
+                    confirmButtonColor: "#1fa67a",
+                    confirmButtonText: "Yes, Save It!",
+                    showLoaderOnConfirm: true,
+                }, function () {
+                    $.get(url, {
+                        office_id: office_id,
+                        program_id: program_id,
+                        ooe_id: ooe_id,
+                        account_id: account_id,
+                        month_: date_desu.getMonth() + 1,
+                        numeric_: numeric_,
+                        year_: year_,
+                        release_ps: ConvertCommasToEmpty(release_ps),
+                        release_mooe: ConvertCommasToEmpty(release_mooe),
+                        release_co: ConvertCommasToEmpty(release_co),
+                        remainPS: remainPS,
+                        remainMOOE: remainMOOE,
+                        remainCO: remainCO,
+                        subsIn: subsIn,
+                        date_: date_,
+                        income_Available: income_Available,
+                        subsidy_Available: subsidy_Available
+                    }, function (d) {
+
+
+                        if (d == "1") {
+
+                            swal({
+                                title: "Success!",
+                                text: "Release.",
+                                timer: 2000,
+                                type: "success",
+                                showConfirmButton: false
+                            })
+                            document.getElementById("debayd_PS_EE").value = "";
+                            document.getElementById("debayd_MOOE_EE").value = "";
+                            document.getElementById("debayd_CO_EE").value = "";
+                            $('#EconomicEnterprise_Grid').data('kendoGrid').dataSource.read();
+                            income_available_();
+                            subsidy_available_();
+                            acc_availble_mount();
+                        } else if (d == "3") {
+                            swal({
+                                title: "Error!",
+                                text: "System Error! Please Check Available Amount in Income",
+                                timer: 2000,
+                                type: "error",
+                                showConfirmButton: false
+                            })
+                        }
+                        else if (d == "4") {
+                            swal({
+                                title: "Error!",
+                                text: "System Error! Please Check Available Amount in Subsidy",
+                                timer: 2000,
+                                type: "error",
+                                showConfirmButton: false
+                            })
+                        }
+                        else {
+                            swal({
+                                title: "Error!",
+                                text: "System Error! Please try again.",
+                                timer: 2000,
+                                type: "error",
+                                showConfirmButton: false
+                            })
+                        }
+                    })
+                });
+            }
+        }
+    }
+
+
+
+
+    function dibayd_na_EE() {
+        var url = "@Url.Action("debayd_dibay", "Release")";
+
+
+        var office_id = $("#offs").val();
+        var program_id = $("#Progss").val();
+        var ooe_id = $("#ooe_id").val();
+        var account_id = $("#account_list").val();
+        var month_ = $("#Months").val();
+        var numeric_ = $("#numeric").val();
+        var year_ = $("#ddlYear").val();
+        var classtype = $("#classtype").val();
+        var acc_available = $("#available_EEOK").val();
+        var date_desu = $("#datepicker_desu").data("kendoDatePicker").value();
+
+
+        $.get(url, {
+            office_id: office_id,
+            program_id: program_id,
+            ooe_id: ooe_id,
+            account_id: account_id,
+            month_: date_desu.getMonth() + 1,
+            numeric_: numeric_,
+            year_: year_,
+            classtype: classtype,
+            acc_available: acc_available
+        }, function (d) {
+
+            document.getElementById("debayd_PS_EE").value = commaSeparateNumber(d.debayd_PS);
+            document.getElementById("debayd_MOOE_EE").value = commaSeparateNumber(d.debayd_MOOE);
+            document.getElementById("debayd_CO_EE").value = commaSeparateNumber(d.debayd_CO);
+            
+        })
+
+    }
+
+    function reqReserve_EE() {
+        $(window).scrollTop(0);
+
+        var url = "@Url.Action("Reserve_EE", "Release")";
+
+        $.get(url, {
+            office_id: '@Session["office_id"]',
+            program_id: '@Session["program_id"]',
+            ooe_id: '@Session["ooe_id"]',
+            account_id: '@Session["account_id"]',
+            month_: '@Session["month_"] ',
+            numeric_: '@Session["numeric_"]',
+            year_: '@Session["year_"] '
+        }, function (d) {
+            $('#ReserveWindow_EE').html(d);
+        })
+
+        $('#ReserveWindow_EE').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Reserve").center().open();
+
+    }
+
+    function reqAnnual_EE() {
+        $(window).scrollTop(0);
+
+        var url = "@Url.Action("Annual_EE", "Release")";
+
+        $.get(url, {
+            office_id: '@Session["office_id"]',
+            program_id: '@Session["program_id"]',
+            ooe_id: '@Session["ooe_id"]',
+            account_id: '@Session["account_id"]',
+            month_: '@Session["month_"] ',
+            numeric_: '@Session["numeric_"]',
+            year_: '@Session["year_"] '
+        }, function (d) {
+            $('#AnnualWindow_EE').html(d);
+        })
+
+        $('#AnnualWindow_EE').data('kendoWindow').title("<i class='fa fa-navicon'> </i>").center().open();
+
+    }
+
+
+
+    function reqRealignedTo_EE() {
+        $(window).scrollTop(0);
+
+        var url = "@Url.Action("RealignedTo", "Release")";
+
+        $.get(url, {
+            office_id: '@Session["office_id"]',
+            program_id: '@Session["program_id"]',
+            ooe_id: '@Session["ooe_id"]',
+            account_id: '@Session["account_id"]',
+            month_: '@Session["month_"] ',
+            numeric_: '@Session["numeric_"]',
+            year_: '@Session["year_"] '
+        }, function (d) {
+            $('#RealignedToWindow_EE').html(d);
+        })
+
+        $('#RealignedToWindow_EE').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Realign").center().open();
+
+    }
+     
+    function reqSupplemental_EE() {
+        $(window).scrollTop(0);
+
+        var url = "@Url.Action("Supplemental", "Release")";
+
+        $.get(url, {
+            office_id: '@Session["office_id"]',
+            program_id: '@Session["program_id"]',
+            ooe_id: '@Session["ooe_id"]',
+            account_id: '@Session["account_id"]',
+            month_: '@Session["month_"] ',
+            numeric_: '@Session["numeric_"]',
+            year_: '@Session["year_"] '
+        }, function (d) {
+            $('#SupplementalWindow_EE').html(d);
+        })
+
+        $('#SupplementalWindow_EE').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Supplement").center().open();
+
+    }
+
+
+
+    function reqFloat_EE() {
+        $(window).scrollTop(0);
+
+        var url = "@Url.Action("Float_EE_Main", "Release")";
+
+        $.get(url, {
+            office_id: '@Session["office_id"]',
+            program_id: '@Session["program_id"]',
+            ooe_id: '@Session["ooe_id"]',
+            account_id: '@Session["account_id"]',
+            month_: '@Session["month_"] ',
+            numeric_: '@Session["numeric_"]',
+            year_: '@Session["year_"] '
+        }, function (d) {
+            $('#FloatWindow_EE').html(d);
+        })
+
+        $('#FloatWindow_EE').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Float").center().open();
+
+    }
+
+    function reqRelease_EE() {
+        $(window).scrollTop(0);
+
+        var url = "@Url.Action("Release_History", "Release")";
+
+        $.get(url, {
+            office_id: '@Session["office_id"]',
+            program_id: '@Session["program_id"]',
+            ooe_id: '@Session["ooe_id"]',
+            account_id: '@Session["account_id"]',
+            month_: '@Session["month_"] ',
+            numeric_: '@Session["numeric_"]',
+            year_: '@Session["year_"] '
+        }, function (d) {
+            $('#ReleaseWindow_EE').html(d);
+        })
+
+        $('#ReleaseWindow_EE').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Release").center().open();
+
+    }
+
+
+    function ReadData_EE() {
+
+        var office_id = $("#offs").val();
+        var program_id = $("#Progss").val();
+        var ooe_id = $("#ooe_id").val();
+        var account_id = $("#account_list").val();
+        var month_ = $("#Months").val();
+        var numeric_ = $("#numeric").val();
+        var year_ = $("#ddlYear").val();
+        var type_desu = $("#WithSubsidyFlag").val();
+
+        return {
+            office_id: office_id,
+            program_id: program_id,
+            ooe_id: ooe_id,
+            account_id: account_id,
+             month_: '@Session["month_"] ',
+            numeric_: numeric_,
+            year_: year_,
+            type_desu: type_desu
+            
+        }
+    }
+    setTimeout(function () {
+
+        okkk_EE();
+
+
+    }, 1000);
+
+    function okkk_EE(e) {
+        $("#Progss").data("kendoDropDownList").dataSource.read();
+    }
+    function reqRealignFrom_EE() {
+        var url = "@Url.Action("RealignFrom_EE", "Release")";
+
+        $.get(url, {
+          
+        }, function (d) {
+            $('#RealignFromWindow_EE').html(d);
+        })
+
+        $('#RealignFromWindow_EE').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Reserve").center().open();
+
+    }
+</script>
+
+
+
+
+
+
+@(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.MonthlyR_Model>()
+    .Name("EconomicEnterprise_Grid")
+    .Columns(col =>
+    {
+        col.Bound(m => m.subjects).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;"></div></text>)
+                        .Width(160)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate(
+                                       "# if(subjects == 'Reserve' || subjects == 'Realigned From' || subjects == 'Float' || subjects == 'Reversion From') { #" +
+                                       "<div style='color:white;font-size: 14px;font-weight: bold;'>#=kendo.toString(subjects)# </div>" +
+"# } else if(subjects == 'Release') { #" +
+                                       "<div style='color:\\#FFFF99;font-size: 18px;font-weight: bold;'>#=kendo.toString(subjects)# </div>" +
+                                       "# } else{ #" +
+                                       "<div style='color:black;font-size: 15px;font-weight: bold;'>#=kendo.toString(subjects)# </div>" +
+                                       "# } #");
+        col.Bound(m => m.ps)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size: 18px;font-weight: bold;">PS</div></text>)
+                        .Width(160)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("# if(subjects == 'Reserve' || subjects == 'Realigned From' || subjects == 'Float' || subjects == 'Reversion From') { #" +
+                                       "<div style='color:white;font-size: 14px;font-weight: bold;'>#=kendo.toString(ps,'c2')# </div>" +
+"# } else if(subjects == 'Release') { #" +
+                                       "<div style='color:\\#FFFF99;font-size: 18px;font-weight: bold;'>#=kendo.toString(ps,'c2')# </div>" +
+                                       "# } else{ #" +
+                                       "<div style='color:black;font-size: 15px;font-weight: bold;'>#=kendo.toString(ps,'c2')# </div>" +
+                                       "# } #");
+        col.Bound(m => m.mooe)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size: 18px;font-weight: bold;">MOOE</div></text>)
+                        .Width(160)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("# if(subjects == 'Reserve' || subjects == 'Realigned From' || subjects == 'Float' || subjects == 'Reversion From') { #" +
+                                       "<div style='color:white;font-size: 14px;font-weight: bold;'>#=kendo.toString(mooe,'c2')# </div>" +
+"# } else if(subjects == 'Release') { #" +
+                                       "<div style='color:\\#FFFF99;font-size: 18px;font-weight: bold;'>#=kendo.toString(mooe,'c2')# </div>" +
+                                       "# } else{ #" +
+                                       "<div style='color:black;font-size: 15px;font-weight: bold;'>#=kendo.toString(mooe,'c2')# </div>" +
+                                       "# } #");
+        col.Bound(m => m.co)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size: 18px;font-weight: bold;">CO</div></text>)
+                        .Width(160)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("# if(subjects == 'Reserve' || subjects == 'Realigned From' || subjects == 'Float' || subjects == 'Reversion From') { #" +
+                                       "<div style='color:white;font-size: 14px;font-weight: bold;'>#=kendo.toString(co,'c2')# </div>" +
+"# } else if(subjects == 'Release') { #" +
+                                       "<div style='color:\\#FFFF99;font-size: 18px;font-weight: bold;'>#=kendo.toString(co,'c2')# </div>" +
+                                       "# } else{ #" +
+                                       "<div style='color:black;font-size: 15px;font-weight: bold;'>#=kendo.toString(co,'c2')# </div>" +
+                                       "# } #");
+        col.Bound(m => m.subsidy)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size: 18px;font-weight: bold;">Subsidy</div></text>)
+                        .Width(160)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("#if( subjects == 'Float' && type_desu == 0) {#" +
+                                        "<div style='color:white;font-size: 14px;font-weight: bold;'>#=kendo.toString(subsidy,'c2')# </div>" +
+
+                                        "#} else if( subjects == 'Reserve'|| subjects == 'Realigned From' || subjects == 'Reversion From') { #" +
+                                        "<div style='color:white;font-size: 14px;font-weight: bold;'>---</div>" +
+"#} else if( subjects == 'Float') { #" +
+                                       "<div style='color:white;font-size: 15px;font-weight: bold;'>#=kendo.toString(income,'c2')# </div>" +
+                                     
+                                        "#} else if(subjects == 'Realigned From' || subjects == 'Supplemental' || subjects == 'Realigned To' || subjects == 'Available of Allotment'|| subjects == 'Reversion From') { #" +
+                                        "<div style='color:black;font-size: 15px;font-weight: bold;'>---</div>" +
+"# } else if(subjects == 'Release') { #" +
+                                        "<div style='color:\\#FFFF99;font-size: 18px;font-weight: bold;'>#=kendo.toString(subsidy,'c2')# </div>" +
+                                        "#} else { #" +
+
+                                        "<div style='color:black;font-size: 15px;font-weight: bold;'>#=kendo.toString(subsidy,'c2')# </div>" +
+                                        "# } #");
+
+        col.Bound(m => m.income)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size: 18px;font-weight: bold;">Income</div></text>)
+                        .Width(160)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("#if( subjects == 'Float' && type_desu == 1) {#" +
+                                        "<div style='color:white;font-size: 14px;font-weight: bold;'>#=kendo.toString(income,'c2')# </div>" +
+
+                                        "#} else if( subjects == 'Reserve' || subjects == 'Realigned From' || subjects == 'Reversion From') { #" +
+                                        "<div style='color:white;font-size: 14px;font-weight: bold;'>---</div>" +
+"#} else if( subjects == 'Float') { #" +
+                                       "<div style='color:white;font-size: 15px;font-weight: bold;'>#=kendo.toString(income,'c2')# </div>" +
+                                      
+                                        "#} else if(subjects == 'Realigned From' || subjects == 'Supplemental' || subjects == 'Realigned To' || subjects == 'Available of Allotment' || subjects == 'Reversion From') { #" +
+                                        "<div style='color:black;font-size: 15px;font-weight: bold;'>---</div>" +
+"# } else if(subjects == 'Release') { #" +
+                                        "<div style='color:\\#FFFF99;font-size: 18px;font-weight: bold;;font-size: 18px;font-weight: bold;'>#=kendo.toString(income,'c2')# </div>" +
+                                        "#} else { #" +
+                                        "<div style='color:black;font-size: 15px;font-weight: bold;'>#=kendo.toString(income,'c2')# </div>" +
+                                        "# } #");
+
+        col.Template(t => { }).ClientTemplate(
+"#if( subjects == 'Balance of Appropriations' || subjects == 'Available of Allotment' || subjects == 'Reversion From'|| subjects == 'Reversion To') {#" +
+              " " +
+          
+                   "#} else if( subjects == 'Annual' ) { #" +
+                   "<div class='k-button k-button-icontext' style='border-radius:50px;color:\\#000000;background-color:\\#dcdcdc;' onclick='reqAnnual_EE()'><span class='fa fa-file-text' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'> </span>set</div> " +
+
+                "#} else if( subjects == 'Reserve' ) { #" +
+                "<div class='k-button k-button-icontext' style='border-radius:50px;color:\\#000000;background-color:\\#dcdcdc;' onclick='reqReserve_EE()'><span class='fa fa-file-text' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'> </span>set</div> " +
+
+         
+                    "#} else if( subjects == 'Realigned From' ) { #" +
+               "<div class='k-button k-button-icontext' style='border-radius:50px;color:\\#000000;background-color:\\#dcdcdc;'onclick='reqRealignFrom_EE()'><span class='fa fa-search-plus' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'> </span>view</div> " +
+       
+                "#} else if( subjects == 'Realigned To' ) { #" +
+                "<div class='k-button k-button-icontext' style='border-radius:50px;color:\\#000000;background-color:\\#dcdcdc;' onclick='reqRealignedTo_EE()'><span class='fa fa-file-text' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'> </span>set</div> " +
+
+           
+
+                "#} else if( subjects == 'Supplemental' ) { #" +
+                "<div class='k-button k-button-icontext' style='border-radius:50px;color:\\#000000;background-color:\\#dcdcdc;' onclick='reqSupplemental_EE()'><span class='fa fa-file-text' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'> </span>set</div> " +
+
+              
+
+                "#} else if( subjects == 'Float' ) { #" +
+                "<div class='k-button k-button-icontext' style='border-radius:50px;color:\\#000000;background-color:\\#dcdcdc;' onclick='reqFloat_EE()'><span class='fa fa-file-text' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'> </span>set</div> " +
+
+
+                "#} else if( subjects == 'Release' ) { #" +
+                "<div class='k-button k-button-icontext' style='border-radius:50px;color:\\#000000;background-color:\\#dcdcdc;' onclick='reqRelease_EE()'><span class='fa fa-search-plus' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'> </span>view</div> " +
+
+             
+
+                 "#} else { #" +
+                 "<div class='k-button k-button-icontext' style='border-radius:50px;color:\\#000000;background-color:\\#dcdcdc;' onclick='reqReserve_EE()'> add</div> " +
+
+               
+              "# } #"
+              ).HtmlAttributes(new { style = "vertical-align: top;" }).Width(10);
+    })
+             .Events(e => e.DataBound("OnGridDataBound_EE"))
+                    .DataSource(d => d
+                    .Ajax()
+                    .PageSize(50)
+                    .Model(m => m.Id(i => i.monthly_id))
+                    .Events(e => e.Change("okkk_EE"))
+                    .Read(read => read.Action("LoadMonthlyRelease_Economic", "Release").Data("ReadData_EE")))
+
+
+
+                                        //.Pageable(page => page.Refresh(true)
+// .Enabled(true)
+// .ButtonCount(4)
+// .PreviousNext(true))
+// .Selectable()
+
+)
+
+
+
+<div id="AmountDepartment" style="float: none;clear:both; margin-top: 60px">
+
+    <div style="float:left;margin-left:17px;margin-top:-45px;">
+        <label>
+Amount :
+        </label>
+    </div>
+    <div style="float:left;margin-left:100px;margin-top:-45px;">
+        <input type="text" style="width:125px" name="debayd_PS_EE" id="debayd_PS_EE" placeholder="PS" onkeyup="commaSeparateNumberversion2('debayd_PS_EE')" disabled>
+    </div>
+    <div style="float:left;margin-left:253px;margin-top:-45px;">
+        <input type="text" style="width:125px" name="debayd_MOOE_EE" id="debayd_MOOE_EE" placeholder="MOOE" onkeyup="commaSeparateNumberversion2('debayd_MOOE_EE')" disabled>
+    </div>
+    <div style="float:left;margin-left:408px;margin-top:-45px;">
+        <input type="text" style="width:125px" name="debayd_CO_EE" id="debayd_CO_EE" placeholder="CO" onkeyup="commaSeparateNumberversion2('debayd_CO_EE')" disabled>
+    </div>
+    <div style="float:left;margin-left:558px;margin-top:-45px;">
+        <input type='checkbox' class='checkbox' onclick=checktest_EE() id="is_float_EE" /> Floating 
+    </div>
+    <div style="float:left;margin-left:634px;margin-top:-45px;">
+        <div class="k-button k-button-icontext" style="border-radius:50px;color:#ffffff;background-color:#1FA67A;" onclick="dibayd_na_EE()">Auto Divide</div>
+    </div>
+    <div style="float:left;margin-left:474px;margin-top:-5px;">
+        <input type="text" style="width:140px" name="total_debayd_EE" id="total_debayd_EE" value="0" hidden disabled>
+    </div>
+    <div style="float:left;margin-left:474px;margin-top:-5px;">
+        <input type="text" style="width:140px" name="total_debayd_EEm" id="total_debayd_EEm" value="0" hidden disabled>
+    </div>
+    @*<div style="float:left;margin-left:474px;margin-top:-5px;">
+        <input type="text" style="width:140px" name="income_Available" id="income_Available" value="0" hidden disabled>
+    </div>*@
+    @*----radio*@
+    <div style="float:left;margin-left:474px;margin-top:-5px;">
+        <input type="text" style="width:140px" name="radios" id="radios" hidden disabled>
+    </div>
+
+    <div style="float:left;margin-left:474px;margin-top:-5px;">
+        <input type="text" style="width:140px" name="total_debayd_EEc" id="total_debayd_EEc" value="0" hidden disabled>
+    </div>
+    <div style="float:left;margin-left:634px;margin-top:-5px;" id="Rel_EE">
+ 
+        <div class="k-button k-button-icontext eeeewqwdqwd" style="border-radius:12px;color:#ffffff;background-color:#1FA67A;height:50px;width:110px;text-align:center" onclick="Release_Na_EE()" id="Release_GG_EE"> Release</div>
+ 
+    </div>
+    <div style="float:left;margin-left:634px;margin-top:-51px; visibility: hidden" id="Rel_float_EE">
+
+        <div class="k-button k-button-icontext eeeewqwdqwd" style="border-radius:12px;color:#dcdcdc;background-color:#1FA67A;height:50px;width:110px;text-align:center" onclick="fn_reqSave_Float_EE()" id="Release_GG_FLOAT_EE"> Release Float</div>
+
+    </div>
+
+
+
+    <div style="float:left;margin-left:474px;margin-top:-5px;">
+        <input type="text" style="width:140px" name="s1_EE" id="s1_EE" hidden disabled>
+    </div>
+    <div style="float:left;margin-left:474px;margin-top:-5px;">
+        <input type="text" style="width:140px" name="s2_EE" id="s2_EE" hidden disabled>
+    </div>
+    <div style="float:left;margin-left:474px;margin-top:-5px;">
+        <input type="text" style="width:140px" name="s3_EE" id="s3_EE" hidden disabled>
+    </div>
+</div>
+
+
+
+
+
+@(Html.Kendo().Window()
+        .Name("ReserveWindow_EE")
+        .Title("New Entry")
+        .Width(775)
+        .Height(560)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+        .Events(e => e.Close("Close_EE"))
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+                .Actions(a => { a.Close(); })
+)
+@(Html.Kendo().Window()
+        .Name("AnnualWindow_EE")
+        .Title("New Entry")
+        .Width(800)
+        .Height(550)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+        .Events(e => e.Close("Close_EE"))
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+                .Actions(a => { a.Close(); })
+)
+@(Html.Kendo().Window()
+        .Name("RealignedToWindow_EE")
+         .Title("New Entry")
+        .Width(800)
+        .Height(520)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+        .Events(e => e.Close("Close"))
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+                .Actions(a => { a.Close(); })
+)
+
+
+
+
+@(Html.Kendo().Window()
+        .Name("SupplementalWindow_EE")
+        .Title("New Entry")
+        .Width(380 )
+        .Height(200)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+        .Events(e => e.Close("Close_EE"))
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+                .Actions(a => { a.Close(); })
+)
+
+
+@(Html.Kendo().Window()
+        .Name("FloatWindow_EE")
+        .Title("New Entry")
+        .Width(753)
+        .Height(390)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+        .Events(e => e.Close("Close_EE"))
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+                .Actions(a => { a.Close(); })
+)
+
+
+@(Html.Kendo().Window()
+        .Name("ReleaseWindow_EE")
+        .Title("New Entry")
+        .Width(865)
+        .Height(498)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+          .Events(e => e.Close("Close_EE"))
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+                .Actions(a => { a.Close(); })
+)
+
+@(Html.Kendo().Window()
+        .Name("RealignFromWindow_EE")
+        .Title("New Entry")
+        .Width(770)
+        .Height(430)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+        .Events(e => e.Close("Close_EE"))
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+                .Actions(a => { a.Close(); })
+)
+
+
+
+<style>
+    .Minus_desu_EE {
+        background-color: #B43C3C;
+    }
+    /*.metro td {
+
+     color : #ffffff;
+    }*/
+    .k-grid {
+        font-size: 10px;
+        color: #ffffff;
+    }
+
+        .k-grid td {
+            line-height: 2em;
+        }
+
+    .ChangeStepIncrementBackColor {
+        background-color: #80FF80;
+    }
+
+    .koooo {
+        background-color: #ffffff;
+    }
+
+    .red {
+        color: red;
+    }
+      DIV.eeeewqwdqwd {
+    min-height: 10em;
+    display: table-cell;
+    vertical-align: middle }
+</style>

@@ -1,0 +1,92 @@
+﻿
+<script>
+  
+    var thisculture = kendo.culture();
+    thisculture.numberFormat.currency.symbol = '₱'; // Script For Changing The Currency Sign
+ 
+    function OnTabstripActivate() {
+        var SelectedTabIndex = $("#tabstripPPA").data("kendoTabStrip").select().index();
+        var OfficeID = $("#ddlAIPOffices").val();
+        if (OfficeID != '') {
+            if (SelectedTabIndex == 0) {
+               // $("#NOTC").data("kendoGrid").dataSource.read();
+            }
+            else if (SelectedTabIndex == 1) {
+                $("#grdLBPForm4OtherData").data("kendoGrid").dataSource.read();
+            }
+        }
+    }
+    function getoffice() {
+        return {
+            office: $("#officeppa").val()
+        }
+    }
+    function OnOfficeChange() {
+        $("#accountppa").data("kendoComboBox").dataSource.read();
+    }
+</script>
+
+<h2><span class="fa fa-print"></span> PPA's Transfer of Charges</h2>
+
+@*<font size="3"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>Note:</strong> You can generate report with or without Office </font>*@
+<br />
+ <div style="display:none">
+     <label>
+         Office :
+     </label>
+     @(Html.Kendo().ComboBox()
+                         .Name("officeppa")
+                         .DataTextField("Office")
+                         .DataValueField("OfficeID")
+                         .Filter("contains")
+                         .MinLength(1)
+                         .Placeholder("Select Office...")
+                         .HtmlAttributes(new { @style = "width: 527px;" })
+                         .DataSource(source => source.Read(read => read.Action("getofficeppa", "Maintenance")))
+                        .Events(e => e.Change("OnOfficeChange"))
+     )
+ </div>
+<div style="display:none">
+    <label>
+        Account :
+    </label>
+    @(Html.Kendo().ComboBox()
+                         .Name("accountppa")
+                         .DataTextField("AccountName")
+                         .DataValueField("AccountID")
+                         .Filter("contains")
+                         .MinLength(1)
+                         .Placeholder("Select Office...")
+                         .HtmlAttributes(new { @style = "width: 527px;" })
+                         .DataSource(source => source.Read(read => read.Action("getofficeAccountppa", "Maintenance").Data("getoffice")))
+     //    .Events(e => e.Change("OnddlAIPOfficesChange"))
+    )
+</div>
+
+<div>
+    @(Html.Kendo().TabStrip()
+          .Name("tabstripPPA")
+          .Navigatable(false)
+          .Animation(animation =>
+              animation.Open(effect =>
+              effect.Fade(FadeDirection.In)))
+          .Events(e => e.Activate("OnTabstripActivate"))
+          .Items(tabstrip =>
+          {
+              tabstrip.Add().Text("Transfer").Selected(true).LoadContentFrom("pvNOTransferPPACharge", "Maintenance");//.Enabled(false);
+              //tabstrip.Add().Text("Other Data").LoadContentFrom("pvLBPForm4OtherData_Tab", "BudgetPreparation");
+
+          })
+    )
+</div>
+   
+<script>
+    $(document).ready(function () {
+        //$("#btnSave").attr('disabled', 'disabled')
+       // document.getElementById("btnSave").disabled = true;
+        //  document.getElementById("btnSave").setAttribute('disabled', 'disabled');
+        OnTabstripActivate();
+        $("#officeppa").data("kendoComboBox").dataSource.read()
+    });
+  
+</script>

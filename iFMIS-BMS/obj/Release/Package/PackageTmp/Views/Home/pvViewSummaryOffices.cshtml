@@ -1,0 +1,120 @@
+﻿<script>
+    function GetProposalYear() {
+        var ProposalYear = $("#ddlYear").val();
+
+        return {
+            ProposalYear: ProposalYear
+        }
+    }
+    function SearchOfficeSummary() {
+        
+        var SearchProgramData = $("#txtSearchOfficeSummary").val();
+        var ProgramgGrid = $("#grdOfficeSummaryPerExpenseClass").data("kendoGrid").dataSource;
+        ProgramgGrid.filter([
+            {
+                logic: "or",
+                filters: [{
+                    field: "OfficeName",
+                    operator: "contains",
+                    value: SearchProgramData
+                }]
+            }
+        ]);
+    }
+    document.getElementById('txtSearchOfficeSummary').onkeydown = function (event) {
+        if (event.keyCode == 13) {
+            SearchOfficeSummary();
+        }
+    }
+    document.getElementById('txtSearchOfficeSummary').onkeyup = function () {
+        if (($(this).val() == '' || $(this).val() == 'Search Office') && $(this).attr('type') != 'hidden') {
+            SearchOfficeSummary()
+        }
+    }
+</script>
+<div>
+    <h2>Transaction Year : <b> <span id="TransactionYear"></span> </b></h2>
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.SummaryAllOffices>()
+        .Name("grdOfficeSummaryPerExpenseClass")
+        .Columns(columns =>
+        {
+            //columns.Bound(p => p.OfficeName).ClientGroupHeaderTemplate("Office Name: #= OfficeName #");
+            columns.Bound(c => c.OfficeName).Hidden()
+                .ClientGroupHeaderTemplate("<div style='display:inline-block'>#= value #</div>");
+            columns.Bound(p => p.OOEFullName).HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                .Title("Office Name")
+                .ClientGroupFooterTemplate("<div style='text-align:left;color:darkgreen'><label>Total</label></div>")
+                .ClientFooterTemplate("<div> <span style='text-align:right;color:black;margin-left:10px;font-size:18px;'> Total : </span> </div>")
+                .Width(300);
+            columns.Bound(p => p.PastYear)
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                .ClientTemplate("<div style='text-align:right'> <b> #=kendo.toString(PastYear, 'c2')# </b> </div>")
+                .Width(115)
+                .HeaderTemplate(@<text><div style="font-weight:600;">Year<br><span id="CurrentSummary"></span></div></text>)
+                .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                .ClientGroupFooterTemplate("<div style='text-align:right;color:darkgreen'><label>#=kendo.toString(sum, 'c2')#</label></div>")
+                .ClientFooterTemplate("<div> <span style='text-align:right;color:black;margin-left:10px;font-size:18px;'> #=kendo.toString(sum, 'c2') # </span> </div>");
+            columns.Bound(p => p.TotalCost)
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                .ClientTemplate("<div> <b> #=kendo.toString(TotalCost, 'c2')# </b> </div>")
+                .Width(115)
+                .HeaderTemplate(@<text><div style="font-weight:600;">Year<br><span id="BudgetSummary"></span></div></text>)
+                .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                .ClientGroupFooterTemplate("<div style='text-align:right;color:darkgreen'><label>#=kendo.toString(sum, 'c2')#</label></div>")
+                .ClientFooterTemplate("<div> <span style='text-align:right;color:black;margin-left:10px;font-size:18px;'> #=kendo.toString(sum, 'c2') # </span> </div>");
+            columns.Bound(p => p.PercentageIncreaseDecrease).HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                .ClientTemplate("<div> <b> " +
+                "# if (PercentageIncreaseDecrease < 0) { #" +
+                "<span style='color:red'> #=kendo.toString(PercentageIncreaseDecrease, 'p')# </span>" +
+                "# } else if(PercentageIncreaseDecrease == 0){ #" +
+                "#=kendo.toString(PercentageIncreaseDecrease, 'p')# " +
+                "# } else { #" +
+                "<span style='color:green'> #=kendo.toString(PercentageIncreaseDecrease, 'p')# </span>" +
+                "# } #</b> </div>")
+                .Width(75).Title("% Increase Decrease").HtmlAttributes(new { style = "text-align:right;height:30px" });
+        })
+                .HtmlAttributes(new { style = "height: 480px;" })
+                .Scrollable(s => s.Enabled(true))
+                .Pageable( p => p.ButtonCount(1).PreviousNext(true).Refresh(true))
+                .Selectable()
+                .DataSource(dataSource => dataSource
+                        .Ajax().Batch(true)
+                        .ServerOperation(true)
+                        .Read(read => read.Action("SelectAllOffice", "Home").Data("GetProposalYear"))
+                        
+                        .Model(m => m.Id(i => i.ProposalID))
+                        .Group(groups => groups.Add(p => p.OfficeName))
+                        .Aggregates(aggregates =>
+                        {
+                            aggregates.Add(p => p.TotalCost).Sum();
+                            aggregates.Add(p => p.PastYear).Sum();
+                        })
+                        .PageSize(10)
+                )
+                .ToolBar(toolbar =>
+                {
+                    toolbar.Template(@<text>
+                        <div style="float: right; height:28px;margin-top:2px;">
+                            <link href="~/Content/metroui/css/docs.css" rel="stylesheet" />
+                            <div style="background-color:white;border:solid;border-color:whitesmoke;border-width:thin;width:310px;height:30px;float:right;padding:0px;margin-top:-3px;" id="search">
+                                <input type="text" style="width:260px;border-collapse:collapse;border-color:white;margin:0px;margin-left:-10px;height:70%;outline:none;border-left-style:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search Office" id="txtSearchOfficeSummary" name="txtSearchOfficeSummary">
+                                <div class="k-button k-button-icontext" style="height:29px;width:40px;margin-top:0.6px;" onclick="SearchOfficeSummary()"><span class="mif-search"></span></div>
+                            </div>
+                        </div>
+                    </text>);
+                })
+)
+
+</div>
+
+<script>
+    $(document).ready(function () {
+        var ProposalYear = $("#ddlYear").val();
+        //alert(ProposalYear);
+        var CurrentYear = ProposalYear - 1;
+        document.getElementById("CurrentSummary").innerHTML = CurrentYear;
+        document.getElementById("BudgetSummary").innerHTML = ProposalYear;
+        document.getElementById("TransactionYear").innerHTML = ProposalYear;
+        $("#grdOfficeSummaryPerExpenseClass").data("kendoGrid").dataSource.read();
+    },1000);
+</script>

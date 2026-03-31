@@ -1,0 +1,55 @@
+﻿<script>
+    function getGridParam() {
+        var ddlYear = $("#ddlYear").val();
+        var GridData ='@ViewBag.ViewType';
+            return{
+                gridData: GridData,
+                YearOf: ddlYear
+            }
+    }
+    function OnGridDataBound(e) {
+        var rows = e.sender.tbody.children();
+
+        for (var j = 0; j < rows.length; j++) {
+
+            var row = $(rows[j]);
+            var dataItem = e.sender.dataItem(row);
+
+            if (dataItem.get("isComplete") == '1') {
+                row.addClass("ChangeBackColor");
+            }
+        }
+
+    }
+</script>
+@(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.DashBoard.OfficeListModel>()
+        .Name("grOfficeList")
+        .Columns(columns =>
+        {
+            columns.Bound(c => c.OfficeName).Title("Office").Width(200)
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+            columns.Bound(c => c.NoofAccountsSubmitted).Title("Accounts Submitted").Width(150)
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+            columns.Bound(c => c.DateTimeSubmitted).Title("Date Submitted").Width(150)
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        })
+        .HtmlAttributes(new { style = "height: 500px;" })
+        .Scrollable(s => s.Enabled(true))
+        .Events(e => e.DataBound("OnGridDataBound"))
+        .Selectable()
+        .DataSource(dataSource => dataSource
+            .Ajax()
+            .Batch(true)
+            .ServerOperation(false)
+            .Read(read => read.Action("grOfficeListData", "DashBoard").Data("getGridParam"))
+        )
+)
+<div style="display:inline-block; float: right">
+    <div id="btncloseComputationDetail" class="k-button k-button-icontext" style="margin-right:5px;display:inline-block;width: 80px;clear:both; margin-top: 10px" onclick="CloseKendoWindow('OfficeListWindow')">Close</div>
+</div>
+
+<style>
+    .ChangeBackColor {
+        background-color: #80FF80;
+    }
+</style>

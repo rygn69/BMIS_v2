@@ -1,0 +1,134 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="formattingRule47.Filters" xml:space="preserve">
+    <value>=Split("|", "Provincial Governor Office|Barangay and Cultural Communities Affairs Unit|Provincial Information Management Office|Provincial Administrator Office|Sports and Youth Development Services|Cooperative Development Services|Public Employment Services Office|Sangguniang Panlalawigan Office|Provincial Human Resource Management Office|Provincial General Services Office|Civil Security Unit|Provincial Legal Office|Provincial Planning and Development Coordinator Office|Provincial Budget Office|Provincial Accountant Office|Office of the Provincial Engineer|Provincial Social Welfare and Development Office|Provincial Health Office|DOP Memorial Hospital|Bunawan District Hospital|Esperanza Medicare Community Hospital|Talacogon District Hospital|Loreto District Hospital|Provincial Assessor Office|Provincial Treasurer Office|Provincial Agriculturist Office|Provincial Environment and Natural Resources Office|Provincial Veterinarian Office|Provincial Learning Center|Patin-ay Waterworks System|Provincial Economic and Enterprise Development Office (Services)|Agricultural Resource Center|NON-OFFICE|Provincial Vice-Governor's Office|Provincial Tourism Office|Moral and Spiritual Renewal Services|PROVINCIAL SECRETARY OFFICE|SEF-Elementary Education|SEF-Secondary Education|SEF-Citezenship Development Training|SEF-Reserve for Contingencies|Provincial Disaster Risk Reduction Management Office|Human Resource Management Development Program|Provincial Internal Audit Office|SEF-Capital Outlay|Provincial Correctional and Security Management Office |Provincial Public Information Office|SEF-Others|SEF-Repair and Maintenance of School Buildings|SEF-Education Research|SEF-Sports Development|SEF-Citizenship Development|SEF-Support to Special Project|SEF-Promotion of Sports and Physical Education|SEF-Purchase, repair refurnishing of machines, laboratory, equipment for Senior High School|SEF-Assistance to ALS literacy Development|SEF-Assistance to Music and Arts Education|SEF-Assistance to Araling Panlipunan Education|SEF-Assistance to Special Education|SEF-Assistance to Science Education|SEF-Assistance to English Education (Press Con D/R/N) |SEF-Assistance to Kindergarten Education|SEF-Assistance to Mathematics Education|SEF-Assistance Filipino Education|SEF-Assistance to Tech-Voc &amp;amp; Livelihood Education|SEF-Assistance to Values Education|SEF-Assistance to Mother Tongue-Based Multilingual Education|SEF-Assistance to DepEd Special Projects|SUBSTANCE USE RECOVERY  AND ENLIGHTENMENT PROGRAM|Provincial Agriculture and Veterinary Office|Provincial Assessment and Treasury Office")</value>
+  </data>
+  <data name="htmlTextBox10.Value" xml:space="preserve">
+    <value>=iif(Fields.MainGroupFooter = 0 , '       ' +'&lt;b&gt;'+ Fields.SecondGroup +'&lt;/b&gt;',iif(Fields.FirstGroup = 'CURRENT OPERATING EXPENDITURES','&lt;b&gt;'+iif(Fields.SecondGroup = '0',Fields.SecondGroup,Fields.FirstGroup)+'&lt;/b&gt;',iif(fields.SecondGroup = '0','&lt;b&gt;CURRENT OPERATING EXPENDITURES&lt;/b&gt;',Fields.SecondGroup +"
+
+"+'&lt;br/&gt;&lt;br/&gt;&lt;b&gt;CURRENT OPERATING EXPENDITURES&lt;/b&gt;')))</value>
+  </data>
+  <data name="htmlTextBox13.Value" xml:space="preserve">
+    <value>APPROVED:&amp;nbsp;&lt;span style="text-decoration: underline"&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;/span&gt;</value>
+  </data>
+  <metadata name="$this.ShowSnapGrid" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+</root>

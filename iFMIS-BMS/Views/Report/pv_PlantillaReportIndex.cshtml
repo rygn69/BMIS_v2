@@ -1,0 +1,122 @@
+﻿<script>
+    function reqPrint(e) {
+        var IncludeProposed = "";
+        if (document.getElementById("cbIncludeProposed").checked == true) {
+            IncludeProposed = 1;
+        }
+        else {
+            IncludeProposed = 0;
+        }
+        if (document.getElementById("cbAllProposed").checked == false) {
+            if ($("#ddlOffices").val() != "" && $("#ddlYear").val() != "") {
+                var officeID = $("#ddlOffices").val()
+                var officeName = $("#ddlOffices").data("kendoComboBox").text();
+                var Year = $("#ddlYear").val()
+                $.ajax({
+                    async: false,
+                    dataType: 'html',
+                    success: window.open("../Reports/ReportViewer.aspx?rid=2&OfficeID=" + officeID + "&OfficeName=" + officeName + "&Year=" + Year + "&IncludeProposed=" + IncludeProposed + "")
+                });
+            }
+            else {
+                alert("Please Select Office and Year");
+            }
+        }
+        else if ($("#ddlYear").val() == "") {
+            alert("Please Select Year");
+        }
+        else {
+            var Year = $("#ddlYear").val()
+            $.ajax({
+                async: false,
+                dataType: 'html',
+                success: window.open("../Reports/ReportViewer.aspx?rid=7&Year=" + Year + "")
+            });
+        }
+
+    }
+    function ChangeCheckIncludeProposed() {
+        document.getElementById("cbIncludeProposed").checked = false
+        document.getElementById("cbForBuildUP").checked = false
+        if (document.getElementById("cbAllProposed").checked == true) {
+            $("#ddlOffices").data("kendoComboBox").enable(false);
+        }
+        else {
+            if ('@Account.UserInfo.UserTypeDesc' != 'Budget In-Charge') {
+                $("#ddlOffices").data("kendoComboBox").enable(true);
+            }
+        }
+    }
+    function ChangeCheckAllProposed() {
+        document.getElementById("cbAllProposed").checked = false
+        document.getElementById("cbForBuildUP").checked = false
+        if ('@Account.UserInfo.UserTypeDesc' != 'Budget In-Charge') {
+            $("#ddlOffices").data("kendoComboBox").enable(true);
+        }
+    }
+    function ChangeCheckForBuildUp() {
+        document.getElementById("cbIncludeProposed").checked = false
+        document.getElementById("cbAllProposed").checked = false
+        if ('@Account.UserInfo.UserTypeDesc' != 'Budget In-Charge') {
+            $("#ddlOffices").data("kendoComboBox").enable(true);
+        }
+    }
+</script>
+<div style="width : 81.5%; margin-top: 0px;border-style: solid; border-color: #1fa67a;">
+    <div style="width:100%;height : 25px ; background-color:#1fa67a; color: white">
+        <label class="fa fa-file-text-o fa-lg" style="margin-left: 5px; display:inline-block">  PRINT PLANTILLA REPORT</label>
+    </div>
+    <div style="margin-left: 5px; margin-bottom:5px">
+        <label style="margin-left: 0px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px; display : inline-block">
+            Office :&nbsp;&nbsp;&nbsp;&nbsp;
+            @(Html.Kendo().ComboBox()
+                         .Name("ddlOffices")
+                         .DataTextField("OfficeName")
+                         .DataValueField("OfficeID")
+                         .Filter("contains")
+                         .MinLength(1)
+                         .Placeholder("Select Office...")
+                         .HtmlAttributes(new { @style = "width: 527px;" })
+                         .DataSource(source => source.Read(read => read.Action("ddlOfficeWithAll", "User")))
+            )
+
+        </label>
+        <label style="margin-left: 0px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px; display : inline-block">
+            Budget Year : @(Html.Kendo().DropDownList()
+                        .Name("ddlYear")
+                        .DataTextField("ProposalYear")
+                        .DataValueField("ProposalYear")
+                        .SelectedIndex(0)
+                        .HtmlAttributes(new { @style = "width: 90px;" })
+                        .DataSource(source => source.Read(read => read.Action("GetPropYear", "PYear")))
+            )
+        </label>
+    </div>
+    <div style="float:left; margin-left: 5px">
+        <input type="checkbox" id="cbIncludeProposed" class="k-checkbox" onclick="ChangeCheckAllProposed()">
+        <label class="k-checkbox-label" for="cbIncludeProposed">Include Proposed</label>
+    </div>
+    <div style="float:left; margin-left: 5px">
+        <input type="checkbox" id="cbAllProposed" class="k-checkbox" onclick="ChangeCheckIncludeProposed()">
+        <label class="k-checkbox-label" for="cbAllProposed">All Proposed</label>
+    </div>
+    <div style="float:left; margin-left: 5px">
+        <input type="checkbox" id="cbForBuildUP" class="k-checkbox" onclick="ChangeCheckForBuildUp()">
+        <label class="k-checkbox-label" for="cbForBuildUP">For Build-UP</label>
+    </div>
+    <div style="display:inline-block;width:100%">
+        <div id="btnPrint" class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 80px;float:right; margin-top: 5px; margin-right:10px; margin-bottom:5px" onclick="reqPrint()">Print</div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        if ('@Account.UserInfo.UserTypeDesc' == 'Budget In-Charge') {
+            $("#ddlOffices").data("kendoComboBox").value(@Account.UserInfo.Department);
+            $("#ddlOffices").data("kendoComboBox").enable(false);
+        }
+        else {
+            $("#ddlOffices").data("kendoComboBox").enable();
+            $("#ddlOffices").data("kendoComboBox").value("");
+        }
+    });
+</script>

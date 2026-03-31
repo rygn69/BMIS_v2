@@ -1,0 +1,76 @@
+﻿@model iFMIS_BMS.BusinessLayer.Models.lbp5
+<script>
+    function SumbitOBJ() {
+        var FSNameEDIT = document.getElementById("FSNameEDIT").value;
+        var FSID = document.getElementById("FSID").value;
+        var OrderBy = $("#orderByFSEdit").val();
+        var url = "@Url.Action("SaveEditFS", "Maintenance")";
+        $.post(url, {FSNameEDIT: FSNameEDIT, OrderBy: OrderBy, FSID: FSID }, function(e){
+            if(e == "success"){
+                swal({
+                    title: "Success",
+                    text: "Functional Statement has been Updated!",
+                    type: "success",
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+                setTimeout(function(){ 
+                    $("#grFS").data("kendoGrid").dataSource.read();
+                    $("#windowEditFS").data("kendoWindow").close();
+                    if ($("#FSSizeIndicator").val() == 0) {
+                        document.documentElement.style.overflow = 'auto';  // firefox, chrome
+                        document.body.scroll = "yes";
+                        $(window).scrollTop(CurrentScrollPosition);
+                    }
+                }, 2000);
+            }else{
+                swal({
+                    title: "Error",
+                    text: "Failed to Update!",
+                    type: "error",
+                    timer: 2000,
+                    showConfirmButton: false });
+            }
+
+        });
+    }
+    function oncloseWindowEditFS()
+    {
+        $("#windowEditFS").data("kendoWindow").close();
+        if ($("#FSSizeIndicator").val() == 0) {
+            document.documentElement.style.overflow = 'auto';  // firefox, chrome
+            document.body.scroll = "yes";
+            $(window).scrollTop(CurrentScrollPosition);
+        }
+    }
+
+</script>
+<div style="margin-top:5px;margin-left:5px;">
+    <label>Objective Description</label>
+    <textarea name="FSNameEDIT" id="FSNameEDIT" style="width:97%;height:70px">@Model.FS_DESCparam</textarea>
+    @*<input type="text" name="FSNameEDIT" id="FSNameEDIT" value="@Model.FS_DESCparam" style="width:90%" />*@
+    <input type="text" name="FSID" id="FSID" value="@Model.FS_IDparam" hidden="hidden" />
+</div>
+<div style="margin-top:5px;margin-left:5px;">
+    <label>Order By</label>
+    @(Html.Kendo().ComboBox()
+                  .Name("orderByFSEdit")
+                  .Filter("contains")
+                  .MinLength(1)
+                  .Placeholder("Select order by")
+                  .DataTextField("x")
+                  .DataValueField("x")
+                  .HtmlAttributes(new { @style = "height:110%;" })
+                  .DataSource(source => source.Read(read => read.Action("ddlOrderby", "Dropdowns")).ServerFiltering(false))
+    )
+</div>
+<div style="margin-top:5px;float:right;margin-right:5px;">
+    <div class="k-button k-state-active" onclick="SumbitOBJ()"><i class="fa fa-plus"></i> Update Functional Statement</div> <div class="k-button" onclick="oncloseWindowEditFS()"><i class="fa fa-close"></i> Close</div>
+</div>
+<script>
+    $(document).ready(function () {
+        var OrderBy = @Model.FS_OrderByparam;
+        $("#orderByFSEdit").data("kendoComboBox").value(OrderBy);
+    });
+
+</script>

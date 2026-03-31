@@ -1,0 +1,196 @@
+﻿@model iFMIS_BMS.BusinessLayer.Models.AccountDenomination
+
+<script>
+    function CloseWindow() {
+        //var Budget = $("#moneyUpdatedBudget").text();
+        //alert(Budget);
+        document.documentElement.style.overflow = 'auto';  // firefox, chrome
+        document.body.scroll = "yes";
+        $("#CreateNewDenominationAccount").data("kendoWindow").close();
+    }
+    $(function () {
+        $("#QuantityPercentage").keyup(function (e) {
+            sync();
+        });
+
+        $("#DenominationMonth").keyup(function (e) {
+            sync();
+        });
+
+        $("#DenominationAmount").keyup(function (e) {
+            sync();
+        });
+        
+    });
+
+    
+    function reqSave() {
+        sync()
+        if ($("#btnSaveIcon").attr('class') == 'fa fa-check') {
+            $("#btnSaveIcon").removeClass('fa fa-check').addClass('fa fa-spinner fa-pulse fa-spin fa-fw');
+            var name = document.getElementById("DenominationName").value;
+            var amount = document.getElementById("DenominationAmount").value;
+            var month = document.getElementById("DenominationMonth").value;
+            if (name == '' || amount == '' || month == '') {
+                swal({
+                    title: "Cannot Complete Request!",
+                    text: "Denomination Name, Month, and Amount is Required",
+                    type: "warning",
+                    timer: 2000,
+                    showConfirmButton: true
+                });
+                $("#btnSaveIcon").removeClass('fa fa-spinner fa-pulse fa-spin fa-fw').addClass('fa fa-check');
+            }
+            else{
+                var url = "@Url.Action("SaveNewAccountDenomination", "BudgetPreparation")";
+                var frmData = $('#AccountDenomination').serialize();
+                frmData = frmData + "&OfficeID=" + @Session["selectedOfficeID"];
+                $.post(url, frmData, function (d) {
+                    if (d.split("_")[0] == "success") {
+                        getTotalProposed();
+                        $("#CreateNewDenominationAccount").data("kendoWindow").close();
+                        var DenominationAmount = "₱" + formatCurrency($("#DenominationAmount").val())
+                        var TotalDenominationAmount = "₱" + formatCurrency($("#TotalDenominationAmount").val())
+                        var gridName = "#grid_"+ @Model.AccountID;
+                        //  $(gridName).data("kendoGrid").dataSource.read();
+                        $(gridName).data("kendoGrid").dataSource.add({ AccountDenominationID: d.split("_")[1],
+                            DenominationName: $("#DenominationName").val(), DenominationAmount: DenominationAmount,
+                            isPPMP: "0",QuantityPercentage: $("#QuantityPercentage").val(),
+                            TotalDenominationAmount: TotalDenominationAmount,DenominationMonth: $("#DenominationMonth").val()});
+
+                        swal({
+                            title: "Success!",
+                            text: "Account Denomination Added.",
+                            type: "success",
+                            timer: 2000,
+                            showConfirmButton: true
+                        });
+                        $("#btnSaveIcon").removeClass('fa fa-spinner fa-pulse fa-spin fa-fw').addClass('fa fa-check');
+                        $('#AccountDenomination')[0].reset();
+                    }
+                    else {
+                        swal({
+                            title: "Error!",
+                            text: d,
+                            type: "error",
+                            timer: 2000,
+                            showConfirmButton: true
+                        });
+                        $("#btnSaveIcon").removeClass('fa fa-spinner fa-pulse fa-spin fa-fw').addClass('fa fa-check');
+                    }
+                })
+            }
+        }
+    }
+    function CheckIfMax(){
+        if(document.getElementById("DenominationMonth").value > 12 ||document.getElementById("DenominationMonth").value < 1){
+            document.getElementById("DenominationMonth").value = 1;
+            sync();
+        }
+    }
+</script>
+
+<form id="AccountDenomination">
+    <div style="display:none">
+        <input type="text" name="ProgramID" value="@Model.ProgramID" />
+        <input type="text" name="AccountID" value="@Model.AccountID" />
+        <input type="text" name="TransactionYear" value="@Model.ProposalYear" />
+        <input type="text" name="OfficeID" value="@Model.OfficeID" />
+        <input type="text" name="DenominationAmount_Denomination" value="@Model.DenominationAmount" />
+    </div>
+    <div style="margin-bottom:5px;margin-top:5px;margin-left:5px;margin-right:15px">
+        <label>Particular Name</label> <input type="text" id="DenominationName" name="DenominationName" style="width:100%" required autofocus />
+    </div>
+   
+    <div style="display:inline-block;width:550px;">
+        <div style="margin-bottom:5px;margin-top:5px;margin-left:5px;margin-right:15px;display:inline-block;">
+            <script>
+                function sync() {
+                    var n1 = $("#QuantityPercentage").val();
+                    var n2 = document.getElementById("DenominationAmount");
+                    var n3 = document.getElementById("TotalDenominationAmount");
+                    var n4 = document.getElementById("DenominationMonth");
+                    var TotAmountExpClass=$("#TotAmountExpClass").val();
+                    var AIPTotalAmount=$("#AIPTotalAmount").val();
+
+                    var f1=$("#DenominationAmount").val();
+                    var f2=$("#TotalDenominationAmount").val();
+                    var f3=$("#DenominationMonth").val();
+
+                    n3.value = n1 * n2.value * n4.value;
+
+                    var t1=Number(n1) * Number(f2) * Number(f3)
+                    var t2= Number(TotAmountExpClass) + Number(t1)
+                    //alert(AIPTotalAmount)
+                    //alert(t2)
+                    var tt=AIPTotalAmount - t2
+                   
+                    if (Number(tt) < 0 && $("#fundid").val() != 201)
+                    {
+                        swal({
+                            title: "W A R N I N G ! ! !",
+                            text: "The total proposed budget by expense class must not be greater than the approved AIP!\n",
+                            type: "warning",
+                            showCancelButton: false,
+                            confirmButtonColor: "#1fa67a",
+                            confirmButtonText: "OK!",
+                            closeOnConfirm: true,
+                        }, function(){
+                            $("#DenominationAmount").val(0);
+                            $("#DenominationMonth").val(1);
+                            $('#QuantityPercentage').siblings('input:visible').focus();
+                            $('#QuantityPercentage').val(1);
+                            sync();
+                        })
+                    }
+                }
+            </script>
+            <label>Quantity/Percentage Increase</label>
+            @(Html.Kendo().NumericTextBox<double>()
+            .Name("QuantityPercentage")
+            .Value(1)
+            .Events(e => e.Change("sync").Spin("sync"))
+            .Placeholder("Enter Quantity or Percentage")
+            )
+        </div>
+        <style>
+            #QuantityPercentage { 
+                width: 100px;
+            }
+        </style>
+
+
+        <div style="margin-bottom:5px;margin-top:5px;display:inline-block;width:300px">
+            <div style="display:inline-block">
+                <label>Amount</label>
+                <input type="number" id="DenominationAmount" name="DenominationAmount" style="width:200px" required onkeyup="sync()" onclick="sync()" onchange="sync()"  value="@Model.DenominationAmount" />
+            </div>
+            <div style="display:inline-block; margin-left:10px">
+                <label>Month(s)</label>
+                <input type="number" id="DenominationMonth" name="DenominationMonth" style="width:50px" required onkeyup="sync()" onclick="sync()" onchange="sync()"  value="@Model.DenominationMonth" max="12" min="1" onblur="CheckIfMax()" />
+            </div>
+
+        </div>
+        <div></div>
+    </div>
+    <div style="margin-bottom:5px;margin-top:5px;margin-left:5px; margin-right:15px">
+        <label>=Total Amount</label> <input type="text" id="TotalDenominationAmount" name="TotalDenominationAmount" style="width:100%" readonly="readonly" />
+    </div>
+    <div style="float:right;margin-top:10px; margin-right: 5px">
+        <div class="k-button k-state-active" onclick="reqSave()"><span id="btnSaveIcon" class="fa fa-check"></span> Save </div>
+        <div class="k-button" onclick="CloseWindow()"><span class="fa fa-close"></span> Cancel</div>
+    </div>
+</form>
+
+<script>
+    $(document).ready(function () {
+        if ('@Model.ActionCode' == '1') {
+            $("#DenominationAmount").prop("readonly", false);
+        }
+        else {
+            $("#DenominationAmount").prop("readonly", true);
+        }
+    });
+
+
+</script>

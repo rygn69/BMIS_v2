@@ -1,0 +1,158 @@
+﻿<script>
+    function reqEdit(e) {
+        $(window).scrollTop(0);
+        var data = this.dataItem($(e.currentTarget).closest("tr"));
+        var url = "@Url.Action("EditGrants", "Report")";
+        $.get(url, { grants_id: data.grants_id }, function (d) {
+            $('#addeditgrants').html(d);
+        })
+        $('#addeditgrants').data('kendoWindow').title("Edit").center().open();
+    }
+ 
+    function reqaddgrants() {
+        var url = "@Url.Action("pv_AddGrantsViews", "Report")";
+        
+        var Year = $("#ddlYear").val()
+        if (Year == null || Year == "") {
+            setInterval(function () {
+                $("#GrantsGrid").data("kendoGrid").dataSource.read();
+            }, 1000);
+            $("#GrantsGrid").data("kendoGrid").dataSource.read();
+            
+        }
+        $.get(url, { Year: Year }, function (d) {
+            $('#addeditgrants').html(d);
+        })
+        $('#addeditgrants').data('kendoWindow').center().open();
+    }
+
+
+
+    function GrantsData() {
+                   var Year = $("#ddlYear").val();
+                return {
+                    Year: Year
+                }
+           setTimeout(function () {
+                $("#GrantsGrid").data("kendoGrid").dataSource.read();
+            }, 1000);
+    
+                $('#GrantsGrid').data('kendoGrid').dataSource.read()
+    }
+
+    function fn_refresher() {
+        $("#GrantsGrid").data("kendoGrid").dataSource.read();
+    }
+
+</script>
+
+
+
+
+<div style="border: outset;clear:both;border-width:1px;border-color:#1fa67a; width: 754px; padding-left:0px;padding-right:0px;padding-top:0px;padding-bottom:7px;margin-top: 10px;">
+    <div style=" width: 0;height: 0; border-right: 5px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;margin-top: -1px; ">
+        <div style="float: left; width: 678px; margin-top:1px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 36px solid #1fa67a; ">
+
+            <div style="float: left; height:28px; margin-left:-59px; margin-top: 5px;">
+                <i class="fa fa-tasks fa-2x fg-white"></i>
+
+            </div>
+            <div style="text-align: right;float: right;margin-right:10px;margin-top:2px;">
+
+                @(Html.Kendo().DropDownList()
+                        .Name("ddlYear")
+                        .DataTextField("ProposalYear")
+                        .DataValueField("ProposalYear")
+                        .SelectedIndex(0)
+                        .HtmlAttributes(new { @style = "width: 70px;" })
+                        .Events(e => e.Change("fn_refresher"))
+                        .DataSource(source => source.Read(read => read.Action("GetPropYear2", "PYear")))
+                )
+
+
+
+
+            </div>
+            <div style="float: right;margin-right:10px;margin-top:2px;">
+                <i class="fa fa-calendar fa-2x #33333"></i>
+            </div>
+
+        </div>
+    </div>
+
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.GrantsModel>()
+    .Name("GrantsGrid")
+    .Columns(col =>
+    {
+        col.Bound(m => m.grants_name).Title("Name");
+        col.Bound(m => m.Year).Title("Year");
+        col.Bound(m => m.grants_Amount).Title("Amount");
+
+        col.Command(c =>
+        {
+            c.Custom("btnEdit")
+                .Click("reqEdit")
+                .Text("Edit");
+            c.Custom("btnRemove")
+                //.Click("reqRemove")
+                .Text("Remove");
+        }).Width(160);
+    })
+
+    .DataSource(d => d
+    .Ajax()
+    .PageSize(10)
+    .Model(m => m.Id(i => i.grants_id))
+    .Read(read => read.Action("LoadGrants", "Report").Data("GrantsData")))
+
+
+   .ToolBar(t => t.Template(@<text>
+        <div class="k-button" onclick="reqaddgrants()" style="float: left;"><span class="k-icon k-i-plus" style="margin-left: -2px;margin-right: 3px;margin-top: 0px;margin-bottom: 3px;"></span>Add Trunds Fund</div>
+</text>))
+                           .Pageable(page => page.Refresh(true)
+                           .Enabled(true)
+                           .ButtonCount(4)
+                           .PreviousNext(true))
+                                .Selectable())
+  
+
+</div>
+
+
+
+@(Html.Kendo().Window().Name("addeditgrants").Title("New Entry").Width(360).Height(210).Visible(false).Modal(true).Draggable(true).AutoFocus(true).Animation(a => { a.Open(o => o.SlideIn(SlideDirection.Down)); a.Close(c => { c.SlideIn(SlideDirection.Down); c.Reverse(true); }); }).Actions(a => { a.Close(); }))
+
+
+<script>
+    $(document).ready(function () {
+        setTimeout(function () {
+           $("#GrantsGrid").data("kendoGrid").dataSource.read();
+        }, 1000);
+    //    setImmediate(function () {
+    //        $("#GrantsGrid").data("kendoGrid").dataSource.read();
+    //    }, 1000);
+    //    setInterval(function () {
+    //        $("#GrantsGrid").data("kendoGrid").dataSource.read();
+    //    }, 1000);
+    //    $("#GrantsGrid").data("kendoGrid").dataSource.read();
+    })
+
+
+    //$(document).ready(function () {
+    //    var Year = $("#ddlYear").val()
+    //    if (Year == null || Year == "") {
+
+    //        setTimeout(function () {
+    //            $("#GrantsGrid").data("kendoGrid").dataSource.read();
+    //        }, 1000);
+    //        $("#GrantsGrid").data("kendoGrid").dataSource.read();
+    //    } else {
+
+    //        setInterval(function () {
+    //            $("#GrantsGrid").data("kendoGrid").dataSource.read();
+    //        }, 1000);
+    //        $("#GrantsGrid").data("kendoGrid").dataSource.read();
+    //    }
+    //})
+
+</script>

@@ -1,0 +1,153 @@
+﻿<script>
+    function GridParam() {
+        var OfficeID = 0;
+        if (@Account.UserInfo.UserTypeID == 4) {
+            OfficeID = $("#ddlOffices").data("kendoDropDownList").value();
+        }
+        else {
+            OfficeID = @Account.UserInfo.Department;
+        }
+    return {
+        OfficeID: OfficeID
+    }
+    }
+    function OnDropDownListChange() {
+        $('#grdAccountToUpdateList').data('kendoGrid').dataSource.read();
+    }
+    function DivFullScreen() {
+        var DIVSize = $("#GridDIVSizeIndicator").val();
+        var DIV_ID = 'GridDIV';
+        if (DIVSize == 0) {
+            MaximizeDIV(DIV_ID);
+            document.getElementById('GridDIVSizeIndicator').value = 1;
+            document.getElementById('btnResizeText').innerHTML = " Minimize";
+            document.getElementById('btnResizeIcon').className = "fa fa-arrows";
+            $('#grdAccountToUpdateList').data('kendoGrid').dataSource.read();
+        }
+        else {
+            MinimizeDIV(DIV_ID);
+            document.getElementById('GridDIVSizeIndicator').value = 0;
+            document.getElementById('btnResizeText').innerHTML = " Maximize";
+            document.getElementById('btnResizeIcon').className = "fa fa-arrows-alt";
+        }
+    }
+    function OnGridEdit(e) {
+        if (!e.model.isNew() == false) {
+            e.model.set("OfficeID",$("#ddlOffices").data("kendoDropDownList").value())
+        }
+       //alert('1')
+        //if (e.model.AccountID != "") {
+        //e.preventDefault()s
+        //}
+    }
+   
+    function onRequestEnd(e) {
+        if (e.type != "read") {
+            $('#grdAccountToUpdateList').data('kendoGrid').dataSource.read();
+            swal("Success!", "Changes Saved", "success")
+        }
+    }
+
+    //function OnGridEdit(arg) {
+    //    var gridName = $('#grdAccountToUpdateList').data('kendoGrid');
+    //    var dataRows = gridName.items();
+    //    var rowIndex = dataRows.index(gridName.select());
+    //    var ds = gridName.dataSource.view();
+       
+    //    if (arg.container.find("input[name=OOEID]").length > 0) {
+    //        $("#grdAccountToUpdateList").data("kendoGrid").closeCell(arg.container)
+    //    }
+    //    if (arg.container.find("input[name=ProgramID]").length > 0) {
+    //        $("#grdAccountToUpdateList").data("kendoGrid").closeCell(arg.container)
+    //    }
+    //}
+</script>
+<div style="margin-left: 5px; margin-bottom:5px">
+    <label>
+        Update Accounts For The Budget Year @DateTime.Now.AddYears(1).Year
+    </label>
+    <label style="margin-left: 0px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px; display : inline-block">
+        Office :&nbsp;&nbsp;&nbsp;&nbsp;
+        @(Html.Kendo().DropDownList()
+                         .Name("ddlOffices")
+                         .DataTextField("OfficeName")
+                         .DataValueField("OfficeID")
+                         .Filter("contains")
+                         .MinLength(1)
+                         .OptionLabel("Select Office...")
+                         .HtmlAttributes(new { @style = "width: 527px;" })
+                         .Events(e => e.Change("OnDropDownListChange"))
+                         .DataSource(source => source.Read(read => read.Action("ddlOfficeWithAll", "User")))
+        )
+
+    </label>
+</div>
+<div id="GridDIV">
+    <input type="hidden" value="0" id="GridDIVSizeIndicator" />
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.AccountToUpdateModel>()
+    .Name("grdAccountToUpdateList")
+    .Columns(columns =>
+    {
+        columns.Bound(p => p.PrimaryKey).Hidden();
+        columns.Bound(p => p.OfficeID).Hidden();
+        columns.Bound(p => p.AccountName).Width(150);
+        //columns.ForeignKey(p => p.AccountID, (System.Collections.IEnumerable)ViewData["Accounts"], "AccountID", "AccountName").EditorTemplateName("ComboBox")
+        //.Title("Account Name").Width(150).ClientTemplate("#=AccountName#");
+        columns.Bound(p => p.ProjectTittle).Hidden();
+        columns.ForeignKey(p => p.OOEID, (System.Collections.IEnumerable)ViewData["ObjectOfExpenditures"], "OOEID", "OOEName")
+        .Title("Object Of Expenditure").Hidden();//.Width(150);
+        columns.ForeignKey(p => p.ProgramID, (System.Collections.IEnumerable)ViewData["Programs"], "ProgramID", "ProgramDescription").EditorTemplateName("GridForeignKey_ProgramFiltered")
+        .Title("Program").Hidden();//Width(150);
+        
+    })
+    .ToolBar(toolBar =>
+    {
+        toolBar.Custom().Text("<span id='btnResizeIcon' style='display:inline-block' class='fa fa-arrows-alt'> </span> <span style='display:inline-block; margin-left:2px' id='btnResizeText' > Maximize </span>").Name("btnFullScreen").Url("javascript:void(0)").HtmlAttributes(new { onclick = "DivFullScreen()" });
+        toolBar.Save();
+        if (Account.UserInfo.UserTypeID != 1)
+        {
+            //  toolBar.Create().Text("Add Account");
+        }
+    })
+    .Editable(editable => editable.Mode(GridEditMode.InCell))
+    .Pageable(p => p.Refresh(true).PageSizes(new int[] {5,10,15,20,25,30,35,40,45,50}))
+    .Scrollable()//.AutoBind(false)
+    .HtmlAttributes(new { style = "height:100%;" })
+    .Events(e => e.Edit("OnGridEdit"))
+    .AutoBind(false)
+    .DataSource(dataSource => dataSource
+        .Ajax().Events(e => e.RequestEnd("onRequestEnd"))
+        .Batch(true)
+        .PageSize(30)
+        .ServerOperation(false)
+        .Model(model =>
+        {
+            model.Id(p => p.PrimaryKey);
+            model.Field(p => p.PrimaryKey).Editable(false);
+            if (Account.UserInfo.UserTypeID == 1)
+            {
+                model.Field(p => p.ProgramID).Editable(false);
+                model.Field(p => p.OOEID).Editable(false);
+                model.Field(p => p.AccountName).Editable(false);
+            }
+            model.Field(p => p.OOEID).DefaultValue(1);
+        })
+        .Read(read => read.Action("GetListOfAccountsForEdit", "Utility").Data("GridParam"))
+        .Update(update => update.Action("UpdateAccounts", "Utility").Data("GridParam"))
+        .Create(create => create.Action("AddNewAccount","Utility").Data("GridParam"))
+    )
+    )
+</div>
+<script>
+    $(document).ready(function () {
+        if ('@Account.UserInfo.UserTypeDesc' == 'Budget In-Charge') {
+            $("#ddlOffices").data("kendoDropDownList").value(@Account.UserInfo.Department);
+                $("#ddlOffices").data("kendoDropDownList").enable(false);
+            }
+            else {
+                $("#ddlOffices").data("kendoDropDownList").enable();
+                $("#ddlOffices").data("kendoDropDownList").value(@Account.UserInfo.Department);
+            }
+            $('#grdAccountToUpdateList').data('kendoGrid').dataSource.read();
+        });
+</script>

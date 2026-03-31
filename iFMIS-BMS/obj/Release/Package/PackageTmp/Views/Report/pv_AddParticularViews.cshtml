@@ -1,0 +1,63 @@
+﻿@model iFMIS_BMS.BusinessLayer.Models.TransFundsModel
+
+<script>
+
+
+
+
+    function reqSave() {
+        var notifi = new $("#popupNotification").data("kendoNotification");
+
+        var url = "@Url.Action("SaveParticular", "Report")";
+
+        var Eco_Desc_ID = $('#dllEE').val()
+        var Eco_Desc = $("#dllEE").data("kendoComboBox").text();
+        var Year_of = $("#propsYears").val()
+
+        $.post(url, { Eco_Desc_ID: Eco_Desc_ID, Eco_Desc: Eco_Desc, Year_of: Year_of }, function (d) {
+            if (d == "1") {
+                swal({
+                    title: "Success!",
+                    text: "Successfully Added.",
+                    timer: 2000,
+                    type: "success",
+                    showConfirmButton: false
+                })
+                $('#addPart').data('kendoWindow').close();
+                $('#EcoEnterGrid').data('kendoGrid').dataSource.read();
+            } else {
+                swal({
+                    title: "Error!",
+                    text: "System Error! Please try again.",
+                    timer: 2000,
+                    type: "error",
+                    showConfirmButton: false
+                })
+            }
+
+
+        })
+    }
+
+
+
+
+</script>
+
+
+
+<label>Source of Funds :</label>
+@(Html.Kendo().ComboBox()
+        .Name("dllEE")
+        .DataTextField("Eco_Desc")
+        .DataValueField("Eco_Desc_ID")
+        .Placeholder("Select or Add Economic Enterprise...")
+        .HtmlAttributes(new { @style = "width: 310px;" })
+            .DataSource(source => source.Read(read => read.Action("GetEE", "Report")))
+
+)
+
+
+
+<div class="k-button k-button-icontext" style="position: absolute; bottom: 15px; right: 20px;width: 80px;" onclick="reqSave()">Save</div>
+

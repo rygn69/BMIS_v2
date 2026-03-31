@@ -1,0 +1,216 @@
+﻿<script>
+    function searchAccount() {
+        var $filter = new Array();
+        $filter = [];
+
+        if ($('#SearchData').val().length > 0) {
+            $filter.push({ field: "office", operator: "contains", value: $('#SearchData').val() }),
+            $filter.push({ field: "accountname", operator: "contains", value: $('#SearchData').val() }),
+            $filter.push({ field: "particular", operator: "contains", value: $('#SearchData').val() })
+            ;
+        }
+
+        $('#sb3_grid').data('kendoGrid').dataSource.filter({
+            logic: "or",
+            filters: $filter
+        });
+
+    }
+
+    $(function () {
+        $("#SearchData").keypress(function (e) {
+            if (e.keyCode == 13) {
+                searchAccount();
+            }
+        });
+    });
+</script>
+
+<div id="searchAccountid" style="height: 20px; margin-top: -5px; float: right;">
+    <input type="text" style="width:250px;border-collapse:collapse;margin:0px;border-style:solid;margin-left:0px;height:100%;outline:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search..." id="SearchData" name="SearchData">
+    <div class="k-button k-button-icontext" style="height:30px;width:40px;border-style:solid;" onclick="searchAccount()"><span class="mif-search"></span></div>
+</div>
+@*<div  style="float:left;">
+        <label style="font-size:12px;">Breakdown</label>
+    </div>*@
+<div style="display:inline-block;width:100%;height:550px; margin: 10px 0 20px 0px;">
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.WFPrepare>()
+        .Name("sb3_grid")
+        .HtmlAttributes(new { style = "" })
+        .Columns(col =>
+        {
+        col.Template(@<text></text>)
+                                @*.Hidden()*@
+        .HeaderTemplate(@<text>No.</text>)
+        .Width(35)
+        .HtmlAttributes(new { style = "text-align:center;vertical-align:top" })
+        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:11px;color:beige;" })
+        .ClientTemplate("<div>#=trnno# </div>");
+
+    col.Template(@<text></text>)
+        .HeaderTemplate(@<text>Office ID</text>)
+        .Hidden()
+        .HtmlAttributes(new { style = "text-align:center;font-size:12px" })
+        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+        .ClientTemplate("<div>#=officeid# </div>");
+
+    col.Template(@<text></text>)
+        .HeaderTemplate(@<text>Office</text>)
+        .Width(50)
+        .HtmlAttributes(new { style = "text-align:center;vertical-align:top" })
+        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:11px;color:beige;" })
+        .ClientTemplate("<div>#=office# </div>");
+
+    col.Template(@<text></text>)
+        .HeaderTemplate(@<text>Program</text>)
+        .Hidden()
+        .HtmlAttributes(new { style = "text-align:center;vertical-align:top" })
+        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:11px;color:beige;" })
+        .ClientTemplate("<div>#=program# </div>");
+
+    col.Template(@<text></text>)
+        .HeaderTemplate(@<text>Account</text>)
+        .Width(190)
+        .HtmlAttributes(new { style = "text-align:left;vertical-align:top" })
+        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:11px;color:beige;" })
+        .ClientTemplate("<div>#=accountname# </div>")
+        .ClientFooterTemplate("<div style='text-align:center;color:darkgreen;font-size:10px'><label> </label><label> Total</label></div>");
+
+    col.Template(@<text></text>)
+        .HeaderTemplate(@<text>Particular</text>)
+        .Width(280)
+        .HtmlAttributes(new { style = "text-align:left;vertical-align:top" })
+        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:11px;color:beige;" })
+        .ClientTemplate("<div>#=particular# </div>");
+
+        col.Bound(c => c.amount)
+        .HeaderTemplate(@<text>Amount</text>)
+        .Width(120)
+        .HtmlAttributes(new { style = "text-align:right;height:30px;font-size:12px;vertical-align:top" })
+        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+        .ClientTemplate("<div>#=kendo.toString(amount,'c2')# </div>")
+        .ClientFooterTemplate("<div style='text-align:right;color:darkgreen;font-size:10px'><label> </label><label> ₱#=kendo.toString(sum, 'c2')#</label></div>");
+
+        })
+            .Resizable(e => e.Columns(true))
+            .Pageable(pageable => pageable
+            .Refresh(true)
+            .ButtonCount(5))
+            .Scrollable()
+            .HtmlAttributes(new { @class = "table-responsive", style = "height:500px;overflow-y:hidden;" })
+            .Selectable()
+            //   .Events(e => e.DataBound("onDataBound").Change("WFPgrid"))
+            .DataSource(dataSource => dataSource
+            .Ajax()
+            .Batch(true)
+            .Model(m => m.Id(i => i.wfpid))
+            .ServerOperation(false)
+
+            .Aggregates(a =>
+            {
+                a.Add(c => c.amount).Sum();
+            })
+            .PageSize(1000)
+            .Read(read => read.Action("getsb3grid", "Report").Data("getParam"))
+            )
+    )
+
+    <div style="float:right;margin-right:-50px;margin-top:30px">
+        <div id="btnPrint" class="k-button k-button-icontext" style="right: 25px;width: 160px;float:right; margin-top: -15px; margin-right:-4px; margin-bottom:0px;background-color:cornflowerblue;border-radius:25px;color:white;margin-right:100px;" onclick="reqDGsignPrint()"><span class="fa fa-search"></span> Preview Via Dgsign</div>
+        <div id="btnPrint" class="k-button k-button-icontext" style="right: 25px;width: 90px;float:right; margin-top: -15px; margin-right:-4px; margin-bottom:0px;background-color:cornflowerblue;border-radius:25px;color:white;margin-right:15px;" onclick="reqPrint()"><span class="fa fa-search"></span> Preview</div>
+    </div>
+</div>
+
+<script>
+    function reqPrint() {
+        var officeid = $("#office_supplemental").val();
+        var tyear = $("#tyear").val();
+        var mode = $("#supplementalproid").val() == 1 ? 1 : 2;
+        if (officeid != 0) {
+            $.ajax({
+                async: false,
+                dataType: 'html',
+                success: window.open("../Reports/ReportViewer.aspx?rid=42&OfficeID=" + officeid + "&Year=" + tyear + "&mode=" + mode + "")
+            });
+        }
+        else {
+            swal({
+                title: "Confirmation!",
+                text: "This action will generate a supplemental budget document for all offices. Would you like to proceed? \n\n",
+                type: "info",
+                showCancelButton: true,
+                closeOnConfirm: true,
+                confirmButtonColor: "#1fa67a",
+                confirmButtonText: "Yes",
+                showLoaderOnConfirm: true,
+            },
+            function (isConfirm) {
+                if (isConfirm) {
+                    $.ajax({
+                        async: false,
+                        dataType: 'html',
+                        success: window.open("../Reports/ReportViewer.aspx?rid=42&OfficeID=" + officeid + "&Year=" + tyear + "&mode=" + mode + "")
+                    });
+                }
+            })
+        }
+    }
+
+    function reqDGsignPrint() {
+        var officeid = $("#office_supplemental").val();
+        var tyear = $("#tyear").val();
+        var mode = $("#supplementalproid").val() == 1 ? 1 : 2;
+        var url = "@Url.Action("dgsignreport", "Report")";
+
+        if (officeid != 0) {
+            swal({
+                title: "Confirmation!",
+                text: "Would you like to create a document for digital signature? \n\n",
+                type: "info",
+                showCancelButton: true,
+                closeOnConfirm: false,
+                confirmButtonColor: "#1fa67a",
+                confirmButtonText: "Yes",
+                showLoaderOnConfirm: true,
+            },
+                function (isConfirm) {
+                    if (isConfirm) {
+                        $.post(url, { YearOf: tyear, OfficeID: officeid, ReportTypeID: 9, docuid: 9, 0: 1, includeLBP1: 0, pagnoid: 0, includeLBP2_SP: 0, eid: 0, includezero: 0, lbp2export: 0, reloadlbp2: 0, sectoral: 0, includeCOE: 0, eco: 3, purpose: "", note: "", sort_: 0 }, function (d) {
+                            if (d != "") {
+                                //window.open(d, '_blank');
+                                swal("Success", "The document generated for digital signature has been sent via SMS and is now available for viewing.", "success")
+                            }
+                            else {
+                                swal("Something Went Wrong!", d, "error");
+                            }
+                        })
+                    }
+                })
+        }
+        else {
+            swal({
+                title: "Confirmation!",
+                text: "This action will generate a supplemental budget document for all offices and create document for digital signature. Would you like to proceed? \n\n",
+                type: "info",
+                showCancelButton: true,
+                closeOnConfirm: false,
+                confirmButtonColor: "#1fa67a",
+                confirmButtonText: "Yes",
+                showLoaderOnConfirm: true,
+            },
+                function (isConfirm) {
+                    if (isConfirm) {
+                        $.post(url, { YearOf: tyear, OfficeID: officeid, ReportTypeID: 9, docuid: 9, 0: 1, includeLBP1: 0, pagnoid: 0, includeLBP2_SP: 0, eid: 0, includezero: 0, lbp2export: 0, reloadlbp2: 0, sectoral: 0, includeCOE: 0, eco: 3, purpose: "", note: "", sort_: 0 }, function (d) {
+                            if (d != "") {
+                                //window.open(d, '_blank');
+                                swal("Success", "The document generated for digital signature has been sent via SMS and is now available for viewing.", "success")
+                            }
+                            else {
+                                swal("Something Went Wrong!", d, "error");
+                            }
+                        })
+                    }
+                })
+        }
+    }
+</script>

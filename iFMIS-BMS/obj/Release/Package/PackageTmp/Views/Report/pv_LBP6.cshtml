@@ -1,0 +1,31 @@
+﻿<div style="width : 81.5%; margin-top: 0px;border-style: solid; border-color: #1fa67a;">
+    <div style="width:100%;height : 25px ; background-color:#1fa67a; color: white">
+        <label class="fa fa-file-text-o fa-lg" style="margin-left: 5px; display:inline-block">  PRINT LBP FORM 6 REPORT</label>
+    </div>
+
+    <label style="margin-left: 10px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px; display : inline-block">
+        Budget Year : @(Html.Kendo().DropDownList()
+                        .Name("ddlYear")
+                        .DataTextField("ProposalYear")
+                        .DataValueField("ProposalYear")
+                        .SelectedIndex(0)
+                        .HtmlAttributes(new { @style = "width: 90px;" })
+                        .DataSource(source => source.Read(read => read.Action("GetPropYear", "PYear")))
+        )
+    </label>
+
+    <div style="display:inline-block;width:100%">
+    
+        <div id="btnPrint" class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 80px;float:right; margin-top: 5px; margin-right:10px; margin-bottom:5px" onclick="reqPreview()"> <span class="fa fa-print"></span> Preview</div>
+    </div>
+</div>
+<script>
+    function reqPreview() {
+        var yearof = $("#ddlYear").val();
+        $.ajax({
+            async: false,
+            dataType: 'html',
+            success: window.open("../Reports/ReportViewer.aspx?rid=32&yearof=" + yearof + "")
+        });
+    }
+</script>

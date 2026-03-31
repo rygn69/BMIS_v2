@@ -1,0 +1,91 @@
+﻿@model iFMIS_BMS.BusinessLayer.Models.BudgetControl.OBRLogger
+
+<script>
+    function setforwardoffice() {
+        var OfficeForward = $("#OfficeForwardv2").val() == "" ? 0 : $("#OfficeForwardv2").val()
+        var url="@Url.Action("setforwardoffice", "BudgetControl")"
+        if (OfficeForward != 0) {
+            $.get(url, { TransactionNo: @Model.trnno, OfficeForward:OfficeForward }, function (e) {
+                 $("#EmployeeForwardv2").data("kendoComboBox").value("")
+                 $("#EmployeeForwardv2").data("kendoComboBox").dataSource.read();
+            });
+        }
+    }
+</script>
+<div style="margin-top:2px;">
+    <div style="border-color:gray;border-width:1px;border-style:solid;width:440px;margin-top:15px;float:left;height:193px;margin-left:1px;margin-bottom:5px;">
+        <div style="background-color:white;width:100px;margin-top:-15px;margin-left:15px;"><span style="font-size:14px;margin-left:5px;">Select Option</span></div>
+        <div style="display:inline-block;margin-left:75px;margin-bottom:15px;margin-top:10px;">
+            <input type="radio" id="radiolgu_v1" value="1" onclick="lguclick_v1()" checked style="margin-left:30px;zoom:1;width:15px;">
+            <span style="font-size:12px"> LGU</span>
+            <input type="radio" id="radiotherindiv_v1" style="margin-left:30px;zoom:1;width:15px;" onclick="otherclick_v1()" />
+            <span style="font-size:12px"> Other Individual</span>
+        </div>
+        <br />
+        <div style="width:120px;display:inline-block;margin-left:3px;"><span style="">Office:</span></div>
+        <div style="width:118px;display:inline-block;margin-left:-5px;">
+
+            @(Html.Kendo().ComboBox()
+                .Name("OfficeForwardv2")
+                .DataTextField("office_name")
+                .DataValueField("office_id")
+                .Placeholder("Select office")
+                .Filter("contains")
+                .MinLength(3)
+                .HtmlAttributes(new { @style = "width: 311px;" })
+                .Events(e => e.Change("setforwardoffice"))
+                .Value(@Model.officeassign.ToString())
+                .DataSource(source => source.Read(read => read.Action("ddlOfficeControl", "Dropdowns")))
+            )
+        </div>
+        <div style="margin-top:5px;">
+            <div style="width:120px;display:inline-block;margin-left:3px;"><span style="">Employee:</span></div>
+            <div style="width:120px;display:inline-block;margin-left:-5px;">
+
+                @(Html.Kendo().ComboBox()
+                .Name("EmployeeForwardv2")
+                .DataTextField("EmpName")
+                .DataValueField("eid")
+                .Placeholder("Select employee")
+                .Filter("contains")
+                .MinLength(3)
+                .HtmlAttributes(new { @style = "width: 311px;" })
+                .Value(@Model.employeeassign.ToString())
+                .DataSource(source => source.Read(read => read.Action("getEmployee", "BudgetControl").Data("getoffice_v2")))
+                )
+            </div>
+        </div>
+        <div style="margin-top:5px;">
+            <div style="width:120px;display:inline-block;margin-left:3px;"><span style="">Other Individual:</span></div>
+            <div style="width:120px;display:inline-block;margin-left:-5px;">
+                <input type="text" id="otherindiv_idv2" readonly value="@Model.otherindividual.ToString()" style="width:300px;" />
+            </div>
+        </div>
+        <div style="float:right;margin-right:20px;margin-top:20px;">
+            <div class="k-button" style="padding:2px;width:99px;margin-top:-10px;border-radius:50px;background-color:cornflowerblue;color:white;" onclick="ProceedCheckout(@Model.trnno,@Model.OBRNowithFnCode,@Model.grOBRNo)"><span class="fa fa-save"></span> Proceed</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function ProceedCheckout(trnno,OBRNowithFnCode,grOBRNo){
+       
+        var OfficeForward=$("#OfficeForwardv2").val() == ""? 0 : $("#OfficeForwardv2").val() 
+        var EmployeeForwardv2 = $("#EmployeeForwardv2").val() == "" ? 0 :  $("#EmployeeForwardv2").val() 
+        var otherindiv_id= $("#otherindiv_idv2").val()
+        var url = CheckOutOBRv2();
+        if (OfficeForward == 0 && otherindiv_id == "" ){
+            swal("Warning","Before checking out and forwarding the transaction, please select an office from the list.","warning")
+        }
+        else{
+            $.get(url, { TransactionNo: trnno, OBRNowithFnCode: OBRNowithFnCode, ObrNoASs: grOBRNo,EmployeeForward:EmployeeForwardv2, otherindiv_id:otherindiv_id}, function (e) {
+                if (e.type == "success") {
+                    $("#grOBR").data("kendoGrid").dataSource.read();
+                    $('#ForwardOffice').data('kendoWindow').close();
+                }
+                swal(e.title, e.message, e.type);
+                
+            });
+        }
+    }
+</script>

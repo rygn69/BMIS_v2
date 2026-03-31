@@ -1,0 +1,472 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="textBox2.Value" xml:space="preserve">
+    <value>=Fields.Activity_ActivityDescription</value>
+  </data>
+  <data name="textBox4.Value" xml:space="preserve">
+    <value>=Fields.Activity_ActivityLocation</value>
+  </data>
+  <data name="textBox6.Value" xml:space="preserve">
+    <value>=Fields.Activity_EmplementingOffice</value>
+  </data>
+  <data name="textBox1.Value" xml:space="preserve">
+    <value>=Fields.Activity_DesiredOutcome</value>
+  </data>
+  <data name="textBox3.Value" xml:space="preserve">
+    <value>=Fields.Activity_DesiredOutputYear1</value>
+  </data>
+  <data name="textBox5.Value" xml:space="preserve">
+    <value>=Fields.Activity_DesiredOutputYear2</value>
+  </data>
+  <data name="textBox7.Value" xml:space="preserve">
+    <value>=Fields.Activity_DesiredOutputYear3</value>
+  </data>
+  <data name="textBox8.Value" xml:space="preserve">
+    <value>=Fields.Activity_SourceOfFunds</value>
+  </data>
+  <data name="textBox9.Value" xml:space="preserve">
+    <value>=iif(Fields.Activity_BudgetaryRequirementsYear1 = 0,'',Fields.Activity_BudgetaryRequirementsYear1)</value>
+  </data>
+  <data name="textBox10.Value" xml:space="preserve">
+    <value>=iif(Fields.Activity_BudgetaryRequirementsYear2 = 0,'',Fields.Activity_BudgetaryRequirementsYear2)</value>
+  </data>
+  <data name="textBox11.Value" xml:space="preserve">
+    <value>=iif(Fields.Activity_BudgetaryRequirementsYear3 = 0,'',Fields.Activity_BudgetaryRequirementsYear3)</value>
+  </data>
+  <data name="textBox12.Value" xml:space="preserve">
+    <value>=iif(Fields.Activity_BudgetaryRequirementsYear1 + Fields.Activity_BudgetaryRequirementsYear2 + Fields.Activity_BudgetaryRequirementsYear3 = 0,'',Fields.Activity_BudgetaryRequirementsYear1 + Fields.Activity_BudgetaryRequirementsYear2 + Fields.Activity_BudgetaryRequirementsYear3)</value>
+  </data>
+  <data name="textBox14.Value" xml:space="preserve">
+    <value>=Fields.Project_ProjectDescription</value>
+  </data>
+  <data name="textBox15.Value" xml:space="preserve">
+    <value>=Fields.Project_ProjectLocation</value>
+  </data>
+  <data name="textBox16.Value" xml:space="preserve">
+    <value>=Fields.Project_EmplementingOffice</value>
+  </data>
+  <data name="textBox17.Value" xml:space="preserve">
+    <value>=Fields.Project_DesiredOutcome</value>
+  </data>
+  <data name="textBox18.Value" xml:space="preserve">
+    <value>=Fields.Project_DesiredOutputYear1</value>
+  </data>
+  <data name="textBox19.Value" xml:space="preserve">
+    <value>=Fields.Project_DesiredOutputYear2</value>
+  </data>
+  <data name="textBox20.Value" xml:space="preserve">
+    <value>=Fields.Project_DesiredOutputYear3</value>
+  </data>
+  <data name="textBox21.Value" xml:space="preserve">
+    <value>=Fields.Project_SourceOfFunds</value>
+  </data>
+  <data name="textBox22.Value" xml:space="preserve">
+    <value>=iif(Fields.Project_BudgetaryRequirementsYear1 = 0,'',Fields.Project_BudgetaryRequirementsYear1)</value>
+  </data>
+  <data name="textBox23.Value" xml:space="preserve">
+    <value>=iif(Fields.Project_BudgetaryRequirementsYear2 = 0,'',Fields.Project_BudgetaryRequirementsYear2)</value>
+  </data>
+  <data name="textBox24.Value" xml:space="preserve">
+    <value>=iif(Fields.Project_BudgetaryRequirementsYear3 = 0,'',Fields.Project_BudgetaryRequirementsYear3)</value>
+  </data>
+  <data name="textBox25.Value" xml:space="preserve">
+    <value>=iif(Fields.Project_BudgetaryRequirementsYear1 + Fields.Project_BudgetaryRequirementsYear2 + Fields.Project_BudgetaryRequirementsYear3 = 0,'',Fields.Project_BudgetaryRequirementsYear1 + Fields.Project_BudgetaryRequirementsYear2 + Fields.Project_BudgetaryRequirementsYear3)</value>
+  </data>
+  <data name="textBox26.Value" xml:space="preserve">
+    <value>Project Cost PLGU</value>
+  </data>
+  <data name="textBox34.Value" xml:space="preserve">
+    <value>=iif(sum(Fields.Project_Internal_BudgetaryRequirementsYear1) = 0,'',sum(Fields.Project_Internal_BudgetaryRequirementsYear1))</value>
+  </data>
+  <data name="textBox35.Value" xml:space="preserve">
+    <value>=iif(sum(Fields.Project_Internal_BudgetaryRequirementsYear2) = 0,'',sum(Fields.Project_Internal_BudgetaryRequirementsYear2))</value>
+  </data>
+  <data name="textBox36.Value" xml:space="preserve">
+    <value>=iif(sum(Fields.Project_Internal_BudgetaryRequirementsYear3) = 0,'',sum(Fields.Project_Internal_BudgetaryRequirementsYear3))</value>
+  </data>
+  <data name="textBox37.Value" xml:space="preserve">
+    <value>=iif(sum(Fields.Project_Internal_BudgetaryRequirementsYear1) +
+sum(Fields.Project_Internal_BudgetaryRequirementsYear2) +
+sum(Fields.Project_Internal_BudgetaryRequirementsYear3) = 0,'',sum(Fields.Project_Internal_BudgetaryRequirementsYear1) + sum(Fields.Project_Internal_BudgetaryRequirementsYear2)+
+sum(Fields.Project_Internal_BudgetaryRequirementsYear3))</value>
+  </data>
+  <data name="textBox38.Value" xml:space="preserve">
+    <value>=Fields.Program_ProgramDescription</value>
+  </data>
+  <data name="textBox39.Value" xml:space="preserve">
+    <value>=Fields.Program_ProgramLocation</value>
+  </data>
+  <data name="textBox40.Value" xml:space="preserve">
+    <value>=Fields.Program_EmplementingOffice</value>
+  </data>
+  <data name="textBox41.Value" xml:space="preserve">
+    <value>=Fields.Program_DesiredOutcome</value>
+  </data>
+  <data name="textBox42.Value" xml:space="preserve">
+    <value>=Fields.Program_DesiredOutputYear1</value>
+  </data>
+  <data name="textBox43.Value" xml:space="preserve">
+    <value>=Fields.Program_DesiredOutputYear2</value>
+  </data>
+  <data name="textBox44.Value" xml:space="preserve">
+    <value>=Fields.Program_DesiredOutputYear3</value>
+  </data>
+  <data name="textBox45.Value" xml:space="preserve">
+    <value>=Fields.Program_SourceOfFunds</value>
+  </data>
+  <data name="textBox46.Value" xml:space="preserve">
+    <value>=iif(Fields.Program_BudgetaryRequirementsYear1 = 0,'',Fields.Program_BudgetaryRequirementsYear1)</value>
+  </data>
+  <data name="textBox47.Value" xml:space="preserve">
+    <value>=iif(Fields.Program_BudgetaryRequirementsYear2 = 0,'',Fields.Program_BudgetaryRequirementsYear2)</value>
+  </data>
+  <data name="textBox48.Value" xml:space="preserve">
+    <value>=iif(Fields.Program_BudgetaryRequirementsYear3 = 0,'',Fields.Program_BudgetaryRequirementsYear3)</value>
+  </data>
+  <data name="textBox49.Value" xml:space="preserve">
+    <value>=iif(Fields.Program_BudgetaryRequirementsYear1 + Fields.Program_BudgetaryRequirementsYear2 + Fields.Program_BudgetaryRequirementsYear3 = 0,'',Fields.Program_BudgetaryRequirementsYear1 + Fields.Program_BudgetaryRequirementsYear2 + Fields.Program_BudgetaryRequirementsYear3)</value>
+  </data>
+  <data name="textBox50.Value" xml:space="preserve">
+    <value>Program Cost PLGU</value>
+  </data>
+  <data name="textBox58.Value" xml:space="preserve">
+    <value>=iif(sum(Fields.Project_Internal_BudgetaryRequirementsYear1) = 0,'',sum(Fields.Project_Internal_BudgetaryRequirementsYear1))</value>
+  </data>
+  <data name="textBox59.Value" xml:space="preserve">
+    <value>=iif(sum(Fields.Project_Internal_BudgetaryRequirementsYear2) = 0,'',sum(Fields.Project_Internal_BudgetaryRequirementsYear2))</value>
+  </data>
+  <data name="textBox60.Value" xml:space="preserve">
+    <value>=iif(sum(Fields.Project_Internal_BudgetaryRequirementsYear3) = 0,'',sum(Fields.Project_Internal_BudgetaryRequirementsYear3))</value>
+  </data>
+  <data name="textBox61.Value" xml:space="preserve">
+    <value>=iif(sum(Fields.Project_Internal_BudgetaryRequirementsYear1) +
+sum(Fields.Project_Internal_BudgetaryRequirementsYear2) +
+sum(Fields.Project_Internal_BudgetaryRequirementsYear3) = 0,'',sum(Fields.Project_Internal_BudgetaryRequirementsYear1) + sum(Fields.Project_Internal_BudgetaryRequirementsYear2)+
+sum(Fields.Project_Internal_BudgetaryRequirementsYear3))</value>
+  </data>
+  <data name="textBox69.Value" xml:space="preserve">
+    <value>=iif(sum(Fields.Project_External_BudgetaryRequirementsYear1) = 0,'',sum(Fields.Project_External_BudgetaryRequirementsYear1))</value>
+  </data>
+  <data name="textBox70.Value" xml:space="preserve">
+    <value>=iif(sum(Fields.Project_External_BudgetaryRequirementsYear2) = 0,'',sum(Fields.Project_External_BudgetaryRequirementsYear2))</value>
+  </data>
+  <data name="textBox71.Value" xml:space="preserve">
+    <value>=iif(sum(Fields.Project_External_BudgetaryRequirementsYear3) = 0,'',sum(Fields.Project_External_BudgetaryRequirementsYear3))</value>
+  </data>
+  <data name="textBox72.Value" xml:space="preserve">
+    <value>=iif(sum(Fields.Project_External_BudgetaryRequirementsYear1) +
+sum(Fields.Project_External_BudgetaryRequirementsYear2) +
+sum(Fields.Project_External_BudgetaryRequirementsYear3) = 0,'',sum(Fields.Project_External_BudgetaryRequirementsYear1) + sum(Fields.Project_External_BudgetaryRequirementsYear2)+
+sum(Fields.Project_External_BudgetaryRequirementsYear3))</value>
+  </data>
+  <data name="textBox73.Value" xml:space="preserve">
+    <value>Project Cost EXTERNAL</value>
+  </data>
+  <data name="textBox13.Value" xml:space="preserve">
+    <value>Program Cost EXTERNAL</value>
+  </data>
+  <data name="textBox81.Value" xml:space="preserve">
+    <value>=iif(sum(Fields.Project_External_BudgetaryRequirementsYear1) = 0,'',sum(Fields.Project_External_BudgetaryRequirementsYear1))</value>
+  </data>
+  <data name="textBox82.Value" xml:space="preserve">
+    <value>=iif(sum(Fields.Project_External_BudgetaryRequirementsYear2) = 0,'',sum(Fields.Project_External_BudgetaryRequirementsYear2))</value>
+  </data>
+  <data name="textBox83.Value" xml:space="preserve">
+    <value>=iif(sum(Fields.Project_External_BudgetaryRequirementsYear3) = 0,'',sum(Fields.Project_External_BudgetaryRequirementsYear3))</value>
+  </data>
+  <data name="textBox84.Value" xml:space="preserve">
+    <value>=iif(sum(Fields.Project_External_BudgetaryRequirementsYear1) +
+sum(Fields.Project_External_BudgetaryRequirementsYear2) +
+sum(Fields.Project_External_BudgetaryRequirementsYear3) = 0,'',sum(Fields.Project_External_BudgetaryRequirementsYear1) + sum(Fields.Project_External_BudgetaryRequirementsYear2)+
+sum(Fields.Project_External_BudgetaryRequirementsYear3))</value>
+  </data>
+  <data name="textBox98.Value" xml:space="preserve">
+    <value>Total - {Parameters.SectorDescription} PLGU</value>
+  </data>
+  <data name="textBox106.Value" xml:space="preserve">
+    <value>=iif(sum(Fields.Project_Internal_BudgetaryRequirementsYear1) = 0,'',sum(Fields.Project_Internal_BudgetaryRequirementsYear1))</value>
+  </data>
+  <data name="textBox107.Value" xml:space="preserve">
+    <value>=iif(sum(Fields.Project_Internal_BudgetaryRequirementsYear2) = 0,'',sum(Fields.Project_Internal_BudgetaryRequirementsYear2))</value>
+  </data>
+  <data name="textBox108.Value" xml:space="preserve">
+    <value>=iif(sum(Fields.Project_Internal_BudgetaryRequirementsYear3) = 0,'',sum(Fields.Project_Internal_BudgetaryRequirementsYear3))</value>
+  </data>
+  <data name="textBox109.Value" xml:space="preserve">
+    <value>=iif(sum(Fields.Project_Internal_BudgetaryRequirementsYear1) +
+sum(Fields.Project_Internal_BudgetaryRequirementsYear2) +
+sum(Fields.Project_Internal_BudgetaryRequirementsYear3) = 0,'',sum(Fields.Project_Internal_BudgetaryRequirementsYear1) + sum(Fields.Project_Internal_BudgetaryRequirementsYear2)+
+sum(Fields.Project_Internal_BudgetaryRequirementsYear3))</value>
+  </data>
+  <data name="textBox113.Value" xml:space="preserve">
+    <value>= Parameters.Year1Param.Value</value>
+  </data>
+  <data name="textBox114.Value" xml:space="preserve">
+    <value>= Parameters.Year2Param.Value</value>
+  </data>
+  <data name="textBox115.Value" xml:space="preserve">
+    <value>= Parameters.Year3Param.Value</value>
+  </data>
+  <data name="textBox117.Value" xml:space="preserve">
+    <value>= Parameters.Year1Param.Value</value>
+  </data>
+  <data name="textBox118.Value" xml:space="preserve">
+    <value>= Parameters.Year2Param.Value</value>
+  </data>
+  <data name="textBox119.Value" xml:space="preserve">
+    <value>= Parameters.Year3Param.Value</value>
+  </data>
+  <data name="textBox120.Value" xml:space="preserve">
+    <value>total</value>
+  </data>
+  <data name="textBox121.Value" xml:space="preserve">
+    <value>Program, Project, Activity</value>
+  </data>
+  <data name="textBox122.Value" xml:space="preserve">
+    <value>Location</value>
+  </data>
+  <data name="textBox123.Value" xml:space="preserve">
+    <value>Emplementing Office</value>
+  </data>
+  <data name="textBox124.Value" xml:space="preserve">
+    <value>Desired Outcome</value>
+  </data>
+  <data name="textBox125.Value" xml:space="preserve">
+    <value>Desired Output</value>
+  </data>
+  <data name="textBox128.Value" xml:space="preserve">
+    <value>Source of Funds</value>
+  </data>
+  <data name="textBox129.Value" xml:space="preserve">
+    <value>Budgetary Requirements (PHP)</value>
+  </data>
+  <data name="textBox85.Value" xml:space="preserve">
+    <value>Local Development Investment Program (LDIP)
+{Parameters.Year1Param.Value} - {Parameters.Year3Param.Value}</value>
+  </data>
+  <data name="textBox86.Value" xml:space="preserve">
+    <value>SECTOR : {Parameters.SectorDescription.Value}</value>
+  </data>
+  <data name="textBox130.Value" xml:space="preserve">
+    <value>Total - {Parameters.SectorDescription} External</value>
+  </data>
+  <data name="textBox138.Value" xml:space="preserve">
+    <value>=iif(sum(Fields.Project_External_BudgetaryRequirementsYear1) = 0,'',sum(Fields.Project_External_BudgetaryRequirementsYear1))</value>
+  </data>
+  <data name="textBox139.Value" xml:space="preserve">
+    <value>=iif(sum(Fields.Project_External_BudgetaryRequirementsYear2) = 0,'',sum(Fields.Project_External_BudgetaryRequirementsYear2))</value>
+  </data>
+  <data name="textBox140.Value" xml:space="preserve">
+    <value>=iif(sum(Fields.Project_External_BudgetaryRequirementsYear3) = 0,'',sum(Fields.Project_External_BudgetaryRequirementsYear3))</value>
+  </data>
+  <data name="textBox141.Value" xml:space="preserve">
+    <value>=iif(sum(Fields.Project_External_BudgetaryRequirementsYear1) +
+sum(Fields.Project_External_BudgetaryRequirementsYear2) +
+sum(Fields.Project_External_BudgetaryRequirementsYear3) = 0,'',sum(Fields.Project_External_BudgetaryRequirementsYear1) + sum(Fields.Project_External_BudgetaryRequirementsYear2)+
+sum(Fields.Project_External_BudgetaryRequirementsYear3))</value>
+  </data>
+  <data name="textBox142.Value" xml:space="preserve">
+    <value>Grand Total - {Parameters.SectorDescription} </value>
+  </data>
+  <data name="textBox150.Value" xml:space="preserve">
+    <value>=iif(sum(Fields.Project_External_BudgetaryRequirementsYear1) + sum(Fields.Project_Internal_BudgetaryRequirementsYear1) = 0,'',sum(Fields.Project_External_BudgetaryRequirementsYear1) + sum(Fields.Project_Internal_BudgetaryRequirementsYear1))</value>
+  </data>
+  <data name="textBox151.Value" xml:space="preserve">
+    <value>=iif(sum(Fields.Project_External_BudgetaryRequirementsYear2) + sum(Fields.Project_Internal_BudgetaryRequirementsYear2) = 0,'',sum(Fields.Project_External_BudgetaryRequirementsYear2) + sum(Fields.Project_Internal_BudgetaryRequirementsYear2))</value>
+  </data>
+  <data name="textBox152.Value" xml:space="preserve">
+    <value>=iif(sum(Fields.Project_External_BudgetaryRequirementsYear3) + sum(Fields.Project_Internal_BudgetaryRequirementsYear3) = 0,'',sum(Fields.Project_External_BudgetaryRequirementsYear3) + sum(Fields.Project_Internal_BudgetaryRequirementsYear3))</value>
+  </data>
+  <data name="textBox153.Value" xml:space="preserve">
+    <value>=iif(sum(Fields.Project_External_BudgetaryRequirementsYear1)+
+sum(Fields.Project_External_BudgetaryRequirementsYear2)+
+sum(Fields.Project_External_BudgetaryRequirementsYear3)+
+sum(Fields.Project_Internal_BudgetaryRequirementsYear1)+
+sum(Fields.Project_Internal_BudgetaryRequirementsYear2)+
+sum(Fields.Project_Internal_BudgetaryRequirementsYear3)= 0,'',
+sum(Fields.Project_External_BudgetaryRequirementsYear1)+ 
+sum(Fields.Project_External_BudgetaryRequirementsYear2)+
+sum(Fields.Project_External_BudgetaryRequirementsYear3)+
+sum(Fields.Project_Internal_BudgetaryRequirementsYear1)+
+sum(Fields.Project_Internal_BudgetaryRequirementsYear2)+
+sum(Fields.Project_Internal_BudgetaryRequirementsYear3)
+)</value>
+  </data>
+  <data name="htmlTextBox4.Value" xml:space="preserve">
+    <value>&lt;p style="text-align: center"&gt;&lt;strong&gt;&lt;span style="font-family: arial narrow"&gt;&lt;span style="font-size: 18pt"&gt;&lt;/span&gt;&lt;span style="font-size: 18pt"&gt;Local Development Investment Program&lt;/span&gt;&lt;/span&gt;&lt;/strong&gt;&lt;span style="font-size: 18pt"&gt;&lt;span style="font-size: 18pt"&gt;&lt;/span&gt;&lt;/span&gt;&lt;/p&gt;</value>
+  </data>
+  <data name="textBox87.Value" xml:space="preserve">
+    <value>SECTOR : {Parameters.SectorDescription.Value}</value>
+  </data>
+  <data name="textBox88.Value" xml:space="preserve">
+    <value>Program, Project, Activity</value>
+  </data>
+  <data name="textBox89.Value" xml:space="preserve">
+    <value>Location</value>
+  </data>
+  <data name="textBox90.Value" xml:space="preserve">
+    <value>Emplementing Office</value>
+  </data>
+  <data name="textBox91.Value" xml:space="preserve">
+    <value>Desired Outcome</value>
+  </data>
+  <data name="textBox92.Value" xml:space="preserve">
+    <value>Desired Output</value>
+  </data>
+  <data name="textBox93.Value" xml:space="preserve">
+    <value>= Parameters.Year1Param.Value</value>
+  </data>
+  <data name="textBox94.Value" xml:space="preserve">
+    <value>= Parameters.Year2Param.Value</value>
+  </data>
+  <data name="textBox95.Value" xml:space="preserve">
+    <value>= Parameters.Year3Param.Value</value>
+  </data>
+  <data name="textBox96.Value" xml:space="preserve">
+    <value>Source of Funds</value>
+  </data>
+  <data name="textBox97.Value" xml:space="preserve">
+    <value>Budgetary Requirements (PHP)</value>
+  </data>
+  <data name="textBox110.Value" xml:space="preserve">
+    <value>= Parameters.Year1Param.Value</value>
+  </data>
+  <data name="textBox111.Value" xml:space="preserve">
+    <value>= Parameters.Year2Param.Value</value>
+  </data>
+  <data name="textBox112.Value" xml:space="preserve">
+    <value>= Parameters.Year3Param.Value</value>
+  </data>
+  <data name="textBox116.Value" xml:space="preserve">
+    <value>total</value>
+  </data>
+  <data name="textBox126.Value" xml:space="preserve">
+    <value>*Name of PPAs taken from approved CY {Parameters.Year1Param.Value} Annual Budget** Budget in {Parameters.Year1Param.Value} incorporated in the Rubber Production Project</value>
+  </data>
+  <data name="textBox127.Value" xml:space="preserve">
+    <value>= PageNumber</value>
+  </data>
+  <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="$this.ShowSnapGrid" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+</root>

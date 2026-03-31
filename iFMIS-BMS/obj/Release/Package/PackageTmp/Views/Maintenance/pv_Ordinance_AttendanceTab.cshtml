@@ -1,0 +1,310 @@
+﻿<script>
+    function reqRemovePerson(SeriesID) {
+        swal({
+            title: "Are you sure?",
+            text: "This Action Will Remove The Selected Employee to the List.",
+            type: "info",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes!",
+            closeOnConfirm: false
+        }, function () {
+            var url = "@Url.Action("RemoveEmployeeAttendance", "Maintenance")";
+            $.post(url, { SeriesID: SeriesID }, function (d) {
+                if (d == 1) {
+                    swal({
+                        title: "Success!",
+                        text: "Employee Removed!",
+                        type: "success",
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    $("#grOrdinanceAttendance").data("kendoGrid").dataSource.read();
+                    $("#ddlEmployeeAttendance").data("kendoComboBox").dataSource.read();
+                    $("#txtDesignation").data("kendoComboBox").dataSource.read();
+                }
+                else {
+                    swal({
+                        title: "Something went wrong!",
+                        text: d,
+                        type: "error",
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                }
+            })
+        });
+    }
+    function Ondatabound() {
+        $('#grOrdinanceAttendance tbody .k-grouping-row:contains("GroupOrderNo")').hide();
+    }
+    function AddToAttendance() {
+        var eid = $("#ddlEmployeeAttendance").val();
+        var Designation = $("#txtDesignation").val();
+        var Status = 0;
+        if (document.getElementById("cbPresent").checked == true) {
+            Status = 1
+        }
+        if (document.getElementById("cbAbsent").checked == true) {
+            Status = 2
+        }
+        if (document.getElementById("cbOBus").checked == true) {
+            Status = 3
+        }
+        if (eid == "" || Designation == "" || Status == 0) {
+            swal({
+                title: "Cannot Complete Request!",
+                text: "Employee, Designation and Status is Required!",
+                type: "error",
+                timer: 2000,
+                showConfirmButton: false
+            });
+        }
+        else {
+            var url = "@Url.Action("AddToAttendance", "Maintenance")";
+            $.post(url, { eid : eid, Designation:Designation,Status:Status }, function (d) {
+                if (d == 1) {
+                    swal({
+                        title: "Success!",
+                        text: "Employee Added!",
+                        type: "success",
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    document.getElementById("cbPresent").checked = true;
+                    document.getElementById("cbAbsent").checked = false;
+                    document.getElementById("cbOBus").checked = false;
+                    $("#txtDesignation").data("kendoComboBox").value("");
+                    $("#ddlEmployeeAttendance").data("kendoComboBox").value("");
+                    $("#grOrdinanceAttendance").data("kendoGrid").dataSource.read();
+                    $("#ddlEmployeeAttendance").data("kendoComboBox").dataSource.read();
+                    $("#txtDesignation").data("kendoComboBox").dataSource.read();
+                }
+                else {
+                    swal({
+                        title: "Something went wrong!",
+                        text: d,
+                        type: "error",
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                }
+            })
+        }
+    }
+    function GetAttendanceHeader() {
+        var url = "@Url.Action("GetAttendanceHeader", "Maintenance")";
+        $.getJSON(url, function (d) {
+            document.getElementById("txtReportTittle").value = d[0];
+            $("#txtReportDescription").data("kendoEditor").value(d[1]);
+        });
+    }
+    function UpdateReportHeader() {
+        var url = "@Url.Action("UpdateAttendanceHeader", "Maintenance")";
+        var ReportDescription = $("#txtReportDescription").val();
+        var ReportTittle = $("#txtReportTittle").val();
+        $.post(url, { ReportTittle: ReportTittle, ReportDescription: ReportDescription }, function (d) {
+            if (d == 1) {
+                swal({
+                    title: "Success!",
+                    text: "Description and Tittle Updated!",
+                    type: "success",
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+                GetAttendanceHeader();
+            }
+            else {
+                swal({
+                    title: "Something went wrong!",
+                    text: d,
+                    type: "error",
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            }
+        })
+    }
+    function onAttendanceOrderChange(arg) {
+
+        var gridName = $('#grOrdinanceAttendance').data('kendoGrid');
+        var ds = gridName.dataSource.data();
+        var dataRows = gridName.items();
+        var SeriesID = "";
+        if (arg.container.find("input[name=Name]").length > 0) {
+            $("#grOrdinanceAttendance").data("kendoGrid").closeCell(arg.container)
+        }
+        if (arg.container.find("input[name=Designation]").length > 0) {
+            $("#grOrdinanceAttendance").data("kendoGrid").closeCell(arg.container)
+        }
+        var input = arg.container.find("input[name=OrderNo]");
+        var value = input.val();
+        var OldValue = input.val();
+        input.keyup(function () {
+            value = input.val();
+        });
+        input.blur(function () {
+            var rowIndex = dataRows.index(gridName.select());
+            SeriesID = ds[rowIndex].SeriesID;
+            if (value != OldValue) {
+                var url = "@Url.Action("UpdateAttendanceOrder", "Maintenance")";
+                $.post(url, { SeriesID: SeriesID, Percentage: value }, function (d) {
+                    if (d == "1") {
+                        $("#grOrdinanceAttendance").data("kendoGrid").dataSource.read();
+                    }
+                    else {
+                        alert('Failed To Update Order No. Please Try Again')
+                    }
+                })
+            }
+        });
+    }
+</script>
+<div style="width : 100%; margin-top: 0px;border-style: solid; border-color: #1fa67a">
+    <div style="width:100%;height : 25px ; background-color:#1fa67a; color: white">
+        <label class="fa fa-file-text-o fa-lg" style="margin-left: 5px; display:inline-block">  Header</label>
+    </div>
+    <label style="margin-left:10px">Report Tittle :</label>
+    <input id="txtReportTittle" placeholder="Report Tittle" style="width:95%;margin-left:10px; margin-top:10px" />
+   @*<textarea id="txtReportDescription" placeholder="Report Description" style="width:95%;margin-left:10px; margin-top:10px;margin-bottom:10px;height: 100px;" />*@
+    <label style="margin-left:10px">Report Description :</label>
+    <div style="margin-left:10px;margin-bottom:10px">
+      @(Html.Kendo().Editor()
+      .Name("txtReportDescription")
+      .HtmlAttributes(new { style = "width: 98%;height:100px;", id = "txtReportDescription" })
+      .Tools(tools => tools
+          .Clear()
+          .SuperScript()
+      )
+      )
+    </div>
+    <div style="display:inline-block; width:100%">
+        <div style=" float:right; margin-right:12px ; margin-bottom:5px" class="k-button k-button-icontext" onclick="UpdateReportHeader()"> <i class="fa fa-exchange"></i> Update </div>
+    </div>
+</div>
+<div style="width : 100%; margin-top: 0px;border-style: solid; border-color: #1fa67a">
+    <div style="width:100%;height : 25px ; background-color:#1fa67a; color: white">
+        <label class="fa fa-file-text-o fa-lg" style="margin-left: 5px; display:inline-block">  Attendance</label>
+    </div>
+    <label style="margin-left: 0px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px; display : inline-block; width:35%">
+       @(Html.Kendo().ComboBox()
+                         .Name("ddlEmployeeAttendance")
+                         .DataTextField("empName")
+                         .DataValueField("eid")
+                         .Filter("contains")
+                         .MinLength(1)
+                         .Placeholder("Search Employee...")
+                         .HtmlAttributes(new { @style = "width:100% ; margin-left:10px; display: inline-block" })
+                         .DataSource(source => source.Read(read => read.Action("ddlEmployeeForOrdinanceAttendance", "User")).ServerFiltering(false))
+        )
+
+       
+    @*<input id="txtDesignation" placeholder="Designation" style="width:58.5%;margin-left:10px; display:inline-block" maxlength="200" />*@
+    </label>
+    <label style="margin-left: 0px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px; display : inline-block; width:58.5%">
+        @(Html.Kendo().ComboBox()
+                         .Name("txtDesignation")
+                         .DataTextField("empName")
+                         .DataValueField("empName")
+                         .Filter("contains")
+                         .Placeholder("Designation")
+                         .HtmlAttributes(new { @style = "width: 100%; margin-left:10px; display: inline-block" })
+                         .DataSource(source => source.Read(read => read.Action("ddlOrdinanceAttendanceDesignation", "User")))
+        )
+    </label>
+    
+    <div style="display:inline-block; margin-left:10px; margin-top:5px">
+        <input type="checkbox" id="cbPresent" class="k-checkbox">
+        <label class="k-checkbox-label" for="cbPresent">Present</label> 
+    </div>
+    <div style="display:inline-block; margin-left:10px; margin-top:5px">
+        <input type="checkbox" id="cbAbsent" class="k-checkbox"> 
+        <label class="k-checkbox-label" for="cbAbsent">Absent</label>
+    </div>
+    <div style="display:inline-block; margin-left:10px; margin-top:5px">
+        <input type="checkbox" id="cbOBus" class="k-checkbox">
+        <label class="k-checkbox-label" for="cbOBus">On Official Business</label>
+    </div>
+    <div style="display:inline-block; width:100%">
+        <div style=" float:right; margin-right:12px ; margin-bottom:5px" class="k-button k-button-icontext" onclick="AddToAttendance()"> <i class="fa fa-exchange"></i> Add </div>
+    </div>
+    <div style="margin-top:10px">
+        @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Maintenance.OrdinanceAttendanceModel>()
+                .Name("grOrdinanceAttendance")
+                .Columns(columns =>
+                {
+                    columns.Bound(c => c.SeriesID).Hidden();
+                    columns.Bound(c => c.Status).Title("Status").Hidden()
+                        .ClientGroupHeaderTemplate("<div style='display:inline-block'>#= value #</div>");
+                    columns.Bound(c => c.Name).Title("Name").Width(150)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+                    columns.Bound(c => c.Designation).Title("Designation").Width(180)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+                    columns.Bound(c => c.OrderNo).Title("Order No").Width(50)
+                       .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                       .ClientTemplate("# if(SeriesID == 0) { #" +
+                                               "" +
+                                               "# } else { #" +
+                                               "#=OrderNo#" +
+                                               "# }#"
+                       
+                       )
+                       .HtmlAttributes(new { style = "text-align:center;" });
+                    columns.Template(t => { }).ClientTemplate("# if(SeriesID == 0) { #" +
+                                               "" +
+                                               "# } else { #" +
+                                               "<div class='k-button' onclick='reqRemovePerson(#=SeriesID#)' style='inline-block' title='Remove'>Remove</div>" +
+                                               "# }#"
+                        ).Width(60);
+                })
+                        .HtmlAttributes(new { style = "height: 300px;" })
+                        .Scrollable(s => s.Enabled(true))
+                        .Selectable()
+                        .Editable(editable => editable.Mode(GridEditMode.InCell))
+                        .Events(e => e.Edit("onAttendanceOrderChange"))
+                        .DataSource(dataSource => dataSource
+                            .Ajax()
+                            .Batch(true)
+                            .ServerOperation(false)
+                            .Model(m => m.Id(i => i.SeriesID))
+                            .Read(read => read.Action("grOrdinanceAttendance", "Maintenance"))
+                            .Group(g =>
+                                {
+                                    g.Add(c => c.GroupOrderNo);
+                                    g.Add(c => c.Status);
+                                })
+                        )
+                        .Events(e=> e.DataBound("Ondatabound"))
+        )
+    </div>
+    
+</div>
+
+<style>
+    textarea {
+    resize: none;
+}
+</style>
+<script>
+    $(document).ready(function () {
+        document.getElementById("cbPresent").checked = true;
+        $("input.k-checkbox").click(function () {
+            var cbid = $(this).attr('id');
+            switch (cbid) {
+                case "cbPresent":
+                    document.getElementById("cbAbsent").checked = false
+                    document.getElementById("cbOBus").checked = false
+                    break;
+                case "cbAbsent":
+                    document.getElementById("cbPresent").checked = false
+                    document.getElementById("cbOBus").checked = false
+                    break;
+                case "cbOBus":
+                    document.getElementById("cbAbsent").checked = false
+                    document.getElementById("cbPresent").checked = false
+                    break;
+            }
+        });
+        GetAttendanceHeader();
+    });
+</script>

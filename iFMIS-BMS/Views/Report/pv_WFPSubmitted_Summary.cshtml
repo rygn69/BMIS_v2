@@ -1,0 +1,139 @@
+﻿<script>
+    function fnoffice() {
+        return {
+            officeid: $("#office_submitted").val(),//@Account.UserInfo.Department,
+            fundid:  0
+        }
+    }
+
+    function getParam() {
+        return {
+            yearof: $("#wfpyear").val(),
+            officeid: $("#office_submitted").val(),
+            submit: $("#checkboxsubmmittedid").val()
+        }
+    }
+
+    function fnOffice_sel() {
+        $("#WFPGridSubmitted_summary").data("kendoGrid").dataSource.read()
+    }
+    function checkboxsubmmitted() {
+        if (document.getElementById("checkboxsubmmittedid").checked) {
+            $("#checkboxsubmmittedid").val(1)
+        }
+        else {
+            $("#checkboxsubmmittedid").val(0)
+        }
+        $("#WFPGridSubmitted_summary").data("kendoGrid").dataSource.read()
+    }
+    function lbl_checkboxsubmmitted() {
+        if (document.getElementById("checkboxsubmmittedid").checked) {
+            $("#checkboxsubmmittedid").prop("checked", false)
+            $("#checkboxsubmmittedid").val(0)
+        }
+        else {
+            $("#checkboxsubmmittedid").prop("checked", true)
+            $("#checkboxsubmmittedid").val(1)
+        }
+        $("#WFPGridSubmitted_summary").data("kendoGrid").dataSource.read()
+    }
+</script>
+<div style="width:400px;">
+    @(Html.Kendo().ComboBox()
+            .Name("office_submitted")
+            .DataTextField("offname")
+            .DataValueField("OfficeID")
+            .AutoBind(true)
+            .Placeholder("Select Office...")
+            .Filter("contains")
+            .MinLength(3)
+            .Events(e => e.Change("fnOffice_sel"))
+            //       .SelectedIndex(0)
+            .HtmlAttributes(new { style = "width:100%; height:100%", @class = "form-control autoselect" })
+            .DataSource(source =>
+            {
+                source.Read(read =>
+                {
+                    read.Action("GetOfficeWFP", "Report").Data("fnoffice");
+                })
+            .ServerFiltering(false);
+            })
+    )
+</div>
+<div style="float:right; margin-right:300px;margin-top:-25px;">
+    <input style="zoom:1.2" type="checkbox" id="checkboxsubmmittedid" checked onclick="checkboxsubmmitted()" value="1" />
+    <span style="font-size:14px;margin-left:2px;cursor:pointer;color:green"  onclick="lbl_checkboxsubmmitted()"><b><u> Submitted</u></b></span>
+</div>
+<div>
+    <div style="width:100%;float:left;margin-top:-3px;margin-bottom:5px;">
+        @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.WFPrepare>()
+        .Name("WFPGridSubmitted_summary")
+        .HtmlAttributes(new { style = "height:450.5px;" })
+        .Scrollable()
+        .Columns(col =>
+        {
+        col.Template(@<text></text>)
+                .HeaderTemplate(@<text>Account ID</text>)
+                .Hidden()
+                .HtmlAttributes(new { style = "text-align:center;" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                @*.HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal"})*@
+                .ClientTemplate("<div>#=accountid# </div>");
+         col.Template(@<text></text>)
+                .HeaderTemplate(@<text>Office</text>)
+                .Width(100)
+                .HtmlAttributes(new { style = "text-align:left;" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                .ClientTemplate("<div>#=office# </div>");
+        col.Template(@<text></text>)
+                .HeaderTemplate(@<text>Account</text>)
+                .Width(300)
+                .HtmlAttributes(new { style = "text-align:left;" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                .ClientTemplate("<div>#=accountname# </div>")
+                .ClientFooterTemplate("<div style='text-align:center;color:darkgreen;width:170px'><label>Total </label></div>");
+        col.Bound(c=>c.amount)
+                .HeaderTemplate(@<text>Amount</text>)
+                .Width(80)
+                .HtmlAttributes(new { style = "text-align:right;" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                .ClientTemplate("<div>#=kendo.toString(amount,'c2')# </div>")
+                .ClientFooterTemplate("<div style='text-align:right;color:darkgreen;font-size:10px'><label> </label><label> ₱#=kendo.toString(sum, 'c2')#</label></div>");
+        col.Template(@<text></text>)
+                .HeaderTemplate(@<text>Date/Time <br />Submitted</text>)
+                .Width(120)
+                .HtmlAttributes(new { style = "text-align:right;" })
+                .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" })
+                .ClientTemplate("<div>#=datetimeentered# </div>");
+        })
+            .Editable(editable => editable.Mode(GridEditMode.InCell))
+            .Resizable(e => e.Columns(true))
+            //.AutoBind(false)
+            .Pageable(pageable => pageable
+            .Refresh(true)
+            //.ButtonCount()
+            )
+            .Resizable(s => s.Columns(true))
+            .Selectable()
+            //.Events(e => e.DataBound("onDataBound").Edit("onGridEdit"))
+            .DataSource(dataSource => dataSource
+            .Ajax()
+            .Batch(true)
+            .Model(m => m.Id(i => i.wfpid))
+            .ServerOperation(false)
+            .Aggregates(a =>
+            {
+                a.Add(c => c.amount).Sum();
+            })
+            .PageSize(1000)
+            .Read(read => read.Action("GetWFPSubmittedSumm", "Report").Data("getParam"))
+            )
+        )
+
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $("#office_submitted").data("kendoComboBox").value($("#office").val())
+    })
+</script>

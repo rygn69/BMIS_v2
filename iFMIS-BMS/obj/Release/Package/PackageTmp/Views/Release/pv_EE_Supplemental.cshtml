@@ -1,0 +1,864 @@
+﻿
+
+<script>
+
+    function sup_DeletesEE(supplementalbudget_id) {
+        var url = "@Url.Action("Edit_Supplement_", "Release")";
+
+        $.get(url, { supplementalbudget_id: supplementalbudget_id }, function (e) {
+            document.getElementById("amount_supplemental_EE_DUM").value = e.Amount;
+        })
+
+        var url = "@Url.Action("delete_Supplement_", "Release")";
+
+        var supplement_available = $('#available_amount_null_SUPEE').val()
+        var supplement_amount = $('#amount_supplemental_EE_DUM').val()
+
+
+        var Expense = $("#Expense_").val();
+        var Total_Release = $("#total_Release").val();
+
+        var TO_E = Number(Total_Release) - Number(Expense);
+
+        if (Number(Total_Release) < Number(Expense)) {
+            swal({
+                title: "Sorry!",
+                text: "This Transaction has already been used in obligation.",
+                timer: 2000,
+                type: "error",
+                showConfirmButton: false
+            })
+
+        } else {
+            //if (Number(TO_E) < Number(supplement_amount)) {
+            //    swal({
+            //        title: "Sorry!",
+            //        text: "This Transaction has already been used in obligation.",
+            //        timer: 2000,
+            //        type: "error",
+            //        showConfirmButton: false
+            //    })
+
+            //} else {
+
+
+        if (Number(supplement_amount) > Number(supplement_available)) {
+            swal({
+                title: "Oopps!",
+                text: "You Can't Delete this Item",
+                timer: 2000,
+                type: "error",
+                showConfirmButton: false
+            })
+        }else{
+
+            swal({
+                title: "Are you sure?",
+                text: "This item will be removed!",
+                type: "info",
+                showCancelButton: true,
+                closeOnConfirm: false,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes, Remove It!",
+                showLoaderOnConfirm: true,
+            }, function () {
+
+                $.get(url, { supplementalbudget_id: supplementalbudget_id}, function (e) {
+
+                    if (e == "1") {
+                        swal({
+                            title: "Success!",
+                            text: "Item has been Removed.",
+                            timer: 2000,
+                            type: "success",
+                            showConfirmButton: false
+                        })
+                        acc_availble_mount();
+                        grid_ref_sup_ok_EE();
+                        $('#EconomicEnterprise_Grid').data('kendoGrid').dataSource.read();
+
+                        document.getElementById("amount_supplemental_EE").value = 0;
+                        document.getElementById("amount_supplemental_EE_DUM").value = 0;
+                        document.getElementById("amount_supplemental_EE_ID").value = 0;
+                    } else {
+                        swal({
+                            title: "Error!",
+                            text: "System Error! Please try again.",
+                            timer: 2000,
+                            type: "error",
+                            showConfirmButton: false
+                        })
+                    }
+
+                })
+            });
+        }
+            }
+        //}
+    }
+    function sup_EditsEE(supplementalbudget_id) {
+
+        var url = "@Url.Action("Edit_Supplement_", "Release")";
+
+        $.get(url, { supplementalbudget_id: supplementalbudget_id }, function (e) {
+            document.getElementById("amount_supplemental_EE").value = commaSeparateNumberRealignment(e.Amount);
+            document.getElementById("amount_supplemental_EE_DUM").value = e.Amount;
+            $("#legalbasis_supplemental_EE").data("kendoComboBox").value(e.LegalCode);
+            document.getElementById("amount_supplemental_EE_ID").value = e.supplementalbudget_id;
+        })
+
+
+    }
+
+    function fn_closeSupplemental_EE() {
+
+        $("#SupplementalWindow_EE").data("kendoWindow").close();
+    }
+    function SupGrid_EE() {
+        var LegalCode = $('#legalbasis_supplemental_EE').val()
+        var office_id = $('#office_supplemental_EE').val()
+        var program_id = $('#Program_supplemental_EE').val()
+        var ooe_id = $('#ooe_id_supplemental_EE').val()
+        var account_id = $('#account_list_supplemental_EE').val()
+        var month_ = $('#Months_supplemental_EE').val()
+        var year_ = $("#ddlYear").val();
+        return {
+            LegalCode: LegalCode,
+            office_id: office_id,
+            program_id: program_id,
+            ooe_id: ooe_id,
+            account_id: account_id,
+            month_: month_,
+            year_: year_
+        }
+    }
+    function grid_ref_sup_ok_EE() {
+        $("#grd_Sups_List_EE").data("kendoGrid").dataSource.read();
+        setTimeout(function () {
+            var url = "@Url.Action("datass", "Release")";
+
+            var office_id = $('#office_supplemental_EE').val()
+            var program_id = $('#Program_supplemental_EE').val()
+            var account_id = $('#account_list_supplemental_EE').val()
+            var year_ = $("#ddlYear").val();
+
+            if (account_id == 0 || account_id == null) { document.getElementById("available_amount_null_SUPEE").value = 0; } else {
+
+                $.post(url, { office_id: office_id, program_id: program_id, account_id: account_id, year_: year_ }, function (e) {
+
+                    document.getElementById("available_amount_null_SUPEE").value = commaSeparateNumberRealignment(e);
+                })
+            }
+        }, 1000);
+        }
+
+        function fn_Edit_supp_EE() {
+            var url = "@Url.Action("supplement_amountV2", "Release")";
+
+            var legal_code = $('#legalbasis_supplemental_EE').val()
+            var office_id = $('#office_supplemental_EE').val()
+            var program_id = $('#Program_supplemental_EE').val()
+            var ooe_id = $('#ooe_id_supplemental_EE').val()
+            var account_id = $('#account_list_supplemental_EE').val()
+            var MonthOf = $('#Months_supplemental_EE').val()
+            var year_ = $("#ddlYear").val();
+
+            $.get(url, { legal_code: legal_code, office_id: office_id, program_id: program_id, ooe_id: ooe_id, account_id: account_id,  MonthOf: MonthOf, year_: year_ }, function (d) {
+                $("#grd_Sups_List_EE").data("kendoGrid").dataSource.read();
+                //document.getElementById("amount_supplemental_EE").value = d.Amount_Sup;
+                //document.getElementById("for_ID_SUPP_EE").value = d.supplementalbudget_id;
+            })
+        }
+
+        function fn_legalbasis_EE() {
+            var url = "@Url.Action("LegalBasis", "Release")";
+
+            $.get(url, {}, function (d) {
+                $('#legal_basis_window_EE').html(d);
+            })
+
+            $('#legal_basis_window_EE').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Legal Basis").center().open();
+
+        }
+
+        function fn_reqSave_supplemental_EE() {
+
+            var url = "@Url.Action("Save_Supplement", "Release")";
+            var lur = "@Url.Action("Edit_Supplement", "Release")";
+
+
+            var legal_code = $('#legalbasis_supplemental_EE').val()
+            var office_id = $('#office_supplemental_EE').val()
+            var program_id = $('#Program_supplemental_EE').val()
+            var ooe_id = $('#ooe_id_supplemental_EE').val()
+            var account_id = $('#account_list_supplemental_EE').val()
+
+            var supplement_amount = $('#amount_supplemental_EE').val()
+            var MonthOf = $('#Months_supplemental_EE').val()
+            var for_ID_SUPP_EE = $('#for_ID_SUPP_EE').val()
+            var year_ = $("#ddlYear").val();
+
+            var supplement_id = $('#amount_supplemental_EE_ID').val()
+            var supplement_available = $('#available_amount_null_SUPEE').val()
+            var supplement_amount_DUM = $('#amount_supplemental_EE_DUM').val()
+
+          
+            var Expense = $("#Expense_").val();
+            var Total_Release = $("#total_Release").val();
+
+            var TO_E = Number(Total_Release) - Number(Expense);
+
+
+
+            if (supplement_id == 0 || supplement_id == null) {
+
+                if (legal_code == null || legal_code == '' ||
+                office_id == null || office_id == '' ||
+                program_id == null || program_id == '' ||
+                ooe_id == null || ooe_id == '' ||
+                account_id == null || account_id == '' ||
+                supplement_amount == null || supplement_amount == '' ||
+                MonthOf == null || MonthOf == '')
+                {
+
+                    swal({
+                        title: "Error!",
+                        text: "System Error! Please Complete the Form.",
+                        timer: 3000,
+                        type: "error",
+                        showConfirmButton: false
+                    })
+                }
+                else {
+                    if (Number(supplement_amount) == 0 || Number(supplement_amount) == null) {
+
+                        swal({
+                            title: "Error!",
+                            text: "System Error! Please set Amount.",
+                            timer: 3000,
+                            type: "error",
+                            showConfirmButton: false
+                        })
+                    }
+                    else {
+                        swal({
+                            title: "Are you sure?",
+                            text: "This Item will be SAVED!",
+                            type: "info",
+                            showCancelButton: true,
+                            closeOnConfirm: false,
+                            confirmButtonColor: "#1fa67a",
+                            confirmButtonText: "Yes, Save It!",
+                            showLoaderOnConfirm: true,
+                        }, function () {
+
+                            $.post(url, { legal_code: legal_code, office_id: office_id, program_id: program_id, ooe_id: ooe_id, account_id: account_id, year_: year_, supplement_amount: ConvertCommasToEmpty(supplement_amount), MonthOf: MonthOf }, function (e) {
+                                if (e == "1") {
+                                    swal({
+                                        title: "Success!",
+                                        text: "Supplement has been Saved.",
+                                        timer: 2000,
+                                        type: "success",
+                                        showConfirmButton: false
+                                    })
+                                    acc_availble_mount();
+                                    grid_ref_sup_ok_EE();
+                                    $('#EconomicEnterprise_Grid').data('kendoGrid').dataSource.read();
+
+
+                                    document.getElementById("amount_supplemental_EE").value = 0;
+                                    document.getElementById("amount_supplemental_EE_DUM").value = 0;
+                                    document.getElementById("amount_supplemental_EE_ID").value = 0;
+
+                                } else {
+                                    swal({
+                                        title: "Error!",
+                                        text: "System Error! Please try again.",
+                                        timer: 2000,
+                                        type: "error",
+                                        showConfirmButton: false
+                                    })
+                                }
+                            });
+                        });
+                        // }
+                    }
+                }
+            }
+            else {
+
+
+                if (Number(supplement_amount_DUM) > Number(supplement_amount)) {
+                    var supp_difference = Number(supplement_amount_DUM) - Number(supplement_amount);
+
+                    if (Total_Release < Expense) {
+                        swal({
+                            title: "Sorry!",
+                            text: "You can't Edit this Transaction has already been used in obligation.",
+                            timer: 2000,
+                            type: "error",
+                            showConfirmButton: false
+                        })
+
+                    } else {
+                        //if (TO_E < supp_difference) {
+                        //    swal({
+                        //        title: "Sorry!",
+                        //        text: "You can't Edit this Transaction has already been used in obligation.",
+                        //        timer: 2000,
+                        //        type: "error",
+                        //        showConfirmButton: false
+                        //    })
+
+                        //} else {
+
+                    if (Number(supp_difference) > Number(supplement_available)) {
+                        swal({
+                            title: "Oopps!",
+                            text: "You Can't Edit this Item",
+                            timer: 2000,
+                            type: "error",
+                            showConfirmButton: false
+                        })
+                    } else {
+                        if (Number(supplement_amount) == 0 || Number(supplement_amount) == null) {
+
+                            swal({
+                                title: "Error!",
+                                text: "System Error! Please set Amount.",
+                                timer: 3000,
+                                type: "error",
+                                showConfirmButton: false
+                            })
+                        }
+                        else {
+                            swal({
+                                title: "Are you sure?",
+                                text: "This item will be EDITED and SAVED!",
+                                type: "info",
+                                showCancelButton: true,
+                                closeOnConfirm: false,
+                                confirmButtonColor: "#1fa67a",
+                                confirmButtonText: "Yes, Save It!",
+                                showLoaderOnConfirm: true,
+                            }, function () {
+
+                                $.post(lur, { legal_code: legal_code, office_id: office_id, program_id: program_id, ooe_id: ooe_id, account_id: account_id, year_: year_, supplement_amount: ConvertCommasToEmpty(supplement_amount), MonthOf: MonthOf, supplement_id: supplement_id }, function (e) {
+                                    if (e == "1") {
+                                        swal({
+                                            title: "Success!",
+                                            text: "Supplement has been Saved.",
+                                            timer: 2000,
+                                            type: "success",
+                                            showConfirmButton: false
+                                        })
+                                        acc_availble_mount();
+                                        grid_ref_sup_ok_EE();
+                                        $('#EconomicEnterprise_Grid').data('kendoGrid').dataSource.read();
+
+
+                                        document.getElementById("amount_supplemental_EE").value = 0;
+                                        document.getElementById("amount_supplemental_EE_DUM").value = 0;
+                                        document.getElementById("amount_supplemental_EE_ID").value = 0;
+
+                                    } else {
+                                        swal({
+                                            title: "Error!",
+                                            text: "System Error! Please try again.",
+                                            timer: 2000,
+                                            type: "error",
+                                            showConfirmButton: false
+                                        })
+                                    }
+                                });
+                            });
+
+                        }
+                    }
+
+                      //  }
+                    }
+                } else {
+                    if (Number(supplement_amount) == 0 || Number(supplement_amount) == null) {
+
+                        swal({
+                            title: "Error!",
+                            text: "System Error! Please set Amount.",
+                            timer: 3000,
+                            type: "error",
+                            showConfirmButton: false
+                        })
+                    }
+                    else {
+                        swal({
+                            title: "Are you sure?",
+                            text: "This item will be EDITED and SAVED!",
+                            type: "info",
+                            showCancelButton: true,
+                            closeOnConfirm: false,
+                            confirmButtonColor: "#1fa67a",
+                            confirmButtonText: "Yes, Save It!",
+                            showLoaderOnConfirm: true,
+                        }, function () {
+
+                            $.post(lur, { legal_code: legal_code, office_id: office_id, program_id: program_id, ooe_id: ooe_id, account_id: account_id, year_: year_, supplement_amount: ConvertCommasToEmpty(supplement_amount), MonthOf: MonthOf, supplement_id: supplement_id }, function (e) {
+                                if (e == "1") {
+                                    swal({
+                                        title: "Success!",
+                                        text: "Supplement has been Saved.",
+                                        timer: 2000,
+                                        type: "success",
+                                        showConfirmButton: false
+                                    })
+                                    acc_availble_mount();
+                                    grid_ref_sup_ok_EE();
+                                    $('#EconomicEnterprise_Grid').data('kendoGrid').dataSource.read();
+                                    document.getElementById("amount_supplemental_EE").value = 0;
+                                    document.getElementById("amount_supplemental_EE_DUM").value = 0;
+                                    document.getElementById("amount_supplemental_EE_ID").value = 0;
+                                } else {
+                                    swal({
+                                        title: "Error!",
+                                        text: "System Error! Please try again.",
+                                        timer: 2000,
+                                        type: "error",
+                                        showConfirmButton: false
+                                    })
+                                }
+                            });
+                        });
+                    }
+                }
+                    
+                }
+        }
+
+        function fn_refresher_supplemental_EE() {
+
+            $("#office_supplemental_EE").val(null);
+            $("#account_list_supplemental_EE").val(null);
+            $("#ooe_id_supplemental_EE").val(null);
+
+            $("#office_supplemental_EE").data("kendoComboBox").text(null);
+            $("#account_list_supplemental_EE").data("kendoComboBox").text(null);
+            $("#ooe_id_supplemental_EE").data("kendoDropDownList").text(null);
+
+            $("#Program_supplemental_EE").data("kendoDropDownList").dataSource.read();
+            $("#ooe_id_supplemental_EE").data("kendoDropDownList").dataSource.read();
+            $("#account_list_supplemental_EE").data("kendoComboBox").dataSource.read();
+
+        }
+
+        function fn_dprefresherorb_supplemental_EE() {
+
+            $("#Program_supplemental_EE").data("kendoDropDownList").dataSource.read();
+            $("#ooe_id_supplemental_EE").data("kendoDropDownList").dataSource.read();
+            $("#account_list_supplemental_EE").data("kendoComboBox").dataSource.read();
+
+        }
+        setTimeout(function () {
+            $("#account_list_supplemental_EE").data("kendoComboBox").dataSource.read();
+            $("#grd_Sups_List_EE").data("kendoGrid").dataSource.read();
+
+        }, 500);
+
+        function fn_sup_OOE_EE() {
+
+            $("#account_list_supplemental_EE").data("kendoComboBox").dataSource.read();
+            $("#grd_Sups_List_EE").data("kendoGrid").dataSource.read();
+        }
+
+
+
+</script>
+<div style="border: outset;clear:both;border-width:1px;border-color:#1fa67a; width: 749px; padding-left:0px;padding-right:0px;padding-top:0px;padding-bottom:7px;margin-top: 0px;">
+    <div style=" width: 0;height: 0; border-right: 5px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;margin-top: -1px; ">
+        <div style="float: left; width: 683px; margin-top:1px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 36px solid #1fa67a; ">
+            <div style="float: left; height:28px; margin-left:-59px; margin-top: 5px;">
+                <i class="fa fa-tasks fa-2x fg-white"></i>
+
+            </div>
+
+            <div style="text-align: right;float: right;margin-right:10px;margin-top:2px;">
+
+
+                @(Html.Kendo().DropDownList()
+                            .Name("pooopyt")
+                            .DataTextField("ProposalYear")
+                            .DataValueField("ProposalYear")
+                            .SelectedIndex(0)
+                            .HtmlAttributes(new { @style = "width: 70px;" })
+                              .Events(e => e.Change("grid_ref_sup_ok_EE"))
+                            .DataSource(source => source.Read(read => read.Action("GetPropYear2", "PYear")))
+                )
+
+
+
+
+            </div>
+            <div style="float: right;margin-right:10px;margin-top:2px;">
+                <i class="fa fa-calendar fa-2x #33333"></i>
+            </div>
+
+
+        </div>
+    </div>
+    <div>
+        @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Monthly_DD_Model>()
+    .Name("grd_Sups_List_EE")
+    .Scrollable()
+    .Columns(col =>
+    {
+
+        
+
+        col.Bound(m => m.LegalDescription).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Legal Basis</div></text>)
+                        .Width(265)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientFooterTemplate("<div style='text-align:center;color:darkgreen'><label> </label><label> Total Amount </label></div>");
+        col.Bound(m => m.Amount)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Amount</div></text>)
+                        .Width(160)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div>#=kendo.toString(Amount,'c2')# </div>")
+                        .ClientFooterTemplate("<div style='text-align:center;color:darkgreen'><label> </label><label> #=kendo.toString(sum, 'c2')#</label></div>");
+
+        col.Bound(m => m.MonthOf).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Month</div></text>)
+                        .Width(85)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Bound(m => m.YearOf).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Year</div></text>)
+                        .Width(60)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+
+      
+        col.Template(t => { }).ClientTemplate(
+
+                                      "<div class='k-button k-button-icontext' style='border-radius:50px;color:\\#ffffff;background-color:\\#1FA67A;'    onclick='sup_EditsEE(#=supplementalbudget_id#)'   ><span class='fa fa-pencil-square-o' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'> </span>edit</div> " +
+                                     "<div class='k-button k-button-icontext' style='border-radius:50px;color:\\#ffffff;background-color:\\#DE5555;'   onclick='sup_DeletesEE(#=supplementalbudget_id#)'   ><span class='fa fa-trash-o' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'> </span>del</div> "
+                                    ).HtmlAttributes(new { style = "vertical-align: top;" }).Width(160);
+                                    
+        col.Bound(m => m.supplementalbudget_id).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Traction ID</div></text>)
+                        .Width(70)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+                        
+    })
+
+                .Sortable()
+                .Scrollable()
+                .HtmlAttributes(new { style = "height:200px;" })
+                                .DataSource(d => d
+                                .Ajax()
+                                .Aggregates(a =>
+                                   {
+                                       a.Add(c => c.Amount).Sum();
+                                   })
+                                .PageSize(1000)
+                                .Model(m => m.Id(i => i.supplementalbudget_id))
+                                .Read(read => read.Action("Load_Supp", "Release").Data("SupGrid_EE")))
+        )
+
+    </div>
+    <div class="demo-section k-content" style=" float:right;margin-top: 7px;margin-right:7px ">
+
+
+    </div>
+
+
+</div>
+
+<div style="float: left;margin-right:10px;margin-top:5px;">
+
+</div>
+<div style="float: none;clear:both;">
+    <div style="float: left;margin-right:10px;margin-top:2px;">
+        <label style="float:left;margin-left: 50px;">
+            Legal Basis :
+        </label>
+    </div>
+    <div style="float: right;margin-right:130px;margin-top:0px;">
+
+
+        @(Html.Kendo().ComboBox()
+                            .Name("legalbasis_supplemental_EE")
+                            .DataTextField("LegalDescription")
+                            .DataValueField("LegalCode")
+                            .Placeholder("Select Legal Basis...")
+                            .Filter("contains")
+                            .MinLength(1)
+                            .HtmlAttributes(new { @style = "width: 420px;" })
+                //.Events(e => e.Change("fn_dprefresherorb_supplemental_EE"))
+                       .DataSource(source => source.Read(read => read.Action("GetLegalBasis", "Release")))
+        )
+
+
+    </div>
+    <div style="float: right;margin-right:-500px;margin-top:0px;">
+        <div class="k-button k-button-icontext" style=" bottom: 15px; right: 220px;width: 80px; border-radius:50px;color:#ffffff;background-color:#04eff8;" onclick="fn_legalbasis_EE()"><span class='fa fa-plus-circle' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'></span> add</div>
+
+        @*<div class="k-button k-button-icontext" style=" right: 0px;width: 70px;" onclick="fn_legalbasis_EE()"> add</div>*@
+    </div>
+
+    <div style="float: left;margin-right:10px;margin-top:5px;">
+        <label style="float:left;margin-left: 50px;">
+            Office    :
+        </label>
+    </div>
+    <div style="float: right;margin-right:50px;margin-top:3px;">
+
+
+        @(Html.Kendo().ComboBox()
+                            .Name("office_supplemental_EE")
+                            .DataTextField("OfficeName")
+                            .DataValueField("OfficeID")
+                            .Placeholder("Select office...")
+                            .Filter("contains")
+                            .MinLength(1)
+                            .HtmlAttributes(new { @style = "width: 500px;" })
+                            .Events(e => e.Change("fn_dprefresherorb_supplemental_EE"))
+                            .Value(Session["office_id"].ToString())
+                       .DataSource(source => source.Read(read => read.Action("GetOffice_EE", "Release")))
+        )
+
+
+    </div>
+
+    <div style="height:40px;">
+
+    </div>
+
+    <div id="ProgramAndExpenseClassDiv" style="float: none;clear:both; margin-top: 25px">
+
+        <div style="float: left;margin-right:10px;margin-top:2px;">
+            <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                Program :
+            </label>
+        </div>
+        <div style="float: right;margin-right:50px;margin-top:0px;">
+            <script>
+                    function fn_Offices_supplemental_EE() {
+
+                        var proyy = $("#ddlYear").val();
+                        var off_id = $("#office_supplemental_EE").val();
+                        var ooe_id = $("#ooe_id_supplemental_EE").val();
+
+                        return {
+                            propYear: proyy,
+                            office_ID: off_id,
+                            ooe_id: ooe_id
+                        }
+                    }
+            </script>
+
+            @(Html.Kendo().DropDownList()
+                            .Name("Program_supplemental_EE")
+                            .DataTextField("ProgramDescription  ")
+                            .DataValueField("ProgramID")
+                            .OptionLabel("Select programs...")
+                            .HtmlAttributes(new { @style = "width: 500px;" })
+                            .AutoBind(true)
+                   .DataSource(source => source.Read(read => read.Action("GetPrograms2", "Release").Data("fn_Offices_supplemental_EE")))
+            )
+
+        </div>
+
+        <div style="float: left;margin-right:10px;margin-top:10px;">
+            <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                Expense Class    :
+            </label>
+        </div>
+        <div style="float: right;margin-right:50px;margin-top: 5px;">
+            @(Html.Kendo().DropDownList()
+                        .Name("ooe_id_supplemental_EE")
+                        .DataTextField("ooe_name")
+                        .DataValueField("ooe_id")
+                        .OptionLabel("Select Expenses...")
+                        .HtmlAttributes(new { @style = "width: 500px;" })
+                        .Events(e => e.Change("fn_sup_OOE_EE"))
+                        .Value(Session["ooe_id"].ToString()) 
+                        .DataSource(source => source.Read(read => read.Action("ddlOOENonOfficeLevel", "Dropdowns")))
+            )
+        </div>
+        <div style="float: left;margin-right:10px;margin-top:10px;">
+            <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                Account    :
+            </label>
+        </div>
+        <div style="float: right;margin-right:50px;margin-top:5px;">
+            <script>
+                    function fn_ForAccount_supplemental_EE() {
+                        var propYear = $("#ddlYear").val();
+                        var office_ID = $("#office_supplemental_EE").val();
+                        var ooe_id = $("#ooe_id_supplemental_EE").val();
+                        var prog_id = $("#Program_supplemental_EE").val();
+                        return {
+                            propYear: propYear,
+                            office_ID: office_ID,
+                            ooe_id: ooe_id,
+                            prog_id: prog_id
+                        }
+                    }
+            </script>
+
+            @(Html.Kendo().ComboBox()
+                        .Name("account_list_supplemental_EE")
+                        .DataTextField("account_name")
+                        .DataValueField("account_id")
+                        .Filter("contains")
+                        .MinLength(1)
+                        .Placeholder("Select Account...")
+                        .Events(e => e.Change("grid_ref_sup_ok_EE"))
+                        .HtmlAttributes(new { @style = "width: 500px;" })
+                        .DataSource(source => source.Read(read => read.Action("MOS_Account", "Dropdowns").Data("fn_ForAccount_supplemental_EE")))
+            )
+        </div>
+
+
+        <div style="float:left;margin-left:50px;margin-top:19px;">
+            <label>
+                Available  Amount    :
+            </label>
+        </div>
+
+        <div style="float:left;margin-left:34px;margin-top:11px;">
+            <input type="text" style="width:180px;color: #1fca03" name="available_amount_null_SUPEE" id="available_amount_null_SUPEE" value="0" onkeyup="commaSeparateNumberversion2('available_amount_null_SUPEE')" step="0.01" disabled>
+        </div>
+        <div style="float:left;margin-left:0px;margin-top:11px;">
+            <input type="text" style="width:150px" name="amount_supplemental_EE_DUM" id="amount_supplemental_EE_DUM" value="0" hidden disabled>
+        </div>
+        <div style="float:left;margin-left:-30px;margin-top:11px;">
+            <input type="text" style="width:150px" name="amount_supplemental_EE_ID" id="amount_supplemental_EE_ID" value="0" hidden disabled>
+        </div>
+        <div style="float:left;margin-left:34px;margin-top:11px;">
+            <label>
+                Release Month    :
+            </label>
+        </div>
+        <div style="float:left;margin-left:45px;margin-top:11px;">
+            @(Html.Kendo().DropDownList()
+                          .Name("Months_supplemental_EE")
+                          .DataTextField("Text")
+                          .DataValueField("Value")
+                          .Events(e => e.Change("fn_Edit_supp_EE"))
+                          .BindTo(new List<SelectListItem>() {
+                              new SelectListItem() {
+                                  Text = "January",
+                                  Value = "1"
+                              },
+                              new SelectListItem() {
+                                  Text = "Febuary",
+                                  Value = "2"
+                              },
+                              new SelectListItem() {
+                                  Text = "March",
+                                  Value = "3"
+                              },
+                              new SelectListItem() {
+                                  Text = "April",
+                                  Value = "4"
+                              },
+                              new SelectListItem() {
+                                  Text = "May",
+                                  Value = "5"
+                              },
+                              new SelectListItem() {
+                                  Text = "June",
+                                  Value = "6"
+                              },
+                              new SelectListItem() {
+                                  Text = "July",
+                                  Value = "7"
+                              },
+                              new SelectListItem() {
+                                  Text = "August",
+                                  Value = "8"
+                              },
+                              new SelectListItem() {
+                                  Text = "September",
+                                  Value = "9"
+                              },
+                              new SelectListItem() {
+                                  Text = "October",
+                                  Value = "10"
+                              },
+                              new SelectListItem() {
+                                  Text = "November",
+                                  Value = "11"
+                              },
+                              new SelectListItem() {
+                                  Text = "December",
+                                  Value = "12"
+                              }
+                          })
+                          .Value(@ViewBag.MonthVaue)
+                          .HtmlAttributes(new { style = "width: 150px" })
+            )
+
+        </div>
+
+        <div style="float: left;margin-right:-5px;margin-top:10px;">
+            <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                 Amount :
+            </label>
+
+        </div>
+
+        <div style="float: right;margin-right:389px;margin-top:5px;">
+            <input type="text" style="width:180px" name="amount_supplemental_EE" id="amount_supplemental_EE" value="0" onfocus="this.select();" onkeyup="commaSeparateNumberversion2('amount_supplemental_EE')" step="0.01">
+        </div>
+
+    </div>
+
+    <div style="float:left;margin-top:-20px;margin-left:470px">
+        <div class="k-button k-button-icontext" style=" bottom: 15px; right: 220px;width: 80px; border-radius:50px;color:#ffffff;background-color:#1FA67A;" onclick="fn_reqSave_supplemental_EE()"><span class='fa fa-plus-circle' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'></span> Save</div>
+    </div>
+    <div style="float:left;margin-top:-29px;margin-left:617px">
+        <div class="k-button k-button-icontext" style=" bottom: 15px; right: 220px;width: 80px; border-radius:50px;color:#ffffff;background-color:#DE5555;" onclick="fn_closeSupplemental_EE()"><span class='fa fa-times' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'></span> Close</div>
+    </div>
+
+    <div style="float:left;margin-left:4000px;margin-top:11px;">
+        <input type="text" style="width:100px" name="for_ID_SUPP_EE" id="for_ID_SUPP_EE" disabled hidden>
+    </div>
+
+</div>
+
+
+@(Html.Kendo().Window()
+        .Name("legal_basis_window_EE")
+        .Title("New Entry")
+        .Width(780)
+        .Height(500)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+                .Actions(a => { a.Close(); })
+)
+
+
+<script>
+
+    $(document).ready(function () {
+        var LBLBORODJEI = $('#Progss').val()
+        $("#Program_supplemental_EE").data("kendoDropDownList").value(LBLBORODJEI);
+    }, 1000);
+    $(document).ready(function () {
+        var EWIMOFSKDVAO = $('#account_list').val()
+        $("#account_list_supplemental_EE").data("kendoComboBox").value(EWIMOFSKDVAO);
+        grid_ref_sup_ok_EE()
+    }, 1000);
+</script>

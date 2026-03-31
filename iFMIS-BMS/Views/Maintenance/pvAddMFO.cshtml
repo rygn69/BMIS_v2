@@ -1,0 +1,64 @@
+﻿<script>
+    function SumbitMFO() {
+        var ObjName = document.getElementById("MFOName").value;
+        var MFOCost = document.getElementById("MFOCost").value;
+        var OrderBy = $("#orderByMFO").val();
+        var url = "@Url.Action("SaveMFO", "Maintenance")";
+        $.post(url, { ObjName: ObjName, MFOCost: MFOCost, OrderBy: OrderBy }, function (e) {
+            if (e == "success") {
+                $('#MFOName').val('');
+                $('#MFOCost').val('');
+                //$('#orderBy').data('kendoComboBox').value('');
+                swal({
+                    title: "Success",
+                    text: "MFO has been added!",
+                    type: "success",
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+                $("#grPPA").data("kendoGrid").dataSource.read();
+            } else {
+                swal({
+                    title: "Error",
+                    text: "MFO has NOT been added!",
+                    type: "error",
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            }
+        });
+    }
+    function oncloseWindowMFO() {
+        if ($("#PPASizeIndicator").val() == 0) {
+            document.documentElement.style.overflow = 'auto';  // firefox, chrome
+            document.body.scroll = "yes";
+            $(window).scrollTop(CurrentScrollPosition);
+        }
+        $("#windowAddMFO").data("kendoWindow").close();
+    }
+</script>
+<div style="margin-top:5px;margin-left:5px;">
+    <label>MFO Description</label>
+    <textarea name="MFOName" id="MFOName" style="width:97%;height:70px"></textarea>
+    @*<input type="text" name="MFOName" id="MFOName" style="width:90%" />*@
+</div>
+<div style="margin-top:5px;margin-left:5px;">
+    <label>Cost</label>
+    <input type="number" name="MFOCost" id="MFOCost" style="width:97%" />
+</div>
+<div style="margin-top:5px;margin-left:5px;">
+    <label>Order By</label>
+    @(Html.Kendo().ComboBox()
+                  .Name("orderByMFO")
+                  .Filter("contains")
+                  .MinLength(1)
+                  .Placeholder("Select order by")
+                  .DataTextField("x")
+                  .DataValueField("x")
+                  .HtmlAttributes(new { @style = "height:110%;" })
+                  .DataSource(source => source.Read(read => read.Action("ddlOrderby", "Dropdowns")).ServerFiltering(false))
+    )
+</div>
+<div style="margin-top:5px;float:right;margin-right:5px;">
+    <div class="k-button k-state-active" onclick="SumbitMFO()"><i class="fa fa-plus"></i> Submit New MFO</div> <div class="k-button" onclick="oncloseWindowMFO()"><i class="fa fa-close"></i> Close</div>
+</div>

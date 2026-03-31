@@ -1,0 +1,474 @@
+﻿@model iFMIS_BMS.BusinessLayer.Models.BudgetControl.ExcessModel
+<script>
+    function SetTempOBRURL() {
+        return '@Url.Action("SetPrefixTemp20OBR", "Excess")';
+    }
+    function TypeID() {
+        return @Account.UserInfo.UserTypeID;
+    }
+    function getOfficeID() {
+        return '@Account.UserInfo.Department';
+    }
+    function SearchExcessAirMarkURL(){
+        return '@Url.Action("SearchExcessAirMark", "Excess")';
+    }
+    function SearchTempExcessAirMarkURL(){
+        return '@Url.Action("SearchTempExcessAirMark", "Excess")';
+    }
+    function CheckIfAirMarkURL() {
+        return '@Url.Action("CheckIfAirMark", "Excess")';
+    }
+    function CheckIfRefURL(){
+        return '@Url.Action("CheckIfRef", "Excess")';
+    }
+    function ExcessComputationURL(){
+        return '@Url.Action("ExcessComputation", "Excess")';
+    }
+    function GetExcessAccountIDURL(){
+        return '@Url.Action("GetExcessAccountID", "Excess")';
+    }
+    function GetSubAccountBalanceURL(){
+        return '@Url.Action("GetSubAccountBalance", "Excess")';
+    }
+    function NonOfficeSubAccountExcess(){
+        return '@Url.Action("NonOfficeSubAccountExcess", "BudgetControl")';
+    }
+    function exceescomURL(){
+        return '@Url.Action("SearchComDetails","Excess")'
+    }
+    $(function () {
+        var url ="@Url.Action("SearchTransno", "BudgetControl")";
+        $("#qrexcess").keyup(function (event) {
+            $.get(url, { cttsqr: $("#qrexcess").val() }, function (e) {
+                $("#ControlNo").val(e);
+                if (e != 0) {
+                    SearchOBR()
+                }
+            });
+        });
+
+        $("#controlnew").keypress(function (event) {
+            if (event.keyCode == 13) {
+                $("#ControlNo").val($("#controlnew").val());    
+                SearchOBR()
+                $("#Office").data("kendoComboBox").value("");
+                } 
+        });
+    })
+</script>
+           
+<style>
+    input[type="radio"] {
+        width: auto;
+    }
+
+    textarea {
+        resize: none;
+    }
+        textarea:focus, input:focus, input[type]:focus, .uneditable-input:focus {
+            border-color: rgba(0, 128, 0, 0.8);
+            box-shadow: 0 1px 1px rgba(0, 128, 0, 0.075) inset, 0 0 8px rgba(0, 128, 0, 0.6);
+            outline: 0 none;
+        }
+</style>
+<div style="border-color:gray;border-width:1px;border-style:solid;width:380px;margin-top:10px;float:left">
+    <div style="background-color:white;width:120px;margin-top:-15px;margin-left:15px;border-style:solid;border-color:black;border-width:1px;">
+        <span style="font-size:18px;font-weight:bold;margin-left:5px;">MODE : <span id="mode-status" style="color:green">NEW</span></span>
+    </div>
+    <div style="margin-top:15px;margin-right:15px;text-align:right">
+        <div style="display:inline-block;">
+            <span style="margin-left:20px;display:none" id="20PercentFund"> <input type="radio" name="FundType" value="0" onclick="enableControl()"> 20 Percent </span>
+            <span style="margin-left:20px;display:none" id="SEFFundText"><input type="radio" id="SEFFund" name="FundType" value="1" onclick="enableControl()"> SEF </span>
+            <span style="margin-left:20px;display:none" id="GeneralFundText"><input type="radio" id="GeneralFund" name="FundType" value="2" onclick="enableControl()"> General Fund </span>
+            <span style="margin-left:20px;display:none" id="EcoFundText"><input type="radio" id="EcoFund" name="FundType" value="3" onclick="enableControl()"> Eco </span>
+        </div>
+    </div>
+    <hr />
+    <div style="margin-top:15px;margin-left:16px;">
+            <span style="float:left;margin-left:-12px;margin-top:7px">QR No. :</span>
+            <input class="k-input" type="text" style="background-color:#405b43;color:whitesmoke;font-size:large;text-align:center;width:250px;margin-left:63.5px;margin-bottom:10px;" id="qrexcess" name="qrexcess" autocomplete="off" value="" />
+      
+        <span style="float:left;margin-left:-12px;margin-top:3px;">Transaction No.:</span> <input type="text" id="controlnew" name="controlnew" class="k-input" style="width:250px;margin-left:16px;" disabled/>
+        <input  type="text" id="ControlNo" name="ControlNo" class="k-input" style="width:250px;margin-left:16px;display:none;" disabled/>
+    </div>
+    <hr />
+   
+    <div style="margin-top:15px;margin-left:5px;">
+        <div style="display:inline-block;">
+            <div style="display:inline-block;width:60px;">
+                <span>Office:</span>
+            </div>
+             
+            <div style="display:inline-block;">
+                @(Html.Kendo().ComboBox()
+                                    .Name("Office")
+                                    .DataTextField("office_name")
+                                    .DataValueField("office_id")
+                                    .Placeholder("Search Office Name . .")
+                                    .Filter("contains")
+                                    .MinLength(3)
+                                    .Events(e => e.Change("SetPrograms"))
+                                    .HtmlAttributes(new { @style = "width: 300px;" })
+                                    .DataSource(source => source.Read(read => read.Action("ddlOffice", "Dropdowns")))
+                )
+            </div>
+         </div>
+    </div>
+    <div style="margin-top:15px;margin-left:5px;">
+        <div style="display:inline-block;">
+            <div style="display:inline-block;width:60px;">
+                <span>Program:</span>
+            </div>
+
+            <div style="display:inline-block;">
+                @(Html.Kendo().ComboBox()
+                                    .Name("Program")
+                                    .DataTextField("setProgramDesc")
+                                    .DataValueField("setProgramID")
+                                    .Placeholder("Search Program . .")
+                                    .Filter("contains")
+                                    .MinLength(3)
+                                    .AutoBind(false)
+                                    .Events(e => e.Change("SetAccounts"))
+                                    .HtmlAttributes(new { @style = "width: 300px;" })
+                                    .DataSource(source => source.Read(read => read.Action("ddlgetPrograms", "Dropdowns").Data("getProgram")))
+                )
+            </div>
+        </div>
+    </div>
+    <div style="margin-top:15px;margin-left:5px;">
+        <div style="display:inline-block;">
+            <div style="display:inline-block;width:60px;">
+                <span>Account:</span>
+            </div>
+
+            <div style="display:inline-block;">
+                @(Html.Kendo().ComboBox()
+                                    .Name("Account")
+                                    .DataTextField("AccountName")
+                                    .DataValueField("AccountID")
+                                    .Placeholder("Search Account . .")
+                                    .Filter("contains")
+                                    .MinLength(3)
+                                    .AutoBind(false)
+                                    .Events(e => e.Change("SetPPA"))
+                                    .HtmlAttributes(new { @style = "width: 300px;" })
+                                    .DataSource(source => source.Read(read => read.Action("ddlProgramAccount", "Dropdowns").Data("getAccount")))
+                )
+            </div>
+        </div>
+    </div>
+    
+    <div style="margin-top:0px;margin-left:5px;">
+        <div style="display:inline-block;">
+            <div style="display:inline-block;width:60px;">
+                <span>Account Charge:</span>
+            </div>
+
+            <div style="display:inline-block;">
+                @(Html.Kendo().ComboBox()
+                                    .Name("ExcessAccount")
+                                    .DataTextField("AccountName")
+                                    .DataValueField("AccountID")
+                                    .Placeholder("Search Charge Account . .")
+                                    .Filter("contains")
+                                    .MinLength(3)
+                                    .AutoBind(false)
+                                    .Events(e => e.Change("setExcessControl"))
+                                    .HtmlAttributes(new { @style = "width: 300px;" })
+                                    .DataSource(source => source.Read(read => read.Action("ddlExcessAppropriation", "Dropdowns").Data("getExcessAccount")))
+                )
+            </div>
+        </div>
+    </div>
+    <div style="margin-top:12px;margin-left:5px;">
+        <div style="display:inline-block;">
+            <div style="display:inline-block;width:60px;">
+                <span>Sub-PPA:</span>   
+            </div>
+
+            <div style="display:inline-block;">
+                @(Html.Kendo().ComboBox()
+                                    .Name("SubAccount")
+                                    .DataTextField("office_name")
+                                    .DataValueField("office_id")
+                                    .Placeholder("Select sub-account. . .")
+                                    .Filter("contains")
+                                    .MinLength(3)
+                                    .AutoBind(false)
+                                    .Events(e => e.Change("GetSubAccountBalance"))
+                                    .HtmlAttributes(new { @style = "width: 300px;" })
+                                    .DataSource(source => source.Read(read => read.Action("ddlPPANonOfficeExcess", "Dropdowns").Data("getSubAccount")))
+                )
+            </div>
+        </div>
+    </div>
+    <div style="margin-top:15px;margin-left:5px;display:none">
+        <div style="display:inline-block;">
+            <div style="display:inline-block;width:60px;">
+                <span>PPA:</span>
+            </div>
+            <div style="display:inline-block;">
+                @(Html.Kendo().ComboBox()
+                                    .Name("PPAID")
+                                    .DataTextField("PPAAccount")
+                                    .DataValueField("PPAID")
+                                    .Placeholder("Search PPA . .")
+                                    .Filter("contains")
+                                    .MinLength(3)
+                                    .AutoBind(false)
+                                    .Events(e => e.Change("setPPAID"))
+                                    .HtmlAttributes(new { @style = "width: 300px;" })
+                                    .DataSource(source => source.Read(read => read.Action("ddlPPA", "Dropdowns").Data("getPPAID")))
+                )
+            </div>
+        </div>
+    </div>
+    <div style="margin-top:15px;margin-left:5px;">
+        <div style="display:inline-block;">
+            <div style="display:inline-block;width:60px;">
+                <span>Description:</span>
+            </div>
+            <div style="margin-left:10px;display:inline-block;">
+                <textarea style="width:280px" id="ExcessDescription" name="ExcessDescription"></textarea>
+
+            </div>
+        </div>
+    </div>
+    <div style="margin-top:15px;margin-left:5px;">
+        <div style="display:inline-block;">
+            <div style="display:inline-block;width:60px;">
+                <span>Amount:</span>
+            </div>
+            <div style="margin-left:10px;display:inline-block;">
+                <input type="number" style="width:290px" class="k-input" id="AmountExcess" name="AmountExcess" onkeyup="sync()" />
+            </div>
+        </div>
+    </div>
+    <div style="margin-top:0px;margin-left:5px;margin-bottom:10px;">
+        <div style="display:inline-block;">
+        @*@if(@Session["qrcodeexcess"].ToString() == "0")
+        {*@
+            <div id="obrlabelid" style="float:left;width:60px;margin-top:8px;">
+                <span id="OBRLabel">ObR No.:</span>
+            </div>
+            <div id="obrnoid" style="float:left;margin-left: 14px; margin-top: 15px;">
+                <input type="text" style="width:290px;background-color:#f1f1f1" class="k-input" id="OBRNo" name="OBRNo" readonly />
+            </div>
+        @*}
+        else
+        {*@
+            <div id="functionlabelid" style="float:left;width:60px;margin-top:8px;">
+                <span id="">Function Code:</span>
+            </div>
+
+            <div id="funcnoid" style="float:left;margin-left: 14px; margin-top: 15px;">
+                <input type="text" style="width:290px;background-color:#f1f1f1" class="k-input" id="funcNo" name="funcNo" readonly />
+            </div>
+        @*}*@
+        </div>
+    </div>
+
+</div>
+<!--Amount Computation-->
+<div style="border-color:gray;border-width:1px;border-style:solid;width:380px;margin-top:10px;float:left;margin-left:10px;">
+    <div style="background-color:white;width:200px;margin-top:-15px;margin-left:15px;">
+        <span style="font-size:18px;font-weight:300;margin-left:5px;">Amount Computation :</span>
+    </div>
+    <div style="margin-top:15px;margin-left:5px;">
+        <div style="display:inline-block;">
+            <div style="width:220px;margin:10px;">
+                <span>Total excess amount as of this year: </span>
+            </div>
+            <div style="margin-left:25px;">
+                <input type="text" style="width:310px;font-weight:700;text-align:right;font-size:18px;background-color:#f1f1f1;color:green" class="k-input" id="ExcessTotalAppropriation" name="ExcessTotalAppropriation" readonly />
+            </div>
+        </div>
+    </div>
+    <div style="margin-top:10px;margin-left:5px;">
+        <div style="display:inline-block;">
+            <div style="width:220px;margin:10px;">
+                <span>Total obligation incurred: </span>
+            </div>
+            <div style="margin-left:25px;">
+                <input type="text" style="width:310px;font-weight:700;text-align:right;font-size:18px;background-color:#f1f1f1;color:#ff0000" class="k-input" id="ExcessObligation" name="ExcessObligation" readonly />
+         </div>
+        </div>
+    </div>
+    <div style="margin-top:10px;margin-left:5px;">
+        <div style="display:inline-block;">
+            <div style="width:220px;margin:10px;">
+                <span>Total Allotment Available: </span>
+            </div>
+            <div style="margin-left:25px;">
+                <input type="text" style="width:310px;font-weight:700;text-align:right;font-size:18px;background-color:#f1f1f1" class="k-input" id="ExcessAllotment" name="ExcessAllotment" readonly />
+           </div>
+        </div>
+    </div>
+    <div style="margin-top:10px;margin-left:5px;">
+        <div style="display:inline-block;">
+            <div style="width:220px;margin:10px;">
+                <span>Claim: <span id="ShowPOAmount" style="display:none"><b>(PO: ₱<span id="POAmount"></span> )</b></span></span>
+            </div>
+            <div style="margin-left:25px;">
+                <input type="text" style="width:310px;font-weight:700;text-align:right;font-size:18px;background-color:#f1f1f1" class="k-input" id="Claim" name="Claim" readonly />
+           </div>
+        </div>
+    </div>
+    <div style="margin-top:10px;margin-left:5px;">
+        <div style="display:inline-block;">
+            <div style="width:220px;margin:10px;">
+                <span>Balance: </span>
+            </div>
+            <div style="margin-left:25px;">
+                <input type="text" style="width:310px;font-weight:700;text-align:right;font-size:18px;background-color:#f1f1f1" class="k-input" id="ExcessBalance" name="ExcessBalance" readonly />
+          </div>
+        </div>
+    </div>
+
+    <div style="display:none">
+        <input type="text" id="_OBRSeries" name="_OBRSeries" />
+        <input type="number" id="_ExcessTotalAppropriation" name="_ExcessTotalAppropriation" />
+        <input type="number" id="_ExcessObligation" name="_ExcessObligation" />
+        <input type="number" id="_ExcessAllotment" name="_ExcessAllotment" />
+        <input type="number" id="_Claim" name="_Claim" value=""/>
+        <input type="number" id="_ClaimValue" name="_ClaimValue" />
+        <input type="number" id="_AmountExcess" name="_AmountExcess" value="0" />
+        <input type="number" id="_ExcessBalance" name="_ExcessBalance" />
+        <input type="number" id="_TransactionYear" name="_TransactionYear" value="@Model.TransactionYear" />
+        <input type="number" id="_CurrentObligation" name="_CurrentAllotmentBalance" />
+        <input type="number" id="_ModeIndicator" name="_ModeIndicator" value="0" />
+        <input type="number" id="_trnno" name="_trnno" />
+        <input type="number" id="_AcctCharge" name="_AcctCharge" />
+        <input type="number" id="_TempIndicator" name="_TempIndicator" />
+        <input type="number" id="_TempExcessBal" name="_TempExcessBal" />
+        <input type="number" id="_TempExcessAppID" name="_TempExcessAppID" />
+        <input type="number" id="_OrigClaim" name="_OrigClaim" value="" />
+        <input type="number" id="_OrigExcessObligation" name="_OrigExcessObligation" />
+        <input type="number" id="_ppabalance" name="_ppabalance" />
+        <input type="number" id="NonOfficeCode" name="NonOfficeCode" />
+        <input type="number" id="userOffficeid" name="userOffficeid" />
+        
+    </div>
+    <div style="padding:15px;float:right;">
+        <div class="k-button" style="padding:5px;width:99px;" id="SaveExcessControl" onclick="SaveExcessControl()"><span class="fa fa-save"></span> SAVE</div>
+        <div class="k-button" style="padding:5px;width:99px;display:none;" id="UpdateExcessControl" onclick="UpdateExcessControl()"><span class="fa fa-upload"></span> Update</div>
+        <div class="k-button" style="padding:5px;width:99px;display:none;" id="DeleteExcessControl" onclick="DeleteExcessControl()"><span class="fa fa-trash"></span> Delete</div>
+        <div class="k-button" style="padding:5px;width:99px;" id="ClearExcessControl" onclick="ClearExcessControl()"><span class="fa fa-minus-circle"></span> CLEAR</div>
+        <div class="k-button" style="padding:5px;width:99px;" id="CloseExcessControl" onclick="CloseExcessControl()"><span class="fa fa-times"></span> Close</div>
+    </div>    
+</div>
+<script src="~/Scripts/BMS/BudgetControl/excess.js"></script>
+<script>
+
+   
+    function DisableCombo(){
+        $("#Program").data("kendoComboBox").enable(false);
+        $("#Account").data("kendoComboBox").enable(false);
+    }
+    function EnableCombo(){
+        $("#Program").data("kendoComboBox").enable(true);
+        $("#Account").data("kendoComboBox").enable(true);
+    }
+    function TrnnoCache() {
+        return @Model.grTrnnoID;
+    }
+
+    function TransYear() {
+        return @Model.TransactionYear;
+    }
+    function FillEditFormUrl(){
+        return '@Url.Action("EditExcessControl", "Excess")';
+    }
+    function SearchOBRURL()
+    {
+        return '@Url.Action("SearchOBRDetails", "Excess")';
+    }
+    function setAppropriationURL() {
+        return '@Url.Action("ExcessSetAppropriation", "Excess")';
+    }
+    function setObligationURL() {
+        return '@Url.Action("ExcessObligation", "Excess")';
+    }
+    function setProgramOBRURL() {
+        return '@Url.Action("SetProgramOBR", "Excess")';
+    }
+    function setPPAOBRURL() {
+        return '@Url.Action("SetPPAOBR", "Excess")';
+    }
+    function setAccountURL() {
+        return '@Url.Action("SetAccountOBR", "Excess")';
+    }
+    function SaveExcessControlURL() {
+        return '@Url.Action("SaveExcessControl", "Excess")';
+    }
+    function SearchExcessControlURL(){
+        return '@Url.Action("EditExcessControl", "Excess")';
+    }
+    function UpdateExcessControlURL() {
+        return '@Url.Action("UpdateExcessControl", "Excess")';
+    }
+    function DeleteExcessControlURL() {
+        return '@Url.Action("DeleteExcessControl", "Excess")';
+    }
+    function SearchTrnnoURL() {
+        return '@Url.Action("SearchTrnno", "Excess")';
+    }
+    function CheckCurrentURL() {
+        return '@Url.Action("CheckCurrentAllotment", "Excess")';
+    }
+    function CheckIFOBRExistInAirMarkURL() {
+        return '@Url.Action("CheckIFOBRExistInAirMark", "Excess")';
+    }
+    function UserType(){
+        return @Account.UserInfo.UserTypeID;
+    }
+    function getSubAccountItem(){
+        return '@Url.Action("getSubAccountID", "Excess")';
+    }
+    $(document).ready(function () {
+        CheckStatus();
+        //$("#Program").data("kendoComboBox").enable(false);
+        //$("#Account").data("kendoComboBox").enable(false);
+        // $("#PPAID").data("kendoComboBox").enable(false);
+       
+          @*if ((@Account.UserInfo.Department == 19 || @Account.UserInfo.Department == 1 || @Account.UserInfo.Department == 43) && $("#OBRNo").val().length()== 19){
+        
+          }*@
+          $("#userOffficeid").val(@Account.UserInfo.Department)
+        if(@Account.UserInfo.Department == 19){
+            $("#20PercentFund").show();
+            DisableCombo()
+        }
+        else if (@Account.UserInfo.Department == 1 || @Account.UserInfo.Department == 43){
+            $("#SEFFundText").show();
+            $("#GeneralFundText").show();
+            $("#EcoFundText").show();
+            DisableCombo()
+        }
+        else{
+            $("#20PercentFund").show();
+            $("#SEFFundText").show();
+            $("#GeneralFundText").show();
+            $("#EcoFundText").show();
+            EnableCombo()
+        }
+        var url="@Url.Action("getCAFOAmode", "Excess")"
+        $.get(url,function (e) {
+            if (e==1)
+            {
+                document.getElementById("obrlabelid").style.display = "none"
+                document.getElementById("obrnoid").style.display = "none"
+                document.getElementById("functionlabelid").style.display = "inline"
+                document.getElementById("funcnoid").style.display = "inline"
+            }
+            else{
+                document.getElementById("obrlabelid").style.display = "inline"
+                document.getElementById("obrnoid").style.display = "inline"
+                document.getElementById("functionlabelid").style.display = "none"
+                document.getElementById("funcnoid").style.display = "none"
+            }
+        });
+        $("#qrexcess").focus();
+    });
+</script>

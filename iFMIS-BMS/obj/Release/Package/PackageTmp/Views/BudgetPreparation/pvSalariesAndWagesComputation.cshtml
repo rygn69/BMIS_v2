@@ -1,0 +1,293 @@
+﻿
+@model iFMIS_BMS.BusinessLayer.Models.AccountComputationModel
+
+<script>
+    function ReqCloseSalariesAndWagesComputation() {
+        document.documentElement.style.overflow = 'auto';  // firefox, chrome
+        document.body.scroll = "yes";
+        $("#ForFundingDetail").data("kendoWindow").close();
+    }
+    function ViewDetails(){
+        var url2 = "@Url.Action("viewFormulaDetails", "BudgetPreparation")";
+
+        var accountCode = @Model.AccountCode;
+        var Amount = @Model.Amount;
+        var ComputedAmount = @Model.ComputedAmount;
+        var totalBasicSalary = @Model.totalBasicSalary;
+        var isRoundof = @Model.isRoundOf;
+        var maxAmount =@Model.MaxAmount;
+        var Percentage = @Model.Percentage;
+
+
+        $.get(url2,{AccountCode:accountCode, Amount:Amount, ComputedAmount:
+        ComputedAmount, TotalBasicSalary: totalBasicSalary,isRoundof:
+        isRoundof, maxAmount: maxAmount, Percentage:Percentage},function (pvData)
+        {
+            $(window).scrollTop(0);
+            $('#FormulaDetails').html(pvData);
+            $('#FormulaDetails').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Computation Details").center().open();
+        })
+    }
+    function getGridParam() {
+        var selectedYear = @Session["selectedYear"] + 1;
+        OfficeID = @Session["selectedOfficeID"];
+        var casualTag = '@Session["isCasual"]';
+        return{
+            OfficeID:OfficeID,
+            PropYear:selectedYear,
+            isCasual: casualTag
+        }
+    }
+
+    function reqAddCasual() {
+        var url2 = "@Url.Action("ReqAddCasual", "BudgetPreparation")";
+        $.get(url2,function (pvData)
+        {
+            $(window).scrollTop(0);
+            $('#AddVacantCasual').html(pvData);
+            $('#AddVacantCasual').data('kendoWindow').center().open();
+        })
+    }
+    function ReqChangeDateVacant(SeriesID,AppointmentDate) {
+        
+        var EffectivityDate = AppointmentDate;
+        var url2 = "@Url.Action("ReqChangeproposedDateVacant", "Home")";
+        var isNewProposed ="No";
+        $.post(url2, { ProposedItemID: SeriesID,ActualDate:EffectivityDate }, function (d) {
+            $(window).scrollTop(0);
+            $('#ChangeDateWindowVacant').html(d);
+            $('#ChangeDateWindowVacant').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Change Proposed Date").center().open();
+        })
+    }
+    function OnGridDataBound(e) {
+        var rows = e.sender.tbody.children();
+  
+        for (var j = 0; j < rows.length; j++) {
+            var row = $(rows[j]);
+            var dataItem = e.sender.dataItem(row);
+  
+            if (dataItem.get("EmployeeName").includes('Vacant') == true) {
+                row.addClass("ChangeVacantBackColor");
+            }
+            if (dataItem.get("step") < dataItem.get("StepNew")) {
+                row.addClass("ChangeStepIncrementBackColor");
+            }
+        }
+    
+    }
+
+</script>
+<div style="width: 98%; margin-bottom: 10px;">
+    <div style="width: 100%;height:100%">
+        <label style="display:inline-block">Account Code : @Model.AccountCode</label>
+        <label>Account Name : @Model.AccountName</label>
+        <div style="border:solid; border-color:#1fa67a ;width: 100%; height: 100%;display:inline-block;">
+            <div style="margin-left: 5px; margin-bottom:10px;">
+                <label>Formula</label>
+                <span id="Amount"></span>
+                <span id="Percentage"></span>
+                <span id="Month"></span>
+            </div>
+            <div style="margin-left: 5px; margin-bottom:10px;display:none">
+                <label>Details</label>
+                <span id="AmountValue"></span> <br />
+                <span id="PercentageValue"></span><br />
+                <span id="MonthValue"></span><br />
+            </div>
+            <div style="margin-left: 5px; margin-bottom:10px;display:none">
+                <span id="noteMax" style="color:red"></span>
+            </div>
+            <div style="margin-left: 5px; margin-bottom:10px;">
+                <span id="noteRoundOff" style="color:red"></span>
+            </div>
+        </div>
+    </div>
+</div>
+@(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Maintenance.PlantillaModel>()
+        .Name("grdComputationDetailSalary")
+        .Columns(columns =>
+        {
+            columns.Bound(c => c.SeriesID).Hidden();
+            columns.Bound(c => c.DivName).Title("DivName").Hidden()
+                .ClientGroupHeaderTemplate("<div style='display:inline-block'>#= value #</div>");
+            columns.Bound(c => c.EmployeeName).Title("Name").Width(150)
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                .ClientGroupHeaderTemplate("<label style='display:inline-block'>: #=count#</label>")
+                .ClientFooterTemplate("<div style='color:darkgreen;'><Label>Employee Count :</label></div>");
+            columns.Bound(c => c.sg).Title("Salary Grade").Width(70)
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                .ClientFooterTemplate("<div style='color:darkgreen;'><Label>#=count#</label></div>");
+            @*columns.Template(@<text></text>)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" }).HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Salary Effectivity Date</div></text>)
+                        .Width(90)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate(
+                        "# if(EmployeeName.includes('Vacant') == true || EmployeeName == 'Casual') { #" +
+                            "<div class='k-button' onclick='ReqChangeDateVacant(#=SeriesID#,\"#=AppointmentDate#\")' style='inline-block' title='Change Proposed Date'>#=AppointmentDate#</div>" +
+                            "# } else { #" +
+                            "#=kendo.toString(AppointmentDate)#" +
+                            "# } #"
+                        );*@
+            columns.Template(@<text></text>)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" }).HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Salary Effectivity Date</div></text>)
+                        .Width(90)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate(
+                            "#=kendo.toString(AppointmentDate)#"
+                        );
+            //columns.Bound(c => c.AppointmentDate).Title("Salary Effectivity Date").Width(100)
+            //    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+            columns.Bound(c => c.StepIncrementEffectivityDate).Title("Step Effectivity Date").Width(90)
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+            columns.Bound(c => c.step).Title("Current Step").Width(60)
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+            columns.Bound(c => c.StepNew).Title("New Step").Width(60)
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+            columns.Bound(c => c.Salary).Title("Salary No Step").Width(100)
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+            columns.Bound(c => c.SalaryWithStep).Title("Salary With Step").Width(100)
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+            columns.Bound(c => c.Increase).Title("Salary Increase No Step").Width(100)
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+            columns.Bound(c => c.IncreaseWithStep).Title("Salary Increase With Step").Width(100)
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                .ClientFooterTemplate("<div style='color:darkgreen;'><Label>Total :</label></div>");
+            columns.Bound(c => c.YearlySalary).Title("Yearly Salary").Width(120)
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                .ClientFooterTemplate("<div style='text-align:center;color:darkgreen'><label> </label><label> #=kendo.toString(sum, 'c2')#</label></div>");
+
+        })
+        .Events(e => e.DataBound("OnGridDataBound"))
+        .HtmlAttributes(new { style = "height: 430px;" })
+        .Scrollable(s => s.Enabled(true))
+        .Selectable()
+        .DataSource(dataSource => dataSource
+            .Ajax()
+            .Batch(true)
+            .ServerOperation(false)
+            .Aggregates(a =>
+            {
+                a.Add(c => c.YearlySalary).Sum();
+                a.Add(c => c.sg).Count();
+            })
+            .Read(read => read.Action("grGetComputationDetailsAdminView", "BudgetPreparation").Data("getGridParam"))
+            .Group(g => g.Add(c => c.DivName))
+        )
+)
+<div style="display:inline-block; float: right">
+    <div id="btncloseComputationDetail" class="k-button k-button-icontext" style="margin-right:5px;display:inline-block;width: 80px;clear:both; margin-top: 10px" onclick="ReqCloseSalariesAndWagesComputation()">Close</div>
+</div>
+
+@(Html.Kendo().Window()
+    .Name("FormulaDetails")
+    .Title("Formula Details")
+    .Width(600)
+    .Height(600)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(true)
+    .AutoFocus(true)
+    .Animation(a =>
+    {
+        a.Open(o => o.SlideIn(SlideDirection.Down));
+        a.Close(c =>
+        {
+            c.SlideIn(SlideDirection.Down);
+            c.Reverse(true);
+        });
+    }).Actions(a => { a.Close(); }))
+@(Html.Kendo().Window()
+    .Name("AddVacantCasual")
+    .Title("Add Vacant Casual")
+    .Width(540)
+    .Height(300)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(true)
+    .AutoFocus(true)
+    .Animation(a =>
+    {
+        a.Open(o => o.SlideIn(SlideDirection.Down));
+        a.Close(c =>
+        {
+            c.SlideIn(SlideDirection.Down);
+            c.Reverse(true);
+        });
+    }).Actions(a => { a.Close(); }))
+
+
+@(Html.Kendo().Window()
+    .Name("ChangeDateWindowVacant")
+    .Title("Change Proposed Effectivity Date")
+    .Width(300)
+    .Height(120)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(true)
+    .AutoFocus(true)
+    .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        }).Actions(a => { a.Close(); }))
+
+
+<script>
+    $(document).ready(function () {
+@using System.Globalization
+@{
+    var ComputedAmount = "₱" + string.Format(new CultureInfo("en-US"), "{0:N2}", Model.ComputedAmount);
+    var TotalBasicSalary = "₱" + string.Format(new CultureInfo("en-US"), "{0:N2}", Model.totalBasicSalary);
+    var Amount = "₱" + string.Format(new CultureInfo("en-US"), "{0:N2}", Model.Amount);
+    var MaxSalaryBase = string.Format(new CultureInfo("en-US"), "{0:N2}", Model.MaxAmount);
+
+}
+        if (@Model.Amount == 0) {
+            document.getElementById('Amount').innerHTML = "Basic Salary";
+            document.getElementById('AmountValue').innerHTML = "Employees Salary"
+        }
+        else {
+            document.getElementById('Amount').innerHTML = "Given Amount(Constant)";
+            document.getElementById('AmountValue').innerHTML = "Amount: @Model.Amount";
+        }
+        if (@Model.Month == 12) {
+            document.getElementById('Month').innerHTML = "*Salary Effectivity Date";
+            document.getElementById('MonthValue').innerHTML = "Month :@Model.Month";
+        }
+        else {
+            document.getElementById('Month').innerHTML = "";
+        }
+        if (@Model.Percentage == 0) {
+            document.getElementById('Percentage').innerHTML = "";
+        }
+        else {
+            document.getElementById('Percentage').innerHTML = "*Percentage";
+            document.getElementById('PercentageValue').innerHTML = "Percentage: @Model.Percentage"
+        }
+        if (@Model.MaxAmount == 0) {
+            document.getElementById('noteMax').innerHTML = "";
+        }
+        else {
+            document.getElementById('noteMax').innerHTML = "● Maximum Salary base is @MaxSalaryBase";
+        }
+        if (@Model.isRoundOf == 0  ) {
+            document.getElementById('noteRoundOff').innerHTML = "";
+        }
+        else {
+            document.getElementById('noteRoundOff').innerHTML = "● Salary base Less than @MaxSalaryBase are Rounded off (e.g. 24,999 = 24,000)";
+        }
+    })
+</script>
+<style>
+    .ChangeVacantBackColor{
+        background-color: #FFFF80;
+    }
+    .ChangeStepIncrementBackColor{
+        background-color: #80FF80;
+    }
+    
+</style>

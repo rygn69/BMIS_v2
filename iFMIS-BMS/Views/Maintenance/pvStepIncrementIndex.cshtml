@@ -1,0 +1,186 @@
+﻿<script>
+    var SalaryGrade = "";
+    //  var myVar = setInterval(GetBudgetSalary, 1000);
+    function OfficeData() {
+        return {
+            OfficeID: $("#ddlOffices").val()
+        };
+    }
+    function getActualSalary() {
+
+        var eid = $('#ddlEmployees').val()
+        var OfficeID = $('#ddlOffices').val()
+        var url = "@Url.Action("getActualSalary", "Maintenance")";
+        $.post(url, { EmployeeID: eid, OfficeID: OfficeID }, function (d) {
+
+            SalaryGrade = d.SalaryGrade;
+            document.getElementById('ActualSalary').innerHTML = d.ActualSalary;
+            document.getElementById('BudgetedSalary').innerHTML = d.BudgetSalary;
+            document.getElementById('SalaryGrade').innerHTML = d.SalaryGrade;
+            document.getElementById('Step').innerHTML = d.Step;
+            document.getElementById('SalaryGradeBudgeted').innerHTML = d.SalaryGradeBudgeted;
+            $("#ddlStep").data("kendoDropDownList").value(d.StepBudgeted + 2);
+            for (var i = 1; i < d.StepBudgeted; i++) {
+                var ddl = $("#ddlStep").data("kendoDropDownList");
+
+                var oldData = ddl.dataSource.data();
+
+                ddl.dataSource.remove(oldData[0]);
+
+            }
+            $("#ddlStep").data("kendoDropDownList").value(d.StepBudgeted + 2);
+
+        })
+    }
+    function ClearData() {
+        document.getElementById('ActualSalary').innerHTML = "";
+        document.getElementById('BudgetedSalary').innerHTML = "";
+        document.getElementById('SalaryGrade').innerHTML = "";
+        document.getElementById('Step').innerHTML = "";
+        document.getElementById('SalaryGradeBudgeted').innerHTML = "";
+    }
+    function GetBudgetSalary() {
+        var Step = $("#ddlStep").data("kendoDropDownList").text();
+        var url = "@Url.Action("getBudgetSalary", "Maintenance")";
+        $.post(url, { SalaryGrade: SalaryGrade, Step: Step }, function (d) {
+            document.getElementById('BudgetedSalary').innerHTML = d;
+        })
+    }
+    function reqUpdate() {
+        if ($('#ddlEmployees').val() == "") {
+            $.Notify({
+                caption: 'Cannot Complete Request',
+                content: 'Please Select Employee to Update',
+                type: 'alert'
+            });
+        }
+        else {
+            var Step = $("#ddlStep").val() - 2;
+            if (Step == -2) {
+                Step = 1;
+            }
+            var eid = $('#ddlEmployees').val()
+            var url = "@Url.Action("UpdateSalary", "Maintenance")";
+            $.post(url, { SalaryGrade: SalaryGrade, Step: Step, eid:eid }, function (d) {
+                if (d == 1) {
+                    $.Notify({
+                        caption: 'Success',
+                        content: 'Successfuly Updated',
+                        type: 'success'
+                    });
+                    ClearData();
+                    if ('@Account.UserInfo.UserTypeDesc' == 'Budget In-Charge') {
+                        $("#ddlOffices").data("kendoComboBox").value(@Account.UserInfo.Department);
+                    }
+                    else {
+                        $("#ddlOffices").data("kendoComboBox").value("");
+                    }   
+                }
+                else {
+                    $.Notify({
+                        caption: 'Cannot Complete Request',
+                        content: d,
+                        type: 'alert'
+                    });
+                }
+            })
+        }
+    }
+
+</script>
+
+<div style="width : 100%; margin-top: 0px;border-style: solid; border-color: #1fa67a;">
+    <div style="width:100%;height : 25px ; background-color:#1fa67a; color: white">
+        <label class="fa fa-line-chart fa-lg" style="margin-left: 5px; display:inline-block">  STEP INCREMENT SETTINGS</label>
+    </div>
+    <div style="margin-left:5px">
+        <label style="margin-left: 0px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px; display : inline-block">Office : </label>
+        <label style="margin-left: 24px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px; display : inline-block">
+            @(Html.Kendo().ComboBox()
+                         .Name("ddlOffices")
+                         .DataTextField("OfficeName")
+                         .DataValueField("OfficeID")
+                         .Filter("contains")
+                         .MinLength(1)
+                         .Placeholder("Select Office...")
+                         .HtmlAttributes(new { @style = "width: 595px;" })
+                         .DataSource(source => source.Read(read => read.Action("ddlOffice", "User")))
+                         .Events(e => { e.Change("ClearData"); })
+            )
+        </label>
+        <label style="margin-left: 0px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px; display : inline-block">
+            Employee : @(Html.Kendo().ComboBox()
+                         .Name("ddlEmployees")
+                         .DataTextField("empName")
+                         .DataValueField("eid")
+                         .Filter("contains")
+                         .MinLength(1)
+                         .Placeholder("Select Employee...")
+                         .HtmlAttributes(new { @style = "width: 595px;" })
+                         .DataSource(source => source.Read(read => read.Action("ddlEmployeeCascade", "User").Data("OfficeData")).ServerFiltering(true))
+                         .Enable(false)
+                         .AutoBind(false)
+                         .CascadeFrom("ddlOffices")
+                         .Events(e => { e.Change("getActualSalary"); })
+            )
+        </label>
+        <div style="width:100%; height:100%; margin-top:10px; margin-bottom:10px;">
+            <div style="width : 48%; height:175px;margin-top: 0px;border-style: solid; border-color: #1fa67a; float:left;">
+                <div style="width:100%;height : 25px ; background-color:#1fa67a; color: white">
+                    <label style="margin-left: 5px; display:inline-block">ACTUAL</label>
+                </div>
+                <div style="margin-left:5px">
+                    <label style="margin-left: 0px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px;">
+                        Salary Grade: <span id="SalaryGrade"></span>
+                    </label>
+                    <label style="margin-left: 0px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px;">
+                        Step: <span id="Step"></span>
+                    </label>
+                    <label style="margin-left: 0px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px; ">Actual Salary: <span id="ActualSalary"></span></label>
+                </div>
+            </div>
+
+            <div style="width : 48%; margin-top: 0px;border-style: solid; border-color: #1fa67a; display:inline-block;margin-left:13px; height:100%;">
+                <div style="width:100%;height : 25px ; background-color:#1fa67a; color: white">
+                    <label style="margin-left: 5px; display:inline-block">BUDGETED</label>
+                </div>
+                <div style="margin-left:5px">
+                    <label style="margin-left: 0px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px;">
+                        Salary Grade: <span id="SalaryGradeBudgeted"></span>
+                    </label>
+                    <label style="margin-left: 0px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px;">
+                        Step: @(Html.Kendo().DropDownList()
+                         .Name("ddlStep")
+                         .DataTextField("StepColumn")
+                         .DataValueField("Step")
+                         .MinLength(1)
+                         .HtmlAttributes(new { @style = "width: 100px;" })
+                         .DataSource(source => source.Read(read => read.Action("ddlStep", "Dropdowns")).ServerFiltering(true))
+                         .Enable(false)
+                         .AutoBind(false)
+                         .CascadeFrom("ddlEmployees")
+                         .Events(e => { e.Change("GetBudgetSalary"); })
+                        )
+                    </label>
+                    <label style="margin-left: 0px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px;">Budgeted Salary: <span id="BudgetedSalary"></span></label>
+                </div>
+                <div style="display:inline-block;width:100%">
+                    <div id="btnUpdate" class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 80px;float:right; margin-top: 5px; margin-right:10px; margin-bottom:5px" onclick="reqUpdate()">Update</div>
+                </div>
+            </div>
+        </div>
+</div>
+        
+</div>
+<script>
+    $(document).ready(function () {
+        if ('@Account.UserInfo.UserTypeDesc' == 'Budget In-Charge') {
+            $("#ddlOffices").data("kendoComboBox").value(@Account.UserInfo.Department);
+            $("#ddlOffices").data("kendoComboBox").enable(false);
+        }
+        else {
+            $("#ddlOffices").data("kendoComboBox").enable();
+            $("#ddlOffices").data("kendoComboBox").value("");
+        }
+    });
+</script>

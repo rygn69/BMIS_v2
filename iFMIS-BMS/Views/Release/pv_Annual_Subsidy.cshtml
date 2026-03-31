@@ -1,0 +1,355 @@
+﻿<script>
+
+    function fn_closeSubsidy() {
+
+        $("#AnnualWindow_EE").data("kendoWindow").close();
+    }
+
+    setTimeout(function () {
+        var office_id = $("#annual_subsidy_EE").val();
+        if (office_id == null || office_id == 0 || office_id == '') {
+            $("#annual_subsidy_EE_To").data("kendoComboBox").enable(false);
+            $("#annual_subsidy_Prog_To").data("kendoDropDownList").enable(false);
+            $("#annual_subsidy_Acc_To").data("kendoComboBox").enable(false);
+        } else {
+            $("#annual_subsidy_EE_To").data("kendoComboBox").enable(true);
+            $("#annual_subsidy_Prog_To").data("kendoDropDownList").enable(true);
+            $("#annual_subsidy_Acc_To").data("kendoComboBox").enable(true);
+        }
+
+    }, 1000);
+
+    function Office_sub() {
+        var office_id = $("#annual_subsidy_EE").val();
+        return {
+            office_id: office_id
+        }
+    }
+    function fn_refresh_Grid_To() {
+        $('#grd_Subsidy_EE').data('kendoGrid').dataSource.read();
+        $("#annual_subsidy_EE_To").data("kendoComboBox").enable(true);
+        $("#annual_subsidy_Prog_To").data("kendoDropDownList").enable(true);
+        $("#annual_subsidy_Acc_To").data("kendoComboBox").enable(true);
+    }
+
+    function Delete_sub(Binding_ID) {
+
+
+
+        var url = "@Url.Action("Delete_Subsidy", "Release")";
+        var lure = "@Url.Action("Delete_Check", "Release")";
+
+        var year_ = $("#ddlYear").val();
+
+        $.get(lure, { Binding_ID: Binding_ID, year_: year_ }, function (e) {
+            if (e.ProposalAllotedAmount == 0 || e.ProposalAllotedAmount == '' || e.ProposalAllotedAmount == null) {
+              
+
+                swal({
+                    title: "Are you sure?",
+                    text: "This item will be removed!",
+                    type: "info",
+                    showCancelButton: true,
+                    closeOnConfirm: false,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Yes, Remove It!",
+                    showLoaderOnConfirm: true,
+                }, function () {
+
+
+                    $.get(url, { Binding_ID: Binding_ID }, function (d) {
+
+                        if (d == "1") {
+                            swal({
+                                title: "Success!",
+                                text: "Binding has been Removed.",
+                                timer: 2000,
+                                type: "success",
+                                showConfirmButton: false
+                            })
+                            $('#grd_Subsidy_EE').data('kendoGrid').dataSource.read();
+                        } else {
+                            swal({
+                                title: "Error!",
+                                text: "System Error! Please try again.",
+                                timer: 2000,
+                                type: "error",
+                                showConfirmButton: false
+                            })
+                        }
+                    });
+                });
+            } else {
+
+                swal({
+                    title: "Error!",
+                    text: "You can't delete this Binding.",
+                    timer: 4000,
+                    type: "error",
+                    showConfirmButton: false
+                })
+
+            }
+            });
+       
+       // 09079530814
+    }
+    function sub_save() {
+
+        var url = "@Url.Action("Save_Subs", "Release")";
+
+        var office_id = $("#annual_subsidy_EE").val();
+        var office_id_to = $("#annual_subsidy_EE_To").val();
+        var program_id_to = $("#annual_subsidy_Prog_To").val();
+        var account_id_to = $("#annual_subsidy_Acc_To").val();
+        var year_ = $("#ddlYear").val();
+
+
+       
+
+        swal({
+            title: "Are you sure?",
+            text: "This Subsidy will be SAVED!",
+            type: "info",
+            showCancelButton: true,
+            closeOnConfirm: false,
+            confirmButtonColor: "#1fa67a",
+            confirmButtonText: "Yes, Save It!",
+            showLoaderOnConfirm: true,
+        }, function () {
+   
+            $.post(url, {
+                office_id: office_id,
+                office_id_to: office_id_to,
+                program_id_to: program_id_to,
+                account_id_to: account_id_to,
+                year_: year_
+
+            }, function (e) {
+               
+                if (e == "1") {
+                    swal({
+                        title: "Success!",
+                        text: "Subsidy has been Added.",
+                        timer: 2000,
+                        type: "success",
+                        showConfirmButton: false
+                    })
+                    $("#grd_Subsidy_EE").data("kendoGrid").dataSource.read();
+                    $('#EconomicEnterprise_Grid').data('kendoGrid').dataSource.read();
+                } else {
+                    swal({
+                        title: "Error!",
+                        text: "System Error! Please try again.",
+                        timer: 2000,
+                        type: "error",
+                        showConfirmButton: false
+                    })
+                }
+            });
+        });
+    }
+</script>
+<label style="margin-left: 50px;height:360px">
+   
+</label>
+
+
+<div>
+    <div style="margin-top:-360px;">
+        @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Monthly_Annuals>()
+    .Name("grd_Subsidy_EE")
+    .Scrollable()
+    .Columns(col =>
+    {
+       
+
+        col.Bound(m => m.Binding_ID).Hidden();
+        col.Bound(m => m.AccountName)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Account</div></text>)
+                        .Width(160)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+
+        col.Bound(m => m.YearOf).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Year</div></text>)
+                        .Width(60)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+
+        col.Bound(m => m.ProposalAllotedAmount)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Balance<br />Amount</div></text>)
+                        .Width(120)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div>#=kendo.toString(ProposalAllotedAmount,'c2')# </div>");
+
+        
+
+
+        col.Template(t => { }).ClientTemplate(
+         "<div class='k-button k-button-icontext' style='border-radius:50px;color:\\#ffffff;background-color:\\#DE5555;'   onclick='Delete_sub(#=Binding_ID#)'   ><span class='fa fa-trash-o' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'> </span>del</div> "
+                                      //"<div class='btn-delete'style='inline-block; height: 15px;width:65px;margin-left:30px;'> " +
+                                      //"<a  title='remove'     onclick='Delete_sub(#=Binding_ID#)'               style='margin-left:2px;'><span class='fa fa-remove' style='font-size: 12pt;'></span></a>" +
+                                      //" </div>"
+                                    ).HtmlAttributes(new { style = "vertical-align: top;" }).Width(45);
+    })
+
+                    .Sortable()
+                    .Scrollable()
+                    .HtmlAttributes(new { style = "height:250px;" })
+                                    .DataSource(d => d
+                                    .Ajax()
+                                    .PageSize(1000)
+                                    .Model(m => m.Id(i => i.Binding_ID))
+                                    .Read(read => read.Action("Subsidy_Grid", "Release").Data("Office_sub")))
+        )
+
+    </div>
+    <div style="float: none;clear:both;">
+
+        <div style="float: left;margin-right:10px;margin-top:5px;">
+            <label style="float:left;margin-left: 50px;">
+                Office    :
+            </label>
+        </div>
+        <div style="float: right;margin-right:85px;margin-top:3px;">
+
+
+            @(Html.Kendo().ComboBox()
+                            .Name("annual_subsidy_EE")
+                            .DataTextField("OfficeName")
+                            .DataValueField("OfficeID")
+                            .Placeholder("Select office...")
+                            .Filter("contains")
+                            .MinLength(1)
+                            .HtmlAttributes(new { @style = "width: 500px;" })
+                            .Events(e => e.Change("fn_refresh_Grid_To"))
+                            .DataSource(source => source.Read(read => read.Action("GetOffice_EE", "Release")))
+            )
+
+
+        </div>
+      
+    </div>
+    <div style="float: right;margin-right:-250px;margin-top:40px;">
+        <label style="margin-right: 0px;">
+            Bind To
+        </label>
+   </div>
+    <div id="ProgramAndExpenseClassDiv" style="float: none;clear:both; margin-top: 25px">
+
+        <div style="float: left;margin-right:10px;margin-top:2px;">
+            <label style="float:left;margin-left: 50px;">
+                Office    :
+            </label>
+        </div>
+        <div style="float: right;margin-right:85px;margin-top:0px;">
+            <script>
+                function fn_refresh_To() {
+                    $('#annual_subsidy_Prog_To').data('kendoDropDownList').dataSource.read();
+                    $('#annual_subsidy_Acc_To').data('kendoComboBox').dataSource.read();
+                    
+                }
+            </script>
+
+            @(Html.Kendo().ComboBox()
+                            .Name("annual_subsidy_EE_To")
+                            .DataTextField("OfficeName")
+                            .DataValueField("OfficeID")
+                            .Placeholder("Select office...")
+                            .Filter("contains")
+                            .MinLength(1)
+                            .HtmlAttributes(new { @style = "width: 500px;" })
+                            .Events(e => e.Change("fn_refresh_To"))
+                            .DataSource(source => source.Read(read => read.Action("GetOffice", "dpOffice")))
+            )
+
+
+
+
+        </div>
+
+        <div style="float: left;margin-right:10px;margin-top:10px;">
+            <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                Program :
+            </label>
+        </div>
+        <div style="float: right;margin-right:85px;margin-top: 5px;">
+            <script>
+    function fn_Offices_Sub() {
+        var year_ = $("#ddlYear").val();
+        var off_id = $("#annual_subsidy_EE_To").val();
+       
+
+        return {
+            year_: year_,
+            office_ID: off_id
+        }
+    }
+    function fn_refresh_To_cc() {
+        var program_id_to = $("#annual_subsidy_Prog_To").val();
+       // alert(program_id_to)
+        $('#annual_subsidy_Acc_To').data('kendoComboBox').dataSource.read();
+
+    }
+            </script>
+
+            @(Html.Kendo().DropDownList()
+                            .Name("annual_subsidy_Prog_To")
+                            .DataTextField("ProgramDescription  ")
+                            .DataValueField("ProgramID")
+                            .OptionLabel("Select programs...")
+                            .HtmlAttributes(new { @style = "width: 500px;" })
+                            .Events(e => e.Change("fn_refresh_To_cc"))
+                   .DataSource(source => source.Read(read => read.Action("GetPrograms", "Release").Data("fn_Offices_Sub")))
+            )
+        </div>
+        <div style="float: left;margin-right:10px;margin-top:10px;">
+            <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                Account    :
+            </label>
+        </div>
+        <div style="float: right;margin-right:85px;margin-top:5px;">
+            <script>
+                function fn_ForAccount_float_null() {
+                    var year_ = $("#ddlYear").val();
+                   
+                    var prog_id = $("#annual_subsidy_Prog_To").val();
+                    return {
+                        year_: year_,
+                        prog_id: prog_id
+                    }
+                }
+            </script>
+
+            @(Html.Kendo().ComboBox()
+                        .Name("annual_subsidy_Acc_To")
+                        .DataTextField("account_name")
+                        .DataValueField("account_id")
+                        .Filter("contains")
+                        .MinLength(1)
+                        .Placeholder("Select Account...")
+                        .HtmlAttributes(new { @style = "width: 500px;" })
+                      //  .Events(e => e.Change("fn_grid_refresh_div_null"))
+                        .DataSource(source => source.Read(read => read.Action("_Account_Subsidy", "Release").Data("fn_ForAccount_float_null")))
+            )
+        </div>
+
+
+    </div>
+    <div style="float:left;margin-top:20px;margin-left:530px">
+        <div class="k-button k-button-icontext" style="bottom: 15px; right: 220px;width: 80px; border-radius:50px;color:#ffffff;background-color:#1FA67A;" onclick="sub_save()"><span class='fa fa-plus-circle' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'></span> Save</div>
+    </div>
+    <div style="float:left;margin-top:-29px;margin-left:620px">
+        <div class="k-button k-button-icontext" style=" bottom: 15px; right: 220px;width: 80px; border-radius:50px;color:#ffffff;background-color:#DE5555;" onclick="fn_closeSubsidy()"><span class='fa fa-times' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'></span> Close</div>
+    </div>
+    </div><label style="margin-left: 50px;height:150px">
+
+</label>
+<script>
+    $(document).ready(function () {
+        var ksssawd = $('#offs').val()
+        $("#annual_subsidy_EE").data("kendoComboBox").value(ksssawd);
+        fn_refresh_Grid_To();
+    }, 1000);
+</script>

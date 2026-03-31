@@ -1,0 +1,274 @@
+﻿@{
+    ViewBag.Title = "Users";
+}
+
+<script>
+
+    function reqEdit(e) {
+        @*$(window).scrollTop(0);
+        var data = this.dataItem($(e.currentTarget).closest("tr"));
+        var url = "@Url.Action("pv_AddOfficeViews", "User")";
+        $.get(url, { User_ID: data.User_ID }, function (d) {
+            $('#NewOfficeWindow').html(d);
+        })
+        $('#NewOfficeWindow').data('kendoWindow').title("Edit").center().open();*@
+        var data = this.dataItem($(e.currentTarget).closest("tr"));
+        $("#oldpwd_orig").val(data.pcode)
+        $("#eidtmp").val(data.eid)
+        $("#officehead").val(data.depthead)
+        $("#officeheadposition").val(data.deptheadposition)
+        $("#firstname").val(data.fname)
+        $("#lastname").val(data.lname)
+    }
+
+
+    function reqRemove(e) {
+        var data = this.dataItem($(e.currentTarget).closest("tr"));
+        var url = "@Url.Action("RemoveUserNewNO", "User")";
+        var eid = $('#ddlEmployees').val()
+        
+        $.post(url, { eid: data.eid }, function (d) {
+            if (d == 1) {
+                swal({ title: "Success!", text: "Successfuly Removed!", timer: 1000, showConfirmButton: false, type: "success" });
+
+                $('#OfficeGrid').data('kendoGrid').dataSource.read();
+            }
+            else {
+                swal("Something Went Wrong!", d, "error");
+            }
+        })
+    }
+</script>
+
+<h2>Add/Update Users</h2>
+
+<div>
+    @*<label style="margin-left: 0px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px; display : inline-block">
+        Employee : @(Html.Kendo().ComboBox()
+                         .Name("ddlEmployees")
+                         .DataTextField("empName")
+                         .DataValueField("eid")
+                         .Filter("contains")
+                         .MinLength(1)
+                         .Placeholder("Select Employee...")
+                         .HtmlAttributes(new { @style = "width: 250px;" })
+                         .DataSource(source => source.Read(read => read.Action("ddlEmployee", "User")))
+                        .Events(e => { e.Change("Refresher"); })
+        )
+    </label>*@
+</div>
+<div id="divSubmitID" style="float:left;margin-top:-30px;margin-left:420px;width:250px;display:none">
+    <label style="font-size:12px;">Enable submit button</label>
+    <input type="checkbox" id="enablesubmitid" style="float:left;margin-top:-16px;margin-left:-18px;zoom:1.5" onclick="endisubmitbudget()" />
+</div>
+
+<div id="divExecutionid" style="float:left;margin-top:-5px;margin-left:420px;width:250px;display:none">
+    <label style="font-size:12px;">Office Execution</label>
+    <input type="checkbox" id="executionid" style="float:left;margin-top:-16px;margin-left:-18px;zoom:1.5" onclick="executionid()" />
+</div>  
+
+<div style="width : 100%; margin-top: 20px;border-style: solid; border-color: #1fa67a">
+
+    <div style="width:100%;height : 25px ; background-color:#1fa67a; color: white">
+        <label class="fa fa-user-plus fa-lg" style="margin-left: 5px; display:inline-block">  User List</label>
+    </div>
+
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.UserOfficeRole>()
+    .Name("OfficeGrid")
+    .Columns(col =>
+    {
+        col.Bound(m => m.lname).Title("Last Name");
+        col.Bound(m => m.fname).Title("First Name");
+        col.Bound(m => m.pcode).Title("Password").Hidden();
+        col.Bound(m => m.depthead).Title("department head").Hidden();
+        col.Bound(m => m.deptheadposition).Title("department head position").Hidden();
+        
+        col.Command(c =>
+        {
+            c.Custom("btnEdit")
+                .Click("reqEdit")
+                .Text("Edit");
+            c.Custom("btnRemove")
+                .Click("reqRemove")
+                .Text("Remove");
+        }).Width(160);
+    })  
+
+    .DataSource(d => d
+    .Ajax()
+    .PageSize(10)
+    .Model(m => m.Id(i => i.eid))
+    .Read(read => read.Action("LoadUserOfficeNO", "User")))
+
+    .Pageable(page => page.Refresh(true)
+    .Enabled(true)
+    .ButtonCount(4)
+    .PreviousNext(true)
+    )
+    .Selectable()
+
+    )
+
+    @(Html.Kendo().Window()
+     .Name("NewOfficeWindow").Title("New Entry").Width(770).Height(510).Visible(false).Modal(true).Draggable(true).AutoFocus(true).Animation(a => { a.Open(o => o.SlideIn(SlideDirection.Down)); a.Close(c => { c.SlideIn(SlideDirection.Down); c.Reverse(true); }); }).Actions(a => { a.Close(); }))
+
+</div>
+
+<div style="display:inline-block">
+    <label style="margin-left: 0px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px; display : inline-block;font-size:13px">
+        First Name 
+    </label>
+    <div>
+        <input type="text" id="firstname" value="" />
+    </div>
+</div>
+<br />
+<div style="display:inline-block">
+    <label style="margin-left: 0px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px; display : inline-block;font-size:13px">
+        Last Name
+    </label>
+    <div>
+        <input type="text" id="lastname" value="" />
+    </div>
+</div>
+<br />
+<div style="display:inline-block">
+    <label style="margin-left: 0px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px; display : inline-block;font-size:13px">
+        Department/Office Head
+    </label>
+    <div>
+        <input type="text" id="officehead" value="" />
+    </div>
+</div>
+<br />
+<div style="display:inline-block">
+    <label style="margin-left: 0px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px; display : inline-block;font-size:13px">
+        Department/Office Head Position
+    </label>
+    <div>
+        <input type="text" id="officeheadposition" value="" />
+    </div>
+</div>
+<br />
+<div style="display:inline-block">
+    <label style="margin-left: 0px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px; display : inline-block;font-size:13px">
+        Old Password 
+    </label>
+    <div>
+        <input type="password" id="pwdold" value="" placeholder="********" />
+    </div>
+</div>
+<br />
+<div style="display:inline-block">
+    <label style="margin-left: 0px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px; display : inline-block;font-size:13px">
+        New Password 
+    </label>
+    <div>
+        <input type="password" id="pwd" value="" placeholder="********"/>
+    </div>
+</div>
+<br />
+<div style="display:inline-block">
+    <label style="margin-left: 0px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px; display : inline-block;font-size:13px">
+        Verify New Password 
+    </label>
+    <div>
+        <input type="password" id="pwd_verify" value="" placeholder="********"/>
+    </div>
+</div>
+<br />
+<div style="display:inline-block;margin-left:5px;margin-top:10px">
+    @if (Account.UserInfo.eid == 1299) //sys admin
+    {
+    <div class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 100px;float:left; margin-top: 10px; margin-left:0px;border-radius:50px; margin-bottom:0px" onclick="reqAdd()"><span class="fa fa-plus"></span> Add</div>
+    }
+    <div class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 100px;float:left; margin-top: 10px; margin-left:10px;border-radius:50px;background-color:cornflowerblue;color:white; margin-bottom:0px" onclick="reqUpdate()"><span class="fa fa-edit"></span> Update</div>
+    <div class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 100px;float:left; margin-top: 10px; margin-left:10px;border-radius:50px;margin-bottom:0px" onclick="reqClear()"><span class=""></span> Clear</div>
+</div>
+<div style="display:none">
+    <input id="eidtmp" type="number" value="0"/>
+    <input id="oldpwd_orig" type="text" value=""/>
+</div>
+<script>
+    $(document).ready(function(){
+        $('#OfficeGrid').data('kendoGrid').dataSource.read();
+    })
+    function reqAdd() {
+        var eid = $("#eidtmp").val()
+        var pwd = $("#pwd").val()
+        var pwd_verify = $("#pwd_verify").val()
+        var url = "@Url.Action("AddUserNO","User")"
+        var firstname = $("#firstname").val()
+        var lastname = $("#lastname").val()
+        var officehead = $("#officehead").val()
+        var officeheadposition = $("#officeheadposition").val()
+
+        if (pwd != pwd_verify) {
+            swal("Warning", "Password doesn't match!", "warning")
+            $("#pwd").val("")
+            $("#pwd_verify").val("")
+            $("#pwd").focus
+        }
+        else {
+            $.post(url, { newpwd: $("#pwd").val(), firstname: firstname, lastname: lastname, officehead: officehead, officeheadposition: officeheadposition }, function (d) {
+                if (d == "success") {
+                    swal("Success!", "New user has been added!", "success");
+                    $('#OfficeGrid').data('kendoGrid').dataSource.read();
+                    reqClear()
+                }
+                else {
+                    swal("Something Went Wrong!", d, "error");
+                }
+            })
+        }
+    }
+    function reqUpdate(){
+        var url = "@Url.Action("UpdateUserPwd", "User")";
+        var eid = $("#eidtmp").val()
+        var firstname = $("#firstname").val()
+        var lastname = $("#lastname").val()
+        var officehead = $("#officehead").val()
+        var officeheadposition = $("#officeheadposition").val()
+        var pwdorig=$("#oldpwd_orig").val()
+        var pwdold = $("#pwdold").val()
+        var pwd = $("#pwd").val()
+        var pwd_verify = $("#pwd_verify").val()
+        if (pwdold != pwdorig) {
+            swal("Warning", "Incorrect password! Please try again.", "warning")
+            $("#pwdold").focus
+        }
+        else if (pwd != pwd_verify) {
+            swal("Warning", "Password doesn't match!", "warning")
+            $("#pwd").val("")
+            $("#pwd_verify").val("")
+            $("#pwd").focus
+        }
+        else {
+            $.post(url, { eid: eid, origpwd: pwdorig, oldpwd: $("#pwdold").val(), newpwd: $("#pwd").val(), pwdverify: $("#pwd_verify").val(),firstname: firstname, lastname: lastname, officehead: officehead, officeheadposition: officeheadposition }, function (d) {
+                if (d == "success") {
+                    swal("Success!", "Password successfully updated!", "success");
+                    $('#OfficeGrid').data('kendoGrid').dataSource.read();
+                    reqClear()
+                }
+                else {
+                    swal("Something Went Wrong!", d, "error");
+                }
+            })
+        }
+    }
+
+    function reqClear(){
+        $("#pwdold").val("")
+        $("#pwd").val("")
+        $("#pwd_verify").val("")
+        $("#eidtmp").val(0)
+        $("#oldpwd_orig").val("")
+        $("#firstname").val("")
+        $("#lastname").val("")
+        $("#officehead").val("")
+        $("#officeheadposition").val("")
+    }
+</script>
+
+
+

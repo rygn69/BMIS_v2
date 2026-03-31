@@ -1,0 +1,130 @@
+﻿<script>
+
+
+    function reqPrint(e) {
+        var officeid = $("#ddlOffices").val()
+        var Year = $("#ddlYear").val()
+        if (document.getElementById("cbForFunding").checked == true) {
+            if (officeid != "") {
+                $.ajax({
+                    async: false,
+                    dataType: 'html',
+                    success: window.open("../Reports/ReportViewer.aspx?rid=7&Year=" + Year + "&OfficeID=" + officeid + "")
+                });
+            }
+            else {
+                alert("Please select an office!");
+            }
+            
+        }
+        else {
+            if (officeid != "") {
+                var url = "@Url.Action("getpmisofficeid", "BudgetPreparation")";
+                $.post(url, { officeid: officeid }, function (x) {
+
+                if ($("#radpermanent").val() == 1) {
+                    $.ajax({
+                        async: false,
+                        dataType: 'html',
+                        //https://pgas.ph/hris/Reports/report.aspx?rep_id=16&param=72,2025,0,0,0,0,0,2
+                        success: window.open("https://pgas.ph/hris/Reports/report.aspx?rep_id=16&param=" + x + "," + Year + ",0,0,0,0,0,2")
+                        //success: window.open("https://pgas.ph/hris/Reports/report.aspx?rep_id=16&param=" + x + "," + Year + ",0,0")
+                    });
+                }
+                else {
+                    $.ajax({
+                        async: false,
+                        dataType: 'html',
+                        //success: window.open("https://pgas.ph/hris/Reports/report.aspx?rep_id=18&param=" + x + "," + Year + ",0")
+                        success: window.open("https://pgas.ph/SPMS/Report/ReportViewer.aspx?rid=46&year_=" + Year + "&office_id=" + x + "&p=bms")
+                        //success: window.open("../Reports/ReportViewer.aspx?rid=18&OfficeID=" + officeID + "&Year=" + Year + ",0")
+                    });
+                }
+                })
+            }
+            else {
+                alert("Please select an office!");
+            }
+        }
+    }
+</script>
+
+<div style="width : 81.5%; margin-top: 0px;border-style: solid; border-color: #1fa67a;">
+    <div style="width:100%;height : 25px ; background-color:#1fa67a; color: white">
+        <label class="fa fa-file-text-o fa-lg" style="margin-left: 5px; display:inline-block">  PRINT LBP3 REPORT</label>
+    </div>
+    <div style="margin-left: 5px; margin-bottom:5px">
+        <label style="margin-left: 0px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px; display : inline-block">
+            Office :&nbsp;&nbsp;&nbsp;&nbsp;
+            @(Html.Kendo().DropDownList()
+                         .Name("ddlOffices")
+                         .DataTextField("OfficeName")
+                         .DataValueField("OfficeID")
+                         .Filter("contains")
+                         .MinLength(1)
+                         .OptionLabel("Select Office...")
+                         .HtmlAttributes(new { @style = "width: 527px;" })
+                         .DataSource(source => source.Read(read => read.Action("ddlOfficeWithAll", "User")))
+            )
+
+        </label>
+        <label style="margin-left: 0px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px; display : inline-block">
+            Budget Year : @(Html.Kendo().DropDownList()
+                        .Name("ddlYear")
+                        .DataTextField("ProposalYear")
+                        .DataValueField("ProposalYear")
+                        .SelectedIndex(0)
+                        .HtmlAttributes(new { @style = "width: 90px;" })
+                        .DataSource(source => source.Read(read => read.Action("GetPropYear", "PYear")))
+            )
+        </label>
+    </div>
+    
+    <div style="display:inline-block;width:100%">
+        <label style="display:inline-block;margin-left:10px">
+            <input id='cbForFunding' type='checkbox' class='checkbox' /> For Funding (Note: You can view the submitted proposal only!)
+        </label>
+        <div style="display:inline-block;margin-left:0px;margin-top:5px">
+            <label style="display:inline-block;margin-left:10px">
+                <input id='radpermanent' type='radio' checked class='checkbox' value="1" style="width:10px;zoom:1.2" onclick="radpermanent_click()"/> Permanent
+            </label>
+            <label style="display:inline-block;margin-left:30px">
+                <input id='radcasual' type='radio' class='checkbox' value="0" style="width:10px;zoom:1.2" onclick="radcasual_click()"/> Casual
+            </label>                                           
+        </div>
+
+        <div id="btnPrint" class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 80px;float:right; margin-top: 25px; margin-right:10px; margin-bottom:5px;border-radius:50px;" onclick="reqPrint()">Preview</div>
+    </div>
+</div>
+<div>
+
+</div>
+<script>
+    $(document).ready(function () {
+        if ('@Account.UserInfo.UserTypeDesc' == 'Budget In-Charge') {
+            $("#ddlOffices").data("kendoDropDownList").value(@Account.UserInfo.Department);
+            $("#ddlOffices").data("kendoDropDownList").enable(false);
+        }
+        else {
+            $("#ddlOffices").data("kendoDropDownList").enable();
+            $("#ddlOffices").data("kendoDropDownList").value("");
+        }
+    });
+    function getpmisofficeid(officeID) {
+        var url = "@Url.Action("getpmisofficeid", "BudgetPreparation")";
+        $.post(url, { officeID: officeID }, function (x) {
+
+        })
+    }
+    function radpermanent_click() {
+        
+        document.getElementById("radpermanent").value = "1";
+        document.getElementById("radcasual").value = "0";
+        $("#radcasual").prop("checked", false);
+    }
+    function radcasual_click() {
+        document.getElementById("radpermanent").value = "0";
+        document.getElementById("radcasual").value = "1";
+        $("#radpermanent").prop("checked", false);
+    }
+</script>

@@ -1,0 +1,783 @@
+﻿
+<script>
+
+
+    function fn_addNotch() {
+        var url = "@Url.Action("add_Notch", "Release")";
+        var officeID = $("#offs").val();
+        if (officeID == 0 || officeID == null || officeID == '' || officeID == "") {
+            swal({
+                title: "Error!",
+                text: "PLEASE Select Office",
+                timer: 3000,
+                type: "error",
+                showConfirmButton: false
+            })
+
+        } else { 
+        $.get(url, {}, function (d) {
+            $('#addNotch_').html(d);
+        })
+
+        $('#addNotch_').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Add Note/Purpose").center().open();
+
+    }
+    }
+
+    function sorting_() {
+
+        if (document.getElementById('is_sort').checked) {
+
+            document.getElementById("cake").value = 1;
+
+        } else {
+
+            document.getElementById("cake").value = 0;
+
+        }
+    }
+    function AA() {
+
+        if (document.getElementById('is_oldAA').checked) {
+            
+            document.getElementById("is_oldAA").value = 1;
+            //document.getElementById('hidetailsid').style.display = 'inline';
+            //document.getElementById('hidetailsid').disabled = false;
+
+        } else {
+            
+            document.getElementById("is_oldAA").value = 0;
+            //document.getElementById('hidetailsid').style.display = 'none';
+            //document.getElementById('hidetailsid').disabled = true;
+        }
+    }
+    function pocket_() {
+        
+        if (document.getElementById('is_pocket').checked) {
+            document.getElementById("is_pocket").value = 1;
+        } else {
+            document.getElementById("is_pocket").value = 0;
+        }
+    }
+
+    function notch_() {
+    
+        if (document.getElementById('is_notch').checked) {
+            document.getElementById('no_note').style.visibility = 'hidden';
+            document.getElementById('yes_note').style.visibility = 'visible';
+
+        } else {
+            document.getElementById('yes_note').style.visibility = 'hidden';
+            document.getElementById('no_note').style.visibility = 'visible';
+
+        }
+    }
+    function float_() {
+        if (document.getElementById('is_float').checked) {
+            $("#is_float").val(1)
+        }
+        else {
+            $("#is_float").val(0)
+        }
+    }
+    $(document).ready(function () {
+        $("#numeric").keydown(function (e) {
+            // Allow: backspace, delete, tab, escape, enter and .
+            if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+                // Allow: Ctrl+A, Command+A
+                (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+                // Allow: home, end, left, right, down, up
+                (e.keyCode >= 35 && e.keyCode <= 40)) {
+                // let it happen, don't do anything
+                return;
+            }
+            // Ensure that it is a number and stop the keypress
+            if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                e.preventDefault();
+            }
+        });
+    });
+   
+    function PrevDgsign(){
+        var officeID = $("#offs").val()
+        var ReportType = $('input[name=ReportTypeRadioButton]:checked').val();
+        var Year = $("#ddlYear").val()
+        var includeLBP1 = 0;
+        var includeLBP2_SP =0;
+        var userid=@Account.UserInfo.eid.ToString();
+        var includezero=0;
+        var lbp2export=0;
+        var reloadlbp2=0;
+        var sectoral=0;
+        var includeCOE=0;
+        var eco=0;
+        var month_ = $("#Months").val();
+       
+        var batch = $("#numerictextbox").val();
+        var sort_ = $("#cake").val();
+        var note_ = "";
+        var classtype = $("#classtype").val();
+        var expclass = $("#expclass").val();
+        var purposeid = "";//$("#purposeid").val();
+        var Fundtype = $("#classtype").val();
+        var packet = $("#is_pocket").val();
+        var reporthistory = $("#reporthistory").val();
+        var is_oldAA = $("#is_oldAA").val();
+        var is_float = $("#is_float").val();
+        var budgettype = $("#budgettype").val();
+        var dateissue = $("#dateissue").val();
+
+        var url = "@Url.Action("dgsignreport", "Report")";
+        swal({
+            title: "Confirmation!",
+            text: "Would you like to create a document for digital signature? \n\n",
+            type: "info",
+            showCancelButton: true,
+            closeOnConfirm: false,
+            confirmButtonColor: "#1fa67a",
+            confirmButtonText: "Yes",
+            showLoaderOnConfirm: true,
+        },
+         //$.ajax({
+         //    async: false,
+         //    dataType: 'html',
+         //    success: window.open("../Reports/ReportViewer.aspx?rid=10&OfficeID=" + officeID + "&Year=" + year_ + "&classtype=" + classtype + "&month_=" + month_ + "&batch=" + batch + "&sort_=" + sort_ + "&note_="
+         //        + note_ + "&expclass=" + expclass + "&purposeid=" + purposeid + "&Fundtype=" + Fundtype + "&packet=" + packet + "&reporthistory=" + reporthistory + "&is_float=" + is_float + "&budgettype=" + budgettype + "&dateissue=" + dateissue + "")
+         //});
+        //$("#reporthistory").data("kendoComboBox").dataSource.read();
+            function (isConfirm) {
+                if (isConfirm) {
+                    $.post(url, { YearOf:Year,OfficeID:officeID, ReportTypeID:classtype,docuid:14,reloadlbp4:month_,includeLBP1:batch,pagnoid:$("#pagnoid").val(),includeLBP2_SP:expclass,eid:userid,includezero:includezero,lbp2export:Fundtype,reloadlbp2:reloadlbp2,sectoral:sectoral,includeCOE:dateissue,eco:budgettype,purpose:purposeid,note:note_,sort_:sort_  }, function (d) {
+                        if (d != "") {
+                            //swal.close();
+                            swal("Success","The document generated for digital signature has been sent via SMS and is now available for viewing.","success")
+                            $("#grid_aro").data("kendoGrid").dataSource.read()
+                            //success: window.open(d)
+                        }
+                        else {
+                            swal("Something Went Wrong!", d, "error");
+                        }
+                    })
+                }
+            })
+    }
+
+    function reqPrint() {
+        var officeID = $("#offs").val();
+        var year_ = $("#ddlYear").val();
+        var classtype = $("#classtype").val();
+        var month_ = $("#Months").val();
+        var batch = $("#numerictextbox").val();
+        var sort_ = $("#cake").val();
+        var note_ = "";
+        var expclass = $("#expclass").val();
+        var purposeid = "";//$("#purposeid").val();
+        var Fundtype = $("#classtype").val();
+        var packet = $("#is_pocket").val();
+        var reporthistory = $("#reporthistory").val();
+        var is_oldAA = $("#is_oldAA").val();
+        var is_float = $("#is_float").val();
+        var budgettype = $("#budgettype").val();
+        var dateissue = $("#dateissue").val();
+      
+        
+        if (officeID == 0 || officeID == null || officeID == '' || officeID == "") {
+            swal({
+                title: "Warning!",
+                text: "Please select an office...",
+                timer: 3000,
+                type: "warning",
+                showConfirmButton: false
+            })
+
+        } else if (dateissue == '') {
+            swal({
+                title: "Warning!",
+                text: "Please select the date of issuance!",
+                timer: 3000,
+                type: "warning",
+                showConfirmButton: false
+            })
+        }
+        else {
+            if (is_oldAA == 1) {
+                if (classtype == 3) {
+
+                    $.ajax({
+                        async: false,
+                        dataType: 'html',
+                        success: window.open("../Reports/ReportViewer.aspx?rid=16&OfficeID=" + officeID + "&Year=" + year_ + "&classtype=" + classtype + "&month_=" + month_ + "&batch=" + batch + "&sort_=" + sort_ + "&note_=" + note_ + "")
+                    });
+                } else {
+                    $.ajax({
+                        async: false,
+                        dataType: 'html',
+                        success: window.open("../Reports/ReportViewer.aspx?rid=101&OfficeID=" + officeID + "&Year=" + year_ + "&classtype=" + classtype + "&month_=" + month_ + "&batch=" + batch + "&sort_=" + sort_ + "&note_=" + note_ + "")
+                    });
+                }
+            }
+            else{
+                $.ajax({
+                    async: false,
+                    dataType: 'html',
+                    success: window.open("../Reports/ReportViewer.aspx?rid=10&OfficeID=" + officeID + "&Year=" + year_ + "&classtype=" + classtype + "&month_=" + month_ + "&batch=" + batch + "&sort_=" + sort_ + "&note_="
+                        + note_ + "&expclass=" + expclass + "&purposeid=" + purposeid + "&Fundtype=" + Fundtype + "&packet=" + packet + "&reporthistory=" + reporthistory + "&is_float=" + is_float + "&budgettype=" + budgettype + "&dateissue=" + dateissue + "")
+                });
+                $("#reporthistory").data("kendoComboBox").dataSource.read();
+                $("#grid_aro").data("kendoGrid").dataSource.read()
+            }
+
+
+        }
+    }
+
+
+    setTimeout(function () {
+        var todayDate = kendo.toString(kendo.parseDate(new Date()), 'MMMM');
+     //   $("#datepicker_desu").data("kendoDatePicker").value(todayDate);
+    }, 100);
+
+
+
+
+
+    var thisculture = kendo.culture();
+    thisculture.numberFormat.currency.symbol = '₱'; // Script For Changing The Currency Sign
+
+
+
+
+    setTimeout(function () {
+       $("#offs").data("kendoComboBox").dataSource.read();
+    }, 100);
+
+
+
+
+
+
+    function ocake() {
+        //setTimeout(function () {
+            fn_dprefresher();
+            
+            $("#reporthistory").data("kendoComboBox").dataSource.read();
+        //}, 1000);
+    }
+
+
+    function repris() {
+        $("#offs").data("kendoComboBox").dataSource.read();
+        }
+
+    function Select_Office() {
+
+        var classtype = $("#classtype").val();
+
+        if (classtype == null || classtype == "") {
+
+            return { classtype: 2 }
+        }
+        else {
+            return { classtype: classtype }
+        }
+        }
+        function fn_dprefresherOOied() {
+         
+        }
+        function fn_dprefresherprogs() {
+           
+        }
+    function fn_dprefresher() {
+        getMax()
+        getbatchno()
+        $("#reporthistory").data("kendoComboBox").dataSource.read();
+    }
+    function Reporthistory() {
+        return {
+            office: $("#offs").val(),
+            yearof: $("#ddlYear").val()
+        }
+    }
+    function getwfparconsol() {
+
+        var officeid= $("#offs").val() ==""? 0 : $("#offs").val()
+        var year = $("#ddlYear").val() ==""? 2025 :  $("#ddlYear").val()
+      
+        return {
+            year: year,
+            officeid:officeid
+          }
+    }
+    function rtpwfp(docid){
+        //if (status == "Ready To Print" && gov_sig == 344880){
+        //success: window.open("https://pgas.ph/bmsattachment/" + reportpdf)
+        //success: window.open("https://pgas.ph/dgsign/blank/getPDF_View?pdfData=application/pdf&FormID="+ docid )
+        //success: window.open("https://pgas.ph/dgsign/blank/getPDF_digital_only?pdfData=application/pdf&FormID="+ docid +"") //viewing only
+        success: window.open(" https://pgas.ph/dgsign/blank/keuitughhjugjugah?doc_id=" + docid + "") //with signature status
+        //}
+    }
+    function searchAccount() {
+        var $filter = new Array();
+        var peritem = $("#chkwfpperitem").val();
+        $filter = [];
+
+       
+        if ($('#SearchData_aro').val().length > 0) {
+            $filter.push({ field: "office", operator: "contains", value: $('#SearchData_aro').val() }),
+            $filter.push({ field: "arono", operator: "contains", value: $('#SearchData_aro').val() })
+        }
+
+        $('#grid_aro').data('kendoGrid').dataSource.filter({
+            logic: "or",
+            filters: $filter
+        });
+    }
+
+    $(function () {
+        $("#SearchData_aro").keypress(function (e) {
+            if (e.keyCode == 13) {
+                searchAccount();
+            }
+        });
+    });
+</script>
+
+<h2><span class="fa fa-print"></span> Allotment Release Order Report</h2>
+<br /><br />
+
+<div style="float: none;clear:both;">
+    <div style="float:left;margin-left:50px;margin-top:2px;">
+        <label>
+            Fund Type :
+        </label>
+    </div>
+    <div style="float:left;margin-left:56px;margin-top:0px;">
+        @(Html.Kendo().DropDownList()
+                            .Name("classtype")
+                            .DataTextField("Class_Type")
+                            .DataValueField("Class_ID")
+                            .SelectedIndex(0)
+                            .HtmlAttributes(new { @style = "width: 160px;" })
+                            .DataSource(source => source.Read(read => read.Action("ddlClassesARO", "Dropdowns")))
+                            .Events(e => e.Change("repris"))
+        )
+
+    </div>
+  
+    <div style="float: left;margin-left:-350px;margin-top:38px;">
+        <label style="float:left;margin-left: 50px;">   
+            Office    :
+        </label>
+    </div>
+
+    <div style="float: left;margin-left:190px;margin-top:5px;">
+
+        @(Html.Kendo().ComboBox()
+                            .Name("offs")
+                            .DataTextField("OfficeName")
+                            .DataValueField("OfficeID")
+                            .Placeholder("Select office...")
+                            .Filter("contains")
+                            .MinLength(1)
+                            .HtmlAttributes(new { @style = "width: 500px;" })
+                            .Events(e => e.Change("fn_dprefresher"))
+                            .DataSource(source => source.Read(read => read.Action("GetOffice_MO", "Release").Data("Select_Office")))
+        )
+
+
+
+    </div>
+    <div style="float: left;margin-right:10px;margin-top:10px;">
+        <label style="float:left;margin-left: 50px;">
+            Expense Class    :
+        </label>
+    </div>
+    <div style="float:left;margin-left:21px;margin-top:5px;">
+        @(Html.Kendo().DropDownList()
+            .Name("expclass")
+            .DataTextField("Text")
+            .DataValueField("Value")
+            .BindTo(new List<SelectListItem>() {
+                new SelectListItem() {
+                    Text = "All",
+                    Value = "0"
+                },
+                new SelectListItem() {
+                    Text = "PS",
+                    Value = "1"
+                },
+                new SelectListItem() {
+                    Text = "MOOE",
+                    Value = "2"
+                },
+                new SelectListItem() {
+                    Text = "CO",
+                    Value = "3"
+                },
+                new SelectListItem() {
+                    Text = "FE",
+                    Value = "4"
+                }
+            })
+            .SelectedIndex(0)
+            .HtmlAttributes(new { style = "width: 160px" })
+        )
+
+
+    </div>
+
+    <div style="height:10px;">
+
+    </div>
+
+
+    <div id="MonthDepartment" style="float: none;clear:both; margin-top: 20px">
+
+        <div style="float:left;margin-left:51px;margin-top:10px;">
+            <label>
+                Month of     :
+            </label>
+        </div>
+        <div style="float:left;margin-left:63px;margin-top:5px;">
+            @(Html.Kendo().DropDownList()
+            .Name("Months")
+            .DataTextField("Text")
+            .DataValueField("Value")
+            .Events(e => e.Change("fn_dprefresher"))
+            .BindTo(new List<SelectListItem>() {
+                new SelectListItem() {
+                    Text = "JANUARY",
+                    Value = "1"
+                },
+                new SelectListItem() {
+                    Text = "FEBUARY",
+                    Value = "2"
+                },
+                new SelectListItem() {
+                    Text = "MARCH",
+                    Value = "3"
+                },
+                new SelectListItem() {
+                    Text = "APRIL",
+                    Value = "4"
+                },
+                new SelectListItem() {
+                    Text = "MAY",
+                    Value = "5"
+                },
+                new SelectListItem() {
+                    Text = "JUNE",
+                    Value = "6"
+                },
+                new SelectListItem() {
+                    Text = "JULY",
+                    Value = "7"
+                },
+                new SelectListItem() {
+                    Text = "AUGUST",
+                    Value = "8"
+                },
+                new SelectListItem() {
+                    Text = "SEPTEMBER",
+                    Value = "9"
+                },
+                new SelectListItem() {
+                    Text = "OCTOBER",
+                    Value = "10"
+                },
+                new SelectListItem() {
+                    Text = "NOVEMBER",
+                    Value = "11"
+                },
+                new SelectListItem() {
+                    Text = "DECEMBER",
+                    Value = "12"
+                }
+            })
+            .Value(@ViewBag.MonthVaue)
+            .HtmlAttributes(new { style = "width: 160px" })
+            )
+
+
+        </div>
+
+        <div style="float:left;margin-left:51px;margin-top:43px;position:absolute">
+            <label>
+                Year :
+            </label>
+        </div>
+        <div style="float:left;margin-left:190.5px;margin-top:39px;position:absolute">
+
+            @(Html.Kendo().DropDownList()
+                        .Name("ddlYear")
+                        .DataTextField("ProposalYear")
+                        .DataValueField("ProposalYear")
+                        .SelectedIndex(0)
+                        .HtmlAttributes(new { @style = "width: 95px;" })
+                        .Events(e => e.Change("ocake"))
+                        .DataSource(source => source.Read(read => read.Action("GetPropYear3", "PYear")))
+            )
+
+
+        </div>
+   
+        <div style="float:left;margin-left:-298px;margin-top:78px;">
+            <label>
+                Budget Type :
+            </label>
+        </div>
+        <div style="float:left;margin-left:-160px;margin-top:73px;">
+            @(Html.Kendo().DropDownList()
+                .Name("budgettype")
+                .DataTextField("Text")
+                .DataValueField("Value")
+                .BindTo(new List<SelectListItem>() {
+                new SelectListItem() {
+                    Text = "Annual",
+                    Value = "1"
+                },
+                new SelectListItem() {
+                    Text = "Supplemental",
+                    Value = "2"
+                },
+                new SelectListItem() {
+                    Text = "Reenacted",
+                    Value = "3" 
+                },
+                
+            })
+            .SelectedIndex(0)
+            .HtmlAttributes(new { @style = "width: 160px;" })
+            )
+
+        </div>
+        <div style="float: left;margin-left:-298px;margin-top:112px;">
+            <label>
+                Batch :
+            </label>
+        </div>
+        <div style="float:left;margin-left:-160px;margin-top:107px;">
+            <input type="number" id="numerictextbox" name="numerictextbox" value="1" min="1" style="width:47px" />
+            
+
+        </div>
+        <div style="float:left;margin-top:137px;margin-left:-240px">
+            <div style="float:left;margin-left:-58px;margin-top:8px;">
+                <label>
+                    Date Issue :
+                </label>
+            </div>
+            <div style="float:left;margin-left:53.5px;margin-top:3px;">
+                @(Html.Kendo().DatePicker()
+                       .Name("dateissue")
+                      .Start(CalendarView.Month)
+                      .Depth(CalendarView.Month)
+                      .Format("MM/dd/yyyy")
+                      .HtmlAttributes(new { style = "width: 160px" })
+                )
+
+            </div>
+            
+        </div>
+        <div style="float:left;margin-top:177px;margin-left:-240px">
+            <div style="float:left;margin-left:-58px;margin-top:1px;">
+                <label>
+                    Report History :
+                </label>
+            </div>
+            <div style="float:left;margin-left:23.5px;margin-top:-1px;">
+                @(Html.Kendo().ComboBox()
+                    .Name("reporthistory")
+                    .DataTextField("arono")
+                    .DataValueField("aro_id")
+                    .SelectedIndex(-1)
+                    .HtmlAttributes(new { @style = "width: 160px;" })
+                    .DataSource(source => source.Read(read => read.Action("ddlreport", "Dropdowns").Data("Reporthistory")))
+                    .Events(e => e.Change("repris"))
+                )
+            </div>
+        </div>
+        <div style="float:left;margin-top:215px;margin-left:140px;position:absolute">
+            <div style="float:left;margin-left:30px;margin-top:10px;">
+                <input type='checkbox' class='checkbox' id="is_oldAA" onclick=AA() /> <font style="font-size:15px">Old Report</font>
+            </div>
+            <div id="hidetailsid" style="float:left;margin-left:30px;margin-top:10px;">
+                <input type='checkbox' class='checkbox' id="is_sort" onclick=sorting_() /> <font style="font-size:15px">Hide Details</font>
+            </div>
+            <div style="float:left;margin-left:30px;margin-top:10px;">
+                <input type='checkbox' class='checkbox' id="is_notch" onclick=notch_() /> <font style="font-size:15px">Add Note/Purpose</font>
+            </div>
+            <div style="float:left;margin-left:30px;margin-top:10px;">
+                <input type='checkbox' class='checkbox' id="is_float" value="0"  onclick=float_() /> <font style="font-size:15px">Float</font>
+            </div>
+            <div style="float:left;margin-left:72px;margin-top:10px;display:none">
+                <input type='checkbox' class='checkbox' id="is_pocket" value="1" checked onclick=pocket_() /> <font style="font-size:15px">Enable Report Packet</font>
+            </div>
+        </div>
+        <div style="float:left;margin-top:240px;">
+            <div >
+                <div id="" class="k-button k-button-icontext" style="width: 152px;float:left; margin-top: 0px; margin-left:390px; margin-bottom:5px;border-radius:50px;background-color:cornflowerblue;color:white" onclick="PrevDgsign()"><span class="mif-printer"></span> Preview Via Dgsign</div>
+                <div id="no_note" class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 102px;float:right; margin-top: 0px; margin-right:105px; margin-bottom:5px;border-radius:50px;background-color:cornflowerblue;color:white" onclick="reqPrint()"><span class="mif-printer"></span> Preview</div>
+                <div id="yes_note" class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 90px;float:left; margin-top: -34px; margin-left:550px; margin-bottom:5px;border-radius:50px;visibility:hidden" onclick="fn_addNotch()"><span class="fa fa-plus-circle"></span> Add</div>
+
+             </div>
+            
+        </div>
+        </div>
+</div>
+<div id="searchAccountid" style="height: 30px; margin-top: 10px; float: right; color:cornflowerblue">
+    <input type="text" style="width:212px;border-collapse:collapse;margin:0px;border-style:solid;margin-left:0px;height:70%;outline:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search..." id="SearchData_aro" name="SearchData_aro">
+    <div class="k-button k-button-icontext" style="height:30px;width:40px;border-style:solid;" onclick="searchAccount()"><span class="mif-search"></span></div>
+</div>
+<div style="display:inline-block;margin-top:5px;">
+    <div style="display:inline-block;width:100%;margin-top:-5px;">
+        @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.WFPrepare>()
+            .Name("grid_aro")
+            .HtmlAttributes(new { style = "" })
+            .Scrollable()
+            .Columns(col =>
+            {
+                col.Template(@<text></text>)
+            .HeaderTemplate(@<text>ID</text>)
+            .Width(10)
+            .HtmlAttributes(new { style = "text-align:left;;font-size:12px;vertical-align:top" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=trnno# </div>");
+
+                col.Template(@<text></text>)
+            .HeaderTemplate(@<text>Office</text>)
+            .Width(50)
+            .HtmlAttributes(new { style = "text-align:left;;font-size:12px;vertical-align:top" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=office# </div>");
+                col.Template(@<text></text>)
+            .HeaderTemplate(@<text>office id</text>)
+            .Width(0)
+            .Hidden()
+            .HtmlAttributes(new { style = "text-align:left;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=officeid# </div>");
+          
+                col.Template(@<text></text>)
+            .HeaderTemplate(@<text>ARO No.</text>)
+            .Width(50)
+            .HtmlAttributes(new { style = "text-align:left;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=arono# </div>");
+
+                col.Template(@<text></text>)
+            .HeaderTemplate(@<text></text>)
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:10px;color:beige;" })
+            .ClientTemplate(
+                "<div style='cursor:pointer' onclick='rtpwfp(#=docid#)'><span class='fa fa-print' title='Click to preview ARO!' style='font-size: 16px;margin-top: -1px;margin-left: 1px;margin-right:1px;width:25px;text-align:center;cursor:pointer;'></span>ARO</div> ")
+            .HtmlAttributes(new { style = "vertical-align: middle;text-align:center;vertical-align:top" })
+            .Width(55);
+        
+                col.Bound(m => m.docid)//Template(@<text></text>)
+            .HeaderTemplate(@<text>document ID</text>)
+            .Width(0)
+            .Hidden()
+            .HtmlAttributes(new { style = "text-align:left;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=docid# </div>");
+            })
+          
+            //   .Editable(editable => editable.Mode(GridEditMode.InCell))
+            .Resizable(e => e.Columns(true))
+            .Pageable(pageable => pageable
+            .Refresh(true)
+            .ButtonCount(1))
+            .Scrollable()
+            //.HtmlAttributes(new { @class = "table-responsive", style = "height:410px;" })
+            .HtmlAttributes(new { @class = "table-responsive", style = "height:355px;" })
+            .Selectable()
+            //  .Events(e => e.DataBound("onDataBoundWFP"))
+            .DataSource(dataSource => dataSource
+            .Ajax()
+            .Batch(true)
+            .Model(m => m.Id(i => i.locationid))
+            .ServerOperation(false)
+            .PageSize(5000)
+            .Read(read => read.Action("GetAROdetail", "Report").Data("getwfparconsol"))
+            )
+         )
+    </div>
+</div>
+<div style="float:left;margin-left:474px;margin-top:-5px;">
+    <input type="text" style="width:140px" name="cake" id="cake" value="0" hidden disabled>
+</div>
+
+
+@(Html.Kendo()
+.Window()
+.Name("addNotch_")
+.Title("Entry Note")
+.Width(495)
+.Height(350)
+.Visible(false)
+.Modal(true)
+.Draggable(true)
+.AutoFocus(true)
+.Animation(a => { a.Open(o => o.SlideIn(SlideDirection.Down));
+    a.Close(c => { c.SlideIn(SlideDirection.Down); c.Reverse(true);
+    });
+})
+.Actions(a => { a.Close(); 
+}))
+
+<style>
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        opacity: 1;
+    }
+</style>
+<script>
+
+    setTimeout(function () {
+        var todayDate = kendo.toString(kendo.parseDate(new Date()), 'M/d/yyyy');
+        $("#dateissue").data("kendoDatePicker").value(todayDate);
+       
+    }, 100);
+    $(document).ready(function(){
+        $("#grid_aro").data("kendoGrid").dataSource.read()
+    })
+
+        function getMax() {
+
+            var url = "@Url.Action("getMax", "Release")";
+
+            var office_id = $('#offs').val()
+            var month_ = $('#Months').val()
+            var year_ = $("#ddlYear").val();
+
+            $.post(url, { office_id: office_id, month_: month_, year_: year_ }, function (e) {
+
+                $("#numerictextbox").attr({
+                    "value": 1,
+                    "max": e,        // substitute your own
+                    "min": 0          // values (or variables) here
+                });
+
+            })
+        }
+
+        function getbatchno() {
+            var url = "@Url.Action("numeric_des", "Release")";
+
+            var office_id = $("#offs").val() == "" ? 0 : $("#offs").val();
+            var year_ = $("#ddlYear").val();
+            var selmonth = $("#Months").val();
+            if (office_id != 0) {
+                $.get(url, { office_id: office_id, program_id: 0, account_id: 0, year_: year_, month_: selmonth }, function (d) {
+
+                    if (d == null || d == 0 || d == "" || d == '') {
+                        $("#numerictextbox").val(1);
+                    }
+                    else {
+                        $("#numerictextbox").val(d);
+                    }
+                })
+            } 
+        }
+
+</script>

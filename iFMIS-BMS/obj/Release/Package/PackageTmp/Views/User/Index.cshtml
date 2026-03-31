@@ -1,0 +1,212 @@
+﻿@{
+    ViewBag.Title = "Users";
+}
+
+<script>
+
+
+
+    function reqAddOffice() {
+        $(window).scrollTop(0);
+        var url = "@Url.Action("pv_AddOfficeViews", "User")";
+        var eid = $("#ddlEmployees").val()
+        if (eid == 0 || eid == null) {
+            alert("PLEASE SELECT EMPLOYEE BEFORE YOU ADD")
+        } else {
+            $.get(url, {User_ID:0, eid: eid,officeid:0, UserTypeID:0 }, function (d) {
+
+
+
+                $('#NewOfficeWindow').html(d);
+                $('#NewOfficeWindow').data('kendoWindow').center().open();
+            })
+
+        }
+    }
+
+    function reqEdit(e) {
+        $(window).scrollTop(0);
+        var data = this.dataItem($(e.currentTarget).closest("tr"));
+        var url = "@Url.Action("pv_AddOfficeViews", "User")";
+        var eid = $('#ddlEmployees').val()
+        $.get(url, { User_ID: data.User_ID,eid:eid, officeid:data.IFMISOfficeID, UserTypeID:data.UserTypeID}, function (d) {
+            $('#NewOfficeWindow').html(d);
+        })
+        $('#NewOfficeWindow').data('kendoWindow').title("Edit").center().open();
+    }
+
+
+    function reqRemove(e) {
+        var data = this.dataItem($(e.currentTarget).closest("tr"));
+        var url = "@Url.Action("RemoveUserNew", "User")";
+        var eid = $('#ddlEmployees').val()
+        swal({
+            title: "Delete User Access?",
+           // text: "Delete User Type?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes",
+            closeOnConfirm: false
+        }, function () {
+            $.post(url, { User_ID: data.User_ID, eid: eid }, function (d) {
+                if (d == 1) {
+                    swal({ title: "Success!", text: "User access has been removed!", timer: 1000, showConfirmButton: false, type: "success" });
+
+                    $('#OfficeGrid').data('kendoGrid').dataSource.read();
+                }
+                else {
+                    swal("Something Went Wrong!", d, "error");
+                }
+            })
+        });
+    }
+
+    function Refresher() {
+        $("#OfficeGrid").data("kendoGrid").dataSource.read();
+        var eid = $('#ddlEmployees').val() //selected employee from the list
+        if (eid == 5580 &&  @Account.UserInfo.eid == 5580) {
+            $("#divSubmitID").css("display","normal")
+            $("#divExecutionid").css("display","normal")
+            $("#divWFPSubmitID").css("display","normal")
+        }
+        else {
+            $("#divSubmitID").css("display", "none")
+            $("#divExecutionid").css("display", "none")
+            $("#divWFPSubmitID").css("display", "none")
+        }
+    }
+    function readEmp() {
+        var eid = $('#ddlEmployees').val()
+
+        return {
+            eid: eid
+
+        }
+    }
+
+    function endisubmitbudget() {
+        var url = "@Url.Action("EnableSubmit", "User")";
+        if (document.getElementById('enablesubmitid').checked &&  @Account.UserInfo.eid == 5580) {
+            document.getElementById("enablesubmitid").value = 1;
+        }
+        else {
+            document.getElementById("enablesubmitid").value = 0;
+        }
+        $.post(url, { enablesubmit: $("#enablesubmitid").val() }, function (d) {
+        })
+
+    }
+
+    function isubmitwfp_click(){
+        
+        var url = "@Url.Action("EnableSubmitWFP", "User")";
+        if (document.getElementById('enablesubmitwfpid').checked &&  @Account.UserInfo.eid == 5580) {
+            document.getElementById("enablesubmitwfpid").value = 1;
+        }
+        else {
+            document.getElementById("enablesubmitwfpid").value = 0;
+        }
+        $.post(url, { enablesubmit: $("#enablesubmitwfpid").val() }, function (d) {
+        })
+    }
+    function executionid(){
+        var url = "@Url.Action("EnableExecution", "User")";
+        if (document.getElementById('executionid').checked &&  @Account.UserInfo.eid == 5580) {
+            document.getElementById("executionid").value = 1;
+        }
+        else {
+            document.getElementById("executionid").value = 0;
+        }
+        $.post(url, { enablexecution: $("#executionid").val() }, function (d) {
+        })
+    }
+</script>
+
+<h2>Add/Update Users</h2>
+
+<div>
+    <label style="margin-left: 0px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px; display : inline-block">
+        Employee : @(Html.Kendo().ComboBox()
+                         .Name("ddlEmployees")
+                         .DataTextField("empName")
+                         .DataValueField("eid")
+                         .Filter("contains")
+                         .MinLength(1)
+                         .Placeholder("Select Employee...")
+                         .HtmlAttributes(new { @style = "width: 250px;" })
+                         .DataSource(source => source.Read(read => read.Action("ddlEmployee", "User")))
+                        .Events(e => { e.Change("Refresher"); })
+        )
+    </label>
+</div>
+<div id="divSubmitID" style="float:left;margin-top:-30px;margin-left:420px;width:250px;display:none">
+    <label style="font-size:12px;">Enable submit button</label>
+    <input type="checkbox" id="enablesubmitid" style="float:left;margin-top:-16px;margin-left:-18px;zoom:1.5" onclick="endisubmitbudget()" />
+</div>
+
+<div id="divWFPSubmitID" style="float:left;margin-top:-30px;margin-left:620px;width:250px;display:none">
+    <label style="font-size:12px;">ESW</label>
+    <input type="checkbox" id="enablesubmitwfpid" style="float:left;margin-top:-16px;margin-left:-18px;zoom:1.5" onclick="isubmitwfp_click()" />
+</div>
+
+
+<div id="divExecutionid" style="float:left;margin-top:-5px;margin-left:420px;width:250px;display:none">
+    <label style="font-size:12px;">Office Execution</label>
+    <input type="checkbox" id="executionid" style="float:left;margin-top:-16px;margin-left:-18px;zoom:1.5" onclick="executionid()" />
+</div>  
+
+<div style="width : 100%; margin-top: 20px;border-style: solid; border-color: #1fa67a">
+
+    <div style="width:100%;height : 25px ; background-color:#1fa67a; color: white">
+        <label class="fa fa-user-plus fa-lg" style="margin-left: 5px; display:inline-block">  User Menu</label>
+    </div>
+
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.UserOfficeRole>()
+    .Name("OfficeGrid")
+    .Columns(col =>
+    {
+        col.Bound(m => m.Office_Name).Title("Office");
+        col.Bound(m => m.UserTypeDesc).Title("User Type");
+        col.Bound(m => m.IFMISOfficeID).Hidden();
+        col.Bound(m => m.UserTypeID).Hidden();
+        col.Command(c =>
+        {
+            c.Custom("btnEdit")
+                .Click("reqEdit")
+                .Text("<span id='' title='Click to edit access right!' class='fa fa-pencil'> </span>");
+            c.Custom("btnRemove")
+                .Click("reqRemove")
+                .Text("<span id='' title='Click to remove access right!' class='fa fa-trash' style='color:red;'> </span>");
+        }).Width(155);
+    })
+
+    .DataSource(d => d
+    .Ajax()
+    .PageSize(10)
+    .Model(m => m.Id(i => i.User_ID))
+    .Read(read => read.Action("LoadUserOffice", "User").Data("readEmp")))
+
+
+   .ToolBar(t => t.Template(@<text>
+        <div class="k-button" onclick="reqAddOffice()" style="float: left;"><span class="k-icon k-i-plus" style="margin-left: -2px;margin-right: 3px;margin-top: 0px;margin-bottom: 3px;"></span>Add Office</div>
+</text>))
+        .Pageable(page => page.Refresh(true)
+        .Enabled(true)
+        .ButtonCount(4)
+        .PreviousNext(true)
+        )
+        .Selectable()
+
+    )
+    @(Html.Kendo().Window().Name("NewOfficeWindow").Title("New Entry").Width(770).Height(510).Visible(false).Modal(true).Draggable(true).AutoFocus(true).Animation(a => { a.Open(o => o.SlideIn(SlideDirection.Down)); a.Close(c => { c.SlideIn(SlideDirection.Down); c.Reverse(true); }); }).Actions(a => { a.Close(); }))
+
+
+
+
+
+
+</div>
+
+
+

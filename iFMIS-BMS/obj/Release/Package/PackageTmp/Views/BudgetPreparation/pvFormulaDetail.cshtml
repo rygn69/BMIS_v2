@@ -1,0 +1,172 @@
+﻿@model iFMIS_BMS.BusinessLayer.Models.AccountComputationModel
+<script>
+    var thisculture = kendo.culture();
+    thisculture.numberFormat.currency.symbol = '₱';
+
+
+    function GetGridParameter() {
+        var grid = $('#EmployeeSalaryGrid').data('kendoGrid');
+        var AccountCode = @Model.AccountCode;
+        //var officeID = @Account.UserInfo.Department.ToString();
+        var officeID = @Session["selectedOfficeID"];
+        var refYear = @Session["selectedYear"];
+        return {
+            AccountCode : AccountCode,
+            officeID: officeID,
+            refYear:refYear
+        }
+        dataBound: gridDataBound
+    }
+    function gridDataBound(e) {
+        var grid = e.sender;
+        if (grid.dataSource.total() == 0) {
+            var colCount = grid.columns.length;
+            $(e.sender.wrapper)
+                .find('tbody')
+                .append('<tr class="kendo-data-row"><td colspan="' + colCount + '" class="no-data">Sorry, no data :(</td></tr>');
+        }
+    }
+    function reqClose() {
+        //var g = $("#EmployeeSalaryGrid").data("kendoGrid");
+        //g.dataSource.group({ field: "Employee Status"});
+
+        //g.destroy();
+        //g.dataSource.read();
+        document.documentElement.style.overflow = 'auto';  // firefox, chrome
+        document.body.scroll = "yes";
+        $("#FormulaDetails").data("kendoWindow").close();
+    }
+    function Sample() {
+        alert('asdsad');
+    }
+
+    @*function TransferToOtherOffice(EmployeeID) {
+        var url = "@Url.Action("ShowTransferToOtherOfficeWindow", "BudgetPreparation")";
+        $.get(url,{EmployeeID:EmployeeID},function (pvData)
+        {
+            $(window).scrollTop(0);
+            $('#TransferOffice').html(pvData);
+            $('#TransferOffice').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Transfer Office").center().open();
+        })
+    }*@
+
+    @using System.Globalization
+    @{
+        var ComputedAmount = "₱" + string.Format(new CultureInfo("en-US"), "{0:N2}", Model.ComputedAmount);
+        var TotalBasicSalary = "₱" + string.Format(new CultureInfo("en-US"), "{0:N2}", Model.totalBasicSalary);
+        var Amount = "₱" + string.Format(new CultureInfo("en-US"), "{0:N2}", Model.Amount);
+        var MaxSalaryBase = string.Format(new CultureInfo("en-US"), "{0:N2}", Model.MaxAmount);
+    }
+
+</script>
+<div style="display:inline-block; width:100%; margin-bottom:5px;">
+    <span id="Note" style="color:red; display:inline-block;"></span>
+</div>
+    
+@(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.EmployeeSalaryModel>()
+    .Name("EmployeeSalaryGrid")
+    .Columns(col =>
+    {
+        col.Bound(m => m.EmployeeID).Title("EmployeeID").Hidden();
+
+        col.Template(@<text></text>)
+        .HeaderTemplate(@<text><div style="font-weight:600;">Employee</div></text>)
+        .HtmlAttributes(new { style = "text-align:left" })
+        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+        .ClientTemplate("<div>#=EmployeeName# </div>")
+        .ClientGroupFooterTemplate("<div style='font-weight:700;color:black'>Sub Total<div>")
+        .ClientFooterTemplate("<div style='color:darkgreen;'><Label>Total  </label></div>");
+
+        col.Template(@<text></text>)
+        .HeaderTemplate(@<text><div style="font-weight:600;">Basic Salary</div></text>)
+        .HtmlAttributes(new { style = "text-align:center" })
+        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+        .ClientTemplate("<div>#=kendo.toString(BasicSalary, 'c2')# </div>");
+
+        col.Bound(c => c.AmountUsed)
+        .HeaderTemplate(@<text><div style="font-weight:600;">Amount Used in formula</div></text>)
+        .HtmlAttributes(new { style = "text-align:center" })
+        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+        .ClientGroupFooterTemplate("<div style='text-align:center; font-weight:700;color:black'>#=kendo.toString(sum, 'c2')# </div>")
+        .ClientFooterTemplate("<div style='text-align:center; font-weight:700;color:darkgreen'><label>#=kendo.toString(sum, 'c2')# </label></div>");
+
+        col.Bound(c => c.GivenAmount)
+        .HeaderTemplate(@<text><div style="font-weight:600;">Given Amount</div></text>)
+        .HtmlAttributes(new { style = "text-align:center" })
+        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+        .ClientGroupFooterTemplate("<div style='text-align:center; font-weight:700;color:black'>#=kendo.toString(sum, 'c2')# </div>")
+        .ClientFooterTemplate("<div style='text-align:center;color:darkgreen'><label>#=kendo.toString(sum, 'c2')# </label></div>");
+
+        col.Bound(e => e.EmployeeStatus).Hidden()
+        .ClientGroupHeaderTemplate("<label style='display:inline-block'>#= value # : #=count#</label>");
+
+        //if (Account.UserInfo.UserTypeDesc == "Budget Committee / Local Finance Committee")
+        //{
+        //    col.Template(t => { }).ClientTemplate(
+        //    "<div class='btn-delete'style='inline-block; height: 15px;width:84px'> <a  title='Transfer to Other Office' onclick='TransferToOtherOffice(#=EmployeeID#)'><span class='fa fa-copy' style='font-size: 12pt;'></span></a></div>"
+        //    ).HtmlAttributes(new { style = "margin-left:5px;" }).Width(50);
+        //}
+        
+
+
+    })
+    .Selectable()
+    .DataSource
+    (
+        d => d
+        .Ajax()
+        .Batch(true)
+        .ServerOperation(false)
+        .Aggregates(a => {
+            a.Add(c => c.GivenAmount).Sum();
+            a.Add(c => c.AmountUsed).Sum();
+            a.Add(c => c.EmployeeStatus).Count();
+        })
+        .Model(m => m.Id(i => i.EmployeeID))
+        .Group(g => g.Add(c => c.EmployeeStatus))
+        .Read(read => read.Action("grEmployeeSalaryData", "BudgetPreparation").Data("GetGridParameter"))
+   // ).Groupable(g => g.ShowFooter(true).Messages(m => m.Empty("<div class='k-button k-button-icontext' onclick='Sample()'>Group</div>")))
+    ).Groupable(g => g.ShowFooter(true).Messages(m => m.Empty("")))
+    .Scrollable(s => s.Enabled(true))
+    .HtmlAttributes(new { style = "height: 520px" })
+)
+<div style="float:right">
+    <div id="btnclose" class="k-button k-button-icontext" style="margin-bottom:5px;display:inline-block;width: 80px;clear:both; margin-top:5px;" onclick="reqClose()">Close</div>
+</div>
+
+@(Html.Kendo().Window()
+    .Name("TransferOffice")
+    .Title("Transfer Office")
+    .Width(565)
+    .Height(210)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(true)
+    .AutoFocus(true)
+    .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        }).Actions(a => { a.Close(); }))
+
+
+<script>
+    $(document).ready(function () {
+
+
+        if (@Model.Amount == 0) {
+            $("#EmployeeSalaryGrid").data("kendoGrid").hideColumn(4);
+            document.getElementById('Note').innerHTML = "* Note Casual Employees Monthly Salary is Based on 22 Working Days Per Month";
+        }
+        else {
+            document.getElementById('Note').innerHTML = "";
+            $("#EmployeeSalaryGrid").data("kendoGrid").hideColumn(2);
+            $("#EmployeeSalaryGrid").data("kendoGrid").hideColumn(3);
+        }
+    });
+
+</script>

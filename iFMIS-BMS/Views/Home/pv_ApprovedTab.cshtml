@@ -1,0 +1,232 @@
+﻿
+<script type="text/javascript">
+
+
+    var thisculture = kendo.culture();
+    thisculture.numberFormat.currency.symbol = '₱';
+
+    function errorHandler(e) {
+        if (e.errors) {
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "\n";
+                    });
+                }
+            });
+            alert(message);
+        }
+    }
+
+    function searchAccount() {
+
+        var SearchProgramData = $("#SearchAccount").val();
+        var ProgramgGrid = $("#grd_ApprovedBudget").data("kendoGrid").dataSource;
+        ProgramgGrid.filter([
+            {
+                logic: "or",
+                filters: [{
+                    field: "AccountName",
+                    operator: "contains",
+                    value: SearchProgramData
+                },
+                {
+                    field: "OOE",
+                    operator: "contains",
+                    value: SearchProgramData
+                }]
+            }
+        ]);
+    }
+
+    document.getElementById('SearchAccount').onkeydown = function (event) {
+        if (event.keyCode == 13) {
+            searchAccount();
+        }
+    }
+
+    document.getElementById('SearchAccount').onkeyup = function () {
+        if (($(this).val() == '' || $(this).val() == 'Search Accounts') && $(this).attr('type') != 'hidden') {
+            searchAccount()
+        }
+    };
+
+    function onGridEdit(e) {
+        var gridName = $('#grd_ApprovedBudget').data('kendoGrid');
+        var dataRows = gridName.items();
+        var rowIndex = dataRows.index(gridName.select());
+        var ds = gridName.dataSource.view();
+        var ProposalDenominationCode = ds[rowIndex].ProposalDenominationCode;
+
+        if (ProposalDenominationCode == '1') {
+            this.closeCell();
+        } else if (ProposalDenominationCode != '1') {
+            this.closeCell();
+        }
+    }
+</script>
+<div style="width:100%;margin-top:5px;margin-bottom:2px;">
+    <p>Legends:</p>
+    <span class='fa fa-circle' style='color:blue;' id='circle-id'></span> <span> Have Denomination</span>
+</div>
+@(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Budget_Preparation.Approved>()
+    .Name("grd_ApprovedBudget")
+    .HtmlAttributes(new { style = "height:550px" })
+    .Scrollable()
+    .Columns(col =>
+    {
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;">Accounts</div></text>)
+                        .Width(230)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div>#=AccountName# </div>");
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Account Code</div></text>)
+                        .Width(75)
+                        .HtmlAttributes(new { style = "text-align:center;height:30px" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div onclick=onGridClick()>#=AccountCode# </div>");
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Current Year <span id="actualYearApproved"></span>  (Estimates)</div></text>)
+                        .Width(110)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center" })
+                        .ClientTemplate("<div>#=kendo.toString(Current_Year,'c2')# </div>");
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Budget Year <span id="estimatesYearApproved"></span>   (Proposed)</div></text>)
+                        .Width(120)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center" })
+                        .ClientTemplate("<div>#=kendo.toString(ProposalAmount,'c2')# </div>");
+        col.Bound(m => m.ProposalAllotedAmount)
+                        .HtmlAttributes(new { style = "font-weight:600;text-align:left; vertical-align: middle; overflow: visible; white-space: normal;" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Budget Year <span id="proposedYearApproved"></span> (Approved)</div></text>)
+                        .HeaderHtmlAttributes(new { style = "text-align:center" })
+                        .Width(120)
+                        .ClientTemplate(
+                                       "# if(ProposalDenominationCode == 1) { #" +
+                                       " <span class='fa fa-circle' style='color:blue;' id='circle-id'></span> #=kendo.toString(Budget_Year, 'c2')#" +
+                                       "# } else { #" +
+                                       "#=kendo.toString(Budget_Year, 'c2')#" +
+                                       "# } #"
+                                       );
+        col.Bound(m => m.ProposalDenominationCode).Title("Code").Hidden();
+        col.Bound(m => m.ProgramID).Title("Program ID").Hidden();
+        col.Bound(m => m.AccountID).Title("Account ID").Hidden();
+        col.Bound(m => m.ProposalDenominationCode).Title("Proposal Denomination Code").Hidden();
+        col.Bound(m => m.ProposalYear).Title("ProposalYear").Hidden();
+        col.Bound(m => m.OOE).Title("OOE").Hidden();
+    })
+
+           .ToolBar(toolbar =>
+           {
+              toolbar.Template(@<text>
+                <div style="float: right; height:28px;margin-top:2px;">
+                    <link href="~/Content/metroui/css/docs.css" rel="stylesheet" />
+                    <div style="background-color:white;border:solid;border-color:whitesmoke;border-width:thin;width:320px;height:30px;float:right;padding:0px;margin-top:-3px;" id="search">
+                        <input type="text" style="width:260px;border-collapse:collapse;border-color:white;margin:0px;margin-left:-10px;height:70%;outline:none;border-left-style:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search Accounts" id="SearchAccount" name="SearchAccount">
+                        <div class="k-button k-button-icontext" style="height:29px;width:40px;margin-top:0.6px;" onclick="searchAccount()"><span class="mif-search"></span></div>
+                    </div>
+                </div>
+            </text>);
+           })
+       .Pageable(page => page.Refresh(true)
+            .Enabled(true)
+            .ButtonCount(4)
+            .PreviousNext(true)
+       )
+       .ClientDetailTemplateId("template_approved")
+       .Selectable()
+       .DataSource(d => d
+       .Ajax()
+       .Batch(true)
+       .PageSize(10)
+       .Model(m => m.Id(i => i.AccountID))
+       .Read(read => read.Action("BudgetInCharge_ApproveAccounts", "Home").Data("DataParameter")))
+
+)
+<script id="template_approved" type="text/kendo-tmpl">
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.AccountDenomination>()
+            .Name("grid_#=AccountID#")
+            .HtmlAttributes(new { style = "width:650px;" })
+            .Columns(columns =>
+            {
+                columns.Template(@<text></text>)
+                        .HeaderTemplate(@<text>
+        <div style="font-weight:600;">Particular Name</div></text>)
+                        .HeaderHtmlAttributes(new { style = "text-align:left" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center" })
+                        .Width(370)
+                        .ClientTemplate(
+                         "\\# if( isPPMP == 1) { \\# " +
+                        "<div> <span class='fa fa-circle' style='color:blue'></span> \\#=DenominationName\\# </div>" +
+                        "\\# } else if(isPPMP == 0){ \\#" +
+                        "<div>\\#=DenominationName\\# </div>" +
+                        "\\# } \\#");
+                columns.Bound(e => e.AccountDenominationID).Hidden();
+                columns.Template(@<text></text>)
+                        .HeaderTemplate(@<text>
+        <div style="font-weight:600;">Qty/%</div></text>)
+                        .HtmlAttributes(new { style = "text-align:center" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div>\\#=kendo.toString(QuantityPercentage)\\# </div>").Width(80);
+                columns.Template(@<text></text>)
+                        .HeaderTemplate(@<text>
+        <div style="font-weight:600;">Months</div></text>)
+                        .HtmlAttributes(new { style = "text-align:center" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div>\\#=kendo.toString(DenominationMonth)\\# </div>").Width(80);
+                columns.Template(@<text></text>)
+                        .HeaderTemplate(@<text>
+        <div style="font-weight:600;">Rate/Amount</div></text>)
+                        .Width(120)
+                        .HtmlAttributes(new { style = "text-align:left" })
+                        .HeaderHtmlAttributes(new { style = "text-align:left" })
+                        .ClientTemplate("<div>\\#=kendo.toString(DenominationAmount, 'c2')\\# </div>");
+                columns.Template(@<text></text>)
+                        .HeaderTemplate(@<text>
+        <div style="font-weight:600;">Total Amount</div></text>)
+                        .Width(130)
+                        .HtmlAttributes(new { style = "text-align:left" })
+                        .HeaderHtmlAttributes(new { style = "text-align:left" })
+                        .ClientTemplate("<div>\\#=kendo.toString(TotalDenominationAmount, 'c2')\\# </div>");
+                //columns.Bound(e => e.DenominationAmount).Width(150);
+            })
+.ToolBar(t => t.Template(@<text>
+                <div style="float: right; height:28px;margin-top:2px;">
+
+                    <link href="~/Content/metroui/css/docs.css" rel="stylesheet" />
+                    @* <div class="k-button" onclick="SubmitDenomination()"><span class="fa fa-cloud-upload"></span> <b>Save Particulars</b></div><div class="k-button" onclick="NewAccountsDenomination('#=AccountID#', '#=ProgramID#', '#=ProposalYear#')"><span class="fa fa-plus-circle"></span> Add New Particular </div> @*<div class="k-button" onclick="SaveChanges('#=AccountID#')"><span class="fa fa-check"></span> Save Changes</div> <div class="k-button" onclick="CancelChanges('#=AccountID#')"><span class="fa fa-close"></span> Cancel Changes</div>*@
+                </div>
+</text>))
+
+                                                            .Selectable()
+                                                            .Scrollable()
+                                                            .Pageable(page => page.Refresh(true)
+                                                                      .Enabled(true)
+                                                                      .ButtonCount(4)
+                                                                      .PreviousNext(true))
+                                                            .DataSource(dataSource => dataSource
+                                                                //.Batch(true)
+                                                                .Ajax()
+                                                                //.Aggregates(aggregates => aggregates.Add(m => m.DenominationAmount).Sum())
+                                                                .ServerOperation(false)
+
+                                                                .PageSize(10)
+                                                                .Model(m =>
+                                                                    {
+                                                                        m.Id(i => i.AccountDenominationID);
+
+                                                                    })
+                                                        .Read(read => read.Action("Proposal_AccountDenomination", "BudgetPreparation", new { ProgramID = "#=ProgramID#", AccountID = "#=AccountID#", ProposalYear = "#=ProposalYear#", OfficeID = Session["selectedOfficeID"] }))
+                                                        .Destroy(update => update.Action("EditingPopup_Destroy", "Grid"))
+                                                            )
+                                                            .Pageable()
+                                                            .ToClientTemplate()
+    )
+
+  
+
+</script>

@@ -1,0 +1,72 @@
+﻿
+<script>
+
+    function UpdateAuthor() {
+        var url = "@Url.Action("UpdateAuthor", "Maintenance")";
+        var eid = $("#ddlEmployees").val();
+        $.post(url, { eid: eid }, function (d) {
+            if (d == 1) {
+                swal({
+                    title: "Success!",
+                    text: "Author Updated!",
+                    type: "success",
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            }
+            else {
+                swal({
+                    title: "Something went wrong!",
+                    text: d,
+                    type: "error",
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            }
+
+        })
+    }
+</script>
+
+<div>
+    <div style="width : 100%; margin-top: 0px;border-style: solid; border-color: #1fa67a">
+        <div style="width:100%;height : 25px ; background-color:#1fa67a; color: white">
+            <label class="fa fa-file-text-o fa-lg" style="margin-left: 5px; display:inline-block">  Configure Ordinance</label>
+        </div>
+        <div style="margin: 5px 5px 5px 5px;">
+            <label style="display:inline-block">
+                Authored By :
+                @(Html.Kendo().ComboBox()
+                         .Name("ddlEmployees")
+                         .DataTextField("empName")
+                         .DataValueField("eid")
+                         .Filter("contains")
+                         .MinLength(1)
+                         .Placeholder("Select Employee...")
+                         .HtmlAttributes(new { @style = "width: 250px;" })
+                         .DataSource(source => source.Read(read => read.Action("ddlEmployee", "User")))
+                         .Value(@ViewBag.eid)
+                )
+            </label>
+            <div style="display:inline-block" class="k-button k-button-icontext" onclick="UpdateAuthor()"> <i class="fa fa-exchange"></i> Update </div>
+            @(Html.Kendo().TabStrip()
+              .Name("OrdinanceTabStrip")
+              .Navigatable(false)
+              .Animation(animation =>
+                  animation.Open(effect =>
+                  effect.Fade(FadeDirection.In)))
+              .Items(tabstrip =>
+              {
+                  tabstrip.Add().Text("Sections").Selected(true).LoadContentFrom("SectionsTab", "Maintenance");
+                  tabstrip.Add().Text("Special Provisions").LoadContentFrom("SpecialProvisionsTab", "Maintenance");
+                  tabstrip.Add().Text("Special Provisions (Main)").LoadContentFrom("SpecialProvisionsMainTab", "Maintenance");
+                  tabstrip.Add().Text("Office Descriptions").LoadContentFrom("OfficeDescriptionTab", "Maintenance");
+                  tabstrip.Add().Text("Grouping Properties").LoadContentFrom("GroupingPropertiesTab", "Maintenance");
+                  tabstrip.Add().Text("Session Attendance").LoadContentFrom("AttendanceTab", "Maintenance");
+                  tabstrip.Add().Text("Report Signatories").LoadContentFrom("SignatoriesTab", "Maintenance");
+
+              })
+            )
+        </div>
+    </div>
+</div>

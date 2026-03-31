@@ -1,0 +1,470 @@
+﻿
+
+<script>
+    var PSAmount = "";
+    var MOOEAMount = "";
+    var COAmount = "";
+    var AIPID = "";
+    var CCTypeCodeID = "";
+    ///Public Variables
+    function ddlAddAIP_ProgramActivities_Param() {
+        var OfficeID = $("#ddlAIPOffices").val()
+        return {
+            OfficeID :OfficeID
+        }
+    }
+    function ddlCCTypologyCode_Param() {
+        var CCType = $('input[name=ccRadioButton]:checked').val();
+        return {
+            CCType: CCType
+        }
+    }
+    function ReqAddAIP() {
+        getLastSelected();
+
+        var OfficeID =  $("#ddlAIPOffices").val();
+        var txtExpectedOutput = $("#txtExpectedOutput").val();
+        var txtOrderNo = $("#txtOrderNo").val();
+        var ddlAddAIP_FundingSource = $("#ddlAddAIP_FundingSource").data("kendoDropDownList").value();
+        var DP_AddAIP_CompletionDate = $("#DP_AddAIP_CompletionDate").val();
+        var DP_AddAIP_StartDate = $("#DP_AddAIP_StartDate").val();
+        var ddlAddAIP_ProgramActivities = $("#ddlAddAIP_ProgramActivities").data("kendoComboBox").text();
+        var txtRefCode = $("#txtRefCode").val();
+        var ddlAddAIP_Offices = $("#ddlAddAIP_Offices").val();
+        var ddlAddAIP_ProgramActivities_Main = $("#ddlAddAIP_ProgramActivities_Main").data("kendoDropDownList").value();
+        var CCType = $('input[name=ccRadioButton]:checked').val();
+        var txtCCAmount = $("#txtCCAmount").val();
+        var ddlCCTypologyCode = $("#ddlCCTypologyCode").data("kendoDropDownList").value();
+        if (CCType != 0 && ddlCCTypologyCode == "") {
+            swal({
+                title: "Something went wrong!",
+                text: "Climate change typology code Required!",
+                type: "error",
+                showConfirmButton: true
+            });
+        }
+        else {
+         if (document.getElementById("btnAddext").innerHTML == "Add") {
+             var url = "@Url.Action("SaveAIP", "BudgetPreparation")";
+             $.post(url, {
+                 MotherAIP_ID: ddlAddAIP_ProgramActivities_Main,
+                 OfficeID: OfficeID,
+                 EmplementingOfficeID: ddlAddAIP_Offices,
+                 FundingSource: ddlAddAIP_FundingSource,
+                 AIPRefCode: txtRefCode,
+                 Description: ddlAddAIP_ProgramActivities,
+                 StartDate: DP_AddAIP_StartDate,
+                 CompletionDate: DP_AddAIP_CompletionDate,
+                 ExpectedOutput: txtExpectedOutput,
+                 PSAmount: PSAmount,
+                 MOOEAmount: MOOEAMount,
+                 COAmount: COAmount,
+                 ClimateChangeType: CCType,
+                 ClimateChangeAmount: txtCCAmount,
+                 ClimateChangeTypologyCode: ddlCCTypologyCode,
+                 OrderNo: txtOrderNo
+             }, function (d) {
+                 if (d == 1) {
+                     swal({
+                         title: "Success!",
+                         text: "Data Successfuly Added!",
+                         type: "success",
+                         showConfirmButton: true
+                     });
+                     ResetAllFields();
+                     $("#grdAIPList").data("kendoGrid").dataSource.read();
+                     CloseKendoWindow('AddNewAIPWindow');
+                 }
+                 else {
+                     swal({
+                         title: "Something went wrong!",
+                         text: "Please Close the Window and try again",
+                         type: "error",
+                         showConfirmButton: true
+                     });
+                 }
+             })
+         }
+        else {
+            if (AIPID != "") {
+                var url = "@Url.Action("UpdateAIP", "BudgetPreparation")";
+                $.post(url, {
+                    MotherAIP_ID: ddlAddAIP_ProgramActivities_Main,
+                    EmplementingOfficeID: ddlAddAIP_Offices,
+                    FundingSource: ddlAddAIP_FundingSource,
+                    AIPRefCode: txtRefCode,
+                    Description: ddlAddAIP_ProgramActivities,
+                    StartDate: DP_AddAIP_StartDate,
+                    CompletionDate: DP_AddAIP_CompletionDate,
+                    ExpectedOutput: txtExpectedOutput,
+                    PSAmount: PSAmount,
+                    MOOEAmount: MOOEAMount,
+                    COAmount: COAmount,
+                    ClimateChangeType: CCType,
+                    ClimateChangeAmount: txtCCAmount,
+                    ClimateChangeTypologyCode: ddlCCTypologyCode,
+                    OrderNo: txtOrderNo,
+                    AIPID: AIPID
+                }, function (d) {
+                    if (d == 1) {
+                        swal({
+                            title: "Success!",
+                            text: "Data Successfuly Updated!",
+                            type: "success",
+                            showConfirmButton: true
+                        });
+                        ResetAllFields();
+                        $("#grdAIPList").data("kendoGrid").dataSource.read();
+                        CloseKendoWindow('AddNewAIPWindow');
+                    }
+                    else {
+                        swal({
+                            title: "Something went wrong!",
+                            text: d,
+                            type: "error",
+                            showConfirmButton: true
+                        });
+                    }
+                })
+            }
+        else {
+                swal({
+                    title: "Something went wrong!",
+                    text: d,
+                    type: "error",
+                    showConfirmButton: true
+                });
+        }
+    }   
+        }
+    }
+    function onCBChange() {
+        if ($('input[name=RadioButton]:checked').val() == 1) {
+            $('#txtAmount').attr("placeholder", "Please Enter PS Amount");
+            $('#txtAmount').val(PSAmount);
+        } else if ($('input[name=RadioButton]:checked').val() == 2) {
+            $('#txtAmount').attr("placeholder", "Please Enter MOOE Amount");
+            $('#txtAmount').val(MOOEAMount);
+        } else if ($('input[name=RadioButton]:checked').val() == 3) {
+            $('#txtAmount').attr("placeholder", "Please Enter CO Amount");
+            $('#txtAmount').val(COAmount);
+        }
+    }
+    function onCCRadioChange() {
+        $("#ddlCCTypologyCode").data("kendoDropDownList").dataSource.read();
+        if ($('input[name=ccRadioButton]:checked').val() == 0) {
+            $('#txtCCAmount').val('');
+            $('#txtCCAmount').prop('disabled', true)
+        }
+        else {
+            $('#txtCCAmount').prop('disabled', false)
+        }
+    }
+    function getLastSelected() {
+        if ($('input[name=RadioButton]:checked').val() == 1) {
+            PSAmount = $('#txtAmount').val();
+        } else if ($('input[name=RadioButton]:checked').val() == 2) {
+            MOOEAMount = $('#txtAmount').val();
+        } else if ($('input[name=RadioButton]:checked').val() == 3) {
+            COAmount = $('#txtAmount').val();
+        }
+    }
+    function ResetAllFields() {
+        GetNewOrderNo();
+        $("#ddlAddAIP_Offices").data("kendoDropDownList").value($("#ddlAIPOffices").val());
+        $("#txtExpectedOutput").val("");
+        $("#ddlAddAIP_FundingSource").data("kendoDropDownList").value("");
+        $("#DP_AddAIP_CompletionDate").data("kendoDatePicker").value("Dec. " + (@DateTime.Now.Year +1));
+        $("#DP_AddAIP_StartDate").data("kendoDatePicker").value("Jan. " + (@DateTime.Now.Year + 1));
+        $("#ddlAddAIP_ProgramActivities").data("kendoComboBox").value("");
+        $("#txtRefCode").val("");
+        $("#ddlAddAIP_ProgramActivities_Main").data("kendoDropDownList").value("");
+        document.getElementById("rbCCNone").checked = true;
+        document.getElementById("rbPS").checked = true;
+        $("#txtCCAmount").val("");
+        $("#ddlCCTypologyCode").data("kendoDropDownList").value("");
+        $('#txtAmount').val("");
+        PSAmount = "";
+        MOOEAMount = "";
+        COAmount = "";
+        $('#txtCCAmount').prop('disabled', true);
+        $('#txtAmount').attr("placeholder", "Please Enter PS Amount");
+        $("#ddlCCTypologyCode").data("kendoDropDownList").dataSource.read();
+    }
+    function ClearAllFields() {
+        GetNewOrderNo();
+        $("#ddlAddAIP_Offices").data("kendoDropDownList").value("");
+        $("#txtExpectedOutput").val("");
+        $("#ddlAddAIP_FundingSource").data("kendoDropDownList").value("");
+        $("#DP_AddAIP_CompletionDate").data("kendoDatePicker").value("");
+        $("#DP_AddAIP_StartDate").data("kendoDatePicker").value("");
+        $("#ddlAddAIP_ProgramActivities").data("kendoComboBox").value("");
+        $("#txtRefCode").val("");
+        $("#ddlAddAIP_ProgramActivities_Main").data("kendoDropDownList").value("");
+        document.getElementById("rbCCNone").checked = true;
+        document.getElementById("rbPS").checked = true;
+        $("#txtCCAmount").val("");
+        $("#ddlCCTypologyCode").data("kendoDropDownList").value("");
+        $('#txtAmount').val("");
+        PSAmount = "";
+        MOOEAMount = "";
+        COAmount = "";
+        $('#txtCCAmount').prop('disabled', true);
+        $('#txtAmount').attr("placeholder", "Please Enter PS Amount");
+        $("#ddlCCTypologyCode").data("kendoDropDownList").dataSource.read();
+    }
+    function OnResetClick() {
+        swal({
+            title: "Are you sure?",
+            text: "All data that you've entered on the fields will be lost.",
+            type: "info",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes!",
+            closeOnConfirm: true
+        }, function () {
+            ResetAllFields();
+        });
+    }
+    function OnClearClick() {
+        swal({
+            title: "Are you sure?",
+            text: "All data that you've entered on the fields will be lost.",
+            type: "info",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes!",
+            closeOnConfirm: true
+        }, function () {
+            ClearAllFields();
+        });
+    }
+    function OnddlCCTypeCodeDataBound() {
+        if (document.getElementById("btnAddext").innerHTML != "Add") {
+            $("#ddlCCTypologyCode").data("kendoDropDownList").value(CCTypeCodeID);        
+        }
+    }
+</script>
+<div>
+    <div style="width:98%">
+        <label style="margin-left: 0px;margin-left: 0px;margin-top: 0px;margin-bottom: 2px; display : inline-block">
+            Main (Program / Project / Activity Description) :
+        </label>
+        @(Html.Kendo().DropDownList()
+            .Name("ddlAddAIP_ProgramActivities_Main")
+            .DataValueField("ddlID")
+            .DataTextField("ddlDescription")
+            .Filter("contains")
+            .MinLength(1)
+            .OptionLabel("Select Program / Project / Activity where you want to group this new Entry    ...")
+            .HtmlAttributes(new { @style = "width: 98%;" })
+            .DataSource(source => source.Read(read => read.Action("ddlAddAIP_ProgramActivities_Main_Data", "BudgetPreparation").Data("ddlAddAIP_ProgramActivities_Param")))
+        )
+        <br />
+    </div>
+    <div style="width:98%">
+        <div style="width:70%;display:inline-block">
+            <label style="margin-left: 0px;margin-left: 0px;margin-top: 0px;margin-bottom: 2px; display : inline-block">Implementing Office / Department :</label>
+            @(Html.Kendo().DropDownList()
+                .Name("ddlAddAIP_Offices")
+                .DataValueField("OfficeID")
+                .DataTextField("OfficeName")
+                .Filter("contains")
+                .MinLength(1)
+                .OptionLabel("Select Office...")
+                .HtmlAttributes(new { @style = "width: 100%; margin-top:0px" })
+                .DataSource(source => source.Read(read => read.Action("ddlOfficeUP", "User")))
+            )
+        </div>
+        <div style="width:24.5%;display:inline-block">
+            <label style="margin-left: 0px;margin-left: 10px;margin-top: 0px;margin-bottom: 2px; display : inline-block">
+                AIP Ref Code :&nbsp;&nbsp;&nbsp;&nbsp;
+                <br />
+            </label>
+            <input id="txtRefCode" style="width:100%;margin-left: 10px" placeholder="Ref. Code" />
+        </div>
+        <br />
+    </div>
+    <div style="width:98%">
+        <label style="margin-left: 0px;margin-left: 0px;margin-top: 5px;margin-bottom: 2px; display : inline-block">
+            Program / Project / Activity Description :
+        </label>
+        @(Html.Kendo().ComboBox()
+            .Name("ddlAddAIP_ProgramActivities")
+            .DataValueField("ddlID")
+            .DataTextField("ddlDescription")
+            .Filter("contains")
+            .MinLength(1)
+            .Placeholder("Select Program / Project / Activity Description ...")
+            .HtmlAttributes(new { @style = "width: 98%;" })
+            .DataSource(source => source.Read(read => read.Action("ddlAIPActivityDescription", "BudgetPreparation").Data("ddlAddAIP_ProgramActivities_Param")))
+        )
+        <br />
+    </div>
+    <div style="width:98%">
+        <div style="width:48%;display:inline-block">
+            <label style="margin-left: 0px;margin-left: 0px;margin-top: 5px;margin-bottom: 2px; display : inline-block; width:100%">
+                Start Date :
+            </label>
+            @(Html.Kendo().DatePicker()
+            .Name("DP_AddAIP_StartDate")
+            .Start(CalendarView.Year)
+            .Depth(CalendarView.Year)
+            .Format("MMM. yyyy")
+            .Value("1/1/" + (DateTime.Now.Year + 1))
+            .HtmlAttributes(new { style = "width: 100%;font-weight:bold", type = "text" })
+            )
+        </div>
+        <div style="width:48%;display:inline-block;margin-left: 10px;">
+            <label style="margin-left: 0px;margin-top: 10px;margin-bottom: 2px; display : inline-block; width:100%">
+                Completion Date :
+            </label>
+            @(Html.Kendo().DatePicker()
+            .Name("DP_AddAIP_CompletionDate")
+            .Start(CalendarView.Year)
+            .Depth(CalendarView.Year)
+            .Format("MMM. yyyy")
+            .Value("12/1/" + (DateTime.Now.Year + 1))
+            .HtmlAttributes(new { style = "width: 100%;font-weight:bold;", type = "text" })
+            )
+        </div>
+        <br />
+    </div>
+    <div style="width:95%">
+        <label style="margin-left: 0px;margin-left: 0px;margin-top: 10px;margin-bottom: 2px; display : inline-block">
+            Expected Output :&nbsp;&nbsp;&nbsp;&nbsp;
+            <br />
+        </label>
+        <textarea id="txtExpectedOutput" style="width:100%; height:50px" placeholder="Please Enter Expected Output" />
+    </div>
+    <div style="width:98%">
+        <div style="width:70%; display:inline-block">
+            <div style="display:inline-block;width:100%">
+                <input type="radio" name="RadioButton" id="rbPS" style="width:15px" value="1" onchange="onCBChange()" 
+                 onkeydown="getLastSelected()" onmousedown="getLastSelected()" checked="checked"> 
+                <label style="display:inline-block" for="rbPS" onmousedown="getLastSelected()">PS</label>
+
+                <input type="radio" name="RadioButton" id="rbMOOE" style="width:15px" value="2" onchange="onCBChange()" 
+                 onkeydown="getLastSelected()" onmousedown="getLastSelected()"> 
+                <label style="display:inline-block" for="rbMOOE" onmousedown="getLastSelected()">MOOE</label>
+
+                <input type="radio" name="RadioButton" id="rbCO" style="width:15px" value="3" onchange="onCBChange()" 
+                 onkeydown="getLastSelected()" onmousedown="getLastSelected()"> 
+                <label style="display:inline-block" for="rbCO" onmousedown="getLastSelected()">CO</label>
+            </div>
+            <input id="txtAmount" onkeyup="OnKeyUpConvertToCurrency(event, 'txtAmount')" onkeydown="FilterNumericOnly(event)" style="width:100%" placeholder="Please Enter PS Amount" maxlength="19" />
+        </div>
+        <div style="width:26%;display:inline-block; margin-left:10px">
+            <label style="margin-left: 0px;margin-left: 10px;margin-top: 10px;margin-bottom: 2px; display : inline-block;width:100%">
+                Order No. :&nbsp;&nbsp;&nbsp;&nbsp;<br />
+            </label>
+            <input id="txtOrderNo" style="width:70%;margin-left: 10px" onkeydown="FilterNumericOnly(event)" placeholder="Order No."/>
+        </div>
+    </div>
+    <div style="width:98%">
+        <label style="margin-left: 0px;margin-left: 0px;margin-top: 10px;margin-bottom: 2px; display : inline-block;width:48%">
+            Funding Source :&nbsp;<br />
+            @(Html.Kendo().DropDownList()
+                .Name("ddlAddAIP_FundingSource")
+                .DataValueField("Text")
+                .DataTextField("Text")
+                .OptionLabel("Select Fund Source...")
+                .HtmlAttributes(new { @style = "width: 100%;margin-top:5px" })
+                .DataSource(source => source.Read(read => read.Action("ddlAddAIP_FundingSource", "BudgetPreparation")))
+            )
+        </label>
+        <div style="width:46.5%; display:inline-block; margin-left:10px">
+            <div style="display:inline-block;width:100%">
+                <input type="radio" name="ccRadioButton" id="rbCCNone" style="width:15px" value="0" checked="checked" onchange="onCCRadioChange()">
+                <label style="display:inline-block" for="rbCCNone">N/A</label>
+
+                <input type="radio" name="ccRadioButton" id="rbCCAdaptation" style="width:15px" value="1" onchange="onCCRadioChange()">
+                <label style="display:inline-block" for="rbCCAdaptation">CC Adaptation</label>
+
+                <input type="radio" name="ccRadioButton" id="rbCCMitigation" style="width:15px" value="2" onchange="onCCRadioChange()">
+                <label style="display:inline-block" for="rbCCMitigation">CC Mitigation</label>
+            </div>
+            <input id="txtCCAmount" onkeyup="OnKeyUpConvertToCurrency(event, 'txtCCAmount')" onkeydown="FilterNumericOnly(event)" style="width:100%" placeholder="Climate Change Amount" maxlength="19" disabled="disabled" />
+        </div>
+    </div>
+    <div style="width:98%">
+        <div style="width:100%;display:inline-block; margin-left:0px">
+            <label style="margin-left: 0px;margin-top: 10px;margin-bottom: 2px; display : inline-block;width:100%">
+                Climate Change Typology Code :&nbsp;&nbsp;&nbsp;&nbsp;<br />
+            </label>
+            @(Html.Kendo().DropDownList()
+            .Name("ddlCCTypologyCode")
+            .DataValueField("ddlID")
+            .DataTextField("ddlDescription")
+            .Filter("contains")
+            .MinLength(1)
+            .OptionLabel("Select Typology Code...")
+            .Events(e => e.DataBound("OnddlCCTypeCodeDataBound"))
+            .HtmlAttributes(new { @style = "width: 98%;" })
+                    .DataSource(source => source.Read(read => read.Action("ddlCCTypologyCode_Data", "BudgetPreparation").Data("ddlCCTypologyCode_Param")))
+            )
+        </div>
+    </div>
+</div>
+<div style="float:left; margin-top: 10px">
+    <div style="display:inline-block" class="k-button k-button-icontext" onclick="OnResetClick()"> <i class="fa fa-undo"></i> Reset Fields </div>
+    <div style="display:inline-block" class="k-button k-button-icontext" onclick="OnClearClick()"> <i class="fa fa-eraser"></i> Clear Fields </div>
+</div>
+<div style="float:right; margin-top: 10px">
+    <div style="display:inline-block" class="k-button k-button-icontext" onclick="ReqAddAIP()"> <i class="fa fa-save"></i> <span id="btnAddext">Add</span> </div>
+    <div style="display:inline-block" class="k-button k-button-icontext" onclick="CloseKendoWindow('AddNewAIPWindow')"> <i class="fa fa-times"></i> Close </div>
+</div>
+<script>
+    function GetNewOrderNo() {
+        var OfficeID = $("#ddlAIPOffices").val();
+        var url = "@Url.Action("getAIPNewOrderNo", "BudgetPreparation")";
+        $.post(url, { OfficeID: OfficeID }, function (d) {
+            $("#txtOrderNo").val(d);
+        })
+    }
+    $(document).ready(function () {
+        var ViewBagData = '@ViewBag.Mode';
+        var arr = ViewBagData.split(',')
+        var Mode = arr[0];
+            AIPID = arr[1];
+        if (Mode == "Add") {
+            var OfficeID = $("#ddlAIPOffices").val();
+            $("#ddlAddAIP_Offices").data("kendoDropDownList").value(OfficeID);
+            GetNewOrderNo();
+            document.getElementById("btnAddext").innerHTML = "Add";
+        }
+        else {
+            var url = "@Url.Action("GetAIPDataForEdit", "BudgetPreparation")";
+            $.post(url, { AIPID: AIPID }, function (d) {
+                $("#ddlAddAIP_Offices").data("kendoDropDownList").value(d[1]);
+                $("#txtExpectedOutput").val(d[11]);
+                $("#ddlAddAIP_FundingSource").data("kendoDropDownList").value(d[6]);
+                $("#DP_AddAIP_CompletionDate").data("kendoDatePicker").value(d[5]);
+                $("#DP_AddAIP_StartDate").data("kendoDatePicker").value(d[4]);
+                $("#ddlAddAIP_ProgramActivities").data("kendoComboBox").value(d[3]);
+                $("#txtRefCode").val(d[2]);
+                $("#ddlAddAIP_ProgramActivities_Main").data("kendoDropDownList").value(d[0]);
+                $("#txtCCAmount").val(d[13]);
+                $('#txtAmount').val(d[7]);
+                $('#txtOrderNo').val(d[10]);
+                PSAmount = d[7];
+                MOOEAMount = d[8];
+                COAmount = d[9];
+                if (d[12] == "") {
+                    document.getElementById("rbCCNone").checked = true;
+                    $('#txtCCAmount').prop('disabled', true);
+                } else if (d[12] == 1) {
+                    document.getElementById("rbCCAdaptation").checked = true;
+                }
+                else if (d[12] == 2) {
+                    document.getElementById("rbCCMitigation").checked = true;
+                }
+                $("#ddlCCTypologyCode").data("kendoDropDownList").dataSource.read();
+                CCTypeCodeID = d[14]
+                document.getElementById("btnAddext").innerHTML = "Update";
+                document.getElementById("rbPS").checked = true;
+                $('#txtAmount').attr("placeholder", "Please Enter PS Amount");
+            })
+        }
+    });
+</script>

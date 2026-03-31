@@ -1,0 +1,144 @@
+﻿
+<script>
+    var thisculture = kendo.culture();
+    thisculture.numberFormat.currency.symbol = '₱'; // Script For Changing The Currency Sign
+
+    function OnGridEdit(arg) {
+        if (arg.container.find("input[name=Percentage]").length == 0) {
+            this.closeCell();
+        }
+        var gridName = $('#grOfficeCielingEE').data('kendoGrid');
+        var ds = gridName.dataSource.data();
+        var dataRows = gridName.items();
+        var SeriesID = "";
+
+        var input = arg.container.find("input[name=Percentage]");
+        var value = input.val();
+        var OldValue = input.val();
+        input.keyup(function () {
+            value = input.val();
+        });
+        input.blur(function () {
+            var rowIndex = dataRows.index(gridName.select());
+            SeriesID = ds[rowIndex].SeriesID;
+            if (value != OldValue) {
+                var url = "@Url.Action("UpdateOfficeCielingPercentage", "Maintenance")";
+                $.post(url, { SeriesID: SeriesID, Percentage: value }, function (d) {
+                    if (d == "1") {
+                        $("#grOfficeCielingEE").data("kendoGrid").dataSource.read();
+                    }
+                    else {
+                        alert('Failed To Update Order No. Please Try Again')
+                    }
+                })
+            }
+        });
+    }
+    function btnSearchClick() {
+
+        var SearchProgramData = $("#txtSearch").val();
+        var ProgramgGrid = $("#grOfficeCielingEE").data("kendoGrid").dataSource;
+        ProgramgGrid.filter([
+            {
+                logic: "or",
+                filters: [{
+                    field: "OfficeName",
+                    operator: "contains",
+                    value: SearchProgramData
+                }]
+            }
+        ]);
+    }
+    function GetGridParam() {
+        return {
+            isNonOffice : 0
+        }
+    }
+    function OnKeyDown(event) {
+        if (event.keyCode == 13) {
+            btnSearchClick();
+        }
+    }
+    function OnKeyUp() {
+        if (($("#txtSearch").val() == '' || $("#txtSearch").val() == 'Search Office') && $("#txtSearch").attr('type') != 'hidden') {
+            btnSearchClick()
+        }
+    }
+    function reqChangeStatus(SeriesID,ActionCode) {
+        var url = "@Url.Action("UpdateCeilingStatus", "Maintenance")";
+                $.post(url, { SeriesID: SeriesID,ActionCode:ActionCode}, function (d) {
+                    if (d == "1") {
+                        $("#grOfficeCielingEE").data("kendoGrid").dataSource.read();
+                    }
+                    else {
+                        alert('Failed To Update Order No. Please Try Again')
+                    }
+                })
+    }
+</script>
+<div style="margin-top:0px">
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Budget_Preparation.OfficeCielingModel>()
+                .Name("grOfficeCielingEE")
+                .Columns(columns =>
+                {
+                    columns.Bound(c => c.SeriesID).Hidden();
+                    columns.Bound(c => c.OfficeName).Title("Office Name").Width(250)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+                    columns.Bound(c => c.Percentage).Title("Percentage").Width(120)
+                        .ClientTemplate("<div style ='float:right'>#=Percentage#%</div>")
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+                    columns.Bound(c => c.Amount).Title("Total Amount to Increase").Width(120)
+                        .ClientTemplate("<div style ='float:right;color:red'>#=kendo.toString(Amount,'c2')#</div>")
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientFooterTemplate("<div style='text-align:center;color:darkgreen'><label> </label><label> #=kendo.toString(sum, 'c2')#</label></div>");
+                    columns.Bound(c => c.OriginalAmount).Title("Total Amount to Increase (Original)").Width(120)
+                        .ClientTemplate("<div style ='float:right'>#=kendo.toString(OriginalAmount,'c2')#</div>")
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientFooterTemplate("<div style='text-align:center;color:darkgreen'><label> </label><label> #=kendo.toString(sum, 'c2')#</label></div>");
+                    columns.Bound(c => c.PercentageIncrease).Title("Percentage Increase").Width(180)
+                        .ClientTemplate("<div style ='float:right'>#=PercentageIncrease#%</div>")
+                        .ClientFooterTemplate("<div style='text-align:center;color:darkgreen'><label> </label><label> #=sum#</label></div>")
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+                    columns.Bound(c => c.ActionCode).Title("Status").Width(90)
+                        .ClientTemplate(
+                                        "# if(ActionCode == 1) { #" +
+                                               "<div id='btnCeilingStatus' class='k-button' onclick='reqChangeStatus(#=SeriesID#,#=ActionCode#)' style='inline-block' >Active</div>" +
+                                           "# } else { #" +
+                                               "<div id='btnCeilingStatus' class='k-button' onclick='reqChangeStatus(#=SeriesID#,#=ActionCode#)' style='inline-block' >Inactive</div>" +
+                                           "# } #"
+                        )
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+                })
+                        .HtmlAttributes(new { style = "height: 400px;" })
+                        .Scrollable(s => s.Enabled(true).Height("auto"))
+                        .Selectable()
+                        .Editable(editable => editable.Mode(GridEditMode.InCell))
+                        .Events(e => e.Edit("OnGridEdit"))
+                        .DataSource(dataSource => dataSource
+                                .Ajax()
+                                .Batch(true)
+                                .ServerOperation(false)
+                                .Model(m => m.Id(i => i.SeriesID))
+                                .Read(read => read.Action("grOfficeCieling", "Maintenance").Data("GetGridParam"))
+                                .Aggregates(a =>
+                                     {
+                                         a.Add(c => c.Amount).Sum();
+                                         a.Add(c => c.OriginalAmount).Sum();
+                                         a.Add(c => c.PercentageIncrease).Sum();
+                                     })
+                        )
+                        .ToolBar(toolbar =>
+                        {
+                            toolbar.Template(@<text>
+                                <div style="float: right; height:28px;margin-top:2px;">
+                                    <link href="~/Content/metroui/css/docs.css" rel="stylesheet" />
+                                    <div style="background-color:white;border:solid;border-color:whitesmoke;border-width:thin;width:310px;height:30px;float:right;padding:0px;margin-top:-3px;" id="search">
+                                        <input type="text" style="width:260px;border-collapse:collapse;border-color:white;margin:0px;margin-left:-10px;height:70%;outline:none;border-left-style:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search Office" id="txtSearch" name="txtSearch" onkeydown="OnKeyDown(event)" onkeyup="OnKeyUp()">
+                                        <div class="k-button k-button-icontext" style="height:29px;width:40px;margin-top:0.6px;" onclick="btnSearchClick()"><span class="mif-search"></span></div>
+                                    </div>
+                                </div>
+                            </text>);
+                        })
+
+    )
+</div>

@@ -1,0 +1,137 @@
+﻿<script>
+    function AddNewSection() {
+        var url = "@Url.Action("AddNewSectionWindow", "Maintenance")";
+        $.post(url, function (d) {
+            $(window).scrollTop(0);
+            $('#NewSectionWindow').html(d);
+            $('#NewSectionWindow').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Add New Section").center().open();
+        })
+    }
+    function ResizeSectionDIV() {
+        var gridname = 'Grid_SectionDIV';
+        if (document.getElementById("SectionDIVIndicator").value == 0) {
+            MaximizeDIV(gridname);
+            document.getElementById("SectionDIVIndicator").value = 1
+            $('#grSectionList').css("height", "550px");
+            $("#grSectionList").data("kendoGrid").dataSource.read();
+        }
+        else {
+            MinimizeDIV(gridname)
+            document.getElementById("SectionDIVIndicator").value = 0
+            $('#grSectionList').css("height", "300px");
+            $("#grSectionList").data("kendoGrid").dataSource.read();
+        }
+    }
+    function reqEditSection(SectionID) {
+        var url = "@Url.Action("EditSection", "Maintenance")";
+        $.post(url, { SectionID: SectionID }, function (d) {
+            $(window).scrollTop(0);
+            $('#NewSectionWindow').html(d);
+            $('#NewSectionWindow').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Add New Section").center().open();
+        })
+    }
+    function reqRemoveSection(SectionID) {
+        swal({
+            title: "Are you sure?",
+            text: "This Action Will Remove The Selected Section.",
+            type: "info",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes!",
+            closeOnConfirm: false
+        }, function () {
+            var url = "@Url.Action("RemoveSection", "Maintenance")";
+            $.post(url, {SectionID:SectionID}, function (d) {
+                if (d == 1) {
+                    swal({
+                        title: "Success!",
+                        text: "Section Succesffuly Removed!",
+                        type: "success",
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    $("#grSectionList").data("kendoGrid").dataSource.read();
+                }
+                else {
+                    swal({
+                        title: "Something went wrong!",
+                        text: d,
+                        type: "error",
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                }
+            })
+        });
+    }
+</script>
+
+<div id="Grid_SectionDIV">
+    <input type="hidden" value="0" id="SectionDIVIndicator" />
+    <div style="border: outset;clear:both;border-width:1px;border-color:#1fa67a; width: 100%; padding-left:0px;padding-right:0px;padding-top:0px;padding-bottom:7px;margin-top: 10px;">
+        <div style=" width: 91.5%;height: 100%; border-right: 0px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;margin-top: -1px; ">
+            <div style="float: left; width: 100%; margin-top:1px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 36px solid #1fa67a; ">
+                <div style="float: left; height:28px; margin-left:-59px; margin-top: 5px;">
+                    <i class="fa fa-tasks fa-2x fg-white"> <span> Sections </span></i>
+                </div>
+                <div style="float:right">
+                    <div style="float:right;margin-right:6px;margin-top:5px;">
+                        <button class="k-button k-button-icontext" onclick="ResizeSectionDIV()"> <i class="fa fa-arrows-alt"></i> </button>
+                        <button class="k-button k-button-icontext" onclick="AddNewSection()"> <i class="fa fa-plus-circle"></i> Add New Section </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Maintenance.OrdinanceSectionModel>()
+                .Name("grSectionList")
+                .Columns(columns =>
+                {
+                    columns.Bound(c => c.SectionID).Hidden();
+                    columns.Bound(c => c.SectionOrder).Title("Order No.").Width(40)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .HtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+                    columns.Bound(c => c.SectionDescription).Title("Section Description").Width(350).Encoded(false)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+                    columns.Template(t => { }).ClientTemplate(
+                        "<div class='k-button' onclick='reqEditSection(#=SectionID#)' style='inline-block' title='Edit Item (?)'> <span class='fa fa-edit'></span> Edit</div>" +
+                        "<div class='k-button' onclick='reqRemoveSection(#=SectionID#)' style='inline-block' title='Remove Item'> <span class='fa fa-times'></span>Remove</div>"
+                        ).Width(130);
+
+                })
+                .HtmlAttributes(new { style = "height: 300px;", id ="grSectionList" })
+                .Scrollable(s => s.Enabled(true))
+                .Selectable()
+                .Pageable(page => page.Refresh(true)
+                    .Enabled(true)
+                    .ButtonCount(4)
+                    .PreviousNext(true)
+                )
+                .DataSource(dataSource => dataSource
+                    .Ajax()
+                    .Batch(true)
+                    .ServerOperation(false)
+                    .Read(read => read.Action("ReadOrdinanceSections", "Maintenance"))
+                )
+        )
+    </div>
+</div>
+
+@(Html.Kendo().Window()
+    .Name("NewSectionWindow")
+    .Title("Add New Section")
+    .Width(532)
+    .Height(370)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(true)
+    .AutoFocus(true)
+    .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        }).Actions(a => { a.Close(); })
+)

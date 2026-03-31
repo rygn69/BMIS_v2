@@ -1,0 +1,81 @@
+﻿@model iFMIS_BMS.BusinessLayer.Models.Maintenance.PPSASCode_Model
+
+<div style="border-color:gray;border-width:1px;border-style:solid;width:430px;margin-top:10px;float:left">
+    <div style="background-color:white;width:120px;margin-top:-15px;margin-left:15px;border-style:solid;border-color:black;border-width:1px;">
+        <span style="font-size:18px;font-weight:bold;margin-left:5px;">MODE : <span id="mode-status" style="color:green">EDIT</span></span>
+    </div>
+    <div style="margin-top:15px;margin-left:10px;">
+        <div style="display:inline-block;">
+            <div style="display:inline-block;width:100px;">
+                <span>PPSAS Account:</span>
+            </div>
+
+            <div style="display:inline-block;">
+                @(Html.Kendo().ComboBox()
+                                    .Name("Accounts")
+                                    .DataTextField("AccountName")
+                                    .DataValueField("PPSASCode")
+                                    .Placeholder("Search Code...")
+                                    .Filter("contains")
+                                    .MinLength(3)
+                                    .Events(e => e.Change("SetPPSASCode"))
+                                    .HtmlAttributes(new { @style = "width: 300px;" })
+                                    .DataSource(source => source.Read(read => read.Action("ddlPPSASAccounts", "Dropdowns").Data("YearParam")))
+                )
+            </div>
+        </div>
+        
+    </div>
+    <div style="margin-top:15px;margin-left:10px;display:none">
+        <div style="display:inline-block;">
+            <div style="display:inline-block;width:100px;">
+                <span>PPSAS Code:</span>
+            </div>
+            <div style="display:inline-block;">
+                <input type="text" style="width:300px;background-color:#ededed;text-align:left;font-weight:700;" class="k-input" id="AccountCode" name="AccountCode" readonly="readonly" />
+            </div>
+        </div>
+    </div>
+    <div style="margin-top:15px;margin-left:10px;">
+        <div style="display:inline-block;">
+            <div style="display:inline-block;width:100px;">
+                <span>PPSAS Series:</span>
+            </div>
+            <div style="display:inline-block;">
+                <input type="text" style="width:300px" class="k-input" id="PPSASSeries" name="PPSASSeries" onkeyup="sync()" />
+            </div>
+        </div>
+    </div>
+    <div style="margin-top:15px;margin-left:10px;">
+        <div style="display:inline-block;">
+            <div style="display:inline-block;width:120px;">
+                <span>ChildAccountCode:</span>
+            </div>
+            <div style="display:inline-block;">
+                <input type="text" style="width:280px;background-color:#ededed;text-align:left;font-weight:700;" class="k-input" id="ChildAccountCode" name="ChildAccountCode" readonly="readonly" />
+            </div>
+        </div>
+    </div>
+    <div style="padding:15px;float:right;">
+        <div class="k-button" style="padding:5px;width:99px;" id="SaveNonOfficeCode" onclick="SavePPSASCode()"><span class="fa fa-save"></span> UPDATE</div>
+    </div>
+    <input type="text" name="FMISAccount" id="FMISAccount" value="@Model.FMISAccountCode" style="display:none"/>
+    <input type="text" name="_PPSASCode" id="_PPSASCode" value="@Model.PPSASCode" style="display:none" />
+    <input type="text" name="_PPASeriesCode" id="_PPASeriesCodee" value="@Model.PPASeriesCode" style="display:none" />
+</div>
+<script>
+
+    function SetPPSASCodeURL() {
+        return '@Url.Action("SetPPSASCode", "Maintenance")';
+    }
+    function SavePPSASCodeURL() {
+        return '@Url.Action("SavePPSASCode", "Maintenance")';
+    }
+    function PPSASCodeURL() {
+        return @Model.PPSASCode;
+    }
+    function PPSASSeriesURL() {
+        return @Model.PPASeriesCode;
+    }
+
+</script>

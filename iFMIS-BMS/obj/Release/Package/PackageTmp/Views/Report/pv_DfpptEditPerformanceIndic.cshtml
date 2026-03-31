@@ -1,0 +1,57 @@
+﻿
+<script>
+
+    var thisculture = kendo.culture();
+    thisculture.numberFormat.currency.symbol = ' ';
+
+    function frmclose() {
+        $("#performedit").data("kendoWindow").close();
+
+    }
+    function frmSave() {
+        var office=@Session["office"]
+        var tyear=@Session["tyear"]
+        var perindicator=@Session["perindicator"]
+        var indicatorename = $("#editindicator").val()
+       
+        var url = "@Url.Action("saveeditperformance", "Report")";
+        $.get(url,
+                {
+                    office: office,
+                    tyear: tyear,
+                    perindicator: perindicator,
+                    indicatorename: indicatorename
+                },
+            function (d) {
+                if (d == "success") {
+                    swal("Success","Indicator has been updated!","success")
+                    $("#mfoid").data("kendoComboBox").dataSource.read()
+                }
+            })
+    }
+
+</script>
+<div id="" style="height: 30px; margin-top: 10px; float: left; margin-left: 30px;">
+    <input type="text" style="width:406px;border-collapse:collapse;margin:0px;border-style:solid;margin-left:0px;height:70%;outline:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" value="@Session["perindicatorname"]" placeholder="" id="editindicator" name="editindicator">
+   @* <div class="k-button k-button-icontext" style="height:30px;width:40px;border-style:solid;" onclick="searchSubmitConsol()"><span class="mif-search"></span></div>*@
+</div>
+
+<div style="margin-top:65px">
+    <div class="k-button k-button-icontext" style="width:100px;float:left;background-color:cornflowerblue;margin-left:250px; color:white;border-radius:50px" onclick="frmSave()"><span class="fa fa-save"></span> Save</div>
+    <div  class="k-button k-button-icontext" style="width: 100px;float:right;background-color:indianred; color:white;border-radius:50px;margin-right:20px;" onclick="frmclose()"><span class="fa fa-close"></span> Close</div>
+</div>
+<div style="display:none"></div>
+    <input type="number" id="office"  value="0" style="display:none;">
+    <input type="number" id="tyear" value="0" style="display:none;">
+    <input type="number" id="perindicator" value="0" style="display:none;">
+    <input type="text"  id="perindicatorname" value="" style="display:none;">
+<script>
+    $(document).ready(function () {
+        $("#office").val('@Session["office"]')
+        $("#tyear").val('@Session["tyear"]')
+        $("#perindicator").val('@Session["perindicator"]')
+        $("#perindicatorname").val('@Session["perindicatorname"]')
+      
+    });
+
+</script>

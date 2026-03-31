@@ -1,0 +1,139 @@
+﻿
+@model iFMIS_BMS.BusinessLayer.Models.Maintenance.OrdinanceSpecialProvisionsModel
+<script>
+    function reqCloseSpecialProvisionMainWindow() {
+        document.documentElement.style.overflow = 'auto';  // firefox, chrome
+        document.body.scroll = "yes";
+        $("#NewSpecialProvisionMainWindow").data("kendoWindow").close();
+    }
+    function reqAddSpecialProvisionMain() {
+        var OfficeID = $("#ddlOffices_SpecialProvisionMain").val();
+        var SpecialProvisionNo = $("#txtSpecialProvisionNoMain").val();
+        var SpecialProvision = $("#txtSpecialProvisionMain").val();
+
+        if (@Model.SeriesID == 0) {
+            var url = "@Url.Action("SaveSpecialProvisionMain", "Maintenance")";
+            $.post(url, { OfficeID: OfficeID, SpecialProvisionNo: SpecialProvisionNo, SpecialProvision: SpecialProvision }, function (d) {
+                if (d == 1) {
+                    swal({
+                        title: "Success!",
+                        text: "Special Provision Succesffuly Added!",
+                        type: "success",
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    $("#grSpecialProvisionListMain").data("kendoGrid").dataSource.read();
+                    $("#txtSpecialProvisionMain").data("kendoEditor").value("");
+                    $("#ddlOffices_SpecialProvisionMain").data("kendoComboBox").value("");
+                    document.getElementById("txtSpecialProvisionNoMain").value = 1;
+                }
+                else {
+                    swal({
+                        title: "Something went wrong!",
+                        text: d,
+                        type: "error",
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                }
+            })
+        }
+        else {
+            var url = "@Url.Action("UpdateSpecialProvisionMain", "Maintenance")";
+            $.post(url, { OfficeID: OfficeID, SpecialProvisionNo: SpecialProvisionNo, SpecialProvision: SpecialProvision,SeriesID :@Model.SeriesID }, function (d) {
+                if (d == 1) {
+                    swal({
+                        title: "Success!",
+                        text: "Special Provision Succesffuly Updated!",
+                        type: "success",
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    $("#grSpecialProvisionListMain").data("kendoGrid").dataSource.read();
+                    document.documentElement.style.overflow = 'auto';  // firefox, chrome
+                    document.body.scroll = "yes";
+                    $("#NewSpecialProvisionMainWindow").data("kendoWindow").close();
+                    $("#txtSpecialProvisionMain").data("kendoEditor").value("");
+                    $("#ddlOffices_SpecialProvisionMain").data("kendoComboBox").value("");
+                    document.getElementById("txtSpecialProvisionNoMain").value = 1;
+                }
+                else {
+                    swal({
+                        title: "Something went wrong!",
+                        text: d,
+                        type: "error",
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                }
+            })
+        }
+    }
+    function GetOrderNoSpecialProvisionMain() {
+        var OfficeID = $("#ddlOffices_SpecialProvisionMain").val();
+        var url = "@Url.Action("GetOrderNoSpecialProvisionMain", "Maintenance")";
+        $.post(url, { OfficeID: OfficeID}, function (d) {
+            document.getElementById("txtSpecialProvisionNoMain").value = d;
+        })
+    }
+</script>
+
+<div>
+    <div style="display:inline-block">
+        <label>
+            Office :<br />
+            @(Html.Kendo().ComboBox()
+                         .Name("ddlOffices_SpecialProvisionMain")
+                         .DataTextField("office_name")
+                         .DataValueField("office_id")
+                         .Filter("contains")
+                         .MinLength(1)
+                         .Placeholder("Select Office...")
+                         .HtmlAttributes(new { @style = "width: 420px;" })
+                         .DataSource(source => source.Read(read => read.Action("ddlMainOfficesWithProposal", "Dropdowns")))
+                         .Value(@Model.OfficeName)
+                         .Events(e => e.Change("GetOrderNoSpecialProvisionMain"))
+            )
+        </label>
+    </div>
+    <div style="display:inline-block">
+        <label>
+            No : <br />
+            <input type="number" id="txtSpecialProvisionNoMain" name="txtSpecialProvisionNoMain" style="width:70px" value="@Model.OrderNo" min="1" />
+        </label>
+    </div>
+    <label>
+        Special Provision :
+        @(Html.Kendo().Editor()
+          .Name("txtSpecialProvisionMain")
+          .HtmlAttributes(new { style = "width: 100%;height:100px" })
+          .Tools(tools => tools
+              .Clear()
+          ).Value(@Model.Description)
+        )
+    </label>
+    <div style="float:right; margin-top: 5px">
+        <div id="btnaddSpecialProvisionMain" style="display:inline-block" class="k-button k-button-icontext" onclick="reqAddSpecialProvisionMain()"> <i class="fa fa-save"></i> Add </div>
+        <div style="display:inline-block" class="k-button k-button-icontext" onclick="reqCloseSpecialProvisionMainWindow()"> <i class="fa fa-times"></i> Close </div>
+    </div>
+</div>
+
+<style>
+    textarea {
+        resize: none;
+    }
+</style>
+<script>
+    $(document).ready(function () {
+        setTimeout(function () {
+            if (@Model.SeriesID == 0) {
+                document.getElementById("btnaddSpecialProvisionMain").innerHTML = "<i class='fa fa-save'></i> Add";
+                $("#ddlOffices_SpecialProvisionMain").data("kendoComboBox").enable();
+            }
+            else {
+                document.getElementById("btnaddSpecialProvisionMain").innerHTML = "<i class='fa fa-save'></i> Update";
+                $("#ddlOffices_SpecialProvisionMain").data("kendoComboBox").enable(false);
+            }
+        }, 500);
+    });
+</script>

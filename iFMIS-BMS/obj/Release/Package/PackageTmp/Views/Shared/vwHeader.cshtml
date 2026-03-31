@@ -1,0 +1,326 @@
+﻿@if (Request.IsAuthenticated)
+{
+    <script>
+    $(document).ready(function () {
+        //loadUsrInfo();
+    })
+
+    @*function loadUsrInfo() {
+        // url = "@Url.Action("_MyImage", "LogIn")";
+        //var url1 = "@Url.Action("_MyInfo", "LogIn")";
+        //$.get(url, function (data) {
+        //    document.getElementById("uImg").src = data;
+        //})
+        //$.get(url1, function (d) {
+        //    $("#MyInfo").html(d);
+        //})
+    }*@
+    function reqMyAccount() {
+        $("#myAccount").slideUp();
+
+        $('#siteContent').html('<div style="width: 100%;height:100%;"><img src="@Url.Content("~/Content/images/loading.gif")" alt="Loading..." style="position: absolute;top: 40%;left: 57%;margin-top: -16px;margin-left: -16px;" /></div>');
+        $('#webTitle').html("My Account");
+        @*location.replace("@Url.Action("MyAccount","Home")");*@
+        var url = "@Url.Action("MyAccount", "Home")";
+        $.post(url, function (data) {
+            $("#siteContent").html(data);
+        })
+    }
+
+    function logOut() {
+        var url = "@Url.Action("Logout", "LogIn")";
+        $.post(url, function (d) {
+            if (d == 1) {
+                location.replace("@Url.Action("Index","Login")");
+            }
+        }
+        )
+    }
+        function ImgError(image) {
+            var local = 0
+            var imageFilename = $(image).attr('alt')
+
+            //var safeUrl = "@Url.Content("~/Content/images/photos/")" + imageFilename + ".png" + "?timestamp=" + new Date().getTime();
+            @*var safeUrl = "http://192.168.2.104/idprod/pgas/" + @ProVenS.Models.USER.Data.eid + ".jpg" + "?timestamp=" + new Date().getTime();*@
+            //var safeUrl = "http://10.10.51.111/hris/content/images/photos/" + @Account.UserInfo.eid + ".png" + "?timestamp=" + new Date().getTime();
+            var safeUrl = "https://pgas.ph/hris/content/images/photos/" + @Account.UserInfo.eid + ".png" + "?timestamp=" + new Date().getTime(); // PGAS
+            //var safeUrl = "http://10.100.100.5/hris/content/images/photos/" + @Account.UserInfo.eid + ".png" + "?timestamp=" + new Date().getTime(); //tacurong city
+            var errorUrl = "@Url.Content("~/Content/images/no_avatar_available.jpg")" + "?timestamp=" + new Date().getTime();
+            $.LoadImage(safeUrl, errorUrl, image);
+        }
+
+        $.LoadImage = function (safeUrl, errorUrl, image) {
+            var img = new Image();
+            img.src = safeUrl;
+
+            img.onload = function () {
+                image.src = safeUrl
+            }
+            img.onerror = function () {
+                image.src = errorUrl
+            }
+        }
+
+</script>
+}
+<div class="header" style="margin-left:auto; margin-right:auto; text-align:center;z-index: 100;">
+
+    <div style="width:auto; text-align:center; margin-left:0px; background-color: #fafafa; height:130px; min-width: 1000px; position:absolute">
+    @*<div style="width:auto; text-align:center; margin-left:0px; background-color: #43136b; height:130px; min-width: 1000px; position:absolute">*@
+        <div style="padding:10px" class="container">
+            <input style="display:none" type="color" id="colorPicker" value="#1fa67a">
+            <div style="float:left; margin: -30px; height: 125px; margin-top:-10px;width: 200px;" class="lfloat" id="leftContainer">
+                @*<div style="width: 225px; margin-left:0px">
+                    <div class="small-box bg-color-red" style="opacity:.9"></div>
+                    <div class="small-box bg-color-red" style="opacity:.8"></div>
+                    <div class="small-box bg-color-red" style="opacity:.7"></div>
+                    <div class="small-box bg-color-red" style="opacity:.5"></div>
+                    <div class="small-box bg-color-red" style="opacity:.2"></div>
+                    <div class="small-box bg-color-red" style="opacity:.05"></div>
+                    <div class="small-box bg-color-red" style="opacity:.07"></div>
+                    <div class="small-box bg-color-red" style="opacity:0"></div>
+                    <div class="small-box bg-color-red" style="opacity:0"></div>
+
+                    <div class="small-box bg-color-red" style="opacity:.8"></div>
+                    <div class="small-box bg-color-red" style="opacity:.8"></div>
+                    <div class="small-box bg-color-red" style="opacity:.6"></div>
+                    <div class="small-box bg-color-red" style="opacity:.4"></div>
+                    <div class="small-box bg-color-red" style="opacity:.1"></div>
+                    <div class="small-box bg-color-red" style="opacity:.07"></div>
+                    <div class="small-box bg-color-red" style="opacity:0"></div>
+                    <div class="small-box bg-color-red" style="opacity:.05"></div>
+                    <div class="small-box bg-color-red" style="opacity:0"></div>
+
+                    <div class="small-box bg-color-red" style="opacity:.9"></div>
+                    <div class="small-box bg-color-red" style="opacity:.7"></div>
+                    <div class="small-box bg-color-red" style="opacity:.8"></div>
+                    <div class="small-box bg-color-red" style="opacity:.6"></div>
+                    <div class="small-box bg-color-red" style="opacity:.4"></div>
+                    <div class="small-box bg-color-red" style="opacity:.05"></div>
+                    <div class="small-box bg-color-red" style="opacity:0"></div>
+                    <div class="small-box bg-color-red" style="opacity:0"></div>
+                    <div class="small-box bg-color-red" style="opacity:.06"></div>
+
+                    <div class="small-box bg-color-red" style="opacity:.7"></div>
+                    <div class="small-box bg-color-red" style="opacity:.9"></div>
+                    <div class="small-box bg-color-red" style="opacity:.6"></div>
+                    <div class="small-box bg-color-red" style="opacity:.7"></div>
+                    <div class="small-box bg-color-red" style="opacity:.5"></div>
+                    <div class="small-box bg-color-red" style="opacity:0"></div>
+                    <div class="small-box bg-color-red" style="opacity:.05"></div>
+                    <div class="small-box bg-color-red" style="opacity:0"></div>
+                    <div class="small-box bg-color-red" style="opacity:0"></div>
+
+                    <div class="small-box bg-color-red" style="opacity:.9"></div>
+                    <div class="small-box bg-color-red" style="opacity:.7"></div>
+                    <div class="small-box bg-color-red" style="opacity:.5"></div>
+                    <div class="small-box bg-color-red" style="opacity:.4"></div>
+                    <div class="small-box bg-color-red" style="opacity:.2"></div>
+                    <div class="small-box bg-color-red" style="opacity:.1"></div>
+                    <div class="small-box bg-color-red" style="opacity:.2"></div>
+                    <div class="small-box bg-color-red" style="opacity:.05"></div>
+                    <div class="small-box bg-color-red" style="opacity:.03"></div>
+                </div>*@
+            </div>
+
+            <div style="float:right; margin: -30px;margin-top:-10px; height: 125px; width: 200px;" class="rfloat" id="rightContainer">
+                @*<div style="width: 150px; margin-left:0px">
+
+                    <div class="small-box bg-color-red" style="opacity:0"></div>
+                    <div class="small-box bg-color-red" style="opacity:0"></div>
+                    <div class="small-box bg-color-red" style="opacity:.2"></div>
+                    <div class="small-box bg-color-red" style="opacity:.4"></div>
+                    <div class="small-box bg-color-red" style="opacity:.8"></div>
+                    <div class="small-box bg-color-red" style="opacity:1"></div>
+
+                    <div class="small-box bg-color-red" style="opacity:0"></div>
+                    <div class="small-box bg-color-red" style="opacity:.05"></div>
+                    <div class="small-box bg-color-red" style="opacity:0"></div>
+                    <div class="small-box bg-color-red" style="opacity:.5"></div>
+                    <div class="small-box bg-color-red" style="opacity:.6"></div>
+                    <div class="small-box bg-color-red" style="opacity:.9"></div>
+
+                    <div class="small-box bg-color-red" style="opacity:0"></div>
+                    <div class="small-box bg-color-red" style="opacity:0"></div>
+                    <div class="small-box bg-color-red" style="opacity:.2"></div>
+                    <div class="small-box bg-color-red" style="opacity:0"></div>
+                    <div class="small-box bg-color-red" style="opacity:.7"></div>
+                    <div class="small-box bg-color-red" style="opacity:.6"></div>
+
+                    <div class="small-box bg-color-red" style="opacity:0"></div>
+                    <div class="small-box bg-color-red" style="opacity:.5"></div>
+                    <div class="small-box bg-color-red" style="opacity:0"></div>
+                    <div class="small-box bg-color-red" style="opacity:.5"></div>
+                    <div class="small-box bg-color-red" style="opacity:.8"></div>
+                    <div class="small-box bg-color-red" style="opacity:.9"></div>
+
+                    <div class="small-box bg-color-red" style="opacity:.3"></div>
+                    <div class="small-box bg-color-red" style="opacity:0"></div>
+                    <div class="small-box bg-color-red" style="opacity:.05"></div>
+                    <div class="small-box bg-color-red" style="opacity:.2"></div>
+                    <div class="small-box bg-color-red" style="opacity:.5"></div>
+                    <div class="small-box bg-color-red" style="opacity:.8"></div>
+                </div>*@
+            </div>
+
+        </div>
+    </div>
+
+
+    <div style="position:absolute; z-index:1; margin-left:160px; float:left; margin-top:8px; width:70px; height:115px;">
+        @*<div class="pgas-logo"></div>*@
+        <div style="width:200px;"> @*<img style="float:left;margin-left:-115px;margin-top:2px; width:110px;height:110px;opacity:0.80" id="lgu_logo" src="~/Images/tacurong.png">*@</div>
+        <div class="title" style="margin-left:100px;">
+            @*<div class="toptitle font-stroke">       City Government of Tacurong</div>*@
+            <div class="toptitle font-stroke">       Provincial Government of Agusan del Sur</div>
+            @*<div class="toptitle font-stroke">       Provincial Government of Zamboanga del Norte</div>*@
+            <div class="maintitle">
+                <span class="fg-darkGreen font-stroke">
+                   Budget Management Information System
+                </span>@*<span class="fg-color2 font-stroke">System</span>*@
+            </div>
+            <div class="clear"></div>
+            <div class="version"></div>
+        </div>
+    </div>
+
+</div>
+<div class="clear"></div>
+<div id="menu_header" style="display:block;z-index:1001;width: 1000px;">
+    <div class="left" style="position:relative; z-index:1001">
+        <nav class="navigation-bar bg-darker">
+            <nav class="navigation-bar-content">
+                @*<div id="title-hd" class="element hide">
+                        <a class="fg-white" href="#"><div class="logos_25 lfloat" ></div><span style="margin-left:30px"> @(ThemeSelector.Base.themeSelector.THEME.webAppsName + "(" + ThemeSelector.Base.themeSelector.THEME.webAppsAbbr + ")" ) </span></a>
+                    </div>*@
+                
+                @if (Request.IsAuthenticated)
+                {
+                    <div class="element place-right">
+                        <a class="dropdown-toggle" style="float:right">
+                            
+                            @*<span class="image-button photo image-left "><img class="photo" style="margin:-20px 0 0 0px;height: 45px;width:45px;" src="~/Content/images/no_avatar_available.jpg" id="uImg" /></span>*@
+                            <span class="image-button photo image-left "><img class="photo" style="margin:-20px 0 0 0px;height: 45px;width:45px;background-color:white" onerror="ImgError(this);" alt="@Account.UserInfo.eid" src="/" id="uImg" /></span>
+                       
+                            <span id="MyInfo">@Account.UserInfo.empName</span>
+                        </a>
+                        <script type="text/javascript">
+                           
+                        </script>
+                        <ul class="dropdown-menu place-right" data-role="dropdown" id="myAccount">
+                            <li><a onclick="logOut()"><span class="fa fa-sign-out" style="margin-right:10px;"></span> Logout</a></li>
+                            <li><a onclick="reqMyAccount()"><span class="fa fa-user" style="margin-right:10px;"></span> My Account</a></li>
+                        </ul>
+                    </div>
+                }
+                else
+                {
+                    <div class="element place-right" style="margin-right:10px">
+                        Hi guest! Please <a href="#">log-in</a>.
+                    </div>
+                }
+                <span class="element-divider place-right"></span>
+
+            </nav>
+        </nav>
+    </div>
+</div>
+
+
+
+<script src="@Url.Content("~/Scripts/app.js")"></script>
+
+<script>
+    $(document).ready(function () {
+        var s = $("#menu_header");
+        var pos = s.position();
+        $(window).scroll(function () {
+            var windowpos = $(window).scrollTop();
+            //s.html("Distance from top:" + pos.top + "<br />Scroll position: " + windowpos);
+            if (windowpos >= pos.top) {
+                $('#menu_header').css({ position: 'fixed', top: 0, left: 'auto', width: '1000px' })
+                $('.navigation-bar').addClass("bottom ")
+                $('#title-hd').removeClass("hide")
+            } else {
+                $('#menu_header').css({ position: 'relative', left: 0 })
+                $('.navigation-bar').removeClass("bottom")
+                $('#title-hd').addClass("hide")
+            }
+        });
+        generateBoxes()
+
+        var url = "@Url.Action("gettemplatecolor", "Login")";
+        $.post(url, function (e) {
+            //alert(e)
+            $("#colorPicker").val(e);
+            $("#loguserid").css("background-color", e); 
+            updateColor()
+        })
+        //updateColor()
+    });
+
+    function generateBoxes() {
+        let leftContainer = $("#leftContainer");
+        let rightContainer = $("#rightContainer");
+
+        leftContainer.empty();
+        rightContainer.empty();
+
+        let boxWidth = "25"; //$("#widthSlider").val();
+        let boxHeight ="25"; //$("#heightSlider").val();
+
+        let leftOpacities = [0.9, 0.8, 0.7, 0.5, 0.2, 0.05, 0.07, 0, 0.7, 0.8, 0.6, 0.4, 0.1, 0.07,0,0, 0.9, 0.7, 0.8, 0.6, 0.4, 0.05, 0, 0, 0.6, 0.7, 0.9, 0.6, 0.7, 0.5, 0, 0.05, 0.9, 0.7, 0.5, 0.4, 0.2, 0.1, 0.2, 0.05];
+        let rightOpacities = [0, 0, 0.2, 0.4,0.6, 0.8, 0.9,1,0, 0.05, 0, 0.5, 0.6,0.7,0.8, 0.9, 0, 0, 0.2, 0, 0.7, 0.6,0.8,1, 0, 0.5, 0, 0.5, 0.8, 0.9, 0.3,0.8,0,0, 0, 0.05, 0.2, 0.5, 0.8, 0.9, 0, 0, 0.3, 0, 0.05, 0.2, 0.5, 0.8 ];
+
+        // Generate Left Container Boxes
+        leftOpacities.forEach(opacity => {
+            let box = $("<div>").addClass("small-box").css({
+                "opacity": opacity,
+                "width": boxWidth + "px",
+                "height": boxHeight + "px"
+            });
+            leftContainer.append(box);
+        });
+
+        // Generate Right Container Boxes
+        rightOpacities.forEach(opacity => {
+            let box = $("<div>").addClass("small-box").css({
+                "opacity": opacity,
+                "width": boxWidth + "px",
+                "height": boxHeight + "px"
+            });
+            rightContainer.append(box);
+        });
+    }
+  
+    function updateColor() {
+        let selectedColor = $("#colorPicker").val();
+        $(".small-box").css("background-color", selectedColor);
+    }
+</script>
+<style>
+     .container {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .lfloat, .rfloat {
+            margin: -10px;
+            height: 75px;
+        }
+
+        .lfloat {
+            width: 30px;
+        }
+
+        .rfloat {
+            width: 150px;
+        }
+
+        .small-box {
+            width: 100%;
+            height: 15px;
+            background-color: #1fa67a; /* Default color */
+            margin:0px 0;
+        }
+</style>

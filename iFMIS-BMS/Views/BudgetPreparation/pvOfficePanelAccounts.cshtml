@@ -1,0 +1,519 @@
+﻿<style>
+    .btn-delete a {
+        color: #000000;
+        background-color: #ffffff;
+        border-style: solid;
+        border-color: #333333;
+        border-width: 1px;
+        height: auto;
+        width: auto;
+        padding: 3px;
+        padding-left: 5px;
+        padding-right: 5px;
+        cursor: pointer;
+        margin: auto;
+    }
+
+        .btn-delete a:hover {
+            color: #ffffff;
+            background-color: #000000;
+            border-style: solid;
+            border-color: #333333;
+            height: auto;
+            width: auto;
+        }
+</style>
+<script>
+    function newAccount() {
+        $(window).scrollTop(0);
+        var url = "@Url.Action("newAccounts", "BudgetPreparation")";
+        //ProgramID = e;
+        $.get(url, function (d) {
+            //alert(ProgramID);
+            $('#newAccounts').html(d);
+        })
+        $('#newAccounts').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Create New Accounts").center().open();
+    }
+
+    function FilterByOOE() {
+
+        var OOEID = $("#ddlOOE").val();
+        OOEValue = '';
+        if (OOEID == '1') {
+            OOEValue = 'PS'
+        } else if (OOEID == '2') {
+            OOEValue = 'MOOE'
+        }
+        else if (OOEID == '3') {
+            OOEValue = 'CO'
+        } else if (OOEID == '4') {
+            OOEValue = 'FE'
+        }
+        else if (OOEID == '') {
+            OOEValue = ''
+        }
+        var ProgramgGrid = $("#AccountsGrid").data("kendoGrid").dataSource;
+        ProgramgGrid.filter([
+            {
+                filters: [{
+                    field: "OOEName",
+                    operator: "contains",
+                    value: OOEValue
+                }]
+            }
+        ]);
+        OOEID = '';
+        OOEValue = '';
+    }
+</script>
+
+<div style="border: outset;border-width:1px;border-color:#038603; width: 870px; padding-left:0px;padding-right:0px;padding-top:0px;padding-bottom:7px;margin-top: 10px;">
+    <div style=" width: 0;height: 0; border-right: 5px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;margin-top: -1px; ">
+        <div style="width: 803px; margin-top:1px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 37px solid #1fa67a; ">
+            <div style="float: left; height:28px; margin-left:-59px; margin-top: 5px;">
+                <i class="fa fa-tasks fa-2x fg-white"> &nbsp;&nbsp;</i>
+            </div>
+            <div style="float:right">
+                <div style="float:right;margin-right:6px;margin-top:5px;">
+                    <button class="k-button k-button-icontext" onclick="newAccount()"> <i class="fa fa-plus-circle"></i> Create New Account</button>
+                </div>
+            <div style="float:right">
+                <div style="float:right;margin-right:6px;margin-top:5px;">
+                    <button class="k-button k-button-icontext" onclick="CopyAllAmount()"> <i class="fa fa-files-o "></i> Copy All Amount</button>
+                </div>
+            </div>
+                <div style="float:right">
+                    <div style="float:right;margin-right:6px;margin-top:4px;">
+                        <label style="float:left; margin-right: 10px;" class="fg-white">Expense Class :</label>
+                        @(Html.Kendo().DropDownList()
+                        .Name("ddlOOE")
+                        .DataTextField("ooe_name")
+                        .DataValueField("ooe_id")
+                        .OptionLabel("All Expense Class...")
+                        .HtmlAttributes(new { @style = "width: 350px;" })
+                        .Events(e => e.Change("FilterByOOE"))
+                        .DataSource(source => source.Read(read => read.Action("ddlOOE", "Dropdowns")))
+                        )
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        var thisculture = kendo.culture();
+        thisculture.numberFormat.currency.symbol = '₱';
+
+        function SaveChanges(e) {
+            url = "@Url.Action("Insert_AccountDenomination", "Test")";
+            $.post(url, function(d){
+                if(d == "success"){
+                    alert("Changes Save!");
+                }else{
+                    alert(d);
+                }
+            });
+        }
+
+
+        function GetGridParameter() {
+
+            var grid = $('#AccountsGrid').data('kendoGrid');
+            var proYe = $("#propsYears").val();
+            return {
+
+                propYear1: proYe
+
+            }
+            dataBound: gridDataBound
+
+    }
+    function CopyAllAmount() {
+        var grid = $("#AccountsGrid").data("kendoGrid");
+        var dataSource = grid.dataSource;
+        var totalRecords = dataSource.total();
+        if (totalRecords > 0) {
+            swal({
+                title: "Are you sure?",
+                text: "All Previous Amount Will be the Copied",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes, Copy It!",
+                closeOnConfirm: false
+            }, function () {
+                var url = "@Url.Action("CopyAllAmount", "BudgetPreparation")";
+
+                var selectedProgram = ProgramID
+                var selectedYear = $("#propsYears").val();
+
+                $.get(url, { ProgramID: selectedProgram, Year: selectedYear }, function (d) {
+
+                    if (d == "1") {
+                        swal("Success!", "Previous Amount Successfully Copied", "success");
+                        $("#AccountsGrid").data("kendoGrid").dataSource.read();
+                    } else {
+                        swal("Error!", d, "error");
+        }
+                });
+            });
+        } else
+        {
+            $.Notify({
+                caption: 'Cannot Complete Request',
+                content: 'No data to copy',
+                type: 'warning'
+            });
+        }
+    }
+        function onSaveChanges() {
+            swal({
+                title: "Success!",
+                text: "Successfully Save",
+                type: "success",
+                showCancelButton: false,
+                confirmButtonColor: "#1fa67a",
+                confirmButtonText: "OK!",
+                closeOnConfirm: true,
+            }, function () {
+                $("#AccountsGrid").data("kendoGrid").dataSource.read();
+            });
+            
+        }
+
+        function gridDataBound(e) {
+            var grid = e.sender;
+            if (grid.dataSource.total() == 0) {
+                var colCount = grid.columns.length;
+                $(e.sender.wrapper)
+                    .find('tbody')
+                    .append('<tr class="kendo-data-row"><td colspan="' + colCount + '" class="no-data">Sorry, no data :(</td></tr>');
+            }
+        };
+        var BudgetYear = $("#propsYears").val();
+        var PastYear = BudgetYear - 2;
+        var CurrentYear = BudgetYear - 1;
+        document.getElementById("BudgetYear").innerHTML = BudgetYear;
+        document.getElementById("PastYear").innerHTML = PastYear;
+        document.getElementById("CurrentYear").innerHTML = CurrentYear;
+
+        function EditData(AccountID) {
+            var AccountID = AccountID;
+            var grid = "#grid_" + AccountID;
+            var gridName = $(grid).data('kendoGrid');
+            var dataRows = gridName.items();
+            var rowIndex = dataRows.index(gridName.select());
+            var ds = gridName.dataSource.view();
+            var AccountDenominationID = ds[rowIndex].AccountDenominationID;
+            var DenominationName = ds[rowIndex].DenominationName;
+            var DenominationAmount = ds[rowIndex].DenominationAmount;
+            var url = "@Url.Action("EditData", "BudgetPreparation")";
+            $.get(url, { AccountDenominationID: AccountDenominationID, DenominationName: DenominationName, DenominationAmount: DenominationAmount, AccountID: AccountID }, function (d) {
+                document.documentElement.style.overflow = 'hidden';  // firefox, chrome
+                document.body.scroll = "no";
+                $('#EditDetails').html(d);
+            })
+            $('#EditDetails').data('kendoWindow').title("<i class='fa fa-navicon'> </i>").center().open();
+        }
+
+        function DeleteData(AccountID) {
+            var AccountID = AccountID;
+            //var ProgramID = ProgramID;
+            //var ProposalYear = ProposalYear;
+            var grid = "#grid_" + AccountID;
+            //alert(grid);
+            var gridName = $(grid).data('kendoGrid');
+            var dataRows = gridName.items();
+            var rowIndex = dataRows.index(gridName.select());
+            var ds = gridName.dataSource.view();
+            var AccountDenominationID = ds[rowIndex].AccountDenominationID;
+            swal({
+                title: "Are you sure?",
+                text: "This will Delete your Denomination Account.",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes, delete it!",
+                closeOnConfirm: false
+            }, function () {
+                var url = "@Url.Action("DeleteAccountDenomination", "BudgetPreparation")";
+                $.get(url, { AccountDenominationID: AccountDenominationID }, function (d) {
+                    if (d == "success") {
+                        $(grid).data("kendoGrid").dataSource.read();
+                        swal({
+                            title: "Success!",
+                            text: "Account Denomination Deleted.",
+                            type: "success",
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    }
+                })
+                //swal("Deleted!", "Your imaginary file has been deleted.", "success");
+            });
+        }
+
+        function onGridEdit(arg) {
+            if (arg.container.find("input[name=PastProposalAmmount]").length > 0) {
+
+                $("#AccountsGrid").data("kendoGrid").closeCell(arg.container)
+            }
+        }
+
+        
+        function CopyPreviousAmount() {
+            swal({
+                title: "Are you sure?",
+                text: "Previous Amount Will be the Copied",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes, Copy It!",
+                closeOnConfirm: false
+            }, function () {
+                var url = "@Url.Action("CopyPreviousAmount", "BudgetPreparation")";
+                var gridName = $('#AccountsGrid').data('kendoGrid');
+                var dataRows = gridName.items();
+                var rowIndex = dataRows.index(gridName.select());
+                var ds = gridName.dataSource.view();
+                var PreviousAmount = ds[rowIndex].PastProposalAmmount;
+                var AccountID = ds[rowIndex].AccountID;
+                var ProgramID = ds[rowIndex].ProgramID;
+                var ProposalYear = ds[rowIndex].ProposalYear;
+                
+
+                $.get(url, { PreviousAmount: PreviousAmount, AccountID: AccountID, ProgramID: ProgramID, ProposalYear: ProposalYear }, function (d) {
+
+                if (d == "success") {
+                        swal("Success!", "Previous Amount Successfully Copied", "success");
+                        $("#AccountsGrid").data("kendoGrid").dataSource.read();
+                    } else {
+                        swal("Error!", "Something went wrong!", "error");
+                    }
+                });
+                //swal("Deleted!", "Your imaginary file has been deleted.", "success");
+            });
+        }
+
+        function NewAccountsDenomination(AccountID,ProgramID,ProposalYear) {
+            $(window).scrollTop(0);
+            var ProgramID = ProgramID;
+            var AccountID = AccountID;
+            var ProposalYear = ProposalYear;
+            var url = "@Url.Action("NewAccountDenomination", "BudgetPreparation")";
+            $.get(url, { ProgramID: ProgramID, AccountID: AccountID, ProposalYear: ProposalYear }, function (d) {
+                document.documentElement.style.overflow = 'hidden';  // firefox, chrome
+                document.body.scroll = "no";
+                $('#CreateNewDenominationAccount').html(d);
+            });
+            $('#CreateNewDenominationAccount').data('kendoWindow').title("<i class='fa fa-navicon'> </i>").center().open();
+        }
+        function SubmitDenomination(AccountID, ProgramID, ProposalYear, OOEName) {
+            var url = "@Url.Action("SaveDenomination", "BudgetPreparation")";
+            swal({
+                title: "System Alert!",
+                text: "This Action will Total all you Denomination and Submit it as your Budget Proposal for the Selected Account. Click 'Ok' to Proceed.",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "OK",
+                closeOnConfirm: false
+            }, function () {
+                $.get(url, {AccountID: AccountID, ProgramID: ProgramID, ProposalYear: ProposalYear, OOEName: OOEName}, function(d) {
+                    if (d == "success") {
+                        $("#AccountsGrid").data("kendoGrid").dataSource.read();
+                        swal("Success!", "Account Proposal Save!", "success");                        
+                    }
+                })
+            });
+        }
+    </script>
+    
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.AccountsModel>()
+    .Name("AccountsGrid")
+
+    .Columns(col =>
+    {
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;">Accounts</div></text>)
+                        .Width(150)
+                        .HtmlAttributes(new { style = "text-align:left" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div>#=AccountName# </div>").Width(240);
+
+
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;">Account <br> Code</div></text>)
+                        .Width(50)
+                        .HtmlAttributes(new { style = "text-align:center" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div>#=AccountID# </div>");
+
+
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;">Past Year<br><span id="PastYear"></span><br>(Actual)</div></text>)
+                        .Width(150)
+                        .HtmlAttributes(new { style = "text-align:left" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div>#=PastProposalYear# </div>").Width(29);
+                        
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;">Current Year<br><span id="CurrentYear"></span><br>(Estimates)</div></text>)
+                        .Width(60)
+                        .HtmlAttributes(new { style = "text-align:left" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div>#=kendo.toString(PastProposalAmmount, 'c2')# </div>");
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;">Year</div></text>)
+                        .Width(150)
+                        .HtmlAttributes(new { style = "text-align:left" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div>#=ProposalYear# </div>").Width(50).Hidden();
+
+        col.Bound(m => m.ProposalAllotedAmount).HtmlAttributes(new { style = "text-align:left;" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;">Budget Year<br><span id="BudgetYear"></span><br>(Proposed)</div></text>)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" }).Width(50);
+                        
+        col.Bound(m => m.AccountID).Title("Account ID").Hidden();
+        col.Bound(m => m.ProgramID).Title("Program ID").Hidden();
+        col.Bound(m => m.PastProposalAmmount).Title("Past Proposal Amount").Hidden();
+        col.Bound(m => m.OOEName).Title("OOE Name").Hidden();
+        col.Template(t => { }).ClientTemplate(
+"<div class='btn-delete'> <a  title='Copy Previous Amount' onclick='CopyPreviousAmount()'><span class='fa fa-copy' style='font-size: 12pt;'></span></a></div>"
+).HtmlAttributes(new { style = "margin-left:5px;" }).Width(15);
+    })
+                                                    .ToolBar(toolbar =>
+                                           {
+                                               toolbar.Save();
+                                           })
+                                                             .ClientDetailTemplateId("template")
+
+                                                             .Editable(editable => editable.Mode(GridEditMode.InCell))
+                                                             .Pageable(page => page.Refresh(true)
+                                                                             .Enabled(true)
+                                                                             .ButtonCount(4)
+                                                                             .PreviousNext(true)
+                                                                                 )
+                                                                                       .Events(e => e.SaveChanges("onSaveChanges").Edit("onGridEdit"))
+                                                                                       .Selectable()
+                                                                                       .DataSource(d => d
+                                                                                       .Ajax()
+
+                                                                                       .Batch(true)
+                                                                                       .PageSize(10)
+                                                                                       .Model(m => m.Id(i => i.AccountID))
+                                                                                               .Read(read => read.Action("grOfficeAccounts_OfficeAdmin", "BudgetPreparation").Data("GetGridParameter"))
+                                                                                               .Update("UpdateOffice_OfficeAdmin", "BudgetPreparation"))
+)
+</div>
+<script id="template" type="text/kendo-tmpl">
+    @*<div class="k-button" onclick="AddNewRow('#=AccountID#')"><span class="fa fa-plus-circle"></span> Add New Record</div>
+        <div class="k-button" onclick="SaveChanges('#=AccountID#')"><span class="fa fa-check"></span> Save Changes</div>
+        <div class="k-button" onclick="CancelChanges('#=AccountID#')"><span class="fa fa-close"></span> Cancel Changes</div>*@
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.AccountDenomination>()
+            .Name("grid_#=AccountID#") // template expression, to be evaluated in the master context
+            .Columns(columns =>
+            {
+                columns.Bound(e => e.AccountDenominationID).Hidden();
+                columns.Bound(e => e.DenominationName).Width(150);
+                columns.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;">DenominationAmount</div></text>)
+                        .Width(150)
+                        .HtmlAttributes(new { style = "text-align:left" })
+                        .HeaderHtmlAttributes(new { style = "text-align:left" })
+                        .ClientTemplate("<div>\\#=kendo.toString(DenominationAmount, 'c2')\\# </div>");
+                //columns.Bound(e => e.DenominationAmount).Width(150);
+                columns.Template(@<text></text>)
+                        .ClientTemplate("<div class='k-button' title='Edit Details (?)' onclick='EditData( #=AccountID# )'> <span class='fa fa-edit' style='font-size: 12pt;'></span> Edit </div>").Width(30);
+                columns.Template(@<text></text>)
+                        .ClientTemplate("<div class='k-button' title='Delete (X)' onclick='DeleteData( #=AccountID# )'> <span class='fa fa-close' style='font-size: 12pt;'></span> Delete </div>").Width(35);
+               
+            })
+.ToolBar(t => t.Template(@<text>
+                <div style="float: right; height:28px;margin-top:2px;">
+                    <link href="~/Content/metroui/css/docs.css" rel="stylesheet" />
+                    <div class="k-button" onclick="SubmitDenomination('#=AccountID#', '#=ProgramID#', '#=ProposalYear#', '#=OOEName#')"><span class="fa fa-upload"></span> <b>Submit Denomination</b></div><div class="k-button" onclick="    NewAccountsDenomination('#=AccountID#', '#=ProgramID#', '#=ProposalYear#')"><span class="fa fa-plus-circle"></span> Add New Account Denomination </div> @*<div class="k-button" onclick="SaveChanges('#=AccountID#')"><span class="fa fa-check"></span> Save Changes</div> <div class="k-button" onclick="CancelChanges('#=AccountID#')"><span class="fa fa-close"></span> Cancel Changes</div>*@
+                </div>
+</text>))
+                            .Selectable()
+                            .Pageable(page => page.Refresh(true)
+                                      .Enabled(true)
+                                      .ButtonCount(4)
+                                      .PreviousNext(true))
+                            .DataSource(dataSource => dataSource
+                                //.Batch(true)
+                                .Ajax()
+                                //.Aggregates(aggregates => aggregates.Add(m => m.DenominationAmount).Sum())
+                                .ServerOperation(false)
+                                        
+                                .PageSize(10)
+                                .Model(m =>
+                                    {
+                                        m.Id(i => i.AccountDenominationID);
+
+                                    })
+                                .Read(read => read.Action("Proposal_AccountDenomination", "BudgetPreparation", new { ProgramID = "#=ProgramID#", AccountID = "#=AccountID#", ProposalYear = "#=ProposalYear#" }))
+                        .Destroy(update => update.Action("EditingPopup_Destroy", "Grid"))
+                            )
+                            .Pageable()
+                            .ToClientTemplate()
+    )
+</script>
+
+@(Html.Kendo().Window()
+    .Name("newAccounts")
+    .Title("Create New Accounts")
+    .Width(850)
+    .Height(510)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(false)
+    .AutoFocus(true)
+    .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        }).Actions(a => { a.Close(); }))
+
+@(Html.Kendo().Window()
+    .Name("CreateNewDenominationAccount")
+    .Title("Create New Denomination Account")
+    .Width(450)
+    .Height(180)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(false)
+    .AutoFocus(true)
+    .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        }).Actions(a => { a.Close(); }))
+
+@(Html.Kendo().Window()
+    .Name("EditDetails")
+    .Title("Edit Account Denomination")
+    .Width(450)
+    .Height(180)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(false)
+    .AutoFocus(true)
+    .Animation(a =>
+        {
+            a.Open(o => o.Fade(FadeDirection.In));
+            a.Close(c =>
+            {
+                c.Fade(FadeDirection.Out);
+                c.Reverse(true);
+            });
+        }).Actions(a => { a.Close(); }))

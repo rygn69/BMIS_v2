@@ -1,0 +1,106 @@
+﻿
+<script>
+    function searchAccount_exist() {
+        var $filter = new Array();
+        $filter = [];
+
+        if ($('#searchDataExist').val().length > 0) {
+            $filter.push({ field: "enduser", operator: "contains", value: $('#searchDataExist').val() }),
+            $filter.push({ field: "Description", operator: "contains", value: $('#searchDataExist').val() });
+
+            //Description
+        }
+
+        $('#grd_proposalsummary_existing').data('kendoGrid').dataSource.filter({
+            logic: "or",
+            filters: $filter
+        });
+    }
+
+    $(function () {
+        $("#searchDataExist").keypress(function (e) {
+            if (e.keyCode == 13) {
+                searchAccount_exist();
+            }
+        });
+    });
+    function fn_param_ex() {
+        return {
+            office: '@Session["officeid"]',
+            account: $("#account").val(),
+            tyear: $("#proyear").val()
+        }
+    }
+</script>
+<div id="searchAccountid" style="height: 30px; margin-top:0px; float: right; margin-left: 200px;">
+    <input type="text" style="width:400px;border-collapse:collapse;margin:0px;border-style:solid;border-color:black;margin-left:0px;height:70%;outline:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search..." id="searchDataExist" name="searchDataExist">
+    <div class="k-button k-button-icontext" style="height:30px;width:40px;border-style:solid;border-color:black;" onclick="searchAccount_exist()"><span class="mif-search"></span></div>
+</div>
+<div style="margin-top:32px">
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.BudgetControlModel>()
+        .Name("grd_proposalsummary_existing")
+        .HtmlAttributes(new { style = "height:450px;" })
+        .Scrollable()
+    .Columns(col =>
+    {
+     
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;">Description</div></text>)
+                        .Width(600)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div>#=Description# </div>")
+                        .ClientFooterTemplate("<div style='text-align:center;font-weight:bold'> TOTAL </div>");
+        col.Bound(m => m.qty)
+                        .HtmlAttributes(new { style = "font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Qty</div></text>    )
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle" })
+                    .Width(50)
+                    .ClientTemplate("<div>#=kendo.toString(qty,'N0')# </div>")
+                    .ClientFooterTemplate("<div style='text-align:center;color:darkgreen'><label> </label><label> #=kendo.toString(sum, 'N0')#</label></div>");
+        col.Template(@<text></text>)
+                    .HeaderTemplate(@<text><div style="font-weight:600;">End-User</div></text>)
+                    .Width(200)
+                    .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                    .ClientTemplate("<div>#=enduser# </div>");
+        col.Template(@<text></text>)
+                    .HeaderTemplate(@<text><div style="font-weight:600;">Year Acquired</div></text>)
+                    .Width(100)
+                    .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                    .ClientTemplate("<div>#=yearacquired# </div>");
+        col.Bound(m => m.OfficeID).Title("office").Hidden();
+
+
+
+        //
+
+    })
+
+         .AutoBind(false)
+
+         .Pageable(page => page.Refresh(true)
+            .Enabled(true)
+            .ButtonCount(4)
+            .PreviousNext(true)
+         )
+         // .ClientDetailTemplateId("template_table")
+         .Selectable()
+           .Scrollable()
+
+         .DataSource(d => d
+         .Ajax()
+         .Batch(true)
+         .ServerOperation(false)
+         .Aggregates(a =>
+         {
+             a.Add(c => c.qty).Sum();
+         })
+         .PageSize(12)
+         .Model(m => m.Id(i => i.trnno_id))
+         .Read(read => read.Action("proposal_summary_exist", "Report").Data("fn_param_ex"))
+    //   .Update("UpdateProposed_Summary", "Report"))
+    )
+)
+</div>

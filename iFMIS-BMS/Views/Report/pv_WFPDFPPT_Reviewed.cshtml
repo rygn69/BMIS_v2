@@ -1,0 +1,227 @@
+﻿<script>
+    function getwfprev_param() {
+
+        var officeid = $("#officewfpdf").val() == "" ? 0 : $("#officewfpdf").val()
+        var year = $("#wfpyear").val()
+        var qtr = $("#qtr").val()
+        return {
+            year: year,
+            officeid: officeid,
+            qtr: qtr,
+            mode: 2
+        }
+    }
+    function WFPdfpptgrid(arg){
+        var gridName = $('#grid_wfpdfppt_rev').data('kendoGrid');
+        var dataRows = gridName.items();
+        var rowIndex = dataRows.index(gridName.select());
+        var ds = gridName.dataSource.view();
+
+        if (arg.container.find("input[name=firstmon]").length > 0  || arg.container.find("input[name=secondmon]").length > 0 || arg.container.find("input[name=thirdmon]").length > 0  || arg.container.find("input[name=fourthmon]").length > 0) {
+            this.closeCell();
+        }
+       
+    }
+</script>
+<div style="display:inline-block;width:100%;margin-top:-3px;">
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.WFPrepare>()
+            .Name("grid_wfpdfppt_rev")
+            .HtmlAttributes(new { style = "height:490px;" })
+            .Scrollable()
+            .Columns(col =>
+            {
+            col.Template(@<text></text>)
+            .ClientTemplate("<input id='check#=accountid#' type='checkbox' style='zoom:1.2'  title='Tick the box to include the account in the review!'  class='checkbox'/>")
+            .Title("<input onclick=CheckAllRe(this) type='checkbox' title='Tick all the boxes!' class='checkbox'/> <span style='text - align:center; vertical - align:middle; height: 30px; background - color:#ff6a00;font-size:14px;color:beige;font-weight:100;'></span> ")
+            .Width(32)
+            //.Hidden()
+            //.HeaderTemplate(@<text>For Review</text>)
+            .HtmlAttributes(new { style = "text-align:center;height:30px" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:14px;color:beige;" });
+
+            col.Template(@<text></text>)
+            .HeaderTemplate(@<text>Account</text>)
+            .Width(300)
+            .HtmlAttributes(new { style = "text-align:left;vertical-align:top;font-size:12px" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=accountname# </div>")
+            .ClientFooterTemplate("<div style='text-align:center;color:darkgreen;font-size:10px'><label> </label><label> Total</label></div>");
+
+            col.Bound(c => c.firstmon)
+            .HeaderTemplate(@<text>First <br />Month</text>)
+            .Width(90)
+            .HtmlAttributes(new { style = "text-align:right;vertical-align:top;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=kendo.toString(firstmon,'c2')# </div>")
+            .ClientFooterTemplate("<div style='text-align:right;color:darkgreen;font-size:10px'><label> </label><label> ₱#=kendo.toString(sum, 'c2')#</label></div>");
+                col.Bound(c => c.secondmon)
+            .HeaderTemplate(@<text>Second <br />Month</text>)
+            .Width(90)
+            .HtmlAttributes(new { style = "text-align:right;vertical-align:top;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=kendo.toString(secondmon,'c2')# </div>")
+            .ClientFooterTemplate("<div style='text-align:right;color:darkgreen;font-size:10px'><label> </label><label> ₱#=kendo.toString(sum, 'c2')#</label></div>");
+
+            col.Bound(c => c.thirdmon)
+            .HeaderTemplate(@<text>Third <br />Month</text>)
+            .Width(90)
+            .HtmlAttributes(new { style = "text-align:right;vertical-align:top;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=kendo.toString(thirdmon,'c2')# </div>")
+            .ClientFooterTemplate("<div style='text-align:right;color:darkgreen;font-size:10px'><label> </label><label> ₱#=kendo.toString(sum, 'c2')#</label></div>");
+
+            col.Bound(c => c.fourthmon)
+            .HeaderTemplate(@<text>Fourth <br />Month</text>)
+            .Width(90)
+            .HtmlAttributes(new { style = "text-align:right;vertical-align:top;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=kendo.toString(fourthmon,'c2')# </div>")
+            .ClientFooterTemplate("<div style='text-align:right;color:darkgreen;font-size:10px'><label> </label><label> ₱#=kendo.toString(sum, 'c2')#</label></div>");
+
+            col.Bound(c => c.remarks)
+            .HeaderTemplate(@<text>Remark</text>)
+            .Width(90)
+            .HtmlAttributes(new { style = "text-align:right;vertical-align:top;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:20px;background-color:#ff6a00;font-size:14px;color:beige;" })
+            .ClientTemplate("<div>#=remarks# </div>");
+
+             col.Template(@<text></text>)
+            .HeaderTemplate(@<text></text>)
+            .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:30px;background-color:#ff6a00;font-size:10px;color:beige;" })
+            .ClientTemplate(
+                "<div id='printwfpid#=accountid#' style='color:red;cursor:pointer' onclick='rtpwfp(#=docid#)'><span class='fa fa-file' title='Click to preview WFP!' style='font-size: 16px;margin-top: -1px;margin-left: 1px;margin-right:1px;width:25px;text-align:center;cursor:pointer;'></span>WFP</div> ")
+            .HtmlAttributes(new { style = "vertical-align: middle;text-align:center;vertical-align:top" })
+            .Width(55);
+
+            col.Bound(c => c.programid)
+            .HeaderTemplate(@<text></text>)
+            .Hidden()
+            .ClientTemplate("<div>#=programid# </div>");
+
+            col.Bound(c => c.accountid)
+            .HeaderTemplate(@<text></text>)
+            .Hidden()
+            .ClientTemplate("<div>#=accountid# </div>");
+
+            col.Bound(c => c.ooeid)
+            .HeaderTemplate(@<text></text>)
+            .Hidden()
+            .ClientTemplate("<div>#=ooeid# </div>");
+
+             col.Bound(c => c.wfpno)
+            .HeaderTemplate(@<text></text>)
+            .Hidden()
+            .ClientTemplate("<div>#=wfpno# </div>");
+                
+            })
+             .ToolBar(toolbar =>
+             {
+                 toolbar.Custom().Text("<div style='color:red;'><span id='spanthumbsup' class='fa fa-arrow-circle-left'> </span><span id='SpanOnApproveProgress' style='display:none' class='fa fa-spinner fa-spin'></span> Set As Returned</div>").Name("btnReturn").Url("javascript:void(0)").HtmlAttributes(new { onclick = "btnReturnWFPDFPPT()" });
+             })
+            //.Sortable() // Disable this function to remove sorting or unlink the column header.
+            .Editable(editable => editable.Mode(GridEditMode.InCell))
+            .Resizable(e => e.Columns(true))
+            .Pageable(pageable => pageable
+            .Refresh(true)
+            .ButtonCount(5))
+            //.HtmlAttributes(new { @class = "table-responsive", style = "height:410px;" })
+            // .HtmlAttributes(new { style = "height:490px;" })
+            .Selectable()
+            .Events(e => e.Edit("WFPdfpptgrid"))
+            .DataSource(dataSource => dataSource
+            .Ajax()
+            .Batch(true)
+            .Model(m => m.Id(i => i.locationid))
+            .ServerOperation(false)
+            .Aggregates(a =>
+            {
+                a.Add(c => c.firstmon).Sum();
+                a.Add(c => c.secondmon).Sum();
+                a.Add(c => c.thirdmon).Sum();
+                a.Add(c => c.fourthmon).Sum();
+            })
+            .PageSize(2050)
+            .Read(read => read.Action("GetWFPDfppt_reviewed", "Report").Data("getwfprev_param"))
+            )
+    )
+
+</div>
+<script>
+   
+    function btnReturnWFPDFPPT(){
+        var grid = $("#grid_wfpdfppt_rev").data("kendoGrid");
+        var yearof = $("#wfpyear").val()
+        var programid = $("#ooe").val()
+        var accountid = $("#account").val()
+        var ooeclass = $("#ooeclass").val()
+        var fundid = $("#gfid").val() == 1 ? 0 : 1
+        var mode_trans= $("#gf_currentid").val()
+        var idsToSend = [];
+        var wfpno=[];
+        var programid=[]
+        var accountid=[],remarkval=[]
+        var ooeid=[],remarktag =0;
+        var ds = grid.dataSource.view();
+        var url = "@Url.Action("ReturnWFPDFPPT_reviewed", "Report")";
+        for (var i = 0; i < ds.length; i++) {
+            var row = grid.table.find("tr[data-uid='" + ds[i].uid + "']");
+            var checkbox = $(row).find(".checkbox");
+            if (checkbox.is(":checked")) {
+                idsToSend.push(ds[i].wfpid); //loops
+                wfpno.push(ds[i].wfpno)
+                programid.push(ds[i].programid)
+                accountid.push(ds[i].accountid)
+                ooeid.push(ds[i].ooeid)
+                var remark = $.trim(ds[i].remarks);
+                remarkval.push(remark)
+            }
+            if (remarktag == 0 && remark == ""){
+                remarktag=1
+            }
+        }
+        if (idsToSend == "") {
+            swal({ title: "Error!", text: "Please tick the checkbox first!", timer: 2000, showConfirmButton: false, type: "error" });
+            $('#SpanOnApproveProgress').css("display", "none");
+            $('#spanthumbsup').css("display", "auto");
+        }
+        else if (remarktag == 1){
+            swal("Warning","Please provide remarks for each account before returning the transaction.","warning")
+        }
+        else if (@Account.UserInfo.UserTypeID == 1)
+            swal({ title: "Warning!", text: "Sorry! You're not allowed to access this particular program.", timer: 2500, showConfirmButton: false, type: "warning" });
+        else{
+            swal({
+                title: "W A R N I N G!",
+                text: "Return selected ITEMS?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                closeOnConfirm: false
+            }, function () {
+                $.post(url, { transno: idsToSend,wfpno:wfpno,programid:programid,accountid:accountid,ooeid:ooeid,remarkval:remarkval, yearof: yearof, ooeclass: ooeclass,fundid:fundid,mode_trans:mode_trans}, function (e) {
+                    if (e == "success") {
+                        swal("Success!", "Selected account successfully returned!", "success");
+                        $("#grid_wfpdfppt_rev").data("kendoGrid").dataSource.read();
+                    } else {
+                        swal("Error!", e, "error");
+                        $("#grid_wfpdfppt_rev").data("kendoGrid").dataSource.read();
+                    }
+                });
+            });
+        }
+    }
+    function CheckAllRe(e) {
+        $("#grid_wfpdfppt_rev tbody input:checkbox").prop("checked", e.checked);
+    }
+    function rtpwfp(docid) {
+        //if (status == "Ready To Print" && gov_sig == 344880){
+        //success: window.open("https://pgas.ph/bmsattachment/" + reportpdf)
+        //success: window.open("https://pgas.ph/dgsign/blank/getPDF_View?pdfData=application/pdf&FormID="+ docid )
+        //success: window.open("https://pgas.ph/dgsign/blank/getPDF_digital_only?pdfData=application/pdf&FormID=" + docid + "")
+        //success: window.open("https://pgas.ph/dgsign/blank/keuitughhjugjugah?doc_id=" + docid + "")
+        success: window.open("https://pgas.ph/dgsign/blank/keuitughhjugjugah?doc_id=" + docid + "")
+
+        //}
+    }
+</script>

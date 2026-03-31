@@ -1,0 +1,79 @@
+﻿@model iFMIS_BMS.BusinessLayer.Models.OfficeDataModel
+
+
+<script>
+
+    function GetGridparam() {
+        var PMISOfficeID = @Model.PMISOfficeID;
+        var IFMISOfficeID = @Model.IFMISOfficeID;
+        return {
+            PMISOfficeID: PMISOfficeID,
+            IFMISOfficeID: IFMISOfficeID
+        }
+    }
+    function reqCloseTransferWindow() {
+        document.documentElement.style.overflow = 'auto';  // firefox, chrome
+        document.body.scroll = "yes";
+        $("#TransferCasual").data("kendoWindow").close();
+    }
+    function TransferEmployee(SeriesID) {
+        var url2 = "@Url.Action("TransferSelectedCasual", "BudgetPreparation")";
+        var OfficeID = @Model.IFMISOfficeID;
+        var eid = SeriesID;
+        $.get(url2,{OfficeID: OfficeID, eid: eid},function (d)
+        {
+            if (d == 1) {
+                alert('Succesfuly Transfered');
+                $("#grdCasualToTransfer").data("kendoGrid").dataSource.read();
+            }
+            else {
+                alert(d)
+            }
+        })
+
+    }
+</script>
+
+<label>
+   Transfer From : <span id="OfficeFrom">@Model.PMISOfficeDesc</span>
+</label>
+<label>
+   Transfer To : &nbsp;&nbsp;&nbsp; <span id="OfficeTo">@Model.IFMISOfficeDesc</span>
+</label>
+@(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Maintenance.PlantillaModel>()
+        .Name("grdCasualToTransfer")
+        .Columns(columns =>
+        {
+            columns.Bound(c => c.SeriesID).Hidden();
+            columns.Bound(c => c.EmployeeName).Title("Employee").Width(200)
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+            columns.Template(t => { }).ClientTemplate(
+                  "<div class='k-button' onclick='TransferEmployee(#=SeriesID#)' style='inline-block' title='Transfer'> <span class='fa fa-edit'></span>Transfer</div>"
+                  ).Width(60);
+        })
+        .HtmlAttributes(new { style = "height: 350px;" })
+        .Scrollable(s => s.Enabled(true))
+        .Selectable()
+        .DataSource(dataSource => dataSource
+            .Ajax()
+            .Read(read => read.Action("grGetCasualToTransfer", "BudgetPreparation").Data("GetGridparam"))
+        )
+        .ToolBar(toolbar =>
+        {
+            toolbar.Template(@<text>
+                <div style="float: right; height:28px;margin-top:2px;">
+                    <link href="~/Content/metroui/css/docs.css" rel="stylesheet" />
+                    <div style="background-color:white;border:solid;border-color:whitesmoke;border-width:thin;width:310px;height:30px;float:right;padding:0px;margin-top:-3px;" id="search">
+                        <input type="text" style="width:260px;border-collapse:collapse;border-color:white;margin:0px;margin-left:-10px;height:70%;outline:none;border-left-style:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search Employee" id="SearchAccount" name="SearchAccount">
+                        <div class="k-button k-button-icontext" style="height:29px;width:40px;margin-top:0.6px;" onclick="SearchPosition()"><span class="mif-search"></span></div>
+                    </div>
+
+                </div>
+            </text>);
+        })
+
+)
+
+<div style="display:inline-block; float: right">
+    <div id="btnCloseTransferWindow" class="k-button k-button-icontext" style="margin-right:5px;display:inline-block;width: 80px;clear:both; margin-top: 10px" onclick="reqCloseTransferWindow()">Close</div>
+</div>

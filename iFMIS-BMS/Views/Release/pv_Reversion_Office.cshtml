@@ -1,0 +1,1607 @@
+﻿
+<script src="~/Scripts/BMS/Release/otherfunction.js"></script>
+<script>
+    var thisculture = kendo.culture();
+    thisculture.numberFormat.currency.symbol = ''//'₱';
+    function ConvertCommasToEmpty_realign(str) {
+        str = str.toString().replace(/,/g, "");
+        parseInt(str, 20);
+        return str;
+    }
+    function CurrentYearUrl() {
+        return '@Url.Action("CurrentYear", "Global")';
+    }
+    function fn_closeRealign() {
+        var classtype_GFEE = $("#classtype").val();
+        if (classtype_GFEE == 2) {
+            $("#RealignedToWindow").data("kendoWindow").close();
+        } else if (classtype_GFEE == 3) {
+            $("#RealignedToWindow_EE").data("kendoWindow").close();
+        }
+        else {
+            $("#RealignedToWindow").data("kendoWindow").close();
+        }
+    }
+    function fn_ref_acc() {
+        document.getElementById("toAmount_null").disabled = false;
+        $("#subaccountTo").data("kendoComboBox").dataSource.read();
+        fn_availablebal_to()
+    }
+    function fn_submitreversion() {
+
+        var url = "@Url.Action("submitreversion", "Release")";
+        @*var url = "@Url.Action("GetAllEmployee", "Home")";*@
+
+
+        var office_id = $('#office_revert_to_null').val() == "" ? 0 : $('#office_revert_to_null').val()
+        var program_id = $('#Program_revert_to_null').val() == "" ? 0 : $('#Program_revert_to_null').val()
+        var account_id = $('#account_list_revert_to_null').val() == "" ? 0 : $('#account_list_revert_to_null').val()
+        var year = $("#ddlYear").val();
+
+        if (office_id == '' || office_id == 0 || office_id == null) {
+            swal({
+                title: "Waring!",
+                text: "Please select an offfice",
+                timer: 3000,
+                type: "warning",
+                showConfirmButton: false
+            })
+        } else {
+            swal({
+                title: "Submit!",
+                text: "This will submit all reversions in the above list. Do you want to proceed?",
+                type: "info",
+                showCancelButton: true,
+                closeOnConfirm: false,
+                confirmButtonColor: "#1fa67a",
+                confirmButtonText: "Yes",
+                showLoaderOnConfirm: true,
+            }, function () {
+
+                $.post(url,{office_id: office_id, program_id: program_id, account_id: account_id, year: year}, function (e) {
+
+                    if (e == "success") {
+                        swal({
+                            title: "Success!",
+                            text: "Reversion successfully submitted!",
+                            timer: 2000,
+                            type: "success",
+                            showConfirmButton: false
+                        })
+                        $('#grd_reversionoffice').data('kendoGrid').dataSource.read();
+                    } else {
+                        swal({
+                            title: "Error!",
+                            text: "System Error! Please try again.",
+                            timer: 2000,
+                            type: "error",
+                            showConfirmButton: false
+                        })
+                    }
+
+
+                });
+            })
+            //$.post(url, { office_id: office_id, program_id: program_id, account_id: account_id, year: year }, function (d) {
+            //    $('#grd_reversionoffice').data('kendoGrid').dataSource.read();
+            //})
+        }
+    }
+    function fn_History_realign_to() {
+        var url = "@Url.Action("Realigned_To", "Release")";
+
+
+        var office_id_to = $('#office_revert_to_null_To').val()
+        var program_id_to = $('#Program_revert_to_null_To').val()
+       // var ooe_id_to = $('#ooe_id_realigned_to_null_To').val()
+        var account_id_to = $('#account_list_revert_to_null_To').val()
+
+        if (office_id_to == '' || office_id_to == 0 || office_id_to == null ||
+            program_id_to == '' || program_id_to == 0 || program_id_to == null ||
+           // ooe_id_to == '' || ooe_id_to == 0 || ooe_id_to == null ||
+            account_id_to == '' || account_id_to == 0 || account_id_to == null) {
+            swal("","Please Select Account","")
+        } else {
+            $.get(url, {}, function (d) {
+                $('#history_to').html(d);
+            })
+
+            $('#history_to').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Realigned To").center().open();
+        }
+    }
+
+    function fn_savereversion() {
+       // var asdf = covert_empty($("#amounttorevert_null").val())
+
+        var url = "@Url.Action("Save_Reversion_Office", "Release")";
+
+        var office_id_realign = $('#office_revert_to_null').val() == "" ? 0 : $('#office_revert_to_null').val()
+        var program_id_realign = $('#Program_revert_to_null').val() == "" ? 0 : $('#Program_revert_to_null').val()
+        var account_id_realign = $('#account_list_revert_to_null').val() == "" ? 0 : $('#account_list_revert_to_null').val()
+        var amount_to_realign = $('#amounttorevert_null').val() ==""? 0 : $('#amounttorevert_null').val()
+        var to_be_realign = $('#toberevert_null').val()
+
+        var office_id_to_realign = $('#office_revert_to_null_To').val() == "" ? 0 : $('#office_revert_to_null_To').val()
+        var program_id_to_realign = $('#Program_revert_to_null_To').val() == "" ? 0 : $('#Program_revert_to_null_To').val()
+        var account_id_to_realign = $('#account_list_revert_to_null_To').val() == "" ? 0 : $('#account_list_revert_to_null_To').val()
+        var to_Amount = $('#toAmount_null').val() ==""? 0 : $('#toAmount_null').val()
+        var year_ = $("#ddlYear").val();
+        var subaccountfrom = $("#subaccount_re").val() == "" ? 0 : $("#subaccount_re").val()
+        var subaccountto = $("#subaccountTo").val() == "" ? 0 : $("#subaccountTo").val()
+
+        var available_amount = $('#available_amount_null').val()
+        var tobe_realignamount = $('#toberevert_null').val()
+
+      //  var account_list_revert_to_null_To
+        var mode = $("#mode").val() //add/update
+        var realignid_tmp=$("#realignid_tmp").val()
+        var purposefrom=$("#purposefrom").val()
+        var purposeto=$("#purposeto").val()
+        var origamount_from=covert_empty($("#realignamount_from").val())
+        var newamount_to=covert_empty($("#realignamount_orig").val())
+        var saiprev=$("#saiprev").val()
+        var surplus=$("#revsummaryid").val()
+        var saipno_tag=$("#saipno_revert").val()
+        var account_to=$("#account_to").val()
+        var bal4=0
+        var bal5=0
+        if (account_to == 0){
+            var bal4 = parseFloat(Number(to_be_realign) - (Number(origamount_from)- Number(amount_to_realign))).toFixed(2)
+        }
+        else{
+            var bal5 = parseFloat((Number(to_be_realign) + Number(origamount_from) + Number(newamount_to))- Number(to_Amount)).toFixed(2)
+        }
+        if (amount_to_realign == 0 || amount_to_realign == null || amount_to_realign == '') {
+            amount_to_realign = 0
+        }
+        if (to_Amount == 0 || to_Amount == null || to_Amount == '') {
+            to_Amount = 0
+        }
+
+        var difference_ = to_be_realign - amount_to_realign
+
+        if (Number(ConvertCommasToEmpty_realign(tobe_realignamount)) < Number(ConvertCommasToEmpty_realign(to_Amount)) && realignid_tmp == 0)
+        {
+            swal({
+                title: "Ooops!",
+                text: "Sorry! Please check available amount.",
+                timer: 2000,
+                type: "error",
+                showConfirmButton: false
+            })
+        }
+        else if (account_id_to_realign != 0 && to_Amount == 0) {
+            swal({
+                title: "Ooops!",
+                text: "Please enter the reversion amount.",
+                timer: 2000,
+                type: "warning",
+                showConfirmButton: false
+            })
+        }
+        else if (account_id_to_realign == 0 && amount_to_realign == 0) {
+            swal({
+                title: "Ooops!",
+                text: "Please enter the amount to revert!",
+                timer: 2000,
+                type: "warning",
+                showConfirmButton: false
+            })
+        }
+        else  if (mode == 1 && bal4 < 0){
+            swal("Oooopppsss!","The amount to revert has already been used for reversion. Please check your entry!","warning")
+            $("#amounttorevert_null").val("0.00")
+        }
+        else  if (mode == 1 && bal5 < 0){
+            swal("Oooopppsss!","There is no available total amount to revert. Please check your entry!","warning")
+            $("#amounttorevert_null").val("0.00")
+        }
+        else if ((saiprev == "" || saiprev == 0) && saipno_tag == 1){
+            swal("Warning","Please select supplemental number from the dropdown list!","warning")
+        }
+        else if (purposefrom == '' && account_id_to_realign == 0){
+            swal("Warning","Please enter your reason for reversion!","warning")
+        }
+        else if (purposeto == '' && account_id_to_realign != 0){
+            swal("Warning","Please enter your purpose for reversion!","warning")
+        }
+        else if (account_id_realign == 0 && account_id_to_realign != 0 && @Account.UserInfo.UserTypeID != 4 ){
+            swal("Warning","Please select office, program and account respectively from the source appropriation!","warning")
+        }
+        else {
+
+            if (Number(ConvertCommasToEmpty_realign(available_amount)) < Number(ConvertCommasToEmpty_realign(amount_to_realign)) && realignid_tmp==0)
+            {
+                swal({
+                    title: "Ooops!",
+                    text: "Sorry! Please check the available amount.",
+                    timer: 2000,
+                    type: "error",
+                    showConfirmButton: false
+                })
+            } else {
+                var url2 = "@Url.Action("NonOfficeSubAccount", "BudgetControl")";
+                $.get(url2, { ProgramID: program_id_realign, AccountID: account_id_realign, TransYear: year_, status: 0 }, function (e) {
+                    if (e > subaccountfrom)//no selected sub-ppa
+                    {
+                        swal({
+                            title: "W A R N I N G",
+                            text: "Please select sub-account!",
+                            type: "warning",
+                            showCancelButton: false,
+                            timer: 1500,
+                            closeOnConfirm: true,
+                            showLoaderOnConfirm: false
+                        });
+                    }
+                    else {
+                        $.get(url2, { ProgramID: program_id_to_realign, AccountID: account_id_to_realign, TransYear: year_, status: 0 }, function (e) {
+                            if (e > subaccountto && account_id_to_realign > 0)//no selected sub-ppa
+                            {
+                                swal({
+                                    title: "W A R N I N G",
+                                    text: "Please select sub-account!",
+                                    type: "warning",
+                                    showCancelButton: false,
+                                    timer: 1500,
+                                    closeOnConfirm: true,
+                                    showLoaderOnConfirm: false
+                                });
+                            }
+                            else{
+                                swal({
+                                    title: "Are you sure?",
+                                    text: "This Item will be SAVED!",
+                                    type: "info",
+                                    showCancelButton: true,
+                                    closeOnConfirm: false,
+                                    confirmButtonColor: "#1fa67a",
+                                    confirmButtonText: "Yes, Save It!",
+                                    showLoaderOnConfirm: true,
+                                }, function () {
+
+                                    $.post(url, {
+                                        office_id_realign: office_id_realign,
+                                        program_id_realign: program_id_realign,
+                                        account_id_realign: account_id_realign,
+                                        subaccountfrom:subaccountfrom,
+                                        amount_to_realign: Number(parseFloat(ConvertCommasToEmpty_realign(amount_to_realign)).toFixed(2)),
+                                        to_be_realign: Number(parseFloat(ConvertCommasToEmpty_realign(to_be_realign)).toFixed(2)),
+                                        year_: year_,
+                                        office_id_to_realign: office_id_to_realign,
+                                        program_id_to_realign: program_id_to_realign,
+                                        account_id_to_realign: account_id_to_realign,
+                                        subaccountto:subaccountto,
+                                        to_Amount: Number(parseFloat(ConvertCommasToEmpty_realign(to_Amount)).toFixed(2)),
+                                        realignid_tmp: realignid_tmp,
+                                        purposefrom:purposefrom,
+                                        purposeto:purposeto,
+                                        saiprev:saiprev,
+                                        surplus:surplus
+                                    }, function (e) {
+                                        reffff();
+                                        document.getElementById("amounttorevert_null").value = "";
+                                        document.getElementById("toAmount_null").value = "";
+
+                                        if (e == "1") {
+                                            if (mode == 0) {
+                                                swal({
+                                                    title: "Success!",
+                                                    text: "Amount has been successfully reverted!",
+                                                    timer: 2000,
+                                                    type: "success",
+                                                    showConfirmButton: false
+                                                })
+                                            }
+                                            else {
+                                                swal({
+                                                    title: "Success!",
+                                                    text: "Reverted amount has been updated!",
+                                                    timer: 2000,
+                                                    type: "success",
+                                                    showConfirmButton: false
+                                                })
+                                            }
+                                            $('#grd_reversionoffice').data('kendoGrid').dataSource.read();
+                                        } else {
+                                            swal({
+                                                title: "Error!",
+                                                text: "System Error! Please try again.",
+                                                timer: 2000,
+                                                type: "error",
+                                                showConfirmButton: false
+                                            })
+                                        }
+                                    });
+                                });
+                            }
+                        })
+                    }
+                })
+            }
+        }
+
+
+    }
+    //}
+
+    //}
+
+    function fn_refresher_realigned_to_null() {
+
+        $("#office_revert_to_null").val(null);
+        $("#account_list_revert_to_null").val(null);
+       // $("#ooe_id_realigned_to_null").val(null);
+
+        $("#office_revert_to_null").data("kendoComboBox").text(null);
+        $("#account_list_revert_to_null").data("kendoComboBox").text(null);
+       // $("#ooe_id_realigned_to_null").data("kendoDropDownList").text(null);
+
+        $("#Program_revert_to_null").data("kendoComboBox").dataSource.read();
+       // $("#ooe_id_realigned_to_null").data("kendoDropDownList").dataSource.read();
+        $("#account_list_revert_to_null").data("kendoComboBox").dataSource.read();
+
+        $("#office_revert_to_null_To").val(null);
+        $("#account_list_revert_to_null_To").val(null);
+       // $("#ooe_id_realigned_to_null_To").val(null);
+
+        $("#office_revert_to_null_To").data("kendoComboBox").text(null);
+        $("#account_list_revert_to_null_To").data("kendoComboBox").text(null);
+       // $("#ooe_id_realigned_to_null_To").data("kendoDropDownList").text(null);
+
+        $("#Program_revert_to_null_To").data("kendoComboBox").dataSource.read();
+       // $("#ooe_id_realigned_to_null_To").data("kendoDropDownList").dataSource.read();
+        $("#account_list_revert_to_null_To").data("kendoComboBox").dataSource.read();
+
+
+    }
+    setTimeout(function () {
+
+        var lru = "@Url.Action("thatassRevert", "Release")";
+        var year_ = $("#ddlYear").val();
+        var officeid = $("#office_revert_to_null").val()
+        var revsummaryid=$("#revsummaryid").val()
+        $.post(lru, { year_: year_, officeid: officeid,revsummaryid:revsummaryid }, function (e) {
+            document.getElementById("toberevert_null").value = commaSeparateNumberRealignment(e);
+
+        })
+    }, 1000);
+    function reffff() {
+        setTimeout(function () {
+
+            var lru = "@Url.Action("thatassRevert", "Release")";
+            var year_ = $("#ddlYear").val();
+            var officeid = $("#office_revert_to_null").val()
+            var subppaid = $("#subaccount_re").val() == "" ? 0 : $("#subaccount_re").val()
+            var revsummaryid=$("#revsummaryid").val()
+            var account_id = $('#account_list_revert_to_null').val() == ""? 0: $('#account_list_revert_to_null').val()
+            
+            $.post(lru, { year_: year_, officeid: officeid,revsummaryid:revsummaryid,accountid:account_id }, function (e) {
+                document.getElementById("toberevert_null").value = commaSeparateNumberRealignment(e);
+            })
+        }, 1000);
+
+
+        setTimeout(function () {
+
+            var url = "@Url.Action("datassReversion", "Release")";
+
+
+            var office_id = $('#office_revert_to_null').val()==""? 0 : $('#office_revert_to_null').val()
+            var program_id = $('#Program_revert_to_null').val() == ""? 0: $('#Program_revert_to_null').val()
+            // var ooe_id = $('#ooe_id_realigned_to_null').val()
+            var account_id = $('#account_list_revert_to_null').val() == ""? 0: $('#account_list_revert_to_null').val()
+            var year_ = $("#ddlYear").val();
+            var subppaid = $("#subaccount_re").val() == "" ? 0 : $("#subaccount_re").val()
+
+            $.post(url, { office_id: office_id, program_id: program_id, account_id: account_id, year_: year_, subppaid: subppaid }, function (e) {
+                document.getElementById("available_amount_null").value = commaSeparateNumberRealignment(e);
+                document.getElementById("amounttorevert_null").disabled = false;
+            })
+            @*document.getElementById("amounttorevert_null").value = e;
+            document.getElementById("amounttorevert_null").value = @
+                .ToBeRealign;*@
+            }, 1000);
+    }
+    function refresh_acc() {
+        $("#account_list_revert_to_null").data("kendoComboBox").dataSource.read();
+
+    }
+    function fn_refreshtext_null() {
+        //var account_id_to = $('#account_list_revert_to_null').val()
+        setTimeout(function () {
+        var url = "@Url.Action("datassReversion", "Release")";
+
+        var office_id = $('#office_revert_to_null').val()
+        var program_id = $('#Program_revert_to_null').val()
+        var account_id = $('#account_list_revert_to_null').val()
+        var subppaid = $("#subaccount_re").val() == "" ? 0 : $("#subaccount_re").val()
+        var year_ = $("#ddlYear").val();
+        $.post(url, { office_id: office_id, program_id: program_id, account_id: account_id, year_: year_, subppaid: subppaid }, function (e) {
+            if (account_id = 0 || account_id == null || account_id == '') {
+                document.getElementById("available_amount_null").value = '';
+            } else {
+                document.getElementById("available_amount_null").value = commaSeparateNumberRealignment(e);
+            }
+            document.getElementById("amounttorevert_null").disabled = false;
+            if (e <= 0) {
+
+                document.getElementById("amounttorevert_null").disabled = true;
+
+            }
+            else {
+
+                document.getElementById("amounttorevert_null").disabled = false;
+            }
+            if (subppaid == 0) {
+                $("#subaccount_re").data("kendoComboBox").dataSource.read();
+            }
+            $('#grd_reversionoffice').data('kendoGrid').dataSource.read();
+            if ($("#Program_revert_to_null_To").val() != 0){
+                $("#account_list_revert_to_null_To").data("kendoComboBox").dataSource.read();
+            }
+            reffff()
+        })
+        }, 1000);
+
+    }
+
+    function fn_availablebal_to() {
+        setTimeout(function () {
+            var url = "@Url.Action("datassReversion", "Release")";
+
+            var office_id = $('#office_revert_to_null_To').val()
+            var program_id = $('#Program_revert_to_null_To').val()
+            var account_id = $('#account_list_revert_to_null_To').val()
+            var subppaid = $("#subaccountTo").val() == "" ? 0 : $("#subaccountTo").val()
+
+            var year_ = $("#ddlYear").val();
+            $.post(url, { office_id: office_id, program_id: program_id, account_id: account_id, year_: year_, subppaid: subppaid }, function (e) {
+                if (account_id = 0 || account_id == null || account_id == '') {
+                    document.getElementById("available_amount_revert").value = '';
+                } else {
+                    document.getElementById("available_amount_revert").value = commaSeparateNumberRealignment(e);
+                }
+                if (subppaid == 0) {
+                    $("#subaccountTo").data("kendoComboBox").dataSource.read();
+                }
+                $('#grd_reversionoffice').data('kendoGrid').dataSource.read();
+            })
+        }, 1000);
+    }
+
+    function fn_dprefresherorb_realigned_to_null() {
+     //   fn_Offices_realignedto_null();
+        $("#Program_revert_to_null").data("kendoComboBox").dataSource.read();
+        //$("#account_list_revert_to_null").data("kendoComboBox").dataSource.read();
+        reffff()
+        $('#grd_reversionoffice').data('kendoGrid').dataSource.read();
+      //  $('#office_revert_to_null_To').data('kendoComboBox').dataSource.read();
+
+    }
+    function fn_dprefresherorb_realigned_to_null_To() {
+
+        $("#Program_revert_to_null_To").data("kendoComboBox").dataSource.read();
+       // $("#ooe_id_realigned_to_null_To").data("kendoDropDownList").dataSource.read();
+        $("#account_list_revert_to_null_To").data("kendoComboBox").dataSource.read();
+
+    }
+
+    function acc_ref_null() {
+        $("#account_list_revert_to_null").data("kendoComboBox").dataSource.read();
+        $('#grd_reversionoffice').data('kendoGrid').dataSource.read();
+    }
+    function acc_ref_to_null() {
+        $("#account_list_revert_to_null_To").data("kendoComboBox").dataSource.read();
+    }
+
+    function fn_Office_Type() {
+        var classtype_GFEE = $("#classtype").val();
+        return {
+            classtype_GFEE: classtype_GFEE
+        }
+    }
+    function RealGrid() {
+        var office_id = $('#office_revert_to_null').val() == ""? 0 : $('#office_revert_to_null').val()
+        var program_id = $('#Program_revert_to_null').val() == "" ? 0 : $('#Program_revert_to_null').val()
+        var account_id = $('#account_list_revert_to_null').val() == "" ? 0 : $('#account_list_revert_to_null').val()
+     //   var month_ = $('#Months_supplemental_null').val()
+        //    var subaccount = $("#subaccount").val() == "" ? 0 : $("#subaccount").val()
+        var subaccount=0
+
+        return {
+            office_id: office_id,
+            program_id: program_id,
+            account_id: account_id,
+            yearof: $("#ddlYear").val(),
+            subaccount: subaccount,
+            submit:0,
+            approved:0,
+            posted:0,
+            revsumm:$("#revsummaryid").val()
+        }
+    }
+    function sync() {
+        var availableamount = covert_empty($("#available_amount_null").val())
+        var realignamount = covert_empty($("#amounttorevert_null").val())
+        var toAmount_orig = covert_empty($("#realignamount_orig").val())
+        var toberevert_null = covert_empty($("#toberevert_null").val())
+        var toAmount_null = covert_empty($("#toAmount_null").val())
+        var realignamount_from = $("#realignamount_from").val()
+        var available_amount_revert = $("#available_amount_revert").val()
+        var realignamount_to = $("#realignamount_to").val()
+        var mode=$("#mode").val()
+
+        var bal = parseFloat((Number(availableamount) + Number(realignamount_from)) - Number(realignamount)).toFixed(2)
+        var bal2 = parseFloat((Number(toberevert_null) + Number(toAmount_orig)) - Number(toAmount_null)).toFixed(2)
+        var bal3 = parseFloat((Number(available_amount_revert) + Number(toAmount_orig) + Number(toberevert_null)) - Number(toAmount_null)).toFixed(2)
+        var bal4 = parseFloat(Number(realignamount) - Number(toberevert_null)).toFixed(2)
+     
+        if (bal < 0 )
+        {
+            swal("Warning","Please be reminded that the amount to revert must not be greater than the available amount!","warning")
+            $("#amounttorevert_null").val(realignamount_from)
+        }
+        if (bal2 < 0 || (bal3 < 0 && mode == 1)) {
+            swal("Warning", "Please be reminded that the reversion amount must not be greater than the total amount to revert or the available amount!", "warning")
+            $("#toAmount_null").val(toAmount_orig)
+        }
+    }
+    function sup_Edits(realignmentid, fromprogram, fromaccount, toprogram, toaccount, subaccount, Amount, tooffice, fromoffice,purpose,saipno) {
+        $("#mode").val(1)
+        $("#realignid_tmp").val(realignmentid)
+        document.getElementById("realignsaveid").innerHTML = "<span class='fa fa-edit' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'></span> Update"
+        document.getElementById("realignsaveid").style = "right:120px;width:90px;border-radius:50px;color:#ffffff;background-color:cornflowerblue;color:white;margin-left:10px";
+
+        $("#office_revert_to_null").data("kendoComboBox").value(fromoffice)
+        fn_dprefresherorb_realigned_to_null()
+        $("#Program_revert_to_null").data("kendoComboBox").value(fromprogram)
+        $("#account_list_revert_to_null").data("kendoComboBox").dataSource.read()
+        $("#account_list_revert_to_null").data("kendoComboBox").value(fromaccount)
+        fn_refreshtext_null()
+        $("#subaccount_re").data("kendoComboBox").dataSource.read()
+
+        if (saipno != 0){
+            document.getElementById("saipno_revert").checked=1
+            saip_click()
+        }
+        else{
+            document.getElementById("aipno_revert").checked=1
+            aip_click()
+        }
+        $("#saiprev").data("kendoComboBox").value(saipno)
+        $("#account_to").val(toaccount)
+        if (toaccount == 0) { //source account
+            $("#subaccount_re").data("kendoComboBox").value(subaccount)
+            $("#amounttorevert_null").val(Amount.toString())
+            if (subaccount != 0) {
+                fn_refreshtext_null()
+            }
+            $("#office_revert_to_null_To").data("kendoComboBox").value("")
+            $("#Program_revert_to_null_To").data("kendoComboBox").value("")
+            $("#account_list_revert_to_null_To").data("kendoComboBox").value("")
+            $("#subaccountTo").data("kendoComboBox").value("")
+            $("#toAmount_null").val(0)
+            $("#realignamount_from").val(Amount)
+            $("#purposefrom").val(purpose)
+        }
+        else {//destination account
+            $("#office_revert_to_null_To").data("kendoComboBox").value(tooffice)
+            $("#Program_revert_to_null_To").data("kendoComboBox").dataSource.read()
+            $("#Program_revert_to_null_To").data("kendoComboBox").value(toprogram)
+            $("#account_list_revert_to_null_To").data("kendoComboBox").dataSource.read()
+            $("#account_list_revert_to_null_To").data("kendoComboBox").value(toaccount)
+            $("#subaccountTo").data("kendoComboBox").dataSource.read()
+            $("#subaccountTo").data("kendoComboBox").value(subaccount)
+            $("#toAmount_null").val(Amount.toString())
+            $("#amounttorevert_null").val(0)
+            $("#realignamount_orig").val(Amount)
+            $("#realignamount_to").val(Amount)
+            $("#purposeto").val(purpose)
+           // if (subaccount != 0) {
+                fn_ref_acc()
+          //  }
+        }
+    }
+    function sup_Deletes(realignmentid, toaccount, Amount, tooffice, toprogram, subaccount) {
+        var url2 = "@Url.Action("DeleteReversionRequest", "Release")";
+        var toberealign = covert_empty($("#toberevert_null").val())
+        var Amount = covert_empty(Amount)
+        var actbal = parseFloat(Number(toberealign) - Number(Amount)).toFixed(2)
+
+        if (actbal < 0 && toaccount == 0) {
+                swal("Warning", "Sorry, this transaction can't be deleted! It has already been used for reversion.", "warning")
+        }
+        else if (toaccount != 0) {
+            var url = "@Url.Action("datassReversion", "Release")";
+
+            var office_id = $('#office_revert_to_null_To').val() == "" ? tooffice : $('#office_revert_to_null_To').val()
+            var program_id = $('#Program_revert_to_null_To').val() == "" ? toprogram : $('#Program_revert_to_null_To').val()
+            var account_id = $('#account_list_revert_to_null_To').val() == "" ? toaccount : $('#account_list_revert_to_null_To').val()
+            var subppaid = $("#subaccountTo").val() == ""? subaccount : $("#subaccountTo").val()
+            var year_ = $("#ddlYear").val();
+
+            $.post(url, { office_id: office_id, program_id: program_id, account_id: account_id, year_: year_, subppaid: subppaid }, function (e) {
+                var availableamount_to = parseFloat(Number(e) - Number(Amount)).toFixed(2)
+                if (Number(availableamount_to) < 0) {
+                    swal("Warning", "Sorry, this transaction can't be deleted! It has already been used for reversion.", "warning")
+                }
+                else {
+                    swal({
+                        title: "Are you sure?",
+                        text: "This transaction will be deleted! Do you want to proceed?",
+                        type: "info",
+                        showCancelButton: true,
+                        closeOnConfirm: false,
+                        confirmButtonColor: "#1fa67a",
+                        confirmButtonText: "Yes",
+                        showLoaderOnConfirm: true,
+                    }, function () {
+
+                        $.post(url2, {
+                            realignmentid: realignmentid,toaccount:account_id
+                        }, function (e) {
+
+                            if (e == "success") {
+                                swal({
+                                    title: "Success!",
+                                    text: "Transaction has been deleted!",
+                                    timer: 2000,
+                                    type: "success",
+                                    showConfirmButton: false
+                                })
+                                $('#grd_reversionoffice').data('kendoGrid').dataSource.read();
+                                $('#office_revert_to_null').data('kendoComboBox').dataSource.read();
+                                fn_dprefresherorb_realigned_to_null()
+                            } else {
+                                swal({
+                                    title: "Error!",
+                                    text: "System Error! Please try again.",
+                                    timer: 2000,
+                                    type: "error",
+                                    showConfirmButton: false
+                                })
+                            }
+
+
+                        });
+                    })
+                }
+            })
+        }
+        else {
+            swal({
+                title: "Are you sure?",
+                text: "This transaction will be deleted! Do you want to proceed?",
+                type: "info",
+                showCancelButton: true,
+                closeOnConfirm: false,
+                confirmButtonColor: "#1fa67a",
+                confirmButtonText: "Yes",
+                showLoaderOnConfirm: true,
+            }, function () {
+
+                $.post(url2, {
+                    realignmentid: realignmentid,toaccount:account_id
+                }, function (e) {
+
+                    if (e == "success") {
+                        swal({
+                            title: "Success!",
+                            text: "Transaction has been deleted!",
+                            timer: 2000,
+                            type: "success",
+                            showConfirmButton: false
+                        })
+                        $('#grd_reversionoffice').data('kendoGrid').dataSource.read();
+                        fn_dprefresherorb_realigned_to_null()
+                    } else {
+                        swal({
+                            title: "Error!",
+                            text: "System Error! Please try again.",
+                            timer: 2000,
+                            type: "error",
+                            showConfirmButton: false
+                        })
+                    }
+
+
+                });
+            })
+        }
+
+    }
+    function Close(){
+        $("#grd_reversionoffice").data("kendoGrid").dataSource.read();
+    }
+    function onclick_resummaryid(){
+        if (document.getElementById("revsummaryid").checked){
+            document.getElementById("revsummaryid").value=1
+
+            var url = "@Url.Action("RevertSumm", "Release")";
+            var year_ = $("#ddlYear").val();
+            $.post(url, { year_: year_ }, function (e) {
+                document.getElementById("toberevert_null").value = commaSeparateNumberRealignment(e);
+                $('#grd_reversionoffice').data('kendoGrid').dataSource.read();
+            })
+        }
+        else{
+            document.getElementById("revsummaryid").value=0
+            reffff()
+            $('#grd_reversionoffice').data('kendoGrid').dataSource.read();
+        }
+    }
+    function onDataBound(e) {
+        $(".k-hierarchy-cell").hide();
+        $(".k-hierarchy-col").hide();
+        var grid = $("#grd_reversionoffice").data("kendoGrid")
+        var ds = grid.dataSource.view();
+        var rows = e.sender.tbody.children();
+        var revsummaryid=$("#revsummaryid").val()
+
+        if (@Account.UserInfo.UserTypeID != 4 || revsummaryid==0) {
+           // grid.showColumn('accountfrom');
+           // grid.showColumn('ppafrom');
+            grid.hideColumn('officename');
+        }
+        else{
+           // grid.hideColumn('accountfrom');
+           // grid.hideColumn('ppafrom');
+            grid.showColumn('officename');
+        }
+    }
+</script>
+<h2 style="font-size:18px;font-weight:bold;"><span class="fa fa-tasks"></span><u> Reversion <nbsp></nbsp></u> </h2>
+<br />
+<div class="k-button k-button-icontext" style="margin-left:-4px;" onclick="reversion_submitted()"><span class='fa fa-send' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 0px;margin-right: 0px;'></span> Submitted</div>
+<div class="k-button k-button-icontext" style="margin-left:-4px;" onclick="reversion_approved()"><span class='fa fa-thumbs-o-up' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 0px;margin-right: 0px;'></span> Reviewed</div>
+<div class="k-button k-button-icontext" style="margin-left:-4px;" onclick="reversion_posted()"><span class='fa fa-save' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 0px;margin-right: 3px;'></span> Posted</div>
+<div class="k-button k-button-icontext" style="margin-left:-4px;" onclick="reversion_surplus()"><span class='fa fa-plus-circle' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 0px;margin-right: 3px;'></span> Surplus</div>
+<div style="display:none">
+    <input type="number" id="realignamount_from" value="0" />
+    <input type="number" id="realignamount_orig" value="0"/>
+    <input type="number" id="realignamount_to" value="0" />
+    <input type="number" id="mode" value="0" />
+    <input type="number" id="realignid_tmp" value="0" />
+    <input type="number" id="availableamount_to" value="0" />
+    <input type="number" id="account_to" value="0" />
+</div>
+<div style="">
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Monthly_DD_Model>()
+    .Name("grd_reversionoffice")
+   // .Scrollable()
+    .Columns(col =>
+    {
+        col.Bound(m => m.officename).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Office</div></text>)
+                        .Width(150)
+                        .ClientTemplate("<div>#=officename# </div>")
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Bound(m => m.accountfrom).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Account <br />(From)</div></text>)
+                        .Width(150)
+                        .ClientTemplate("<div>#=accountfrom# </div>")
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Bound(m => m.ppafrom).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">PPA <br />(From)</div></text>)
+                        .Width(150)
+                        .ClientTemplate("<div>#=ppafrom# </div>")
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+    //    .ClientFooterTemplate("<div style='text-align:right;'><label> </label><label> Total</label></div>");
+    
+        col.Template(@<text></text>).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Account <br />(To)</div></text>)
+                        .Width(150)
+                        .ClientTemplate("<div>#=accountto# </div>")
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Template(@<text></text>).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">PPA <br />(To)</div></text>)
+                        .Width(150)
+                        .ClientTemplate("<div>#=ppato# </div>")
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Bound(m => m.Amount)
+                        .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Amount</div></text>)
+                        .Width(100)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div>#=kendo.toString(Amount,'c2')# </div>");
+    //  .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> </label><label> #=kendo.toString(sum, 'c2')#</label></div>");
+        
+        col.Template(t => { }).ClientTemplate(
+                        "<div class='k-button k-button-icontext' style='border-radius:50px;color:\\#ffffff;background-color:\\cornflowerblue;' onclick='sup_Edits(#=reversion_id#,#=fromprogram#,#=fromaccount#,#=toprogram#,#=toaccount#,#=subaccount#,#=Amount#,#=tooffice#,#=fromoffice#,\"#=purpose#\",#=saipno#)'><span class='fa fa-pencil-square-o' style='font-size:10pt;margin:1px;margin-top:-1px;margin-left:1px;margin-right:1px;'> </span>edit</div> " +
+                        "<div class='k-button k-button-icontext' style='border-radius:50px;color:\\#ffffff;background-color:\\#DE5555;'   onclick='sup_Deletes(#=reversion_id#,#=toaccount#,#=Amount#,#=tooffice#,#=toprogram#,#=subaccount#)'   ><span class='fa fa-trash-o' style='font-size: 10pt;margin: 1px;margin-top:-1px;margin-left:1px;margin-right:1px;'> </span>del</div> "
+                        ).HtmlAttributes(new { style = "vertical-align: top;" }).Width(158);
+        col.Bound(m => m.reversion_id).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">id</div></text>)
+                        .Hidden()
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Bound(m => m.fromprogram).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">program(from)</div></text>)
+                        .Hidden()
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Bound(m => m.fromaccount).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">account(from)</div></text>)
+                        .Hidden()
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Bound(m => m.subaccount).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">sub-account</div></text>)
+                        .Hidden()
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Bound(m => m.fromoffice).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">office(from)</div></text>)
+                        .Hidden()
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Bound(m => m.tooffice).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">office(to)</div></text>)
+                        .Hidden()
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Bound(m => m.toprogram).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">program(to)</div></text>)
+                        .Hidden()
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Bound(m => m.toaccount).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">account(to)</div></text>)
+                        .Hidden()
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Bound(m => m.purpose).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Purpose</div></text>)
+                        .Hidden()
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Bound(m => m.saipno).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">SAIP No.</div></text>)
+                        .Hidden()
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+
+    })
+
+        .Sortable()
+        .Scrollable()
+        .Events(e => e.DataBound("onDataBound"))
+        //    .Events(e => e.Change("WFPgrid"))
+        .HtmlAttributes(new { style = "height:auto;" })
+        .Pageable(pageable => pageable
+            .Refresh(true)
+            .ButtonCount(2))
+        .DataSource(d => d
+        .Ajax()
+        //.Aggregates(a =>
+        //{
+        //    a.Add(c => c.Amount).Sum();
+        //})
+        .PageSize(1000)
+        .Model(m => m.Id(i => i.supplementalbudget_id))
+        .Read(read => read.Action("Load_Reversion_Req", "Release").Data("RealGrid")))
+)
+
+</div>
+
+<div style="float: left;margin-left:540px;margin-top:5px;">
+    <div class="k-button k-button-icontext" style="border-radius:50px; color:white; background-color:cornflowerblue;width:100px;" onclick="fn_submitreversion()"><span class='fa fa-send' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'></span> Submit</div>
+</div>
+<div style="clear:both"></div>
+<br />
+<div id="div_surplus" style="display:normal;margin-left:200px">
+    <input style="zoom:1.2"  type="checkbox" id="revsummaryid" onclick="onclick_resummaryid()" value="0"/>
+    <label style="display:inline-block;font-size:12px;font-weight:normal"> View Surplus Reversion</label>
+</div>
+<div style="float: left;margin-top:3px">
+    <div style="float: left;margin-left:73px;margin-top:2px;">
+        <label style="float:left;margin-left: 50px;">
+            Year :
+        </label>
+    </div>
+    <div style="float: right;margin-right:65px;margin-top:0px;">
+
+        @(Html.Kendo().ComboBox()
+            .Name("ddlYear")
+            .DataTextField("ProposalYear")
+            .DataValueField("ProposalYear")
+            .Placeholder("Select year")
+            .Filter("contains")
+            .MinLength(1)
+            .SelectedIndex(0)
+            .HtmlAttributes(new { @style = "width: 500px;" })
+            .DataSource(source => source.Read(read => read.Action("MAFYear", "PYear")))
+        )
+    </div>
+    <div style="float: left;margin-left:60px;margin-top:10px;">
+        <label style="float:left;margin-left: 50px;">
+            Office :
+        </label>
+    </div>
+    <div style="float: right;margin-right:65px;margin-top:5px;">
+
+        @(Html.Kendo().ComboBox()
+            .Name("office_revert_to_null")
+            .DataTextField("OfficeName")
+            .DataValueField("OfficeID")
+            .Placeholder("Select office...")
+            .Filter("contains")
+            .MinLength(2)
+            .HtmlAttributes(new { @style = "width: 500px;" })
+            .Events(e => e.Change("fn_dprefresherorb_realigned_to_null"))
+        .DataSource(source => source.Read(read => read.Action("GetOfficeSupplement", "Release")))
+        //.DataSource(source => source.Read(read => read.Action("GetOfficeName", "Home")))
+        )
+    </div>
+    <div style="height:10px;">
+    </div>
+
+    <div id="ProgramAndExpenseClassDiv" style="float: none;clear:both; margin-top: 25px">
+
+        <div style="float: left;margin-left:40.5px;margin-top:10px;">
+            <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                Program :
+            </label>
+        </div>
+        <div style="float: right;margin-right:65px;margin-top:5px;">
+            <script>
+                function fn_Offices_realignedto_null() {
+
+                    var proyy = $("#ddlYear").val();
+                  var off_id = $("#office_revert_to_null").val();
+               //   var ooe_id = $("#ooe_id_realigned_to_null").val();
+
+                  return {
+                      propYear: proyy,
+                      office_ID: off_id
+                  }
+              }
+            </script>
+
+            @(Html.Kendo().ComboBox()
+            .Name("Program_revert_to_null")
+            .DataTextField("ProgramDescription  ")
+            .DataValueField("ProgramID")
+            .Placeholder("Select programs...")
+            .Events(e => e.Change("acc_ref_null"))
+            .HtmlAttributes(new { @style = "width: 500px;" })
+            .AutoBind(true)
+            .DataSource(source => source.Read(read => read.Action("GetPrograms2", "Release").Data("fn_Offices_realignedto_null")))
+            )
+
+        </div>
+
+        @*<div style="float: left;margin-right:10px;margin-top:10px;">
+                <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                    Expense Class    :
+                </label>
+            </div>
+            <div style="float: right;margin-right:65px;margin-top: 5px;">
+                @(Html.Kendo().DropDownList()
+                            .Name("ooe_id_realigned_to_null")
+                            .DataTextField("ooe_name")
+                            .DataValueField("ooe_id")
+                            .OptionLabel("Select Expenses...")
+
+                            .HtmlAttributes(new { @style = "width: 500px;" })
+                             .Events(e => e.Change("refresh_acc"))
+                            .DataSource(source => source.Read(read => read.Action("ddlOOENonOfficeLevel", "Dropdowns")))
+                )
+            </div>*@
+        <div style="float: left;margin-left:43px;margin-top:10px;">
+            <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                Account    :
+            </label>
+        </div>
+        <div style="float: right;margin-right:65px;margin-top:5px;">
+            <script>
+                    function fn_ForAccount_realignedto_null() {
+                        var office_ID_from = $("#office_revert_to_null").val();
+                        var prog_id_from = $("#Program_revert_to_null").val();
+                      //  var ooe_id_from = $("#ooe_id_realigned_to_null").val();
+
+                        var year_ = $("#ddlYear").val();
+                        var office_ID_to = $("#office_revert_to_null_To").val();
+                        var prog_id_to = $("#Program_revert_to_null_To").val();
+                       // var ooe_id_to = $("#ooe_id_realigned_to_null_To").val();
+                        var account_id_to = $("#account_list_revert_to_null_To").val();
+                        if (office_ID_to == null || office_ID_to == '') {
+                            office_ID_to = 0;
+                        }
+                        if (prog_id_to == null || prog_id_to == '') {
+                            prog_id_to = 0;
+                        }
+
+                        if (account_id_to == null || account_id_to == '') {
+                            account_id_to = 0;
+                        }
+
+                        return {
+                            office_ID_from: office_ID_from,
+                            prog_id_from: prog_id_from,
+                            year_: year_,
+                            office_ID_to: office_ID_to,
+                            prog_id_to: prog_id_to,
+                            account_id_to: account_id_to
+                        }
+                    }
+            </script>
+
+            @(Html.Kendo().ComboBox()
+                        .Name("account_list_revert_to_null")
+                        .DataTextField("account_name")
+                        .DataValueField("account_id")
+                        .Filter("contains")
+                        .MinLength(2)
+                        .Placeholder("Select Account...")
+                        .HtmlAttributes(new { @style = "width: 500px;" })
+                        .AutoBind(true)
+                        .Events(e => e.Change("fn_refreshtext_null"))
+                        .DataSource(source => source.Read(read => read.Action("Account_Mos_From", "Release").Data("fn_ForAccount_realignedto_null")))
+            )
+        </div>
+
+        <div style="float: left;margin-left:8.5px;margin-top:12px;">
+            <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                Sub-Account    :
+            </label>
+        </div>
+        <div style="float: right;margin-right:65px;margin-top:5px;">
+            <script>
+                function getRealignSub() {
+                    var prog_id = $("#Program_revert_to_null").val();
+                    
+                    return {
+                        year: $("#ddlYear").val(),
+                        program: prog_id,
+                        accountTemp: $("#account_list_revert_to_null").val(),
+                        exaccount: 0,
+                        exaccountoption: 0,
+                        allsubppa: 0
+                    }
+                }
+            </script>
+
+            @(Html.Kendo().ComboBox()
+                        .Name("subaccount_re")
+                        .DataTextField("AccountName") 
+                        .DataValueField("SPO_ID")
+                        .Filter("contains")
+                        .MinLength(1)
+                        .Placeholder("Select Sub-Account...")
+                        .HtmlAttributes(new { @style = "width: 500px;" })
+                        .AutoBind(true)
+                        .Events(e => e.Change("fn_refreshtext_null"))
+                        .AutoBind(true)
+                        .DataSource(source => source.Read(read => read.Action("GetSubAccount", "Report").Data("getRealignSub")))
+            )
+        </div>
+
+        <div style="float: left;margin-left:-26.5px;margin-top:14px;">
+            <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                Available Amount :
+            </label>
+
+        </div>
+       
+        <div style="float: right;margin-right:374px;margin-top:5px;">
+            <input type="text" style="width:180px;color: #2c9a0c" name="available_amount_null" id="available_amount_null" onkeyup="commaSeparateNumberversion2('available_amount_null')" step="0.01" disabled>
+        </div>
+
+        <div style="float:right;margin-right:580px;margin-top:10px;">
+            <label style="margin-left:50px;margin-right:5px;margin-top:0px;margin-bottom:2px;">
+                Amount to Revert     :
+            </label>
+        </div>
+        <div style="float: right;margin-right:374px;margin-top:-40px;">
+            <input type="text" style="width:180px; color: red" name="amounttorevert_null" id="amounttorevert_null" onkeyup="commaSeparateNumberversion2('amounttorevert_null')" disabled>
+        </div>
+        
+        <div style="float: left;margin-left:6px;margin-top:4px;">
+            <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                Total Amount <br />to revert :
+            </label>
+        </div>
+        <div style="float:right;margin-right:374px;margin-top:5px;">
+            <input type="text" style="width:180px; color: #0501fa" name="toberevert_null" id="toberevert_null" onkeyup="commaSeparateNumberversion2('toberevert_null')" disabled>
+        </div>
+
+        <div style="float:left;margin-left:-109.5px;margin-top:49px;">
+            <label style="margin-left:50px;margin-right:5px;margin-top:0px;margin-bottom:2px;">
+                Reason :
+            </label>
+        </div>
+        <div style="float:right;margin-right:66px;margin-top:5px;">
+            <textarea type="text" style="width:488px;height:23px;" name="purposefrom" id="purposefrom" placeholder="Enter reason here!!!"></textarea>
+        </div>
+        <div style="border-color:gray;float:left;margin-left:0px;border-style:solid;border-width:1px;width:750px;margin-top:15px;">
+            <div style="background-color:#ff6a00;width:150px;margin-top:-15px;margin-left:10px;"><span style="font-size:15px;margin-left:5px;color:beige;font-style:italic">AIP Plan</span></div>
+            <input type="radio" id="aipno_revert" value="1" checked="checked" style="display:inline-block;margin-left:40px;zoom:1.2;width:20px" onclick="aip_click()" />
+            <label style="display:inline-block;font-size:14px;font-weight:normal"> Regular AIP</label>
+
+            <input type="radio" id="saipno_revert" value="0" style="display:inline-block;margin-left:20px;zoom:1.2;width:20px" onclick="saip_click()" />
+            <label style="display:inline-block;font-size:14px;font-weight:normal"> Supplemental AIP</label>
+            <div style="float:left;margin-left:36px;margin-top:30px;">
+                <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                    SAIP No. :
+                </label>
+            </div>
+            <script>
+            function getyear(){
+                var year = $("#ddlYear").val() == ""? CurrentYear()  :  $("#ddlYear").val()
+                return{
+                    year:year
+                }
+            }
+            </script>
+            <div style="float:right;margin-right:409px;margin-top:5px;margin-bottom:7px">
+                @(Html.Kendo().ComboBox()
+            .Name("saiprev")
+            .DataTextField("SuplementalNo")
+            .DataValueField("SuplementalNo")
+            .Placeholder("")
+            .Filter("contains")
+            .MinLength(1)
+            .SelectedIndex(-1)
+            .HtmlAttributes(new { @style = "width: 150px;" })
+            .DataSource(source => source.Read(read => read.Action("saipno", "Release").Data("getyear")))
+                )
+
+            </div>
+        </div>
+            <br />
+            <div style="float:left;margin-left:150px;margin-top:20px;">
+                <label style="margin-left: 90px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px; color:red;">
+                    <u>Revert To:</u>
+                </label>
+            </div>
+
+
+            <div style="float: left;margin-left:-239.5px;margin-top:58px;">
+                <label style="margin-left: 0px;margin-right: 0px;margin-top: 0px;margin-bottom: 2px;">
+                    Office (To) :
+                </label>
+            </div>
+            <div style="float: right;margin-right:66px;margin-top:10px;">
+                @(Html.Kendo().ComboBox()
+                            .Name("office_revert_to_null_To")
+                            .DataTextField("OfficeName")
+                            .DataValueField("OfficeID")
+                            .Placeholder("Select office...")
+                            .Filter("contains")
+                            .MinLength(1)
+                            .HtmlAttributes(new { @style = "width: 500px;" })
+                            .Events(e => e.Change("fn_dprefresherorb_realigned_to_null_To"))
+                       .DataSource(source => source.Read(read => read.Action("GetOffice", "dpOffice")))
+                )
+            </div>
+
+            <div style="height:10px;">
+
+            </div>
+
+
+
+            <div style="float: left;margin-left:7px;margin-top:50px;">
+                <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                    Program (To) :
+                </label>
+            </div>
+            <div style="float: right;margin-right:66px;margin-top:5px;">
+                <script>
+                    function fn_Offices_revertto_null_To() {
+
+                        var proyy = $("#ddlYear").val();
+                        var off_id = $("#office_revert_to_null_To").val();
+                        var program_from = $("#Program_revert_to_null").val();
+                        return {
+                            propYear: proyy,
+                            office_ID: off_id,
+                            program_from: program_from
+                        }
+                    }
+                </script>
+
+                @(Html.Kendo().ComboBox()
+                    .Name("Program_revert_to_null_To")
+                    .DataTextField("ProgramDescription  ")
+                    .DataValueField("ProgramID")
+                    .Placeholder("Select program...")
+                    .Events(e => e.Change("acc_ref_to_null"))
+                    .HtmlAttributes(new { @style = "width: 500px;" })
+                    .DataSource(source => source.Read(read => read.Action("gProgramsreversion", "Release").Data("fn_Offices_revertto_null_To")))
+                )
+
+            </div>
+
+            @*<div style="float: left;margin-right:10px;margin-top:10px;">
+                <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                    Expense Class    :
+                </label>
+            </div>
+            <div style="float: right;margin-right:65px;margin-top: 5px;">
+                @(Html.Kendo().DropDownList()
+                        .Name("ooe_id_realigned_to_null_To")
+                        .DataTextField("ooe_name")
+                        .DataValueField("ooe_id")
+                        .OptionLabel("Select Expenses...")
+
+                        .HtmlAttributes(new { @style = "width: 500px;" })
+
+                        .DataSource(source => source.Read(read => read.Action("ddlOOENonOfficeLevel", "Dropdowns")))
+                )
+            </div>*@
+            <div style="float:left;margin-left:-155px;margin-top:47px;">
+                <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                    Account (To) :
+                </label>
+            </div>
+            <div style="float: right;margin-right:66px;margin-top:5px;">
+                <script>
+                    function fn_ForAccount_realignedto_null_To() {
+
+                        var office_ID_from = $("#office_revert_to_null").val();
+                        var prog_id_from = $("#Program_revert_to_null").val();
+                       // var ooe_id_from = $("#ooe_id_realigned_to_null").val();
+                        var account_id_from = $("#account_list_revert_to_null").val();
+                        var year_ = $("#ddlYear").val();
+                        var office_ID_to = $("#office_revert_to_null_To").val();
+                        var prog_id_to = $("#Program_revert_to_null_To").val();
+                       // var ooe_id_to = $("#ooe_id_realigned_to_null_To").val();
+
+                        if (office_ID_from == null || office_ID_from == '') {
+                            office_ID_from = 0;
+                        }
+                        if (prog_id_from == null || prog_id_from == '') {
+                            prog_id_from = 0;
+                        }
+
+                        if (account_id_from == null || account_id_from == '') {
+                            account_id_from = 0;
+                        }
+
+                        return {
+                            office_ID_from: office_ID_from,
+                            prog_id_from: prog_id_from,
+
+                            account_id_from: account_id_from,
+                            year_: year_,
+                            office_ID_to: office_ID_to,
+                            prog_id_to: prog_id_to
+                        }
+                    }
+                </script>
+
+                @(Html.Kendo().ComboBox()
+                        .Name("account_list_revert_to_null_To")
+                        .DataTextField("account_name")
+                        .DataValueField("account_id")
+                        .Filter("contains")
+                        .MinLength(1)
+                        .Placeholder("Select Account...")
+                        .Events(e => e.Change("fn_ref_acc"))
+                        .HtmlAttributes(new { @style = "width: 500px;" })
+                        .DataSource(source => source.Read(read => read.Action("ReversionAccount_To", "Release").Data("fn_ForAccount_realignedto_null_To")))
+                )
+            </div>
+
+            <div style="float: left;margin-left:-25px;margin-top:43px;">
+                <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                    Sub-Account (To) :
+                </label>
+            </div>
+            <div style="float: right;margin-right:66px;margin-top:5px;">
+                <script>
+                function getRealignToSub() {
+                    var prog_id = $("#Program_revert_to_null_To").val();
+                    return {
+                        year: $("#ddlYear").val(),
+                        program: prog_id,
+                        accountTemp: $("#account_list_revert_to_null_To").val(),
+                        exaccount: 0,
+                        exaccountoption: 0,
+                        allsubppa: 0
+                    }
+                }
+                </script>
+
+                @(Html.Kendo().ComboBox()
+                        .Name("subaccountTo")
+                        .DataTextField("AccountName")
+                        .DataValueField("SPO_ID")
+                        .Filter("contains")
+                        .MinLength(1)
+                        .Placeholder("Select Sub-Account...")
+                        .Events(e => e.Change("fn_ref_acc"))
+                        .HtmlAttributes(new { @style = "width: 500px;" })
+                        .DataSource(source => source.Read(read => read.Action("GetSubAccount", "Report").Data("getRealignToSub")))
+                )
+            </div>
+            <div style="float: left;margin-left:-192px;margin-top:44px;">
+                <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+                    Available Amount :
+                </label>
+            </div>
+            <div style="float: right;margin-right:374px;margin-top:5px;">
+                <input type="text" style="width:180px;color: #2c9a0c" name="available_amount_revert" id="available_amount_revert" onkeyup="commaSeparateNumberversion2('available_amount_revert')" step="0.01" disabled>
+            </div>
+
+            <div style="float:right;margin-right:598px;margin-top:12px;">
+                <label style="margin-left: 0px;margin-right: 0px;margin-top: 0px;margin-bottom: 2px;">
+                    Reversion Amount :
+                </label>
+            </div>
+            <div style="float: right;margin-right:374px;margin-top:-29px;">
+                <input type="text" style="width:180px; color: red" name="toAmount_null=" id="toAmount_null" value="0.00" onkeyup="commaSeparateNumberversion2('toAmount_null')" disabled>
+            </div>
+            <div style="float:left;margin-left:41.5px;margin-top:12px;">
+                <label style="margin-left:50px;margin-right:5px;margin-top:0px;margin-bottom:2px;">
+                    Purpose :
+                </label>
+            </div>
+            <div style="float: right;margin-right:66px;margin-top:5px;">
+                <textarea type="text" style="width:488px;height:23px;" name="purposeto" id="purposeto" placeholder="Enter purpose here!!!"></textarea>
+            </div>
+        </div>
+    <div style="display:inline-block; margin-left:300px;margin-top:30px">
+        <div class="k-button k-button-icontext" style="right:20px;width: 90px;border-radius:50px;" onclick="fn_clear()"><span class='fa fa-eraser' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;' ></span> Clear</div>
+        <div class="k-button k-button-icontext" id="realignsaveid" style="right:120px;width: 90px; border-radius:50px;color:#ffffff;background-color:cornflowerblue;color:white;margin-left:10px" onclick="fn_savereversion()"><span class='fa fa-save' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'></span> Save</div>
+    </div>
+</div>
+<div style="clear:both"></div>
+
+<script>
+    $(document).ready(function(){
+        $("#saiprev").data("kendoComboBox").enable(false)
+    })
+    function aip_click(){
+        document.getElementById("saipno_revert").checked=0
+        $("#aipno_revert").val(1)
+        $("#saipno_revert").val(0)
+        $("#saiprev").data("kendoComboBox").value("")
+        $("#saiprev").data("kendoComboBox").enable(false)
+    }
+    function saip_click(){
+        document.getElementById("aipno_revert").checked=0
+        $("#aipno_revert").val(0)
+        $("#saipno_revert").val(1)
+        $("#saiprev").data("kendoComboBox").value("")
+        $("#saiprev").data("kendoComboBox").enable(true)
+    }
+</script>
+
+@(Html.Kendo().Window()
+        .Name("reversionsubmitted")
+        .Title("Submitted")
+        .Width(980)
+        .Height(535)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+                
+            });
+        })
+        .Actions(a => { a.Close(); })
+)
+@(Html.Kendo().Window()
+        .Name("reversionForApproval")
+        .Title("For Approval")
+        .Width(980)
+        .Height(810)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+
+            });
+        })
+        .Actions(a => { a.Close(); })
+)
+@(Html.Kendo().Window()
+        .Name("reversionposted")
+        .Title("Realignment")
+        .Width(980)
+        .Height(485)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+
+            });
+        })
+        .Actions(a => { a.Close(); })
+)
+
+@(Html.Kendo().Window()
+        .Name("reversionsurplus")
+        .Title("Reversion Surplus")
+        .Width(600)
+        .Height(490)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+
+            });
+        })
+        .Actions(a => { a.Close(); })
+)
+
+@(Html.Kendo().Window()
+        .Name("reversionapproved")
+        .Title("Realignment")
+        .Width(980)
+        .Height(650)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+
+            });
+        })
+        .Actions(a => { a.Close(); })
+)
+
+<script>
+
+    $(document).ready(function () {
+        var ITIYIDMXPLCKOWE = $('#Progss').val()
+        $("#Program_revert_to_null").data("kendoComboBox").value(ITIYIDMXPLCKOWE);
+        if (@Account.UserInfo.UserTypeID !=4){
+            document.getElementById("div_surplus").style="display:none"
+        } 
+    }, 1000);
+    $(document).ready(function () {
+        var UYIRKKSKALZQWESX = $('#account_list').val()
+        $("#account_list_revert_to_null").data("kendoComboBox").value(UYIRKKSKALZQWESX);
+        setTimeout(function () {
+            $("#account_list_revert_to_null").data("kendoComboBox").dataSource.read();
+
+        }, 1000);
+        fn_refreshtext_null();
+    }, 1000);
+    setTimeout(function () {
+        $("#account_list_revert_to_null").data("kendoComboBox").dataSource.read();
+    }, 1000);
+
+
+    function fn_clear() {
+        $("#realignamount_orig").val(0)
+        $("#mode").val(0)
+        $("#realignid_tmp").val(0)
+        document.getElementById("realignsaveid").innerHTML = "<span class='fa fa-save' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'></span> Save";
+        document.getElementById("realignsaveid").style = "right:120px;width:80px;border-radius:50px;color:#ffffff;background-color:cornflowerblue;color:white;margin-left:10px";
+
+        $('#office_revert_to_null').data("kendoComboBox").value("")
+        $('#Program_revert_to_null').data("kendoComboBox").value("")
+        $('#account_list_revert_to_null').data("kendoComboBox").value("")
+        $('#amounttorevert_null').val("0.00")
+        $('#toberevert_null').val("0.00")
+
+        $('#office_revert_to_null_To').data("kendoComboBox").value("")
+        $('#Program_revert_to_null_To').data("kendoComboBox").value("")
+        $('#account_list_revert_to_null_To').data("kendoComboBox").value("")
+        $('#toAmount_null').val("0.00")
+        $("#subaccount_re").data("kendoComboBox").value("")
+        $("#subaccountTo").data("kendoComboBox").value("")
+        $('#available_amount_null').val("0.00")
+        $('#toberevert_null').val("0.00")
+        $('#available_amount_revert').val("0.00")
+        $('#realignamount_to').val(0)
+        $("#availableamount_to").val(0)
+        $("#purposefrom").val("")
+        $("#purposeto").val("")
+        $("#saiprev").data("kendoComboBox").value("")
+        aip_click()
+        document.getElementById("aipno_revert").checked=1
+        $("#account_to").val(0);
+    }
+    function reversion_submitted() {
+        $(window).scrollTop(0);
+        var officeid = $('#office_revert_to_null').val() == "" ? 0 : $('#office_revert_to_null').val()
+        if (officeid == 0) {
+            swal("Warning","Please select an office!","warning")
+        }
+        else {
+            if (@Account.UserInfo.UserTypeID == 4) //system admin
+            {
+                var url = "@Url.Action("reversionForApproval", "Release")";
+                $.get(url,
+                function (d) {
+                    $('#reversionForApproval').html(d);
+                })
+
+                $('#reversionForApproval').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Reversion For Approval").center().open();
+            }
+            else{
+                var url = "@Url.Action("reversionsubmitted", "Release")";
+                $.get(url,
+                function (d) {
+                    $('#reversionsubmitted').html(d);
+                })
+
+                $('#reversionsubmitted').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Submitted Reversion").center().open();
+            }
+        }
+    }
+    function reversion_approved(){
+        $(window).scrollTop(0);
+        var officeid = $('#office_revert_to_null').val() == "" ? 0 : $('#office_revert_to_null').val()
+        if (officeid == 0) {
+            swal("Warning","Please select an office!","warning")
+        }
+        else {
+            var url = "@Url.Action("reversionapprove", "Release")";
+            $.get(url,
+            function (d) {
+                $('#reversionapproved').html(d);
+            })
+
+            $('#reversionapproved').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Approved Reversion").center().open();
+        }
+    }
+    function reversion_posted(){
+        $(window).scrollTop(0);
+        var officeid = $('#office_revert_to_null').val() == "" ? 0 : $('#office_revert_to_null').val()
+        if (officeid == 0) {
+            swal("Warning","Please select an office!","warning")
+        }
+        else {
+            var url = "@Url.Action("reversionposted", "Release")";
+            $.get(url,
+            function (d) {
+                $('#reversionposted').html(d);
+            })
+
+            $('#reversionposted').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Posted Reversion").center().open();
+        }
+    }
+    function reversion_surplus(){
+        $(window).scrollTop(0);
+        var office_from = $("#office_revert_to_null").val() == ""? 0: $("#office_revert_to_null").val()
+
+        if (office_from == 0 && @Account.UserInfo.UserTypeID !=4){
+            swal("Warning","Please select an office!","warning")
+        }
+        else{
+            var url = "@Url.Action("reversionsurplus", "Release")";
+            $.get(url,
+            function (d) {
+                $('#reversionsurplus').html(d);
+            })
+            $('#reversionsurplus').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Surplus Reversion").center().open();
+        }
+    }
+</script>

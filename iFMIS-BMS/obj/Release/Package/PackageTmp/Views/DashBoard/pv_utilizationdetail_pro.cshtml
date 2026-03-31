@@ -1,0 +1,384 @@
+﻿<script>
+    function classdet() {
+        @*var year = $("#ddlYear").val() == "" ? CurrentYear() : $("#ddlYear").val()
+        var selcat = $("#percategory").val()
+        var classpercent = $("#classpercent").val() == "" ? 0 : $("#classpercent").val()
+        var allclass='@Session["allclass"]';
+        var office = '@Session["office"]';
+
+        return {
+            year: year,
+            percent: classpercent,
+            selcat: selcat,
+            allclass: allclass,
+            officeid: office
+        }*@
+        var year = $("#ddlYear").val() == "" ? CurrentYear() : $("#ddlYear").val()
+        var selcat = $("#percategory").val()
+        var utipercent = $("#utipercent").val() == "" ? 0 : $("#utipercent").val()
+        var allclass = '@Session["allclass"]';
+        var office = '@Session["office"]';
+        return {
+            year: year,
+            percent: utipercent,
+            selcat: selcat,
+            allclass: allclass,
+            officeid: office
+        }
+    }
+    
+    function detailsclassclk_pro() {
+        var gridpro = $("#grd_classdetail_pro").data("kendoGrid")
+        var percategory = $("#percategory").val()
+        var perpercentage = $("#perpercentage").val() == "" ? 0 : $("#perpercentage").val()
+        if (document.getElementById("showdetailclassid").checked) {
+            $("#showdetailclassid").val(1)
+            //account,amount_pr,utilize_pr,amount_ob,utilize_ob
+            if (percategory == 3) {
+                gridpro.showColumn('office');
+                gridpro.showColumn('account');
+                gridpro.showColumn('amount_pr');
+                gridpro.showColumn('utilize_pr')
+                gridpro.showColumn('amount_ob')
+                gridpro.showColumn('utilize_ob')
+
+
+                // gridpro.setOptions({ columns: gridpro.columns });
+            }
+            else {
+                if (percategory == 2) { 
+                    gridpro.showColumn('amount_pr');
+                    gridpro.showColumn('utilize_pr')
+                    gridpro.showColumn('amount_ob')
+                    gridpro.showColumn('utilize_ob')
+                }
+                else {
+                    gridpro.showColumn('amount_pr');
+                    gridpro.showColumn('utilize_pr')
+                    gridpro.showColumn('amount_ob')
+                    gridpro.showColumn('utilize_ob')
+                }
+            }
+            gridpro.columns[0].width = 200;
+            gridpro.columns[0].style = "font-size:11px;"
+        }
+        else {
+            $("#showdetailclassid").val(0)
+            if (percategory == 3) {
+                gridpro.hideColumn('amount_pr');
+                gridpro.hideColumn('utilize_pr')
+                gridpro.hideColumn('amount_ob')
+                gridpro.hideColumn('utilize_ob')
+            }
+            else {
+                if (percategory == 2) {
+                    gridpro.hideColumn('amount_pr');
+                    gridpro.hideColumn('utilize_pr')
+                    gridpro.hideColumn('amount_ob')
+                    gridpro.hideColumn('utilize_ob')
+                }
+                else{
+                    gridpro.hideColumn('account');
+                    gridpro.hideColumn('amount_pr');
+                    gridpro.hideColumn('utilize_pr')
+                    gridpro.hideColumn('amount_ob')
+                    gridpro.hideColumn('utilize_ob')
+                }
+            }
+            gridpro.columns[0].width = 200;
+            gridpro.columns[0].style = "font-size:11px;"
+
+        }
+    }
+    function classuti() {
+        $("#grd_classdetail_pro").data("kendoGrid").dataSource.read()
+    }
+    function onDataBound_detailprocure(e) {
+        //$(".k-hierarchy-cell").hide();
+        //$(".k-hierarchy-col").hide();
+        var grid = $("#grd_classdetail_pro").data("kendoGrid")
+        //var ds = grid.dataSource.view();
+        //var rows = e.sender.tbody.children();
+        var allclass = '@Session["allclass"]';
+        var office = '@Session["office"]';
+
+        
+        if (office != 0) {
+            //$(".k-hierarchy-cell").hide();
+            //$(".k-hierarchy-col").hide();
+            grid.hideColumn('office')
+            grid.showColumn('account')
+        }
+        else {
+            //$(".k-hierarchy-cell").show();
+            //$(".k-hierarchy-col").show();
+            grid.showColumn('office')
+            grid.hideColumn('account')
+        }
+        if (office == 0) {
+            $("#grd_classdetail_pro thead [data-field=office] .k-link").html("Office").css('font-size','12px')
+        }
+    }
+</script>
+
+<div style="display:inline-block">
+    <div style="margin-top:4px">
+        <input type="checkbox" id="showdetailclassid" onclick="detailsclassclk_pro()" value="0" title="Tick to view details." />
+        <label style="font-size:12px; display:inline-block;color:indianred"> View details</label>
+    </div>
+    <label style="font-size:14px;margin-left:480px;margin-top:-15px">
+                Utilization (%) :
+            </label>
+            <div style="float:right;margin-right:0px;margin-top:-32px;">
+                @(Html.Kendo().ComboBox()
+                          .Name("classpercent")
+                          .Filter("contains")
+                          .MinLength(1)
+                          .Placeholder("-- select percentage --")
+                          .BindTo(new List<SelectListItem>()
+                            {
+                                new SelectListItem() {
+                                    Text = "0", Value = "0"
+                                },
+                                new SelectListItem() {
+                                    Text = "10", Value = "10"
+                                },
+                                new SelectListItem() {
+                                    Text = "20", Value = "20"
+                                },
+                                 new SelectListItem() {
+                                    Text = "30", Value = "30"
+                                },
+                                  new SelectListItem() {
+                                    Text = "40", Value = "40"
+                                },
+                                   new SelectListItem() {
+                                    Text = "50", Value = "50"
+                                },
+                                    new SelectListItem() {
+                                    Text = "60", Value = "60"
+                                },
+                                     new SelectListItem() {
+                                    Text = "70", Value = "70"
+                                },
+                                      new SelectListItem() {
+                                    Text = "80", Value = "80"
+                                },
+                                       new SelectListItem() {
+                                    Text = "90", Value = "90"
+                                },
+                                        new SelectListItem() {
+                                    Text = "100", Value = "100"
+                                },
+                            })
+
+                          .HtmlAttributes(new { style = "width:170px;" })
+                          .Events(e => e.Change("classuti"))
+                          .Suggest(true)
+                )
+            </div>
+    <div style="margin-top:0px">
+        @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.DashBoard.DashBoardModel>()
+            .Name("grd_classdetail_pro")
+            // .Scrollable()
+            .Columns(col =>
+            {
+
+            col.Bound(m => m.office).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                    .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size:12px;">Office</div></text>)
+                    .Width(300)
+                    .ClientTemplate("<div style=font-size:11px;>#=office#</div>")
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                    .ClientFooterTemplate("<div style='text-align:center;'><label> </label><label> Total</label></div>");
+            col.Bound(m => m.account).HtmlAttributes(new { style = "text-align:left;" })
+                    .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size:12px;">Account</div></text>)
+                    .Width(200)
+                    .Hidden()
+                    .ClientTemplate("<div style=font-size:11px;>#=account#</div>")
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+            col.Bound(m => m.appropriation_pr)
+                    .HtmlAttributes(new { style = "text-align:right;" })
+                    .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size:12px;">Apropriation <br />Procurement<br />(a)</div></text>)
+                    .Width(145)
+                    .ClientTemplate("<div style=font-size:11px;>#=kendo.toString(appropriation_pr,'c2')# </div>")
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                    .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> </label><label> ₱#=kendo.toString(sum, 'c2')#</label></div>");
+            col.Bound(m => m.amount_pr)
+                    .HtmlAttributes(new { style = "text-align:right;" })
+                    .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size:12px;">PR<br />(b)</div></text>)
+                    .Width(145)
+                    .Hidden()
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                    .ClientTemplate("<div style=font-size:11px;>#=kendo.toString(amount_pr,'c2')# </div>")
+                    .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> </label><label> ₱#=kendo.toString(sum, 'c2')#</label></div>");
+            col.Bound(m => m.utilize_pr)
+                    .HtmlAttributes(new { style = "text-align:right;" })
+                    .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size:12px;">Utilized<br />(b/a)</div></text>)
+                    .Width(120)
+                    .Hidden()
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                    .ClientTemplate("<div style=font-size:11px;></div>#=kendo.toString(utilize_pr,'c2')# </div>");
+            col.Bound(m => m.appropriation_ob)
+                    .HtmlAttributes(new { style = "text-align:right;" })
+                    .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size:12px;">Appropriation<br />Non-Procurement<br />(d)</div></text>)
+                    .Width(155)
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                    .ClientTemplate("<div style=font-size:11px;></div>#=kendo.toString(appropriation_ob,'c2')# </div>")
+                    .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> </label><label> ₱#=kendo.toString(sum, 'c2')#</label></div>");
+            col.Bound(m => m.amount_ob)
+                    .HtmlAttributes(new { style = "text-align:right;" })
+                    .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size:12px;">Obligation<br />(e)</div></text>)
+                    .Width(145)
+                    .Hidden()
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                    .ClientTemplate("<div style=font-size:11px;></div>#=kendo.toString(amount_ob,'c2')# </div>")
+                    .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> </label><label> ₱#=kendo.toString(sum, 'c2')#</label></div>");
+            col.Bound(m => m.utilize_ob)
+                    .HtmlAttributes(new { style = "text-align:right;" })
+                    .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size:12px;">Utilized<br />(e/d)</div></text>)
+                    .Width(120)
+                    .Hidden()
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                    .ClientTemplate("<div style=font-size:11px;></div>#=kendo.toString(utilize_ob,'c2')# </div>");
+            col.Bound(m => m.OfficeID)
+                    .HtmlAttributes(new { style = "text-align:left;" })
+                    .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Office ID</div></text>)
+                    .Hidden();
+            col.Bound(m => m.accountid)
+                    .HtmlAttributes(new { style = "text-align:left;" })
+                    .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">account ID</div></text>)
+                    .Hidden();
+            col.Bound(m => m.num)
+                    .HtmlAttributes(new { style = "text-align:left;" })
+                    .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Office ID</div></text>)
+                    .Hidden();
+            })
+            //.ToolBar(toolbar =>
+            //{
+            //    toolbar.Custom().Text("<span class='fa fa-arrows-alt'> </span> View in Fullscreen").Name("btnFullScreen_pro").Url("javascript:void(0)").HtmlAttributes(new { onclick = "DivFullScreen_pro()" });
+            //    toolbar.Custom().Text("<span class='fa fa-compress'> </span> Restore Screen").Name("btnRestoreScreen_pro").Url("javascript:void(0)").HtmlAttributes(new { onclick = "DivRestoreScreen_pro()" });
+            //})
+            .Sortable()
+            .Scrollable()
+            .Resizable(e => e.Columns(true))
+            .HtmlAttributes(new { style = "height:450px;width:760px" })
+            .ClientDetailTemplateId("templateid")
+            .Pageable(pageable => pageable
+            .Refresh(true)
+            .ButtonCount(2))
+            .Events(e => e.DataBound("onDataBound_detailprocure").Change("gridpercent_pro"))
+            .Selectable()
+            .DataSource(d => d
+            .Ajax()
+            .Aggregates(a =>
+            {
+                a.Add(c => c.appropriation_pr).Sum();
+                a.Add(c => c.appropriation_ob).Sum();
+                a.Add(c => c.amount_pr).Sum();
+                a.Add(c => c.amount_ob).Sum();
+            })
+            .PageSize(1000)
+            .Model(m => m.Id(i => i.num))
+            .Read(read => read.Action("utilizationperprocure", "DashBoard").Data("classdet")))
+                )
+    </div>
+    <script style="" id="templateid" type="text/kendo-tmpl">
+        @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.DashBoard.DashBoardModel>()
+            .Name("grd_classdetail_pro#=OfficeID#")
+            // .Scrollable()
+            .Columns(col =>
+            {
+            col.Bound(m => m.office).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                    .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size:12px;color:black;">Office</div></text>)
+                    .Width(300)
+                    .Hidden()
+                    .ClientTemplate("<div style=font-size:11px;>\\#=office\\#</div>")
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal;background-color:\\#ffd800;font-size:11px;color:black;" })
+                    .ClientFooterTemplate("<div style='text-align:center;'><label> </label><label> Total</label></div>");
+            col.Bound(m => m.account).HtmlAttributes(new { style = "text-align:left;" })
+                    .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size:12px;color:black;">Account</div></text>)
+                    .Width(200)
+                    .ClientTemplate("<div style=font-size:11px;>\\#=account\\#</div>")
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal;background-color:\\#ffd800;font-size:11px;color:black;" });
+            col.Bound(m => m.appropriation_pr)
+                    .HtmlAttributes(new { style = "text-align:right;" })
+                    .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size:12px;color:black;">Apropriation <br />Procurement<br />(a)</div></text>)
+                    .Width(120)
+                    .ClientTemplate("<div style=font-size:11px;>\\#=kendo.toString(appropriation_pr,'c2')\\# </div>")
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal;background-color:\\#ffd800;font-size:11px;color:black;" })
+                    .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> </label><label> ₱\\#=kendo.toString(sum, 'c2')\\#</label></div>");
+            col.Bound(m => m.amount_pr)
+                    .HtmlAttributes(new { style = "text-align:right;" })
+                    .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size:12px;color:black;">PR<br />(b)</div></text>)
+                    .Width(120)
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal;background-color:\\#ffd800;font-size:11px;color:black;" })
+                    .ClientTemplate("<div style=font-size:11px;>\\#=kendo.toString(amount_pr,'c2')\\# </div>")
+                    .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> </label><label> ₱\\#=kendo.toString(sum, 'c2')\\#</label></div>");
+            col.Bound(m => m.utilize_pr)
+                    .HtmlAttributes(new { style = "text-align:right;" })
+                    .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size:12px;color:black;">Utilized<br />(b/a)</div></text>)
+                    .Width(120)
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal;background-color:\\#ffd800;font-size:11px;color:black;" })
+                    .ClientTemplate("<div style=font-size:11px;></div>\\#=kendo.toString(utilize_pr,'c2')\\# </div>");
+            col.Bound(m => m.appropriation_ob)
+                    .HtmlAttributes(new { style = "text-align:right;" })
+                    .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size:12px;color:black;">Appropriation<br />Non-Procurement<br />(d)</div></text>)
+                    .Width(130)
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal;background-color:\\#ffd800;font-size:11px;color:black;" })
+                    .ClientTemplate("<div style=font-size:11px;></div>\\#=kendo.toString(appropriation_ob,'c2')\\# </div>")
+                    .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> </label><label> ₱\\#=kendo.toString(sum, 'c2')\\#</label></div>");
+            col.Bound(m => m.amount_ob)
+                    .HtmlAttributes(new { style = "text-align:right;" })
+                    .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size:12px;color:black;">Obligation<br />(e)</div></text>)
+                    .Width(120)
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal;background-color:\\#ffd800;font-size:11px;color:black;" })
+                    .ClientTemplate("<div style=font-size:11px;></div>\\#=kendo.toString(amount_ob,'c2')\\# </div>")
+                    .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> </label><label> ₱\\#=kendo.toString(sum, 'c2')\\#</label></div>");
+            col.Bound(m => m.utilize_ob)
+                    .HtmlAttributes(new { style = "text-align:right;" })
+                    .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size:12px;color:black;">Utilized<br />(e/d)</div></text>)
+                    .Width(120)
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal;background-color:\\#ffd800;font-size:11px;color:black;" })
+                    .ClientTemplate("<div style=font-size:11px;></div>\\#=kendo.toString(utilize_ob,'c2')\\# </div>");
+            col.Bound(m => m.OfficeID)
+                    .HtmlAttributes(new { style = "text-align:left;" })
+                    .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Office ID</div></text>)
+                    .Hidden();
+            col.Bound(m => m.accountid)
+                    .HtmlAttributes(new { style = "text-align:left;" })
+                    .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">account ID</div></text>)
+                    .Hidden();
+            col.Bound(m => m.num)
+                    .HtmlAttributes(new { style = "text-align:left;" })
+                    .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Office ID</div></text>)
+                    .Hidden();
+            })
+            .Sortable()
+            .Scrollable()
+            .Resizable(e => e.Columns(true))
+            .HtmlAttributes(new { style = "height:450px;width:760px" })
+         //   .ClientDetailTemplateId("templateid")
+            .Pageable(pageable => pageable
+            .Refresh(true)
+            .ButtonCount(2))
+       //     .Events(e => e.DataBound("onDataBoundprocure").Change("gridpercent_pro"))
+            .Selectable()
+            .DataSource(d => d
+            .Ajax()
+            .Aggregates(a =>
+            {
+                a.Add(c => c.appropriation_pr).Sum();
+                a.Add(c => c.appropriation_ob).Sum();
+                a.Add(c => c.amount_pr).Sum();
+                a.Add(c => c.amount_ob).Sum();
+            })
+            .PageSize(1000)
+            .Model(m => m.Id(i => i.num))
+            .Read(read => read.Action("utilizationperprocure", "DashBoard", new { year= "#=yearof#",  percent= "#=prcent#",  selcat= "#=catid#",  allclass= "#=perclass#",  officeid= "#=OfficeID#"}))
+            )
+            .Pageable()
+            .ToClientTemplate()
+        )
+    </script>
+
+</div>

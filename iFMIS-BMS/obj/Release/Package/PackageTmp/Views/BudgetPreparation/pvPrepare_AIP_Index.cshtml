@@ -1,0 +1,313 @@
+﻿<script>
+    function ResizeAIPDIV() {
+        var DIVSize = $("#AIPGridDIVSizeIndicator").val();
+        var DIV_ID = 'AIPGridDIV';
+        if(DIVSize == 0 ){
+            MaximizeDIV(DIV_ID);
+            document.getElementById('AIPGridDIVSizeIndicator').value = 1;
+            document.getElementById('btnResizeText').innerHTML = " Minimize";
+            document.getElementById('btnResizeIcon').className ="fa fa-arrows";
+
+        }
+        else {
+            MinimizeDIV(DIV_ID);
+            document.getElementById('AIPGridDIVSizeIndicator').value = 0;
+            document.getElementById('btnResizeText').innerHTML = " Maximize";
+            document.getElementById('btnResizeIcon').className ="fa fa-arrows-alt";
+        }
+    }
+    function GridParameters() {
+        var OfficeID = $("#ddlAIPOffices").val();
+        return {
+            OfficeID: OfficeID
+        }
+
+    }
+    function AddNewItem() {
+        var Mode = "Add"
+        var url = "@Url.Action("ShowAIPWindow", "BudgetPreparation")";
+        $('#AddNewAIPWindow').html('<div style="width: 100%;height:100%;"><img src="@Url.Content("~/Content/images/loading.gif")" alt="Loading..." style="position: absolute;top: 20%;left: 30%;margin-top: 0px;margin-left: 0px;" /></div>');
+        $.post(url,{Mode:Mode,AIPID:'NONE'}, function (pvData) {
+            $(window).scrollTop(0);
+            $('#AddNewAIPWindow').html(pvData);
+            $('#AddNewAIPWindow').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Add New Item - AIP").center().open();
+        })
+    }
+    function OnddlAIPOfficesChange() {
+        $('#grdAIPList').data('kendoGrid').dataSource.read();
+    }
+    function getAIPGridFooterTotal() {
+        var url = "@Url.Action("getAIPGridFooterTotal", "BudgetPreparation")";
+        var OfficeID = $("#ddlAIPOffices").val();
+        var ReturnValue = "";
+        $.get(url,{OfficeID: OfficeID}, function (d) {
+            document.getElementById('GridFooterTotal').innerHTML = d;
+        })
+    }
+    function OnAIPGridEdit(arg) {
+        //var inputName = arg.container.find('input').attr("name");
+        //if (inputName == "OrderNo") {
+        //    var myInput = arg.container.find('input[name="OrderNo"]');
+        //    setTimeout(function () {
+        //        myInput.select();
+        //    },25);
+        //}
+        if (arg.container.find("input[name=OrderNo]").length <= 0) {
+            $("#grdAIPList").data("kendoGrid").closeCell(arg.container)
+        }
+
+        var gridName = $('#grdAIPList').data('kendoGrid');
+        var ds = gridName.dataSource.data();
+        var dataRows = gridName.items();
+        var AIP_ID = "";
+
+        var input = arg.container.find("input[name=OrderNo]");
+        var value = input.val();
+        var OldValue = input.val();
+
+        input.keyup(function () {
+            value = input.val();
+        });
+        input.blur(function () {
+            var rowIndex = dataRows.index(gridName.select());
+            AIP_ID = ds[rowIndex].AIPID;
+            if (value != OldValue) {
+                var url = "@Url.Action("UpdateAIPOrderNo", "BudgetPreparation")";
+                $.post(url, { AIP_ID: AIP_ID, OrderNo: value }, function (d) {
+                    if (d == "1") {
+                        $("#grdAIPList").data("kendoGrid").dataSource.read();
+                    }
+                    else {
+                        swal({
+                            title: "Error!",
+                            text: d,
+                            type: "error",
+                            showConfirmButton: true
+                        });
+                    }
+                })
+            }
+        });
+
+    }
+    function reqEditAIP(AIPID) {
+        var Mode = "Edit"
+        var url = "@Url.Action("ShowAIPWindow", "BudgetPreparation")";
+        $('#AddNewAIPWindow').html('<div style="width: 100%;height:100%;"><img src="@Url.Content("~/Content/images/loading.gif")" alt="Loading..." style="position: absolute;top: 20%;left: 30%;margin-top: 0px;margin-left: 0px;" /></div>');
+        $.post(url,{Mode:Mode,AIPID :AIPID}, function (pvData) {
+            $(window).scrollTop(0);
+            $('#AddNewAIPWindow').html(pvData);
+            $('#AddNewAIPWindow').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Update Item - AIP").center().open();
+        })
+
+    }
+    function reqRemoveAIP(AIPID) {
+        var url = "@Url.Action("RemoveAIP", "BudgetPreparation")";
+        $.post(url, { AIP_ID: AIPID}, function (d) {
+            if (d == "1") {
+                swal({
+                    title: "Success!",
+                    text: "AIP Item Successfuly Removed",
+                    type: "success",
+                    showConfirmButton: true
+                });
+                $("#grdAIPList").data("kendoGrid").dataSource.read();
+            }
+            else {
+                swal({
+                    title: "Error!",
+                    text: d,
+                    type: "error",
+                    showConfirmButton: true
+                });
+            }
+        })
+    }
+    function NonOfficeToogle(AIPID) {
+        var url = "@Url.Action("NonOfficeToogleAIP", "BudgetPreparation")";
+        $.post(url, { AIPID: AIPID,isNonOffice:$("#cbNonOffice"+AIPID).is(':checked')}
+            //, function (d) {
+            //if (d == "1") {
+            //    swal({
+            //        title: "Success!",
+            //        text: "Item Updated",
+            //        type: "success",
+            //        showConfirmButton: true
+            //    });
+            //}
+            //else {
+            //    swal({
+            //        title: "Error!",
+            //        text: d,
+            //        type: "error",
+            //        showConfirmButton: true
+            //    });
+            //}
+            //}
+        )
+    }
+</script>
+
+<div style="width : 100%; border-style: solid; border-color: #1fa67a">
+    <div style="width:100%;height : 25px ; background-color:#1fa67a; color: white">
+        <label class="fa fa-file-powerpoint-o fa-lg" style="margin-left: 5px; display:inline-block">  Annual Investment Plan (AIP) Preparation</label>
+    </div>
+    <label style="margin-left: 0px;margin-left: 10px;margin-top: 10px;margin-bottom: 2px; display : inline-block">
+        Office :&nbsp;&nbsp;&nbsp;&nbsp;
+        @(Html.Kendo().ComboBox()
+                         .Name("ddlAIPOffices")
+                         .DataTextField("OfficeName")
+                         .DataValueField("OfficeID")
+                         .Filter("contains")
+                         .MinLength(1)
+                         .Placeholder("Select Office...")
+                         .HtmlAttributes(new { @style = "width: 527px;" })
+                         .DataSource(source => source.Read(read => read.Action("ddlOfficeUP", "User")))
+                         .Events(e => e.Change("OnddlAIPOfficesChange"))
+        )<br />
+        <br />
+    </label>  
+    <div id="AIPGridDIV" value="0">
+        <input type="hidden" value="0" id="AIPGridDIVSizeIndicator" />
+        <div style="border: outset;clear:both;border-width:1px;border-color:#1fa67a; width: 100%; padding-left:0px;padding-right:0px;padding-top:0px;padding-bottom:7px;margin-top: 10px;">
+            <div style=" width: 91.5%;height: 100%; border-right: 0px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;margin-top: -1px; ">
+                <div style="float: left; width: 100%; margin-top:1px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 36px solid #1fa67a; ">
+                    <div style="float:right; width:100%">
+                        <div style="float:right;margin-right:6px;margin-top:5px;">
+                            <button class="k-button k-button-icontext" onclick="ResizeAIPDIV()"> <i id="btnResizeIcon" style="display:inline-block" class="fa fa-arrows-alt"></i><div style="display:inline-block; margin-left:2px" id="btnResizeText"> Maximize</div></button>
+                            <button class="k-button k-button-icontext" onclick="AddNewItem()"> <i class="fa fa-plus-circle"></i> Add </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Budget_Preparation.AIPItemsModel>()
+            .Name("grdAIPList")
+            .Columns(columns =>
+            {
+                columns.Bound(c => c.AIPID).Hidden();
+                columns.Bound(c => c.OrderNo).Title("Order No.").Width(65)
+                    .HtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal"})
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+                columns.Bound(c => c.AIPRefCode).Title("AIP Ref Code").Width(70)
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+                columns.Bound(c => c.Description).Title("Program/Project/Activity Description").Width(200).Encoded(false)
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+                columns.Bound(c => c.StartDate).Title("Start Date").Width(100)
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+                columns.Bound(c => c.CompletionDate).Title("Completion Date").Width(100)
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+                columns.Bound(c => c.ExpectedOutput).Title("Expected Outputs").Width(150)
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+                columns.Bound(c => c.FundingSource).Title("Funding Source").Width(70)
+                    .HtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+                columns.Bound(c => c.PSAmount).Title("Personal Services").Width(100)
+                    .HtmlAttributes(new { style = "text-align:right; vertical-align: middle; overflow: visible; white-space: normal" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+                columns.Bound(c => c.MOOEAmount).Title("Maintenance & Other Operating Expenses").Width(100)
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                    .HtmlAttributes(new { style = "text-align:right" })
+                    .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label>Total : </label></div>");
+                columns.Bound(c => c.COAmount).Title("Capital Outlay").Width(100)
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                    .HtmlAttributes(new { style = "text-align:right" });
+                columns.Bound(c => c.TotalAmount).Title("Total").Width(100)
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                    .HtmlAttributes(new { style = "text-align:right" })
+                  .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label id='GridFooterTotal'></label></div>");
+                columns.Bound(c => c.CCAmount).Title("Climate Change Adaption").Width(100)
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                    .ClientTemplate("# if(CCType == 1) { #" +
+                                               "#=kendo.toString(CCAmount)#" +
+                                           "# } else { #" +
+                                               "" +
+                                           "# } #"
+                    )
+                    .HtmlAttributes(new { style = "text-align:right" });
+                columns.Bound(c => c.CCAmount).Title("Climate Change Mitigation").Width(100)
+                    .ClientTemplate("# if(CCType == 2) { #" +
+                                               "#=kendo.toString(CCAmount)#" +
+                                           "# } else { #" +
+                                               "" +
+                                           "# } #"
+                    )
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                    .HtmlAttributes(new { style = "text-align:right" });
+                columns.Bound(c => c.CCTypologyCode).Title("CC Typology Code").Width(100)
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                    .HtmlAttributes(new { style = "text-align:left" });
+                columns.Template(t => { }).Title("is Non-Office")
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                    .ClientTemplate("# if(isNonOffice == 1) { #" +
+                                               "<input id='cbNonOffice#=AIPID#' onclick='NonOfficeToogle(#=AIPID#)' type='checkbox' checked class='checkbox'/>" +
+                                           "# } else { #" +
+                                               "<input id='cbNonOffice#=AIPID#' onclick='NonOfficeToogle(#=AIPID#)' type='checkbox' class='checkbox'/>" +
+                                           "# } #"
+                    )
+                    .Width(85);
+                columns.Template(t => { })
+                    .ClientTemplate("<div class='k-button' onclick='reqEditAIP(#=AIPID#)' style='inline-block' title='Edit'>Edit</div>")
+                    .Width(85);
+                columns.Template(t => { })
+                    .ClientTemplate("<div class='k-button' onclick='reqRemoveAIP(#=AIPID#)' style='inline-block' title='Remove'>Remove</div>")
+                    .Width(85);
+
+            })
+            .HtmlAttributes(new { style = "height: 525px;" })
+            .Scrollable(s => s.Enabled(true))
+            .Selectable()
+            .AutoBind(false)
+            .Pageable(p => p.ButtonCount(4).Refresh(true))
+            .Editable(editable => editable.Mode(GridEditMode.InCell))
+            .Events(e => e.DataBound("getAIPGridFooterTotal").Edit("OnAIPGridEdit"))
+            .DataSource(dataSource => dataSource
+                .Ajax()
+                .Batch(true)
+                .ServerOperation(true)
+                .Model(m => m.Id(i => i.AIPID))
+                .AutoSync(true)
+                //.Aggregates(a =>
+                //{
+                //    a.Add(c => c.TotalAmount).Sum();
+                //})
+                .Read(read => read.Action("grdAIPListData", "BudgetPreparation").Data("GridParameters"))
+                .Sort(s =>
+                {
+                    s.Add(c => c.OrderNo);
+                })
+            )
+            )
+        </div>
+    </div>
+</div>
+@(Html.Kendo().Window()
+    .Name("AddNewAIPWindow")
+    .Title("Add New Item - AIP")
+    .Width(700)
+    .Height(585)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(true)
+    .AutoFocus(true)
+    .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        }).Actions(a => { a.Close(); }))
+<script>
+    $(document).ready(function () {
+        if (@Account.UserInfo.UserTypeID == 1) {
+            $("#ddlAIPOffices").data("kendoComboBox").value(@Account.UserInfo.Department.ToString());
+            $("#ddlAIPOffices").data("kendoComboBox").enable(false);
+        }
+        else {
+            $("#ddlAIPOffices").data("kendoComboBox").value(@Account.UserInfo.Department.ToString());
+            $("#ddlAIPOffices").data("kendoComboBox").enable(true);
+        }
+        $('#grdAIPList').data('kendoGrid').dataSource.read();
+    });
+</script>

@@ -1,0 +1,401 @@
+﻿
+<script>
+    function getParam() {
+        var programid=$("#Program_supplemental_null").val() =="" ? 0 : $("#Program_supplemental_null").val()
+        var accountid= $("#account_list_supplemental_null").val()==""? 0 : $("#account_list_supplemental_null").val()
+        return {
+            office:'@Session["office"]',
+            programid:programid,
+            accountid:accountid,
+            status:5,
+            yearof : $("#tyear").val(),
+            monthof:$("#Months_supplemental_null").val()
+        }
+    }
+    function returnsupplemental(trnno) {
+
+        var gview = $("#grd_supplemental_forapp").data("kendoGrid");
+        var selectedItem = gview.dataItem(gview.select());
+        var purposereturn = selectedItem.purposereturn == "" ? 0 : selectedItem.purposereturn;
+        if (purposereturn == "0" || purposereturn.length == 0 || purposereturn == " " || purposereturn == "") {
+            swal("", "Please enter something in the reason column!", "info")
+        }
+        else {
+            swal({
+                title: "W A R N I N G!",
+                text: "Return this transaction?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                closeOnConfirm: false
+            }, function () {
+                var url = "@Url.Action("returnsupplemental", "Release")";
+                $.get(url, { trnno: trnno,purposereturn:purposereturn }, function (e) {
+                    if (e == "success") {
+                        swal("Success!", "Successfully returned!", "success");
+                        $("#grd_supplemental_forapp").data("kendoGrid").dataSource.read();
+                    } else {
+                        swal("Error!", e, "error");
+                        $("#grd_supplemental_forapp").data("kendoGrid").dataSource.read();
+                    }
+                });
+            });
+        }
+    }
+    function disapprovesupplemental(trnno){
+        swal({
+            title: "W A R N I N G!",
+            text: "Disapprove this transaction?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes",
+            closeOnConfirm: false
+        }, function () {
+            var url = "@Url.Action("disapprovesupplemental", "Release")";
+            $.get(url, { trnno: trnno }, function (e) {
+                if (e == "success") {
+                    swal("Success!", "Successfully disapproved!", "success");
+                    $("#grd_supplemental_forapp").data("kendoGrid").dataSource.read();
+                } else {
+                    swal("Error!", e, "error");
+                    $("#grd_supplemental_forapp").data("kendoGrid").dataSource.read();
+                }
+            });
+        });
+    }
+    function frmclose() {
+        $("#suplesubmittedforapproval").data("kendoWindow").close();
+    }
+    function searchPrep() {
+        var $filter = new Array();
+        $filter = [];
+
+        if ($('#searchPrep').val().length > 0) {
+            $filter.push({ field: "AccountName", operator: "contains", value: $('#searchPrep').val() }),
+            $filter.push({ field: "MonthOf", operator: "contains", value: $('#searchPrep').val() }),
+            $filter.push({ field: "subaccountname", operator: "contains", value: $('#searchPrep').val() })
+        }
+
+        $('#grd_supplemental_forapp').data('kendoGrid').dataSource.filter({
+            logic: "or",
+            filters: $filter
+        });
+
+    }
+
+    $(function () {
+        $("#searchPrep").keypress(function (e) {
+            if (e.keyCode == 13) {
+                searchPrep();
+            }
+        });
+    });
+    function fnSupReportHistory() {
+        return {
+            officeid: '@Session["office"]',
+            monthof: $("#Months_supplemental_null").val()
+        }
+    }
+    function onDataBound(e) {
+        $(".k-hierarchy-cell").hide();
+        $(".k-hierarchy-col").hide();
+        var grid = $("#grd_supplemental_forapp").data("kendoGrid")
+        var ds = grid.dataSource.view();
+        var rows = e.sender.tbody.children();
+
+        for (var i = 0; i < ds.length; i++) {
+            supplementalbudget_id = ds[i].supplementalbudget_id;
+
+            var row = $(rows[i]);
+            // ds[i].AmountApprove == 0
+            if (@Account.UserInfo.UserTypeID != 4 ) {
+                $('#returnid' + supplementalbudget_id + '').css("display", "none");
+                grid.hideColumn('returnid'+ supplementalbudget_id + '');
+                $('#disapprove' + supplementalbudget_id + '').css("display", "none");
+                grid.hideColumn('returnid'+ supplementalbudget_id + '');
+             //   grid.hideColumn('purposereturn');
+            }
+            if (ds[i].status == 5){
+                $('#disapprove' + supplementalbudget_id + '').css("display", "none");
+                grid.hideColumn('disapprove'+ supplementalbudget_id + '');
+            }
+            else if (ds[i].status==6){
+                $('#returnid' + supplementalbudget_id + '').css("display", "none");
+                grid.hideColumn('returnid'+ supplementalbudget_id + '');
+            }
+
+            if (ds[i].AmountApprove == 0) {
+                $('#check' + supplementalbudget_id + '').css("display", "none");
+                //$('#checkallid').css("display", "none");
+            }
+            else {
+                $('#check' + supplementalbudget_id + '').css("display", "normal");
+             //   $('#postsupplementalid').css("display", "none");
+            }
+        }
+    }
+    //function CheckAll(e) {
+    //    $("#grd_supplemental_forapp tbody input:checkbox").prop("checked", e.checked);
+    //}
+    function WFPgrid() {
+
+        var entityGrid = $("#grd_supplemental_forapp").data("kendoGrid");
+        var selectedItem = entityGrid.dataItem(entityGrid.select());
+
+        if (selectedItem.AmountApprove == 0){
+            $("#appoveamount").val(selectedItem.Amount)
+        }
+        else{
+            $("#appoveamount").val(selectedItem.AmountApprove)
+        }
+        $("#t_supplementalid").val(selectedItem.supplementalbudget_id)
+    }
+</script>
+<div id="searchAccountid" style="height: 30px; margin-top: 0px; float: right; margin-left: 200px;">
+    <input type="text" style="width:406px;border-collapse:collapse;margin:0px;border-style:solid;margin-left:0px;height:70%;outline:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search..." id="searchPrep" name="searchPrep">
+    <div class="k-button k-button-icontext" style="height:30px;width:40px;border-style:solid;" onclick="searchPrep()"><span class="mif-search"></span></div>
+</div>
+<div class="fa fa-re" style="width:100%;">
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Monthly_DD_Model>()
+    .Name("grd_supplemental_forapp")
+    .Columns(col =>
+    {
+    @*col.Template(@<text></text>)
+                .ClientTemplate("<input id='check#=supplementalbudget_id#' type='checkbox' class='checkbox'/>")
+                //.ClientTemplate(
+                //    "# if('@Account.UserInfo.UserTypeID.toString()' == 4') { #" +
+                //    "<input type='checkbox' class='checkbox'/>" +
+                //    "# } #"
+                //)
+                .Title("<input id='checkallid' onclick=CheckAll(this) type='checkbox'  class='checkbox'/>")
+                .Width(25)
+                .HtmlAttributes(new { @onclick = "click", style = "align:center;float:none;text-align:center; vertical-align: middle;" })
+                .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });*@
+    col.Template(@<text></text>).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                    .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Account</div></text>)
+                    .Width(150)
+                    .HeaderHtmlAttributes(new { style = "text-align:left; vertical-align: middle; overflow: visible; white-space: normal" })
+                    .ClientTemplate("<div>#=AccountName# </div>")
+                    .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> Total :</label></div>");
+    col.Template(@<text></text>).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                    .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Sub-Account</div></text>)
+                    .Width(120)
+                    .ClientTemplate("<div>#=subaccountname# </div>")
+                    .HeaderHtmlAttributes(new { style = "text-align:left; vertical-align: middle; overflow: visible; white-space: normal" });
+    //    .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> Total :</label></div>");
+    col.Bound(m => m.Amount)
+                    .HtmlAttributes(new { style = "text-align:right;height:30px" })
+                    .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Amount</div></text>)
+                    .Width(80)
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                    .ClientTemplate("<div>#=kendo.toString(Amount,'c2')# </div>")
+                    .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> </label><label> #=kendo.toString(sum, 'c2')#</label></div>");
+    col.Template(@<text></text>).HtmlAttributes(new { style = "text-align:center;height:30px" })
+                    .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Month</div></text>)
+                    .Width(60)
+                    .ClientTemplate("<div>#=MonthOf# </div>")
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+    col.Template(@<text></text>).HtmlAttributes(new { style = "text-align:center;height:30px" })
+                    .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Year</div></text>)
+                    .Width(40)
+                    .ClientTemplate("<div>#=YearOf# </div>")
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+    col.Bound(m => m.purposereturn).HtmlAttributes(new { style = "text-align:center;height:30px" })
+                    .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Reason</div></text>)
+                    .Width(120)
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+    
+    col.Template(t => { }).ClientTemplate(
+                        "<div class='k-button k-button-icontext' id='returnid#=supplementalbudget_id#' style='border-radius:50px;'   onclick='returnsupplemental(#=supplementalbudget_id#)'   ><span class='fa fa-undo' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'> </span>Return</div>"
+        ).HtmlAttributes(new { style = "vertical-align: middle;" }).Width(75);
+
+    col.Bound(m => m.supplementalbudget_id).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                    .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">ID</div></text>)
+                    .Hidden()
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+    col.Bound(m => m.subaccount).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                    .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Sub-Account ID</div></text>)
+                    .Hidden()
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+    col.Bound(m => m.status).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                    .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Status</div></text>)
+                    .Hidden()
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+    })
+        //.ToolBar(toolbar =>
+        //{
+        //    toolbar.Custom().Text("<div id='postsupplementalid'> <span id='spanthumbsup' class='fa fa-save'> </span><span id='SpanOnApproveProgress' style='display:none' class='fa fa-spinner fa-spin'></span>  Post Supplemental </div>").Name("btnApprove").Url("javascript:void(0)").HtmlAttributes(new { onclick = "fn_approvesupple()" });
+        //    // toolbar.Save();
+        //})
+        // .Sortable()
+        .Scrollable()
+        .Selectable()
+        .Editable(editable => editable.Mode(GridEditMode.InCell))
+        .HtmlAttributes(new { style = "height:350px;" })
+        .Pageable(pageable => pageable
+        .Refresh(true)
+        .ButtonCount(3))
+        .Events(e => e.DataBound("onDataBound").Change("WFPgrid"))
+        .DataSource(d => d
+        .Ajax()
+        .Batch(true)
+        .Aggregates(a =>
+        {
+            a.Add(c => c.Amount).Sum();
+        })
+        .PageSize(1000)
+        .Model(m => m.Id(i => i.supplementalbudget_id))
+        .Read(read => read.Action("GetSupplementlist", "Release").Data("getParam")))
+    )
+</div>
+<div style="clear:both"></div>
+@*<div style="float: left;margin-left:46.5px;margin-top:15px;">
+    <label id="suplegalabelid" style="float:left;margin-left: 50px;">
+        Legal Basis :
+    </label>
+    <div id="suplegalbasisid" style="float:left;margin-left:50px;margin-top:0px;">
+        @(Html.Kendo().ComboBox()
+                            .Name("legalbasis_supplemental_req")
+                            .DataTextField("LegalDescription")
+                            .DataValueField("LegalCode")
+                            .Placeholder("Select Legal Basis...")
+                            .Filter("contains")
+                            .MinLength(1)
+                            .HtmlAttributes(new { @style = "width: 500px;" })
+                            .DataSource(source => source.Read(read => read.Action("GetLegalBasis", "Release")))
+        )
+    </div>
+</div>*@
+<div style="float: left;margin-left:37px;margin-top:15px;">
+    <label style="float:left;margin-left: 50px;">
+        Approve Amount   :
+    </label>
+    <div style="float:left;margin-left:14px;margin-top:0px;">
+        <input type="number" id="appoveamount" value="0"/>
+    </div>
+</div>
+@*<div style="float: right;margin-right:768px;margin-top:20px;width:170px;">
+    <label style="float:left;margin-left: 50px;">
+        Report History   :
+    </label>
+</div>
+
+<div style="float:left;margin-left:232.5px;width:220px;margin-top:-30px;">
+    @(Html.Kendo().ComboBox()
+                    .Name("repHistory")
+                    .DataTextField("datetime")
+                    .DataValueField("mafid")
+                    .SelectedIndex(-1)
+                    .Filter("contains")
+                    .MinLength(3)
+                    .HtmlAttributes(new { style = "width:100%; height:100%", @class = "form-control autoselect" })
+                    .DataSource(source => source.Read(read => read.Action("GetReportSupplementalHistory", "Report").Data("fnSupReportHistory")))
+    )
+</div>*@
+<div style="float:right;margin-top:25px;width:550px;margin-right:-5px">
+    <div class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 100px;border-radius:50px;margin-left:5px" onclick="frmclear()"><span class='fa fa-eraser'></span> Clear</div>
+    @*<div class="k-button k-button-icontext" style="bottom:15px; right:25px;width :90px; border-radius:50px;margin-left:5px;background-color:cornflowerblue;color:white" onclick="fn_reqPreview()"><span class='fa fa-print' stye='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'></span> Preview</div>*@
+    <div class="k-button k-button-icontext" style="bottom:15px; right:25px;width :90px; border-radius:50px;margin-left:5px;background-color:cornflowerblue;color:white;" onclick="frmsuppleupdate()"><span class="fa fa-edit"></span> Update</div>
+    <div class="k-button" id="approveid" style="bottom:15px; right:220px;width:90px; border-radius:50px;margin-left:5px;background-color:cornflowerblue;color:white" onclick="fn_savesupple()"><span class='fa fa-thumbs-o-up' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 0px;'></span> Review</div>
+    @*<div class="k-button"  id="approveid" style="bottom:15px; right:220px;width:90px; border-radius:50px;margin-left:5px" onclick="fn_approvesupple()"><span class='fa fa-save' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 0px;' ></span> Post</div>*@
+    <div class="k-button k-button-icontext"  style="bottom: 15px; right: 25px;width: 100px;background-color:indianred; color:white;border-radius:50px;margin-left:5px" onclick="frmclose()"><span class="fa fa-close"></span> Close</div>
+    
+</div>
+
+<div style="display:none">
+    <input type="number" id="t_supplementalid" value="0"/>
+</div>
+<script>
+
+    $(document).ready(function(){
+        $("#grd_supplemental_forapp").data("kendoGrid").dataSource.read();
+     //   $("#repHistory").data("kendoComboBox").dataSource.read();
+        if (@Account.UserInfo.UserTypeID != 4) { //super admin
+
+            document.getElementById("approveid").style.display = "none";
+           // document.getElementById("suplegalabelid").style="display:none"
+          //  document.getElementById("suplegalbasisid").style="display:none"
+            //document.getElementById("postsupplementalid").style="display:none"
+        }
+        else{
+         //   document.getElementById("suplegalabelid").style="display:normal;float:left;margin-left: 50px;"
+          //  document.getElementById("suplegalbasisid").style="display:normal;float:left;margin-left:50px;margin-top:0px;"
+            //document.getElementById("postsupplementalid").style="display:normal"
+        }
+
+    });
+
+    //function fn_reqPreview(){
+    //    var program_id = $('#Program_supplemental_null').val() == ""? 0: $('#Program_supplemental_null').val()
+    //    var accountid=$("#account_list_supplemental_null").val() ==""? 0: $("#account_list_supplemental_null").val()
+    //    var yearof = $("#tyear").val()
+    //    var office=$('#office_supplemental_req').data("kendoComboBox").text()
+    //    var officeid=$('#office_supplemental_req').val()
+    //    var repHistory=$('#repHistory').val()
+    //    if (program_id ==0 || accountid == 0 ){
+    //        swal("Warning","Please select program and account respectively!","warning")
+    //    }
+    //    else{
+    //        $.ajax({
+    //            async: false,
+    //            dataType: 'html',
+    //            success: window.open("../Reports/ReportViewer.aspx?rid=39&programID=" + program_id + "&accountID=" + accountid + "&yearof=" + yearof + "&OfficeName="+ office +"&OfficeID="+ officeid +"&mode=1&repHistory="+ repHistory +"&source=0")
+    //        });
+
+    //    }
+    //}
+
+    function frmsuppleupdate(){
+        var suppid=$("#t_supplementalid").val();
+        var approveamount=$("#appoveamount").val();
+        var url="@Url.Action("updatesuppamount","Release")"
+        
+        $.post(url, { supid: suppid,amount:approveamount}, function (d) {
+            swal({ title: "Success!", text: d, timer: 2500, showConfirmButton: false, type: "success" });
+            $("#grd_supplemental_forapp").data("kendoGrid").dataSource.read();
+        });
+    }
+    function fn_savesupple(){
+        var supid= $("#t_supplementalid").val()
+        var yearof = $("#tyear").val()
+        var amount=$("#appoveamount").val()
+
+        var programid=$("#Program_supplemental_null").val() =="" ? 0 : $("#Program_supplemental_null").val()
+        var accountid= $("#account_list_supplemental_null").val()==""? 0 : $("#account_list_supplemental_null").val()
+        var office='@Session["office"]'
+        var subaccount=$("#subaccount").val()==""? 0: $("#subaccount").val()
+        var status=5
+        var yearof = $("#tyear").val()
+        var monthof=$('#Months_supplemental_null').val()
+
+        var url ="@Url.Action("approvesupplementalamount", "Release")"
+       
+        swal({
+            title: "Are you sure?",
+            text: "Do you to approve the supplemental amount on the list above?",
+            type: "info",
+            showCancelButton: true,
+            closeOnConfirm: false,
+            confirmButtonColor: "#1fa67a",
+            confirmButtonText: "Yes!",
+            showLoaderOnConfirm: true,
+        }, function () {
+            $.post(url, { office:office,programid:programid,accountid:accountid,yearof:yearof,subaccount:subaccount,monthof:monthof}, function (d) {
+                swal({ title: "Success!", text: d, timer: 2500, showConfirmButton: false, type: "success" });
+                $("#grd_supplemental_forapp").data("kendoGrid").dataSource.read();
+            });
+        })
+       
+    }
+    function frmclose() {
+        $("#suplesubmittedforapproval").data("kendoWindow").close();
+    }
+    function frmclear(){
+        $("#t_supplementalid").val(0)
+        $("#appoveamount").val(0)
+        //$("#legalbasis_supplemental_req").data("kendoComboBox").value("")
+       // $("#repHistory").data("kendoComboBox").value("")
+    }
+</script>

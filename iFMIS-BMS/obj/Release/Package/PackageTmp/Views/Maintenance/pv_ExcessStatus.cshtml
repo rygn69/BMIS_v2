@@ -1,0 +1,29 @@
+﻿<script>
+    function OnTabstripActivate() {
+        var SelectedTabIndex = $("#tabstripExcess").data("kendoTabStrip").select().index();
+     
+        if (SelectedTabIndex == 0) {
+            $("#ExcessUnlink").data("kendoGrid").dataSource.read();
+        }
+        else if (SelectedTabIndex == 1) {
+            $("#Excesslink").data("kendoGrid").dataSource.read();
+        }
+     
+    }
+</script>
+<div>
+    @(Html.Kendo().TabStrip()
+          .Name("tabstripExcess")
+          .Navigatable(false)
+          .Animation(animation =>
+              animation.Open(effect =>
+              effect.Fade(FadeDirection.In)))
+          .Events(e => e.Activate("OnTabstripActivate"))
+          .Items(tabstrip =>
+          {
+              tabstrip.Add().Text("Unlink Account").Selected(true).LoadContentFrom("ExcessStatusUnlink", "Maintenance");//.Enabled(false);
+              tabstrip.Add().Text("Link Account").LoadContentFrom("ExcessStatuslink", "Maintenance");
+
+          })
+    )
+</div>

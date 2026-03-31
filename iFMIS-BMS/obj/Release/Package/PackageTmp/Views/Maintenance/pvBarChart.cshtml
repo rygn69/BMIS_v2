@@ -1,0 +1,85 @@
+﻿@model IEnumerable<iFMIS_BMS.BusinessLayer.Models.ChartModel>
+
+
+@*<div class="demo-section k-content wide">
+    @(Html.Kendo().Chart()
+        .Name("chart")
+        .Title("Site Visitors Stats \n /thousands/")
+        .Legend(legend => legend
+            .Visible(false)
+        )
+        .ChartArea(chartArea => chartArea
+            .Background("transparent")
+        )
+        .Series(series =>
+        {
+            series.Column(new double[] { 600000 }).Name("Total Visits");
+            series.Column(new double[] { 100000 }).Name("Unique visitors");
+            series.Column(new double[] { 600000 }).Name("k");
+        })
+        .CategoryAxis(axis => axis
+            .Categories("Ammount")
+            .MajorGridLines(lines => lines.Visible(false))
+        )
+        .ValueAxis(axis => axis
+            .Numeric()
+            .Max(1000000)
+            .Line(line => line.Visible(false))
+            .MajorGridLines(lines => lines.Visible(true))
+        )
+        .Tooltip(tooltip => tooltip
+            .Visible(true)
+            .Template("#= series.name #: #= value #")
+        )
+    )
+</div>*@
+
+@*<div class="demo-section k-content wide">
+    @(Html.Kendo().Chart()
+        .Name("BarChart")
+        .Title("Hybrid car mileage report")
+        .Legend(legend => legend
+            .Position(ChartLegendPosition.Top)
+        )
+        .Series(series =>
+        {
+            series
+                .Column(new int[] { 20, 40 })
+                .Stack(true)
+                .Color("#cc6e38")
+                .Name("on battery");
+            series
+                .Column(new int[] { 20, 30 })
+                .Stack(true)
+                .Color("#ef955f")
+                .Name("on gas");
+  
+        })
+        .CategoryAxis(axis => axis
+            .Categories("Mon", "Tue")
+
+            .AxisCrossingValue(0, 0, 10, 10)
+        )
+        .ValueAxis(axis => axis
+            .Numeric()
+                .Title("miles")
+                .Min(0).Max(100)
+        )
+
+    )
+</div>*@
+
+@(Html.Kendo().Chart<iFMIS_BMS.BusinessLayer.Models.ChartModel>()
+     .Name("ChartName")
+ .Series(series =>
+ {
+     series.Bar(s => s.amountLast);
+     series.Bar(s => s.amountLatest);
+     series.Bar(s => s.amountLast);
+ })
+ .SeriesDefaults(sd => sd.Bar().Stack(true))
+         .CategoryAxis(axis => axis
+                    .Categories("Mon", "Tue")
+                    .AxisCrossingValue(0, 0, 100, 100)
+                )
+)

@@ -1,0 +1,136 @@
+﻿<script>
+    function GetYear() {
+        return {
+            //YearOf: $('#YearOf').data('kendoComboBox').text()//
+            YearOf: $("#YearOf").val()
+          }
+    }
+
+    function fn_viewExcess()
+    {
+        setTimeout(function () {
+            $("#ExcessAppropriation").data("kendoGrid").dataSource.read();
+        }, 500);
+    }
+
+</script>
+
+<style>
+    input[type="radio"] {
+        width: auto;
+
+    }
+    textarea {
+        resize: none;
+    }
+            textarea:focus, input:focus, input[type]:focus, .uneditable-input:focus {
+            border-color: rgba(0, 128, 0, 0.8);
+            box-shadow: 0 1px 1px rgba(0, 128, 0, 0.075) inset, 0 0 8px rgba(0, 128, 0, 0.6);
+            outline: 0 none;
+        }
+</style>
+<div style="border-color:gray;border-width:1px;border-style:solid;width:585px;margin-top:10px;float:left">
+    <div style="background-color:white;width:190px;margin-top:-15px;margin-left:15px;"><span style="font-size:18px;margin-left:5px;"> Excess Appropriation </span></div>
+    <div>
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.BudgetControl.ExcessModel>()
+    .HtmlAttributes(new { style = "width:575px;height:210px;margin:5px;" })
+    .Name("ExcessAppropriation")
+    .Scrollable()
+    .Columns(col =>
+    {
+        col.Bound(m => m.grAccount).Title("Account").Width(200);
+        col.Bound(m => m.grAmount).Title("Amount").Width(100).ClientTemplate("<div> #=kendo.toString(grAmount, 'c2')# </div>");
+        col.Bound(m => m.grYearOf).Title("Year").Width(60);
+        col.Bound(m => m.grFundFlag).Hidden();
+        col.Bound(m => m.grExcessID).Hidden();
+    })
+    .ToolBar(t => t.Template(@<text>   
+        <div style="float: right; height:28px;margin-top:2px;">
+            <link href="~/Content/metroui/css/docs.css" rel="stylesheet" />
+
+            <div style="background-color:white;border:solid;border-color:whitesmoke;border-width:thin;width:280px;height:33px;float:right;padding:0px;margin-top:-3px;" id="search">
+                <input type="text" style="width:200px;border-collapse:collapse;border-color:white;margin:0px;margin-left:0px;height:70%;outline:none;border-left-style:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search by Account . ." id="ExcessData" name="ExcessData">
+                <div class="k-button k-button-icontext" style="height:33px;width:40px;" onclick="searchAccount()"><span class="mif-search"></span></div>
+            </div>
+        </div>
+
+    </text>))
+                .AutoBind(true)
+                .Pageable(page => page.Refresh(true)
+                .Enabled(true)
+                .ButtonCount(4)
+                .PreviousNext(true)
+                )
+                    .Selectable(selectable => selectable.Mode(GridSelectionMode.Single))
+                    .Events(e => e.Change("onGridClickAppropriation"))
+                    .DataSource(d => d
+                    .Ajax()
+                    .PageSize(10)
+                    .Model(m => m.Id(i => i.grExcessID))
+                    .Read(read => read.Action("ExcessAppropriation", "BudgetControl").Data("GetYear"))
+                    )
+    )
+    </div>
+    <div style="">
+
+    </div>
+</div>
+<div style="border-color:gray;border-width:1px;border-style:solid;width:585px;margin-top:10px;float:left">
+    <div style="background-color:white;width:70px;margin-top:-15px;margin-left:15px;"><span style="font-size:18px;margin-left:5px;"> Details </span></div>
+    <div style="padding:15px;margin-top:5px;">
+        <div style="display:inline-block">
+            <span>Year :</span> @(Html.Kendo().DropDownList()
+                    .Name("YearOf")
+                    .DataTextField("YearOf")
+                    .DataValueField("YearOf")
+                    @*.OptionLabel("Year")*@
+                    .SelectedIndex(1)
+                    .Events(e => e.Select("fn_viewExcess"))
+                    .HtmlAttributes(new { @style = "width: 80px;text-align:left;margin-right:5px;" })
+                    .DataSource(source => source.Read(read => read.Action("ExcessYears", "Dropdowns")))
+
+            )
+            <span style="margin-left:20px;"> Amount :</span> <input type="number" class="k-input" value="0.00" id="AmountAppropriation" name="AmountAppropriation">
+        </div>
+    </div>
+    <div style="padding:15px;">
+        <span>Account Name :</span> <input type="text" class="k-input" id="AccountNameAppropriation" name="AccountNameAppropriation" style="width:405px"/>
+    </div>
+    <div style="padding:15px;">
+        <div style="display:inline-block;">
+            <span><input type="radio" id="20PercentFund" name="FundType" value="0"> 20 Percent </span>
+            <span style="margin-left:20px;"><input type="radio" id="SEFFund" name="FundType" value="1"> SEF </span>
+            <span style="margin-left:20px;"><input type="radio" id="GeneralFund" name="FundType" value="2"> General Fund </span>
+            <span style="margin-left:20px;"><input type="radio" id="EcoFund" name="FundType" value="3"> Economic </span>
+        </div>
+    </div>
+    <div style="padding:15px;float:right;">
+        <div class="k-button" style="padding:5px;width:99px;" id="SaveAppropriation" onclick="SaveAppropriation()"><span class="fa fa-save"></span> SAVE</div>
+        <div class="k-button" style="padding:5px;width:99px;display:none;" id="UpdateAppropriation" onclick="UpdateAppropriation()"><span class="fa fa-upload"></span> Update</div>
+        <div class="k-button" style="padding:5px;width:99px;display:none;" id="DeleteAppropriation" onclick="DeleteAppropriation()"><span class="fa fa-trash"></span> Delete</div>
+        <div class="k-button" style="padding:5px;width:99px;" id="ClearAppropriation" onclick="ClearAppropriation()"><span class="fa fa-minus-circle"></span> CLEAR</div>
+        <div class="k-button" style="padding:5px;width:99px;" id="CloseAppropriation" onclick="CloseAppropriation()"><span class="fa fa-times"></span> Close</div>
+    </div>
+    <div style="display:none">
+        <input type="text" id="ExcessID" />
+        <input type="text" id="_PastAccount" name="_PastAccount" />
+    </div>
+</div>
+
+<script>
+
+    function SaveAppropriationURL()
+    {
+        return '@Url.Action("SaveAppropriation", "BudgetControl")';
+    }
+    function UpdateAppropriationURL()
+    {
+        return '@Url.Action("UpdateAppropriation", "BudgetControl")';
+    }
+    function DeleteAppropriationURL()
+    {
+        return '@Url.Action("DeleteAppropriation", "BudgetControl")';
+    }
+ 
+</script>
+<script src="~/Scripts/BMS/BudgetControl/excess.js"></script>

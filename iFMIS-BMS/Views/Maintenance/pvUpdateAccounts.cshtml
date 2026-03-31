@@ -1,0 +1,164 @@
+﻿<script>
+    function reqSave() {
+        var notifi = new $("#popupNotification").data("kendoNotification");
+        //notifi.hide();
+        var url = "@Url.Action("UpdateAccounts","Maintenance")";
+        var frmData = $('#formProgram').serialize();
+        $.post(url, frmData, function (d) {
+            if (d == "Success") {
+                $.Notify({
+                    caption: 'Success!',
+                    content: 'Programs Updated!',
+                    icon: "<span class='mif-checkmark'></span>",
+                    type: 'success'
+                });
+                $('#webTitle').html("Update Accounts");
+                var url = "@Url.Action("pvUpdateAccounts", "Maintenance")";
+                $.get(url, function (d) {
+                    $('#siteContent').html(d);
+                })
+            } else {
+                //notifi.show(d, "error");
+                //alert("Failed!");
+                swal("Error!", "Please try again.", "error")
+            }
+        })
+    }
+</script>
+<div style="float: left;border:outset; border-width:1px;border-color:#038603; width: 745px; padding-left:7px;padding-right:7px;padding-top:7px;padding-bottom:7px;">
+    
+        <h3 style="color:#000000">Update Accounts</h3>        
+        <div style="margin-top:20px">
+            <label>Fund Type</label>
+            <script>
+                function onChange() {
+                    $("#grAccount").data("kendoGrid").dataSource.read();
+                }
+            </script>
+            @(Html.Kendo().DropDownList()
+                    //PoPOut design || Text Field Drop codes
+                                    .Name("fund_id2")
+                                    .DataTextField("fund_name")
+                                    .OptionLabel("Display Accounts by . .")
+                                    .DataValueField("fund_id")
+                                                    .HtmlAttributes(new { @style = "width: 80%;" })
+                                                    .Events(e => { e.Change("onChange"); })
+                    //dropdown connector to EmployeeController
+                                                    .DataSource(source => { source.Read(read => { read.Action("ddlfund", "Dropdowns"); }); })
+            )
+
+        </div>
+    <form id="formProgram" method="post">
+        <div style="margin-top:20px;">
+            <label>Accounts</label>
+            <script>
+                function SearchAccountName() {
+                    var FundDropdown = $("#fund_id2").val();
+                    return {
+                        FundDropdown: FundDropdown
+                    }
+                }
+                function onClick() {
+                    var entityGrid = $("#grAccount").data("kendoGrid");
+                    var selectedItem = entityGrid.dataItem(entityGrid.select());
+                    document.getElementById("account_desc").value = selectedItem.account_desc
+                    document.getElementById("child_series_no").value = selectedItem.child_series_no
+                    document.getElementById("ref_account_id").value = selectedItem.ref_account_id
+                    $("#fund_id").data("kendoDropDownList").value(selectedItem.fund_id);
+                    $("#code").data("kendoDropDownList").value(selectedItem.code);
+
+
+                }
+            </script>
+            @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Maintenance.account_code>()
+            .Name("grAccount")
+            .Columns(col =>
+            {
+                col.Bound(m => m.ref_account_id).Title("Account ID").Hidden();
+                col.Bound(m => m.account_desc).Title("Account Name");
+                col.Bound(m => m.fund_id).Title("").Hidden();
+                col.Bound(m => m.child_series_no).Hidden();
+                col.Bound(m => m.code).Hidden();
+            })
+            .ToolBar(t => t.Template(@<text>
+
+
+                <div style="float: left; width: 0; margin-top:-3px;margin-bottom:-100px;margin-left:-3px; height: 0; border-right: 0px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;">
+                    <div style="float: left; width: 0; margin-top:1px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 36px solid #038603; ">
+
+                        <div style="float: left; height:28px; margin-left:-59px; margin-top: 5px;">
+                            <i class="fa fa-tasks fa-2x fg-white"></i>
+
+                        </div>
+
+                    </div>
+                </div>
+
+                <div style="float: right; height:28px;margin-top:2px;">
+                    <link href="~/Content/metroui/css/docs.css" rel="stylesheet" />
+
+
+                </div>
+            </text>))
+                         .Pageable(page => page.Refresh(true)
+                         .Enabled(true)
+                         .ButtonCount(4)
+                         .PreviousNext(true)
+                         )
+                            .Selectable(selectable => selectable.Mode(GridSelectionMode.Single))
+                            .Events(e =>
+                            {
+                                e.Change("onClick");
+                            })
+                            .DataSource(d => d
+                            .Ajax()
+                            .PageSize(10)
+                            .Model(m => m.Id(i => i.ref_account_id))
+                                    .Read(read => read.Action("SearchAccount", "Maintenance").Data("SearchAccountName"))
+                            )
+                           
+            )
+
+        </div>
+
+        <div style="margin-top:20px;">
+            <label>Account Name</label>
+            <input type="text" id="ref_account_id" name="ref_account_id" hidden="hidden" value=""/>
+            <input type="text" class="k-textbox" style="width: 80%;" id="account_desc" name="account_desc" value="" />
+        </div>
+        <div style="margin-top:20px;">
+            <label>Account Code</label>
+            @(Html.Kendo().DropDownList()
+                    //PoPOut design || Text Field Drop codes
+                                    .Name("code")
+                                    .DataTextField("code")
+                                    .DataValueField("code")
+                                    .OptionLabel("Select Code...")
+                                    .HtmlAttributes(new { @style = "width: 80%;" })
+                    //dropdown connector to EmployeeController
+                                                    .DataSource(source => source.Read(read => read.Action("ddlCode", "Dropdowns")))
+
+            )
+        </div>
+        <div style="margin-top:20px;">
+            <label>Child Series No</label>
+            <input type="text" class="k-textbox" style="width: 80%;" id="child_series_no" name="child_series_no" value="" />
+        </div>
+        <div style="margin-top:20px;">
+            <label>Fund Type</label>
+            @(Html.Kendo().DropDownList()
+                    //PoPOut design || Text Field Drop codes
+                                    .Name("fund_id")
+                                    .DataTextField("fund_name")
+                                    .DataValueField("fund_id")
+                                    .OptionLabel("Select Fund...")
+                                    .HtmlAttributes(new { @style = "width: 80%;" })
+                    //dropdown connector to EmployeeController
+                                                           .DataSource(source => source.Read(read => read.Action("ddlFund", "Dropdowns")))
+
+            )
+        </div>
+
+    </form>
+    <div class="k-button k-button-icontext" onclick="reqSave()" style="padding:5px;float:right;margin-top:10px">Update Account</div>
+</div>

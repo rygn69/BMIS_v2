@@ -1,0 +1,247 @@
+﻿    <script>
+
+        function sup_Edits_revers(supplementalreverse_id, dtetime) {
+        var url = "@Url.Action("Edit_Supplement_reverse", "Release")";
+
+        $.get(url, { supplementalreverse_id: supplementalreverse_id }, function (e) {
+            document.getElementById("supplement_Subs_Ammount").value = commaSeparateNumberRealignment(e.Amount);
+            document.getElementById("supplement_Subs_Ammount_DUM").value = e.Amount;
+            $("#legalbasis_supplemental_null_subs").data("kendoComboBox").value(e.LegalCode);
+            document.getElementById("supplement_Subs_Ammount_ID").value = e.supplementalbudget_id;
+
+            $("#office_supplemental_null_subs").data("kendoComboBox").dataSource.read();
+            $("#office_supplemental_null_subs").data("kendoComboBox").value(e.FMISOfficeCode);
+
+            $("#Months_supplemental_null_subs").data("kendoDropDownList").value(e.MonthOf);
+            $("#supdatetime").data("kendoDateTimePicker").value(dtetime);
+
+            setTimeout(function () {
+
+
+                $("#Program_supplemental_null_subs").data("kendoDropDownList").dataSource.read();
+
+                setTimeout(function () {
+                    $("#Program_supplemental_null_subs").data("kendoDropDownList").value(e.FMISProgramCode);    
+                }, 100);
+
+
+            }, 100);
+            setTimeout(function () {
+
+
+                $("#ooe_id_supplemental_null_subs").data("kendoDropDownList").dataSource.read();
+
+
+                setTimeout(function () {
+                    $("#ooe_id_supplemental_null_subs").data("kendoDropDownList").value(e.OOECode);
+                    setTimeout(function () {
+
+                        $("#account_list_supplemental_null_subs").data("kendoComboBox").dataSource.read();
+
+
+                        setTimeout(function () {
+                            $("#account_list_supplemental_null_subs").data("kendoComboBox").value(e.FMISAccountCode);
+                            grid_ref_sup_ok_subs();
+                        }, 500);
+                    }, 100);
+                }, 100);
+
+
+            }, 100);
+
+
+        })
+
+
+
+    }
+
+
+    function delete_reverse_(supplementalreverse_id) {
+        var url = "@Url.Action("Edit_Supplement_reverse", "Release")";
+
+        $.get(url, { supplementalreverse_id: supplementalreverse_id }, function (e) {
+          
+            document.getElementById("supplement_Subs_Ammount_DUM").value = e.Amount;
+         
+            document.getElementById("supplement_Subs_Ammount_ID").value = e.supplementalbudget_id;
+
+         
+
+        })
+    }
+
+
+
+
+
+
+    function delete_reverse_Main(supplementalreverse_id) {
+
+        delete_reverse_(supplementalreverse_id);
+        setTimeout(function () {
+            var url = "@Url.Action("delete_Supplement_Reverse", "Release")";
+
+            var supplement_amount = $('#supplement_Subs_Ammount').val()
+
+            var supplement_available = $('#available_amount_null_SUP_sub').val()
+            var supplement_amount_DUM = $('#supplement_Subs_Ammount_DUM').val()
+            var tobe_transfered = $('#total_tobe_transfere').val()
+       
+
+            if (Number(ConvertCommasToEmpty_realign(tobe_transfered)) > Number(ConvertCommasToEmpty_realign(supplement_amount_DUM))) {
+                document.getElementById("supplement_Subs_Ammount_DUM").value = 0;
+                document.getElementById("supplement_Subs_Ammount_ID").value = 0;
+                swal({
+                    title: "Oops!",
+                    text: "Not enough Amount.",
+                    timer: 3000,
+                    type: "error",
+                    showConfirmButton: false
+                })
+            } else { 
+
+                swal({
+                    title: "Are you sure?",
+                    text: "This item will be removed!",
+                    type: "info",
+                    showCancelButton: true,
+                    closeOnConfirm: false,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Yes, Remove It!",
+                    showLoaderOnConfirm: true,
+                }, function () {
+
+                    $.get(url, { supplementalreverse_id: supplementalreverse_id }, function (e) {
+
+                        if (e == "1") {
+                            swal({
+                                title: "Success!",
+                                text: "Item has been Removed.",
+                                timer: 2000,
+                                type: "success",
+                                showConfirmButton: false
+                            })
+
+                            grid_ref_sup_ok_subs();
+                            change_sup();
+                            get_total_transfere();
+                            $('#GeneralFund_Grid').data('kendoGrid').dataSource.read();
+                            $('#grd_Sups_List_subs').data('kendoGrid').dataSource.read();
+                            document.getElementById("supplement_Subs_Ammount_DUM").value = 0;
+                            document.getElementById("supplement_Subs_Ammount_ID").value = 0;
+                            document.getElementById("supplement_Subs_Ammount").value = 0;
+                        } else {
+                            swal({
+                                title: "Error!",
+                                text: "System Error! Please try again.",
+                                timer: 2000,
+                                type: "error",
+                                showConfirmButton: false
+                            })
+                        }
+
+                    })
+                });
+            }
+        }, 200);
+      
+    }
+    //}
+
+    function ReadData_rever() {
+        var LegalCode = $('#legalbasis_supplemental_null_subs').val()
+        var office_id = $('#office_supplemental_null_subs').val()
+        var program_id = $('#Program_supplemental_null_subs').val()
+        var ooe_id = $('#ooe_id_supplemental_null_subs').val()
+        var account_id = $('#account_list_supplemental_null_subs').val()
+        var month_ = $('#Months_supplemental_null_subs').val()
+        var year_ = $("#ddlYear").val();
+        return {
+            LegalCode: LegalCode,
+            office_id: office_id,
+            program_id: program_id,
+            ooe_id: ooe_id,
+            account_id: account_id,
+            month_: month_,
+            year_: year_
+        }
+    }
+
+</script>
+@(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Monthly_DD_Model>()
+    .Name("grd_Sups_List_subs")
+    .Scrollable()
+    .Columns(col =>
+    {
+
+
+        col.Bound(m => m.OfficeAbbrivation).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Office</div></text>)
+                        .Width(60)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+                        
+       col.Bound(m => m.AccountName).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Account Name</div></text>)
+                        .Width(260)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientFooterTemplate("<div style='text-align:center;color:darkgreen'><label> </label><label> Total Reversion Amount </label></div>");
+        col.Bound(m => m.Amount)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Amount</div></text>)
+                        .Width(110)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div>#=kendo.toString(Amount,'c2')# </div>")
+                        .ClientFooterTemplate("<div style='text-align:center;color:darkgreen'><label> </label><label> #=kendo.toString(sum, 'c2')#</label></div>");
+
+        col.Bound(m => m.MonthOf).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Month</div></text>)
+                        .Width(85)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Bound(m => m.YearOf).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Year</div></text>)
+                        .Width(55)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+
+        col.Bound(m => m.type_).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Type</div></text>)
+                        .Width(55)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .Hidden();
+        col.Bound(m => m.dtetime).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Date and Time</div></text>)
+                        .Width(160)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+
+        col.Template(t => { }).ClientTemplate(
+      "#if( type_ == 1) {#" +
+             "<div class='k-button k-button-icontext' style='border-radius:50px;color:\\#ffffff;background-color:\\#1FA67A;'    onclick='sup_Edits_revers(#=supplementalreverse_id#,\"#=dtetime#\")'   ><span class='fa fa-pencil-square-o' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'> </span>edit</div> " +
+             "<div class='k-button k-button-icontext' style='border-radius:50px;color:\\#ffffff;background-color:\\#DE5555;'   onclick='delete_reverse_Main(#=supplementalreverse_id#)'   ><span class='fa fa-trash-o' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'> </span>del</div> " +
+
+      "#} else { #" +
+
+             "<div class='k-button k-button-icontext' style='border-radius:50px;color:\\#ffffff;background-color:\\#DE5555;'   onclick='delete_reverse_Main(#=supplementalreverse_id#)'   ><span class='fa fa-trash-o' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'> </span>del</div> " +
+
+      "# } #"
+
+                            ).HtmlAttributes(new { style = "vertical-align: top;" }).Width(160);
+
+        col.Bound(m => m.supplementalbudget_id).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Traction ID</div></text>)
+                        .Hidden()
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+    })
+
+                            .Sortable()
+                            .Scrollable()
+                            .HtmlAttributes(new { style = "height:200px;" })
+                            .DataSource(d => d
+                                            .Ajax()
+                                            .Aggregates(a =>
+                                               {
+                                                   a.Add(c => c.Amount).Sum();
+                                               })
+                                            .PageSize(1000)
+                                                .Model(m => m.Id(i => i.supplementalreverse_id))
+                                            .Read(read => read.Action("Load_Supp_rever", "Release").Data("ReadData_rever")))
+)

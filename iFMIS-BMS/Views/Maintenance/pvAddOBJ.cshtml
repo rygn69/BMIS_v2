@@ -1,0 +1,59 @@
+﻿<script>
+    function SumbitNewOBJ() {
+        var ObjName = document.getElementById("ObjName").value;
+        var OrderBy = $("#orderBy").val();
+        var url = "@Url.Action("SaveOBJ", "Maintenance")";
+        $.post(url, { ObjName: ObjName, OrderBy: OrderBy }, function (e) {
+            if (e == "success") {
+                $('#ObjName').val('');
+                $('#orderBy').data('kendoComboBox').value('');
+                swal({
+                    title: "Success",
+                    text: "Objectives has been added!",
+                    type: "success",
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+                $("#grOBJ").data("kendoGrid").dataSource.read();
+            } else {
+                swal({
+                    title: "Error",
+                    text: "Objectives has NOT been added!",
+                    type: "error",
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            }
+        });
+    }
+
+    function onCloseWindowOBJ() {
+        if ($("#ObjectiveSizeIndicator").val() == 0) {
+            document.documentElement.style.overflow = 'auto';  // firefox, chrome
+            document.body.scroll = "yes";
+            $(window).scrollTop(CurrentScrollPosition);
+        }
+        $("#windowAddOBJ").data("kendoWindow").close();
+    }
+</script>
+<div style="margin-top:5px;margin-left:5px;">
+    <label>Objective Description</label>
+    <textarea name="ObjName" id="ObjName" style="width:97%;height:70px"></textarea>
+    @*<input type="text" name="ObjName" id="ObjName" style="width:90%" />*@
+</div>
+<div style="margin-top:5px;margin-left:5px;">
+    <label>Order By</label>
+    @(Html.Kendo().ComboBox()
+                  .Name("orderBy")
+                  .Filter("contains")
+                  .MinLength(1)
+                  .Placeholder("Select order by")
+                  .DataTextField("x")
+                  .DataValueField("x")
+                  .HtmlAttributes(new { @style = "height:110%;" })
+                  .DataSource(source => source.Read(read => read.Action("ddlOrderby", "Dropdowns")).ServerFiltering(false))
+    )
+</div>
+<div style="margin-top:5px;float:right;margin-right:5px;">
+    <div class="k-button k-state-active" onclick="SumbitNewOBJ()"><i class="fa fa-plus"></i> Submit New Objecives</div> <div class="k-button" onclick="onCloseWindowOBJ()"><i class="fa fa-close"></i> Close</div>
+</div>

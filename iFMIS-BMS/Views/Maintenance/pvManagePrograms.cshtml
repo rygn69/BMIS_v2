@@ -1,0 +1,324 @@
+﻿<!-- This Part is Develop by Ranel Cator -->
+<style>
+    .btn-delete a {
+        color: #000000;
+        background-color: #ffffff;
+        border-style: solid;
+        border-color: #333333;
+        border-width: 1px;
+        height: auto;
+        width: auto;
+        padding: 3px;
+        padding-left: 5px;
+        padding-right: 5px;
+        cursor: pointer;
+        margin: auto;
+    }
+        .btn-delete a:hover {
+            color: #ffffff;
+            background-color: #000000;
+            border-style: solid;
+            border-color: #333333;
+            height: auto;
+            width: auto;
+        }
+    
+</style>
+
+<div style="margin-top:20px;">
+
+    <label>FMIS Office</label>
+    <script>
+        function ProgramReceive() {
+            var DataDropdown = $("#text_office_id").val();
+            return {
+                DataDropdown: DataDropdown
+            }
+            
+        }
+        function UpdateGrid() {
+            $("#grProgram").data("kendoGrid").dataSource.read();
+            $("#grProgramDelete").data("kendoGrid").dataSource.read();
+        }
+        function onSelectOfficeID() {
+            var get_office_id = $("#office_id").val();
+            document.getElementById("text_office_id").value = get_office_id;
+            
+            setTimeout(UpdateGrid, 500);
+        }
+
+        $(document).ready(function () {
+            setTimeout(UpdateGrid, 500);
+        })
+    </script>
+    @(Html.Kendo().ComboBox()
+                                    .Name("office_id")
+                                    .DataTextField("office_name")
+                                    .Filter("contains")
+                                    .MinLength(2)
+                                    .Placeholder("Select Office . .")
+                                    .DataValueField("office_id")
+                                            .HtmlAttributes(new { @style = "width: 80%;" }).Events(e =>
+                                                            {
+                                                                e.Change("onSelectOfficeID");
+                                                            })
+                                    .DataSource(source => { source.Read(read => { read.Action("ddlOffice", "Dropdowns"); }); })
+
+    )
+    <input type="text" name="text_office_id" id="text_office_id" value="" hidden="hidden"/>
+</div>
+
+
+
+<div style="width : 100%; margin-top: 20px;border-style: solid; border-color: #1fa67a">
+
+    <div style="width:100%;height : 35px ; background-color:#1fa67a; color: white">
+        <h2 style="margin-left: 5px;color:white"><i class="fa fa-plus-circle"></i> Active Programs</h2>
+    </div>
+    <div style="padding:5px;">
+        <div style="margin-top:20px;"></div>
+        <script>
+            function searchAccount() {
+                
+                var SearchProgramData = $("#SearchData").val();
+                var ProgramgGrid = $("#grProgram").data("kendoGrid").dataSource;
+                ProgramgGrid.filter([
+                    {
+                        "field": "program_name",
+                        "operator": "contains",
+                        "value": SearchProgramData
+                    }
+                ]);
+            }
+            function searchDeletedProgram() {
+
+                var SearchProgramData = $("#SearchDeletedData").val();
+                var ProgramgGrid = $("#grProgramDelete").data("kendoGrid").dataSource;
+                ProgramgGrid.filter([
+                    {
+                        "field": "program_name",
+                        "operator": "contains",
+                        "value": SearchProgramData
+                    }
+                ]);
+            }
+            $(function () {
+                $("#SearchDeletedData").keypress(function (e) {
+                    if (e.keyCode == 13) {
+                        searchDeletedProgram();
+                    }
+                });
+
+                $("#SearchData").keypress(function (e) {
+                    if (e.keyCode == 13) {
+                        searchAccount();
+                    }
+                });
+            });
+          
+           
+            function deleteAccount(id) {
+                //var data = this.dataItem($(account.currentTarget).closest("tr"));
+                var url = "@Url.Action("DeleteProgram", "Maintenance")";
+                var program_id = id;
+                swal({
+                    title: "Are you sure you want to Delete this Program?",
+                    text: "This Program can be Recovered!",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Yes, delete it!",
+                    closeOnConfirm: false
+                },
+                function () {
+                    //swal("Deleted!", "Your imaginary file has been deleted.", "success");
+
+                    $.get(url, { program_id: id }, function (d) {
+                        if (d == "Success") {
+                            swal("Success!", "Program has been Deleted!", "success");
+                            //$.Notify({
+                            //    caption: 'Success',
+                            //    content: 'Program has been Deleted',
+                            //    icon: "<span class='mif-checkmark'></span>",
+                            //    shadow: true,
+                            //    type: 'success'
+                            //});
+                            $("#grProgram").data("kendoGrid").dataSource.read();
+                            $("#grProgramDelete").data("kendoGrid").dataSource.read();
+                    
+                        } else {
+                            swal("Failed!", d, "error")
+                        }
+
+                    });
+                });
+            }
+            function restoreAccount(id) {
+                //var data = this.dataItem($(account.currentTarget).closest("tr"));
+                var url = "@Url.Action("RestoreProgram", "Maintenance")";
+                var program_id = id;
+                swal({
+                    title: "Are you sure you want to Restore this Program?",
+                    text: "Restoring this Account will cause to be Active.",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Yes, Restore it!",
+                    closeOnConfirm: false
+                },
+                function () {
+                    //swal("Deleted!", "Your imaginary file has been deleted.", "success");
+
+                    $.get(url, { program_id: id }, function (d) {
+                        if (d == "Success") {
+                            swal("Success!", "Program has been Restored!", "success");
+                            //$.Notify({
+                            //    caption: 'Success',
+                            //    content: 'Program has been Restored!',
+                            //    icon: "<span class='mif-checkmark'></span>",
+                            //    shadow: true,
+                            //    type: 'success'
+                            //});
+                            $("#grProgram").data("kendoGrid").dataSource.read();
+                            $("#grProgramDelete").data("kendoGrid").dataSource.read();
+                        } else {
+                            swal("Failed!", "An error has been occured!", "error")
+                        }
+
+                    });
+                });
+            }
+            
+        </script>
+        <style>
+            h2{
+        text-decoration-style:none;     
+    }
+        </style>
+        @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Maintenance.programs>()
+    .Name("grProgram")
+    .Columns(col =>
+    {
+        col.Bound(m => m.program_name).Title("Programs");
+        col.Bound(m => m.OfficeName).Title("Office");
+        col.Bound(m => m.program_id).Title("Program ID").Hidden();
+        col.Template(t => { }).ClientTemplate(
+"<div class='btn-delete'> <a  title='Delete' onclick='deleteAccount(#=program_id#)'><span class='fa fa-trash' style='font-size: 12pt;'></span></a></div>"
+).HtmlAttributes(new { style = "margin-left:5px;" }).Width(40);
+        
+    })
+    .ToolBar(t => t.Template(@<text>
+
+
+        <div style="float: left; width: 0; margin-top:-3px;margin-bottom:-100px;margin-left:-3px; height: 0; border-right: 0px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;">
+            <div style="float: left; width: 0; margin-top:0px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 37px solid #EEE; ">
+
+                <div style="float: left; height:28px; margin-left:-59px; margin-top: 5px;">
+                    <i class="fa fa-tasks fa-2x fg-white"></i>
+
+                </div>
+
+            </div>
+        </div>
+        <div style="float: right; height:28px;margin-top:2px;">
+            <link href="~/Content/metroui/css/docs.css" rel="stylesheet" />
+            <div style="background-color:white;border:solid;border-color:whitesmoke;border-width:thin;width:310px;height:33px;float:right;padding:0px;margin-top:-3px;" id="search">
+                <input type="text" style="width:260px;border-collapse:collapse;border-color:white;margin:0px;margin-left:-10px;height:70%;outline:none;border-left-style:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search by Program Name" id="SearchData" name="SearchData">
+                <div class="k-button k-button-icontext" style="height:33px;width:40px;" onclick="searchAccount()"><span class="mif-search"></span></div>
+            </div>
+
+        </div>
+    </text>))
+                            .Pageable(page => page.Refresh(true)
+                            .Enabled(true)
+                            .ButtonCount(4)
+                            
+                            .PreviousNext(true)
+                            )
+                               .Selectable(selectable => selectable.Mode(GridSelectionMode.Single))
+                               
+                               .DataSource(d => d
+                               .Ajax()
+                               .PageSize(10)
+                                  .Model(m => m.Id(i => i.program_id))
+                                          .Read(read => read.Action("SearchProgram", "Maintenance").Data("ProgramReceive"))
+                               )
+        )
+    </div>
+</div>
+
+<div style="width : 100%; margin-top: 20px;border-style: solid; border-color: #1fa67a">
+    <div style="width:100%;height : 35px ; background-color:#1fa67a; color: white">
+        <h2 style="margin-left: 5px;color:white"><i class="fa fa-minus-circle"></i> Non-Active Programs</h2>
+    </div>
+
+    <div style="padding:5px;">
+        <div style="margin-top:20px;"></div>
+        @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Maintenance.programs>()
+    .Name("grProgramDelete")
+    .Columns(col =>
+    {
+        col.Bound(m => m.program_name).Title("Programs");
+        col.Bound(m => m.OfficeName).Title("Office");
+        col.Bound(m => m.program_id).Title("Program ID").Hidden();
+        col.Template(t => { }).ClientTemplate(
+"<div class='btn-delete'> <a  title='Delete' onclick='restoreAccount(#=program_id#)'><span class='fa fa-reply-all' style='font-size: 12pt;'></span></a></div>"
+).HtmlAttributes(new { style = "margin-left:5px;" }).Width(40);
+
+    })
+    .ToolBar(t => t.Template(@<text>
+
+
+        <div style="float: left; width: 0; margin-top:-3px;margin-bottom:-100px;margin-left:-3px; height: 0; border-right: 0px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;">
+            <div style="float: left; width: 0; margin-top:0px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 37px solid #EEE; ">
+
+                <div style="float: left; height:28px; margin-left:-59px; margin-top: 5px;">
+                    <i class="fa fa-tasks fa-2x fg-white"></i>
+
+                </div>
+
+            </div>
+        </div>
+        <div style="float: right; height:28px;margin-top:2px;">
+            <link href="~/Content/metroui/css/docs.css" rel="stylesheet" />
+            <div style="background-color:white;border:solid;border-color:whitesmoke;border-width:thin;width:310px;height:33px;float:right;padding:0px;margin-top:-3px;" id="search">
+                <input type="text" style="width:260px;border-collapse:collapse;border-color:white;margin:0px;margin-left:-10px;height:70%;outline:none;border-left-style:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search by Program Name" id="SearchDeletedData" name="SearchDeletedData">
+                <div class="k-button k-button-icontext" style="height:33px;width:40px;" onclick="searchAccount()"><span class="mif-search"></span></div>
+            </div>
+
+        </div>
+    </text>))
+                                    .Pageable(page => page.Refresh(true)
+                                    .Enabled(true)
+                                    .ButtonCount(4)
+
+                                    .PreviousNext(true)
+                                    )
+                                       .Selectable(selectable => selectable.Mode(GridSelectionMode.Single))
+
+                                       .DataSource(d => d
+                                       .Ajax()
+                                       .PageSize(10)
+                                          .Model(m => m.Id(i => i.program_id))
+                                                  .Read(read => read.Action("SearchProgramDelete", "Maintenance").Data("ProgramReceive"))
+                                       )
+        )
+
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        var url = "@Url.Action("CheckUserStatus", "Maintenance")";
+        var checkData = "CheckUser";
+        $.post(url, checkData, function (d) {
+            if (d != 0) {
+                // alert(d);
+                $("#office_id").data("kendoComboBox").value(d);
+                document.getElementById("text_office_id").value = d;
+                $("#office_id").data("kendoComboBox").enable(false);
+            }
+            //alert(d);
+
+        })
+    });
+</script>

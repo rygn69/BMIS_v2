@@ -1,0 +1,201 @@
+﻿
+
+<h2><span class="fa fa-search"></span> Monthly Accomplishment Report</h2>
+@{
+    string tmonth = ""; 
+}
+<div style="border-color:gray;border-width:1px;border-style:solid;width:750px;margin-top:20px;float:left;height:180px">
+    <div style="background-color:white;width:110px;margin-top:-15px;margin-left:15px;"><span style="font-size:14px;margin-left:5px;">Report Filter</span></div>
+    <div style="display:inline-block;margin-top:30px;margin-left:57px">
+        <label>
+            Year :
+        </label>
+    </div>
+    <div style="display:inline-block;margin-left:5px;">
+
+        @(Html.Kendo().DropDownList()
+            .Name("ddlYear")
+            .DataTextField("ProposalYear")
+            .DataValueField("ProposalYear")
+            .SelectedIndex(0)
+            .HtmlAttributes(new { @style = "width: 95px;" })
+            .SelectedIndex(0)
+            .DataSource(source => source.Read(read => read.Action("GetPropYear3", "PYear")))
+        )
+    </div>
+    <br />
+
+    <div style="display:inline-block;margin-top:15px;">
+        <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;">
+            From :
+        </label>
+    </div>
+    <div style="display:inline-block">
+        <script>
+            function fn_Offices() {
+                var proyy = $("#ddlYear").val();
+                var off_id = $("#offs").val();
+                var ooe_id = $("#ooe_id").val();
+
+                return {
+                    propYear: proyy,
+                    office_ID: off_id,
+                    ooe_id: ooe_id
+                }
+            }
+        </script>
+
+        @(Html.Kendo().DropDownList()
+            .Name("Months")
+            .DataTextField("Text")
+            .DataValueField("Value")
+            //.Events(e => e.Change("SelMonth"))
+            .BindTo(new List<SelectListItem>() {
+                new SelectListItem() {
+                    Text = "January",
+                    Value = "1"
+                },
+                new SelectListItem() {
+                    Text = "Febuary",
+                    Value = "2"
+                },
+                new SelectListItem() {
+                    Text = "March",
+                    Value = "3"
+                },
+                new SelectListItem() {
+                    Text = "April",
+                    Value = "4"
+                },
+                new SelectListItem() {
+                    Text = "May",
+                    Value = "5"
+                },
+                new SelectListItem() {
+                    Text = "June",
+                    Value = "6"
+                },
+                new SelectListItem() {
+                    Text = "July",
+                    Value = "7"
+                },
+                new SelectListItem() {
+                    Text = "August",
+                    Value = "8"
+                },
+                new SelectListItem() {
+                    Text = "September",
+                    Value = "9"
+                },
+                new SelectListItem() {
+                    Text = "October",
+                    Value = "10"
+                },
+                new SelectListItem() {
+                    Text = "November",
+                    Value = "11"
+                },
+                new SelectListItem() {
+                    Text = "December",
+                    Value = "12"
+                }
+            })
+            // .Value(ViewBag.MonthVaue)
+            .HtmlAttributes(new { style = "width: 150px" })
+        )
+
+
+    </div>
+
+    <div style="display:inline-block;margin-top:10px;margin-left:-20px">
+        <label style="margin-left: 70px;margin-right: 5px;margin-top: 5px;margin-bottom: 2px;">
+            To   :
+        </label>
+    </div>
+    <div style="display:inline-block;margin-left:1px;">
+        @(Html.Kendo().DropDownList()
+            .Name("Months_TO")
+            .DataTextField("Text")
+            .DataValueField("Value")
+            .BindTo(new List<SelectListItem>() {
+                new SelectListItem() {
+                    Text = "January",
+                    Value = "1"
+                },
+                new SelectListItem() {
+                    Text = "Febuary",
+                    Value = "2"
+                },
+                new SelectListItem() {
+                    Text = "March",
+                    Value = "3"
+                },
+                new SelectListItem() {
+                    Text = "April",
+                    Value = "4"
+                },
+                new SelectListItem() {
+                    Text = "May",
+                    Value = "5"
+                },
+                new SelectListItem() {
+                    Text = "June",
+                    Value = "6"
+                },
+                new SelectListItem() {
+                    Text = "July",
+                    Value = "7"
+                },
+                new SelectListItem() {
+                    Text = "August",
+                    Value = "8"
+                },
+                new SelectListItem() {
+                    Text = "September",
+                    Value = "9"
+                },
+                new SelectListItem() {
+                    Text = "October",
+                    Value = "10"
+                },
+                new SelectListItem() {
+                    Text = "November",
+                    Value = "11"
+                },
+                new SelectListItem() {
+                    Text = "December",
+                    Value = "12"
+                }
+            })
+            //.Events(e => e.Change("ReloadAppSumm"))
+            // .Value(Convert.ToString(tmonth))
+            .HtmlAttributes(new { style = "width: 150px" })
+            .AutoBind(true)
+        )
+
+
+
+    </div>
+    <div id="btnPrint" class="k-button k-button-icontext" style="  right: 25px;width: 90px;float:right; margin-top: 30px; margin-right:260px; margin-bottom:0px;background-color:cornflowerblue;border-radius:50px;color:white" onclick="reqPrint()"><span class="fa fa-print"></span> Preview</div>
+</div>
+
+<script>
+    $(document).ready(function () {
+      
+        var url = "@Url.Action("CurrentMonth", "Global")";
+        $.get(url,
+        function (d) {
+            $("#Months_TO").data("kendoDropDownList").value(d);
+        })
+    })
+    function reqPrint() {
+        var month_ = $("#Months").val();
+        var month_To = $("#Months_TO").val();
+        var year_ = $("#ddlYear").val();
+             $.ajax({
+            async: false,
+            dataType: 'html',
+            success: window.open("../Reports/ReportViewer.aspx?rid=43&month_=" + month_ + "&month_To=" + month_To + "&year=" + year_ + "")
+        });
+    }
+</script>

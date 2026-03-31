@@ -1,0 +1,274 @@
+﻿
+
+<script>
+    function reqSave() {
+        var url = "@Url.Action("createNewAccounts", "Maintenance")";
+        var AccountID = $("#AccountName").val();
+        var AccountName = $("#AccountName").data("kendoComboBox").text();
+        var OfficeID = document.getElementById("text_office_id").value;
+        var ProgramID = $("#program_id").val();
+        var OOEID = $("#ooe_id").val();
+        var OOEName = $("#ooe_id").data("kendoComboBox").text();
+        var Amount = document.getElementById("ammount_money").value;
+        var yearof=$("#propsYears").val();
+        //alert(yearof)
+        if (AccountID == "" || AccountName == "" || OfficeID == "" || ProgramID == "" || OOEID == "" || OOEName == "") {
+            swal("Error!", "Please fill-in all the fields", "error")
+        }
+        else {
+            $.post(url, { AccountID: AccountID, AccountName: AccountName, OfficeID: OfficeID, ProgramID: ProgramID, OOEID: OOEID, Amount: Amount, OOEName: OOEName,yearof:yearof }, function (d) {
+                if (d == "Success") {
+                    swal({
+                        title: "Success",
+                        text: "Proposed Account has been Added!",
+                        type: "success",
+                        showCancelButton: false,
+                        confirmButtonColor: "#1fa67a",
+                        confirmButtonText: "Ok!",
+                        closeOnConfirm: true
+                    },
+                        function(){
+                            $("#AccountsGrid").data("kendoGrid").dataSource.read();
+                            $('#newAccounts').data('kendoWindow').title("Create New Accounts").close();
+                        });
+                    $('#webTitle').html("Add Account to Programs");
+
+                } else    if(d==null  ||d==""){
+                    swal("Error!", d, "error")
+                }
+            })
+        }
+        
+    }
+    document.getElementById("DisplayYearDate").innerHTML = yearDate();
+
+    function yearDate(){
+        var d = new Date();
+        return $("#propsYears").val();//d.getFullYear()+1;
+    }
+</script>
+<div style="border: outset;border-width:1px;border-color:#038603; width: 816px; padding-left:0px;padding-right:0px;padding-top:0px;padding-bottom:7px;margin-top: 10px;">
+    <div style=" width: 0;height: 0; border-right: 5px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;margin-top: -1px; ">
+        <div style="width: 750px; margin-top:1px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 37px solid #1fa67a; ">
+
+            <div style="float: left; height:28px; margin-left:-59px; margin-top: 5px;">
+                <i class="fa fa-edit fa-2x fg-white"></i>
+            </div>
+
+        </div>
+    </div>
+    <div style="margin:10px;">
+        <form id="formProgram" method="post">
+            <div>
+                <h2>Transaction Year : <span id="DisplayYearDate"></span> </h2>
+            </div>
+            <hr />
+            <div style="margin-top:20px;">
+
+                <label>FMIS Office</label>
+                <script>
+                    function onSelectOfficeID() {
+                        var get_office_id = $("#office_id").val();
+                        document.getElementById("text_office_id").value = get_office_id;
+                    }
+                </script>
+                @(Html.Kendo().ComboBox()
+                                    .Name("office_id")
+                                    .DataTextField("office_name")
+                                    .Filter("contains")
+                                    .MinLength(2)
+                                    .Placeholder("Select Office . .")
+                                    .DataValueField("office_id")
+                                            .HtmlAttributes(new { @style = "width: 80%;height:110%;" }).Events(e =>
+                                                            {
+                                                                e.Change("onSelectOfficeID");
+                                                            })
+                                    .DataSource(source => { source.Read(read => { read.Action("ddlOffice", "Dropdowns"); }); })
+
+                )
+                <input type="text" name="text_office_id" id="text_office_id" value="" hidden="hidden" />
+                <input type="text" name="program_id1" id="program_id1" value="@Session["ProgID1"]" hidden="hidden" />
+            </div>
+            <div style="margin-top:20px;">
+                <label>Program</label>
+                <script>
+                    function filterProgram() {
+                        var OfficeDropdown = $("#office_id").val();
+                        return {
+                            OfficeDropdown: OfficeDropdown,
+                            YearOf: $("#propsYears").val()
+                        }
+                    }
+                </script>
+                @(Html.Kendo().ComboBox()
+                                    .Name("program_id")
+                                    .DataTextField("program_name")
+                                    .Filter(FilterType.Contains)
+                                    .MinLength(2)
+                                    .Placeholder("Select Program . .")
+                                    .DataValueField("program_id")
+                                            .HtmlAttributes(new { @style = "width: 80%;height:110%;" })
+
+                                                    .DataSource(source =>
+                                                    {
+                                                        source.Read(read =>
+                                                            {
+                                                                read.Action("ddlCascadeProgram", "Dropdowns")
+                                                                    .Data("filterProgram");
+                                                            })
+                                                            .ServerFiltering(true);
+                                                    })
+                                    .Enable(false)
+                                    .AutoBind(false)
+                                    .CascadeFrom("office_id")
+
+                )
+            </div>
+            <div style="margin-top:20px;">
+                <script>
+                    function onOOEID() {
+                        var ooe_id = $("#ddlOOE").val();
+                        if(ooe_id==null||ooe_id==0){
+                            ooe_id=0
+                        }
+                        return {
+                            ooe_id: ooe_id,
+                            ooe_id: $("#ooe_id").data("kendoComboBox").input.val()
+                        }}
+                </script>
+
+                <label>Obj. of Expenditure</label>
+                @(Html.Kendo().ComboBox()
+                                    .Name("ooe_id")
+                                    .DataTextField("ooe_name")
+                                    .Placeholder("Select OOE . .")
+                                   // .SelectedIndex(1)
+                                    .Filter("contains")
+                                   // .SelectedIndex(0)
+                                    .MinLength(1)
+                                    .DataValueField("ooe_id")
+                                            .HtmlAttributes(new { @style = "width: 80%;height:110%;" })
+                                    .DataSource(source => { source.Read(read => { read.Action("ddlOOE", "Dropdowns").Data("onOOEID");}); })
+
+                )
+            </div>
+            @*<div style="margin-top:20px;">
+                <label>Fund Type</label>
+                @(Html.Kendo().DropDownList()
+                                    .Name("fund_id")
+                                    .DataTextField("fund_name")
+                                    .DataValueField("fund_name")
+                                    .SelectedIndex(1)
+                                    .OptionLabel("Select Fund...")
+                                            .HtmlAttributes(new { @style = "width: 80%;height:110%;" })
+                                    .DataSource(source => source.Read(read => read.Action("ddlFund", "Dropdowns")))
+
+                )
+            </div>*@
+            @*<div style="margin-top:20px;">
+                <label>Expense Class</label>
+                @(Html.Kendo().DropDownList()
+                                    .Name("ThirdLevelGroup")
+                                    .DataTextField("ThirdLevelDescription")
+                                    .DataValueField("ThirdLevelDescription")
+                                    .OptionLabel("Select. .")
+                                    .HtmlAttributes(new { @style = "width: 80%;" })
+                                    .DataSource(source => source.Read(read => read.Action("ddl3rdleveldesc", "Dropdowns")))
+                )
+            </div>*@
+            <div style="margin-top:20px;display:block;">
+                <label>Account Name</label>
+                <script>
+                    function onChangeAccount(){
+                        var AccountName = $("#AccountName").data("kendoComboBox").text();
+                        document.getElementById("account_name").value = AccountName;
+                        var AccountCode = $("#AccountName").val();
+                        var OfficeID = $("#office_id").val();
+                        var RefYear = $("#propsYears").val();
+                        var url = "@Url.Action("GetComputationOfAccount", "BudgetPreparation")";
+                        $.post(url, {AccountCode:AccountCode,OfficeID:OfficeID,RefYear:RefYear} , function (d) {
+                            document.getElementById("ammount_money").value = d;
+                            if (d != 0) {
+                                document.getElementById("ammount_money").disabled = true;
+                            }
+                            else {
+                                document.getElementById("ammount_money").disabled = false;
+                            }
+                        })
+                    }
+                </script>
+
+                <input type="text" id="account_name" name="account_name" hidden style="width:80%;" />
+                @(Html.Kendo().ComboBox()
+                    .Name("AccountName")
+                    .DataTextField("AccountName")
+                    .DataValueField("AccountCode")
+                    .Placeholder("Choose Account")
+                    .Filter(FilterType.Contains)
+                    .MinLength(2)
+                    .AutoBind(true)
+                    .HtmlAttributes(new { @style = "width:80%;" })
+                    .Events(e => e.Change("onChangeAccount"))
+                    .DataSource(source =>
+                           {
+                               source.Read(read =>
+                                          {
+                                              read.Action("CodeAccountName", "Dropdowns");
+
+                                          });
+                           })
+                )
+ 
+
+            </div>
+            <div style="width:100%;float:left;display:none">
+                <div style="margin-top:20px;float:left;">
+
+                    <label>Budget Proposal</label>
+                    <div class="k-textbox" style="width: 100%;background-color:#ededed;display:none">
+                        <span style="float:left;font-size:18px;margin-left:5px;">₱</span>
+                        <input type="number" class="k-textbox" style="width: 90%;background-color:#ededed;float:right;outline:none;" id="ammount_money" name="ammount_money" value="" hidden="hidden"/>
+                    </div>
+                </div>
+                @*<div style="margin-left:50px;margin-top:20px;float:left;">
+                    <label>Order #</label>
+                    @(Html.Kendo().ComboBox()
+                  .Name("orderBy")
+                  .Filter("contains")
+                  .MinLength(1)
+                  .Placeholder("Select order by")
+                  .DataTextField("x")
+                  .DataValueField("x")
+                          .HtmlAttributes(new { @style = "height:110%;" })
+                  .DataSource(source => source.Read(read => read.Action("ddlOrderby", "Dropdowns")).ServerFiltering(false))
+                    )
+                </div>*@
+            </div>
+        </form>
+        <div style="width:100%;display:block;">
+            <hr />
+            <div class="k-button k-button-icontext" onclick="reqSave()" style="padding:10px;margin-top:20px;">Save</div>
+        </div>
+    </div>
+</div>
+<script>
+        $(document).ready(function () {
+            var url = "@Url.Action("CheckUserStatus", "Maintenance")";
+            var checkData = "CheckUser";
+            var ProgramID = @Session["ProgID1"];
+
+            $.post(url, checkData, function (d) {
+                if (d != 0) {
+                    // alert(d);
+                    $("#office_id").data("kendoComboBox").value(d);
+                    document.getElementById("text_office_id").value = d;
+                    $("#office_id").data("kendoComboBox").enable(false);
+                    document.getElementById("program_id").value = ProgramID
+
+                }
+                //alert(d);
+            })
+        });
+
+</script>
+

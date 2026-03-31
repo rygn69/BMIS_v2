@@ -1,0 +1,66 @@
+﻿<script>
+    function reqTransfer() {
+
+        if ($('#ddlOffices').val() == "") {
+            $.Notify({
+                caption: 'Cannot Complete Request',
+                content: 'Please Select Office',
+                type: 'alert'
+            });
+        }
+        else {
+            var selectedYear = @Session["selectedYear"];
+            var ProposalYear = @Session["ProposalYear"];
+            var eid = @Session["EmployeeID"];
+            var officeID = $('#ddlOffices').val();
+            var currentOfficeID = @Session["selectedOfficeID"];
+            var officeName =$('#ddlOffices').data("kendoComboBox").text();
+            var url = "@Url.Action("TransferOffice", "BudgetPreparation")";
+            $.post(url, { eid: eid, selectedYear: selectedYear, officeID:officeID, OfficeName:officeName, CurrentOfficeID:currentOfficeID, ProposalYear: ProposalYear }, function (d) {
+                if (d == 1) {
+                    $.Notify({
+                        caption: 'Success',
+                        content: 'Successfuly Transfered',
+                        type: 'success'
+                    });
+                    $("#ddlOffices").data("kendoComboBox").value("");
+                }
+                else {
+                    $.Notify({
+                        caption: 'Cannot Complete Request',
+                        content: d,
+                        type: 'alert'
+                    });
+                }
+            })
+        }
+    }
+
+</script>
+
+<div>
+    <div style="display:inline-block;">
+        <span style="color:red; font-size:15px">* Note : This Action will transfer this Employee's Budget To the Selected Office<br /><br /></span>
+        <span style="color:red;font-size:15px">* This Action will automatically update all account's proposed amount that has <br></span>
+        <span style="color:red;font-size:15px"> &nbsp;&nbsp;computations in this office and in the selected office based on the new total<br /></span>
+        <span style="color:red;font-size:15px"> &nbsp;&nbsp;no. of employees inluded and set the proposal status to "FOR APPROVAL"</span>
+    </div>
+    <label style="margin-left: 0px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px; display : inline-block">Select Office to Transfer : </label>
+    <label style="margin-left: 24px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px; display : inline-block">
+        @(Html.Kendo().ComboBox()
+                         .Name("ddlOffices")
+                         .DataTextField("OfficeName")
+                         .DataValueField("OfficeID")
+                         .Filter("contains")
+                         .MinLength(1)
+                         .Placeholder("Select Office...")
+                         .HtmlAttributes(new { @style = "width: 330px;" })
+                         .DataSource(source => source.Read(read => read.Action("ddlOffice", "User")))
+                         //.Events(e => { e.Change("ClearData"); })
+        )
+    </label>
+    <div style="display:inline-block; float: right">
+        <div id="btnTransfer" class="k-button k-button-icontext" style="margin-right:5px;display:inline-block;width: 80px;clear:both; margin-top: 10px" onclick="reqTransfer()">Transfer</div>
+    </div>
+
+</div>

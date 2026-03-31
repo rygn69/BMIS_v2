@@ -1,0 +1,1316 @@
+﻿
+<script>
+
+    $("#debayd_PS").keyup(function (event) {
+
+        if (event.keyCode == 13) {
+            if (@Account.UserInfo.lgu == 0){
+                if (document.getElementById('is_float').checked) {
+                    $("#Release_GG_FLOAT").click();
+                } else {
+                    $("#Release_GG").click();
+                }
+            }
+            else{
+                Release_Na();
+            }
+        }
+
+    });
+    $("#debayd_MOOE").keyup(function (event) {
+        if (event.keyCode == 13) {
+            if (@Account.UserInfo.lgu == 0){
+                if (document.getElementById('is_float').checked) {
+                    $("#Release_GG_FLOAT").click();
+                } else {
+                    $("#Release_GG").click();
+                }
+            }
+            else{
+                Release_Na();
+            }
+        }
+
+    });
+
+    $("#debayd_CO").keyup(function (event) {
+        if (event.keyCode == 13) {
+            if (@Account.UserInfo.lgu == 0){
+                if (document.getElementById('is_float').checked) {
+                    $("#Release_GG_FLOAT").click();
+                } else {
+                    $("#Release_GG").click();
+                }
+            }
+            else{
+                Release_Na();
+            }
+        }
+    });
+
+
+    //$(function () {
+    //    $("#debayd_PS").keypress(function (e) {
+    //        if (e.keyCode == 13) {
+    //            alert(1)
+    //            //Release_Na();
+    //        }
+    //    });
+    //    $("#debayd_MOOE").keypress(function (e) {
+    //        if (e.keyCode == 13) {
+    //            alert(2)
+    //            //Release_Na();
+    //        }
+    //    });
+    //    $("#debayd_CO").keypress(function (e) {
+    //        if (e.keyCode == 13) {
+    //            alert(3)
+    //            //Release_Na();
+    //        }
+    //    });
+    //});
+    function commaSeparateNumberRealignment(val) {
+        //while (/(\d+)(\d{3})/.test(val.toString())) {
+        //    val = val.toString().replace(/(\d+)(\d{3})/, '$1' + ',' + '$2');
+        //}
+        //return val;
+        //alert(val.toFixed(2))
+       // val = val.parseFlaot.toFixed(2);
+
+
+
+        val = val.toString().replace(/,/g, ''); //remove existing commas first
+        //var valSplit = val.toFixed(2).split('.'); //then separate decimals
+
+        var valSplit = val.split('.'); //then separate decimals
+        while (/(\d+)(\d{3})/.test(valSplit[0].toString())) {
+            valSplit[0] = valSplit[0].toString().replace(/(\d+)(\d{3})/, '$1' + ',' + '$2');
+        }
+
+        if (valSplit.length == 2) { //if there were decimals
+            val = valSplit[0] + "." + valSplit[1]; //add decimals back
+        } else {
+            val = valSplit[0];
+        }
+
+        return val;
+    }
+
+
+    setTimeout(function () {
+
+        var ooe_id = $("#ooe_id").val() == 4 ? 2 : $("#ooe_id").val();
+        if (ooe_id == 1) {
+
+            document.getElementById("debayd_PS").disabled = false;
+            document.getElementById("debayd_MOOE").disabled = true;
+            document.getElementById("debayd_CO").disabled = true;
+
+        } else if (ooe_id == 2) {
+
+            document.getElementById("debayd_PS").disabled = true;
+            document.getElementById("debayd_MOOE").disabled = false;
+            document.getElementById("debayd_CO").disabled = true;
+
+        }
+        if (ooe_id == 3) {
+
+            document.getElementById("debayd_PS").disabled = true;
+            document.getElementById("debayd_MOOE").disabled = true;
+            document.getElementById("debayd_CO").disabled = false;
+
+        }
+    }, 100);
+
+    function OnGridDataBound_GF(e) {
+        var rows = e.sender.tbody.children();
+
+        for (var j = 0; j < rows.length; j++) {
+            var row = $(rows[j]);
+            var dataItem = e.sender.dataItem(row);
+
+            if (dataItem.get("subjects") == 'Reserve' || dataItem.get("subjects") == 'Realigned From' || dataItem.get("subjects") == 'Float' || dataItem.get("subjects") == 'Release' || dataItem.get("subjects") == 'Reversion From') {
+                row.addClass("Minus_desu_GF");
+                ResetColor();
+            }
+                //else if (dataItem.get("subjects") == 'Realigned From' || dataItem.get("subjects") == 'Supplemental') {
+                //    row.addClass("ChangeStepIncrementBackColor");
+                //}
+            else {
+
+            }
+        }
+    }
+    //--------------------------------------------------
+    var str = "12,345,678";
+    str = str.replace(/,/g, "");
+    parseInt(str, 10);
+
+    var thisculture = kendo.culture();
+    thisculture.numberFormat.currency.symbol = '₱'; // Script For Changing The Currency Sign
+    //--------------------------------------------------
+
+    function fn_reqSave_Float() {
+        //alert('oks')
+        var url = "@Url.Action("Save_FlaotV2", "Release")";
+
+        var date_ = $('#datepicker_desu').val()
+       // alert(date_ + "date")
+
+        var date_desu = $("#datepicker_desu").data("kendoDatePicker").value();
+       // alert((date_desu.getMonth() + 1));
+
+        var office_id = $("#offs").val();
+        var program_id = $("#Progss").val();
+        var ooe_id = $("#ooe_id").val() == 4 ? 2 : $("#ooe_id").val();
+        var account_id = $("#account_list").val();
+        //var month_ = $("#Months").val();
+        var numeric_ = $("#numeric").val();
+        var year_ = $("#ddlYear").val();
+
+
+        var release_ps = $("#debayd_PS").val();
+        var release_mooe = $("#debayd_MOOE").val();// == ""? 0 : $("#debayd_MOOE").val();
+        var release_co = $("#debayd_CO").val();
+        //alert(release_mooe);
+
+        var acc_available = $("#available_EEOK").val();
+      //  alert(acc_available)
+        if (ooe_id == 1) {
+           // alert(acc_available)
+            var remainPS = Number(parseFloat(ConvertCommasToEmpty(acc_available)).toFixed(2)) - Number(parseFloat(ConvertCommasToEmpty(release_ps)).toFixed(2));
+            // remainPS = Number(acc_available) - Number(release_ps);
+
+            var remainMOOE = 0;
+            var remainCO = 0;
+            var release_mooe = 0;
+            var release_co = 0;
+
+
+            if (Number(ConvertCommasToEmpty(release_ps)) == 0) {
+
+                swal({
+                    title: "Oppss!",
+                    text: "Please enter the amount.",
+                    timer: 2000,
+                    type: "error",
+                    showConfirmButton: false
+                })
+            }
+            else {
+
+                if (Number(ConvertCommasToEmpty(acc_available)) < Number(ConvertCommasToEmpty(release_ps))) {
+                swal({
+                    title: "Error!",
+                    text: "System Error! Please Check the Appropriation balance.",
+                    timer: 2000,
+                    type: "error",
+                    showConfirmButton: false
+                })
+            }
+            else {
+                    swal({
+                        title: "Are you sure?",
+                        text: "This Float will be SAVED!",
+                        type: "info",
+                        showCancelButton: true,
+                        closeOnConfirm: false,
+                        confirmButtonColor: "#1fa67a",
+                        confirmButtonText: "Yes, Save It!",
+                        showLoaderOnConfirm: true,
+                    }, function () {
+                    //  $.post(url, { office_id: office_id, program_id: program_id, ooe_id: ooe_id, account_id: account_id, month_: month_, numeric_: numeric_, year_: year_, ps_: ps_ , mooe_: mooe_, co_: co_, balance_ps: balance_ps, balance_mooe: balance_mooe, balance_co: balance_co }, function (e) {
+                    $.post(url, {
+                        office_id: office_id,
+                        program_id: program_id,
+                        ooe_id: ooe_id,
+                        account_id: account_id,
+                        month_: date_desu.getMonth() + 1,
+                        numeric_: numeric_,
+                        year_: year_,
+                        release_ps: ConvertCommasToEmpty(release_ps),
+                        release_mooe: ConvertCommasToEmpty(release_mooe),
+                        release_co: ConvertCommasToEmpty(release_co),
+                        remainPS: remainPS,
+                        remainMOOE: remainMOOE,
+                        remainCO: remainCO,
+                        date_: date_
+
+
+
+                    }, function (e) {
+                        $("#float_PS_nulls").val('');
+                        $("#float_MOOE_nulls").val('');
+                        $("#float_CO_nulls").val('');
+
+                        if (e == "1") {
+                            acc_availble_mount();
+                            $('#GeneralFund_Grid').data('kendoGrid').dataSource.read();
+                            document.getElementById("debayd_PS").value = "0";
+                            document.getElementById("debayd_MOOE").value = "0";
+                            document.getElementById("debayd_CO").value = "0";
+                            swal({
+                                title: "Success!",
+                                text: "Float has been Added.",
+                                timer: 2000,
+                                type: "success",
+                                showConfirmButton: false
+                            })
+                            $("#grd_Float").data("kendoGrid").dataSource.read();
+                            acc_availble_mount();
+                            document.getElementById("debayd_PS").value = "";
+                            document.getElementById("debayd_MOOE").value = "";
+                            document.getElementById("debayd_CO").value = "";
+                        } else {
+                            swal({
+                                title: "Error!",
+                                text: "System Error! Please try again.",
+                                timer: 2000,
+                                type: "error",
+                                showConfirmButton: false
+                            })
+                        }
+                    });
+                });
+            }
+        }
+        }
+        else if (ooe_id == 2) {
+
+            var remainPS = 0;
+            var remainMOOE = Number(parseFloat(ConvertCommasToEmpty(acc_available)).toFixed(2)) - Number(parseFloat(ConvertCommasToEmpty(release_mooe)).toFixed(2));
+            var remainCO = 0;
+            var release_ps = 0;
+            var release_co = 0;
+
+            if (Number(ConvertCommasToEmpty(release_mooe)) == 0) {
+
+                swal({
+                    title: "Oppss!",
+                    text: "Please enter the amount.",
+                    timer: 2000,
+                    type: "error",
+                    showConfirmButton: false
+                })
+            }
+            else {
+
+                if (Number(ConvertCommasToEmpty(acc_available)) < Number(ConvertCommasToEmpty(release_mooe))) {
+                    swal({
+                        title: "Error!",
+                        text: "System Error! Please Check Balance Amount.",
+                        timer: 2000,
+                        type: "error",
+                        showConfirmButton: false
+                    })
+                }
+                else {
+                    swal({
+                        title: "Are you sure?",
+                        text: "This Float will be SAVED!",
+                        type: "info",
+                        showCancelButton: true,
+                        closeOnConfirm: false,
+                        confirmButtonColor: "#1fa67a",
+                        confirmButtonText: "Yes, Save It!",
+                        showLoaderOnConfirm: true,
+                    }, function () {
+                        //  $.post(url, { office_id: office_id, program_id: program_id, ooe_id: ooe_id, account_id: account_id, month_: month_, numeric_: numeric_, year_: year_, ps_: ps_ , mooe_: mooe_, co_: co_, balance_ps: balance_ps, balance_mooe: balance_mooe, balance_co: balance_co }, function (e) {
+                        $.post(url, {
+                            office_id: office_id,
+                            program_id: program_id,
+                            ooe_id: ooe_id,
+                            account_id: account_id,
+                            month_: date_desu.getMonth() + 1,
+                            numeric_: numeric_,
+                            year_: year_,
+                            release_ps: ConvertCommasToEmpty(release_ps),
+                            release_mooe: ConvertCommasToEmpty(release_mooe),
+                            release_co: ConvertCommasToEmpty(release_co),
+                            remainPS: remainPS,
+                            remainMOOE: remainMOOE,
+                            remainCO: remainCO,
+                            date_: date_
+
+
+
+                        }, function (e) {
+                            $("#float_PS_nulls").val('');
+                            $("#float_MOOE_nulls").val('');
+                            $("#float_CO_nulls").val('');
+                            get_Balance_GF();
+                            if (e == "1") {
+                                acc_availble_mount();
+                                $('#GeneralFund_Grid').data('kendoGrid').dataSource.read();
+                                document.getElementById("debayd_PS").value = "0";
+                                document.getElementById("debayd_MOOE").value = "0";
+                                document.getElementById("debayd_CO").value = "0";
+                                swal({
+                                    title: "Success!",
+                                    text: "Float has been Added.",
+                                    timer: 2000,
+                                    type: "success",
+                                    showConfirmButton: false
+                                })
+                                $("#grd_Float").data("kendoGrid").dataSource.read();
+                                acc_availble_mount();
+                                document.getElementById("debayd_PS").value = "";
+                                document.getElementById("debayd_MOOE").value = "";
+                                document.getElementById("debayd_CO").value = "";
+                            } else {
+                                swal({
+                                    title: "Error!",
+                                    text: "System Error! Please try again.",
+                                    timer: 2000,
+                                    type: "error",
+                                    showConfirmButton: false
+                                })
+                            }
+                        });
+                    });
+                }
+            }
+        }
+        else if (ooe_id == 3) {
+
+            var remainPS = 0;
+            var remainMOOE = 0;
+            var remainCO = Number(parseFloat(ConvertCommasToEmpty(acc_available)).toFixed(2)) - Number(parseFloat(ConvertCommasToEmpty(release_co)).toFixed(2));
+            var release_ps = 0;
+            var release_mooe = 0;
+
+            if (Number(release_co) == 0) {
+
+                swal({
+                    title: "Oppss!",
+                    text: "Please enter the amount.",
+                    timer: 2000,
+                    type: "error",
+                    showConfirmButton: false
+                })
+            }
+            else {
+                if (Number(ConvertCommasToEmpty(acc_available)) < Number(ConvertCommasToEmpty(release_co))) {
+                    swal({
+                        title: "Error!",
+                        text: "System Error! Please Check Balance Amount.",
+                        timer: 2000,
+                        type: "error",
+                        showConfirmButton: false
+                    })
+                }
+                else {
+                    swal({
+                        title: "Are you sure?",
+                        text: "This Float will be SAVED!",
+                        type: "info",
+                        showCancelButton: true,
+                        closeOnConfirm: false,
+                        confirmButtonColor: "#1fa67a",
+                        confirmButtonText: "Yes, Save It!",
+                        showLoaderOnConfirm: true, },
+                        function () {
+                        //  $.post(url, { office_id: office_id, program_id: program_id, ooe_id: ooe_id, account_id: account_id, month_: month_, numeric_: numeric_, year_: year_, ps_: ps_ , mooe_: mooe_, co_: co_, balance_ps: balance_ps, balance_mooe: balance_mooe, balance_co: balance_co }, function (e) {
+                        $.post(url, {
+                            office_id: office_id,
+                            program_id: program_id,
+                            ooe_id: ooe_id,
+                            account_id: account_id,
+                            month_: date_desu.getMonth() + 1,
+                            numeric_: numeric_,
+                            year_: year_,
+                            release_ps: ConvertCommasToEmpty(release_ps),
+                            release_mooe: ConvertCommasToEmpty(release_mooe),
+                            release_co: ConvertCommasToEmpty(release_co),
+                            remainPS: remainPS,
+                            remainMOOE: remainMOOE,
+                            remainCO: remainCO,
+                            date_: date_
+
+                        }, function (e) {
+                            $("#float_PS_nulls").val('');
+                            $("#float_MOOE_nulls").val('');
+                            $("#float_CO_nulls").val('');
+
+                            if (e == "1") {
+                                acc_availble_mount();
+                                $('#GeneralFund_Grid').data('kendoGrid').dataSource.read();
+                                document.getElementById("debayd_PS").value = "0";
+                                document.getElementById("debayd_MOOE").value = "0";
+                                document.getElementById("debayd_CO").value = "0";
+                                swal({
+                                    title: "Success!",
+                                    text: "Float has been Added.",
+                                    timer: 2000,
+                                    type: "success",
+                                    showConfirmButton: false
+                                })
+                                $("#grd_Float").data("kendoGrid").dataSource.read();
+                                acc_availble_mount();
+                                document.getElementById("debayd_PS").value = "";
+                                document.getElementById("debayd_MOOE").value = "";
+                                document.getElementById("debayd_CO").value = "";
+                            } else {
+                                swal({
+                                    title: "Error!",
+                                    text: "System Error! Please try again.",
+                                    timer: 2000,
+                                    type: "error",
+                                    showConfirmButton: false
+                                })
+                            }
+                        });
+                    });
+                }
+            }
+        }
+        else {
+            swal({
+                title: "Error!",
+                text: "System Error! Please Check Balance Amount.",
+                timer: 2000,
+                type: "error",
+                showConfirmButton: false
+            })
+        }
+
+
+
+
+    }
+
+
+
+    @*function get_Balance_GF() {
+        var url = "@Url.Action("get_balance", "Release")"
+
+        var office_id = $("#offs").val();
+        var program_id = $("#Progss").val();
+        var ooe_id = $("#ooe_id").val();
+        var account_id = $("#account_list").val();
+        var month_ = $("#Months").val();
+        var numeric_ = $("#numeric").val();
+        var year_ = $("#ddlYear").val();
+
+
+        $.get(url, { office_id: office_id, program_id: program_id, ooe_id: ooe_id, account_id: account_id, month_: month_, numeric_: numeric_, year_: year_ }, function (d) {
+            document.getElementById("balance_amount_ps_GF").value = d.balance_amount_ps;
+            document.getElementById("balance_amount_mooe_GF").value = d.balance_amount_moo;
+            document.getElementById("balance_amount_co_GF").value = d.balance_amount_co;
+            //document.getElementById("available_amount").value = d.available_amount;
+
+            //alert(d.balance_amount)
+        })
+    }*@
+
+
+
+
+
+    function checktest() {
+
+        if (document.getElementById('is_float').checked) {
+            document.getElementById('Rel_').style.visibility = 'hidden';
+            document.getElementById('Rel_float').style.visibility = 'visible';
+            document.getElementById("debayd_PS").value = "";
+            document.getElementById("debayd_MOOE").value = "";
+            document.getElementById("debayd_CO").value = "";
+
+        } else {
+            document.getElementById('Rel_float').style.visibility = 'hidden';
+            document.getElementById('Rel_').style.visibility = 'visible';
+            document.getElementById("debayd_PS").value = "";
+            document.getElementById("debayd_MOOE").value = "";
+            document.getElementById("debayd_CO").value = "";
+        }
+    }
+
+    function Close() {
+        $('#GeneralFund_Grid').data('kendoGrid').dataSource.read();
+        acc_availble_mount();
+    }
+
+
+
+    function Release_Na() {
+        var url = "@Url.Action("Release_na", "Release")";
+
+
+        var date_ = $('#datepicker_desu').val()
+        //alert(date_desu)
+
+        var date_desu = $("#datepicker_desu").data("kendoDatePicker").value();
+        //alert((date_desu.getMonth() + 1));
+
+        var office_id = $("#offs").val();
+        var program_id = $("#Progss").val();
+        var ooe_id = $("#ooe_id").val() == 4 ? 2 : $("#ooe_id").val();
+        var account_id = $("#account_list").val();
+        var month_ = $("#Months").val();
+        var numeric_ = $("#numeric").val();
+        var year_ = $("#ddlYear").val();
+
+
+
+        var release_ps = $("#debayd_PS").val();//=="" ? 0 : $("#debayd_PS").val();
+        var release_mooe = $("#debayd_MOOE").val();
+        var release_co = $("#debayd_CO").val();
+
+
+
+
+        var acc_available = $("#available_EEOK").val();
+        if (month_ == 'January') {
+            var month_ = 1;
+        }
+        else if (month_ == 'Febuary') {
+            var month_ = 2;
+        }
+        else if (month_ == 'March') {
+            var month_ = 3;
+        }
+        else if (month_ == 'April') {
+            var month_ = 4;
+        }
+        else if (month_ == 'May') {
+            var month_ = 5;
+        }
+        else if (month_ == 'June') {
+            var month_ = 6;
+        }
+        else if (month_ == 'July') {
+            var month_ = 7;
+        }
+        else if (month_ == 'August') {
+            var month_ = 8;
+        }
+        else if (month_ == 'September') {
+            var month_ = 9;
+        }
+        else if (month_ == 'October') {
+            var month_ = 10;
+        }
+        else if (month_ == 'November') {
+            var month_ = 11;
+        }
+        else if (month_ == 'December') {
+            var month_ = 12;
+        }
+        else {
+            var month_ = 1;
+        }
+        //alert(release_ps)
+        //alert(release_mooe)
+        //alert(release_co)
+        //alert(acc_available)
+        if (release_ps == 0 && release_mooe == 0 && release_co == 0) {
+
+            swal({
+                title: "Error!",
+                text: "System Error! Please Check Available Amount",
+                timer: 2000,
+                type: "error",
+                showConfirmButton: false
+            })
+        }
+        else {
+            //add on 1/19/2019 - xXx
+            release_ps = release_ps == 0 ? 0.00 : release_ps;
+            release_mooe = release_mooe == 0 ? 0.00 : release_mooe;
+            release_co = release_co == 0 ? 0.00 : release_co;
+
+            release_ps = Number(parseFloat(ConvertCommasToEmpty(release_ps)).toFixed(2));
+            release_mooe = Number(parseFloat(ConvertCommasToEmpty(release_mooe)).toFixed(2));
+            release_co = Number(parseFloat(ConvertCommasToEmpty(release_co)).toFixed(2));
+            acc_available = Number(parseFloat(ConvertCommasToEmpty(acc_available)).toFixed(2));
+
+
+            //alert(release_ps);
+            //alert(release_mooe);
+            //alert(release_co);
+            //alert(acc_available);
+            //if (parseFloat(ConvertCommasToEmpty(release_ps)).toFixed(2) > parseFloat(ConvertCommasToEmpty(acc_available)).toFixed(2) || parseFloat(ConvertCommasToEmpty(release_mooe)).toFixed(2) > parseFloat(ConvertCommasToEmpty(acc_available)).toFixed(2) || parseFloat(ConvertCommasToEmpty(release_co)).toFixed(2) > parseFloat(ConvertCommasToEmpty(acc_available)).toFixed(2)) {
+            if (release_ps > acc_available || release_mooe > acc_available || release_co > acc_available) {
+            swal({
+                title: "Error!",
+                text: "System Error! Please check balance of appropriation.",
+                timer: 2000,
+                type: "error",
+                showConfirmButton: false
+            })
+        } else {
+
+
+
+            if (ooe_id == 1) {
+
+                var remainPS = Number(ConvertCommasToEmpty(acc_available)) - Number(ConvertCommasToEmpty(release_ps));
+                var remainMOOE = 0;
+                var remainCO = 0;
+                var release_mooe = 0;
+                var release_co = 0;
+
+
+            } else if (ooe_id == 2) {
+                var remainPS = 0;
+                var remainMOOE = Number(ConvertCommasToEmpty(acc_available)) - Number(ConvertCommasToEmpty(release_mooe));
+                var remainCO = 0;
+                var release_ps = 0;
+                var release_co = 0;
+            } else if (ooe_id == 3) {
+                var remainPS = 0;
+                var remainMOOE = 0;
+                var remainCO = Number(ConvertCommasToEmpty(acc_available)) - Number(ConvertCommasToEmpty(release_co));
+                var release_ps = 0;
+                var release_mooe = 0;
+            } else {
+                var remainPS = 0;
+                var remainMOOE = 0;
+                var remainCO = 0;
+                var release_ps = 0;
+                var release_mooe = 0;
+                var release_co = 0;
+            }
+
+
+
+
+
+            swal({
+                title: "Are you sure?",
+                text: "You want to RELEASE this Amount?",
+                type: "info",
+                showCancelButton: true,
+                closeOnConfirm: false,
+                confirmButtonColor: "#1fa67a",
+                confirmButtonText: "Yes, Save It!",
+           showLoaderOnConfirm: true, }, function () {
+
+                $.get(url, {
+                    office_id: office_id,
+                    program_id: program_id,
+                    ooe_id: ooe_id,
+                    account_id: account_id,
+                    month_: date_desu.getMonth() + 1,
+                    numeric_: numeric_,
+                    year_: year_,
+                    release_ps: ConvertCommasToEmpty(release_ps),
+                    release_mooe: ConvertCommasToEmpty(release_mooe),
+                    release_co: ConvertCommasToEmpty(release_co),
+                    remainPS: remainPS,
+                    remainMOOE: remainMOOE,
+                    remainCO: remainCO,
+                    date_: date_
+                }, function (d) {
+                    if (d == 1) {
+                        $('#GeneralFund_Grid').data('kendoGrid').dataSource.read();
+                        document.getElementById("debayd_PS").value = "";
+                        document.getElementById("debayd_MOOE").value = "";
+                        document.getElementById("debayd_CO").value = "";
+                        swal({ title: "Success!", text: "Amount RELEASE!", timer: 1000, showConfirmButton: false, type: "success" });
+                        acc_availble_mount();
+                    }
+                    else {
+                        swal({
+                            title: "Error!",
+                            text: "System Error! Please try again.",
+                            timer: 2000,
+                            type: "error",
+                            showConfirmButton: false
+                        })
+                    }
+
+                })
+            });
+        }
+    }
+    }
+
+    function dibayd_na() {
+        var url = "@Url.Action("debayd_dibay", "Release")";
+
+        var date_ = $('#datepicker_desu').val()
+
+
+        var date_desu = $("#datepicker_desu").data("kendoDatePicker").value();
+
+
+        var office_id = $("#offs").val();
+        var program_id = $("#Progss").val();
+        var ooe_id = $("#ooe_id").val() == 4 ? 2 : $("#ooe_id").val();
+        var account_id = $("#account_list").val();
+        var month_ = $("#Months").val();
+        var numeric_ = $("#numeric").val();
+        var year_ = $("#ddlYear").val();
+        var classtype = $("#classtype").val();
+        var acc_available = $("#available_EEOK").val();
+
+        if ((office_id == 0 || office_id == null) &&
+            (program_id == 0 || program_id == null) &&
+            (ooe_id == 0 || ooe_id == null) &&
+            (month_ == 0 || month_ == null) &&
+            (numeric_ == 0 || numeric_ == null) &&
+            (year_ == 0 || year_ == null) &&
+            (date_ == 0 || date_ == null) &&
+            (date_desu == 0 || date_desu == null)) {
+
+            swal({
+                title: "Error!",
+                text: "Please Complete the Form!.",
+                timer: 2000,
+                type: "error",
+                showConfirmButton: false
+            })
+        }else {
+
+
+
+        $.get(url, {
+            office_id: office_id,
+            program_id: program_id,
+            ooe_id: ooe_id,
+            account_id: account_id,
+            month_: date_desu.getMonth() + 1,
+            numeric_: numeric_,
+            year_: year_,
+            classtype: classtype,
+            acc_available: acc_available
+        }, function (d) {
+
+            document.getElementById("debayd_PS").value = commaSeparateNumber(d.debayd_PS);
+            document.getElementById("debayd_MOOE").value = commaSeparateNumber(d.debayd_MOOE);
+            document.getElementById("debayd_CO").value = commaSeparateNumber(d.debayd_CO);
+
+        })
+        }
+    }
+
+    function reqReserve() {
+        $(window).scrollTop(0);
+
+        var url = "@Url.Action("Reserve", "Release")";
+
+        $.get(url, {
+            office_id: '@Session["office_id"]',
+            program_id: '@Session["program_id"]',
+            ooe_id: '@Session["ooe_id"]',
+            account_id: '@Session["account_id"]',
+            month_: '@Session["month_"] ',
+            numeric_: '@Session["numeric_"]',
+            year_: '@Session["year_"] '
+        }, function (d) {
+            $('#ReserveWindow').html(d);
+        })
+
+        $('#ReserveWindow').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Reserve").center().open();
+
+    }
+    function reqRealignFrom() {
+        $(window).scrollTop(0);
+
+        var url = "@Url.Action("RealignFrom", "Release")";
+
+        $.get(url, {
+            office_id: '@Session["office_id"]',
+            program_id: '@Session["program_id"]',
+            ooe_id: '@Session["ooe_id"]',
+            account_id: '@Session["account_id"]',
+            month_: '@Session["month_"] ',
+            numeric_: '@Session["numeric_"]',
+            year_: '@Session["year_"] '
+        }, function (d) {
+            $('#RealignFromWindow').html(d);
+        })
+
+        $('#RealignFromWindow').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Reserve").center().open();
+
+    }
+
+
+    function reqRealignedTo() {
+        $(window).scrollTop(0);
+
+        var url = "@Url.Action("RealignedTo", "Release")";
+
+        $.get(url, {
+            office_id: '@Session["office_id"]',
+            program_id: '@Session["program_id"]',
+            ooe_id: '@Session["ooe_id"]',
+            account_id: '@Session["account_id"]',
+            month_: '@Session["month_"] ',
+            numeric_: '@Session["numeric_"]',
+            year_: '@Session["year_"] '
+        }, function (d) {
+            $('#RealignedToWindow').html(d);
+        })
+
+        $('#RealignedToWindow').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Realign").center().open();
+
+    }
+
+
+    function reqSupplemental() {
+        $(window).scrollTop(0);
+       // alert(1);
+        var url = "@Url.Action("Supplemental", "Release")";
+        var date_desu = $("#datepicker_desu").data("kendoDatePicker").value();
+        var office_id = $("#offs").val();
+        var program_id = $("#Progss").val();
+        var ooe_id = $("#ooe_id").val() == 4 ? 2 : $("#ooe_id").val();
+        var account_id = $("#account_list").val();
+        var month_ = $("#Months").val();
+        var numeric_ = $("#numeric").val();
+        var year_ = $("#ddlYear").val();
+        $.get(url, {
+            office_id: office_id,
+            program_id: program_id,
+            ooe_id: ooe_id,
+            account_id: account_id,
+            month_: date_desu.getMonth() + 1,
+            numeric_: numeric_,
+            year_: year_,
+        }, function (d) {
+            $('#SupplementalWindow').html(d);
+        })
+
+        $('#SupplementalWindow').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Supplemental/Reversion").center().open();
+
+    }
+
+
+
+    function reqFloat() {
+        $(window).scrollTop(0);
+
+        var url = "@Url.Action("Float", "Release")";
+
+        $.get(url, {
+            office_id: '@Session["office_id"]',
+            program_id: '@Session["program_id"]',
+            ooe_id: '@Session["ooe_id"]',
+            account_id: '@Session["account_id"]',
+            month_: '@Session["month_"] ',
+            numeric_: '@Session["numeric_"]',
+            year_: '@Session["year_"] '
+        }, function (d) {
+
+            $('#FloatWindow').html(d);
+        })
+
+        $('#FloatWindow').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Float").center().open();
+
+    }
+
+    function reqRelease() {
+        $(window).scrollTop(0);
+
+        var url = "@Url.Action("Release_History", "Release")";
+
+        $.get(url, {
+            office_id: '@Session["office_id"]',
+            program_id: '@Session["program_id"]',
+            ooe_id: '@Session["ooe_id"]',
+            account_id: '@Session["account_id"]',
+            month_: '@Session["month_"] ',
+            numeric_: '@Session["numeric_"]',
+            year_: '@Session["year_"] '
+        }, function (d) {
+            $('#ReleaseWindow').html(d);
+        })
+
+        $('#ReleaseWindow').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Release").center().open();
+
+    }
+
+
+    function ReadData() {
+        return {
+            office_id: '@Session["office_id"]',
+            program_id: '@Session["program_id"]',
+            ooe_id: '@Session["ooe_id"]',
+            account_id: '@Session["account_id"]',
+            month_: '@Session["month_"] ',
+            numeric_: '@Session["numeric_"]',
+            year_: '@Session["year_"] '
+        }
+    }
+    setTimeout(function () {
+    okkk();
+    }, 1000);
+
+    function okkk(e) {
+        $("#Progss").data("kendoDropDownList").dataSource.read();
+    }
+    function ResetColor(){
+        @*var url = "@Url.Action("gettemplatecolor", "Maintenance")";
+        $.get(url, function (e) {*@
+            //alert(e)
+            //document.querySelector(".Minus_desu_GF").style.backgroundColor = e;
+            $(".Minus_desu_GF").each(function () {
+                //let color = $(this).attr("data-color"); // Get color from data attribute
+                $(this).css("background-color", $("#tmp_color").val()); // Apply background color
+            });
+        //}).fail(function () {
+        //    console.error("Failed to fetch template color from API.");
+        //});
+
+        //$(".Minus_desu_GF").each(function () {
+        //    let color = $(this).attr("data-color"); // Get color from data attribute
+        //    $(this).css("background-color", "#43136b"); // Apply background color
+        //});
+        //});
+    }
+</script>
+
+
+
+
+
+
+@(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.MonthlyR_Model>()
+    .Name("GeneralFund_Grid")
+    .Columns(col =>
+    {
+        col.Bound(m => m.subjects).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;"></div></text>)
+                        .Width(160)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate(
+                                       "# if(subjects == 'Reserve' || subjects == 'Realigned From' || subjects == 'Float'||  subjects == 'Reversion From') { #" +
+                                       "<div style='color:white;font-size: 15px;font-weight: bold;'>#=kendo.toString(subjects)# </div>" +
+                                       "# } else  if(subjects == 'Release')  { #" +
+                                       "<div style='color:\\#FFFF99;font-size: 18px;font-weight: bold;'>#=kendo.toString(subjects)# </div>" +
+                                       "# } else{ #" +
+                                       "<div style='color:black;font-size: 15px;font-weight: bold;'>#=kendo.toString(subjects)# </div>" +
+                                       "# } #");
+        col.Bound(m => m.ps)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size: 18px;font-weight: bold;">PS</div></text>)
+                        .Width(160)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate(
+                                       "# if(subjects == 'Reserve' || subjects == 'Realigned From' || subjects == 'Float'||  subjects == 'Reversion From') { #" +
+                                       "<div style='color:white;font-size: 15px;font-weight: bold;'>#=kendo.toString(ps,'c2')# </div>" +
+                                       "# } else  if(subjects == 'Release')  { #" +
+                                       "<div style='color:\\#FFFF99;font-size: 18px;font-weight: bold;'>#=kendo.toString(ps,'c2')# </div>" +
+                                       "# } else{ #" +
+                                       "<div style='color:black;font-size: 15px;font-weight: bold;'>#=kendo.toString(ps,'c2')# </div>" +
+                                       "# } #"
+                      );
+        col.Bound(m => m.mooe)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size: 18px;font-weight: bold;">MOOE</div></text>)
+                        .Width(160)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("# if(subjects == 'Reserve' || subjects == 'Realigned From' || subjects == 'Float'||  subjects == 'Reversion From') { #" +
+                                       "<div style='color:white;font-size: 15px;font-weight: bold;'>#=kendo.toString(mooe,'c2')# </div>" +
+                                       "# } else  if(subjects == 'Release')  { #" +
+                                       "<div style='color:\\#FFFF99;font-size: 18px;font-weight: bold;'>#=kendo.toString(mooe,'c2')# </div>" +
+                                       "# } else{ #" +
+                                       "<div style='color:black;font-size: 15px;font-weight: bold;'>#=kendo.toString(mooe,'c2')# </div>" +
+                                       "# } #");
+        col.Bound(m => m.co)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;font-size: 18px;font-weight: bold;">CO</div></text>)
+                        .Width(160)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("# if(subjects == 'Reserve' || subjects == 'Realigned From' || subjects == 'Float'||  subjects == 'Reversion From') { #" +
+                                       "<div style='color:white;font-size: 15px;font-weight: bold;'>#=kendo.toString(co,'c2')# </div>" +
+                                       "# } else  if(subjects == 'Release')  { #" +
+                                       "<div style='color:\\#FFFF99;font-size: 18px;font-weight: bold;'>#=kendo.toString(co,'c2')# </div>" +
+                                       "# } else{ #" +
+                                       "<div style='color:black;font-size: 15px;font-weight: bold;'>#=kendo.toString(co,'c2')# </div>" +
+                                       "# } #");
+
+        col.Template(t => { }).ClientTemplate(
+              "#if( subjects == 'Annual' ||  subjects == 'Balance of Appropriations' ||  subjects == 'Available of Allotment' ||  subjects == 'Reversion From'||  subjects == 'Reversion To') {#" +
+              "" +
+
+              "#} else if( subjects == 'Reserve' ) { #" +
+               "<div class='k-button k-button-icontext' style='border-radius:50px;color:\\#000000;background-color:\\#dcdcdc;'onclick='reqReserve()'><span class='fa fa-file-text' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'> </span>set</div> " +
+               "#} else if( subjects == 'Realigned From' ) { #" +
+               "<div class='k-button k-button-icontext' style='border-radius:50px;color:\\#000000;background-color:\\#dcdcdc;'onclick='reqRealignFrom()'><span class='fa fa-search-plus' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'> </span>view</div> " +
+              "#} else if( subjects == 'Realigned To' ) { #" +
+                 "<div class='k-button k-button-icontext' style='border-radius:50px;color:\\#000000;background-color:\\#dcdcdc;'onclick='reqRealignedTo()'><span class='fa fa-file-text' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'> </span>set</div> " +
+              "#} else if( subjects == 'Supplemental' ) { #" +
+                 "<div class='k-button k-button-icontext' style='border-radius:50px;color:\\#000000;background-color:\\#dcdcdc;'onclick='reqSupplemental()'><span class='fa fa-file-text' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'> </span>set</div> " +
+              "#} else if( subjects == 'Float' ) { #" +
+                 "<div class='k-button k-button-icontext' style='border-radius:50px;color:\\#000000;background-color:\\#dcdcdc;'onclick='reqFloat()'><span class='fa fa-file-text' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'> </span>set</div> " +
+              "#} else if( subjects == 'Release' ) { #" +
+                  "<div class='k-button k-button-icontext' style='border-radius:50px;color:\\#000000;background-color:\\#dcdcdc;'onclick='reqRelease()'><span class='fa fa-search-plus' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'> </span>view</div> " +
+              "#} else { #" +
+                "<div class='btn-delete'style='inline-block; height: 15px;width:65px;margin-left:5px;'> " +
+                "<a  title='Submit' onclick='reqReserve()' style='margin-left:2px;'><span class='fa fa-search-plus' style='font-size: 12pt;'></span></a>" +
+
+                " </div>" +
+              "# } #"
+              ).HtmlAttributes(new { style = "vertical-align: top;" }).Width(10);
+    })
+                                        .Events(e => e.DataBound("OnGridDataBound_GF"))
+                                        .DataSource(d => d
+                                        .Ajax()
+                                        .PageSize(50)
+                                        .Model(m => m.Id(i => i.monthly_id))
+                                        .Events(e => e.Change("okkk"))
+                                        .Read(read => read.Action("LoadMonthlyRelease_General", "Release").Data("ReadData")))
+
+//dcdcdc
+
+//.Pageable(page => page.Refresh(true)
+//     .Enabled(true)
+//     .ButtonCount(4)
+//     .PreviousNext(true))
+//     .Selectable()
+
+)
+
+
+
+<div id="AmountDepartment" style="float: none;clear:both; margin-top: 60px">
+
+    <div style="float:left;margin-left:17px;margin-top:-45px;">
+        <label>
+            Amount    :
+        </label>
+    </div>
+    <div style="float:left;margin-left:100px;margin-top:-45px;">
+        <input type="text" style="width:125px" name="debayd_PS" id="debayd_PS" placeholder="PS" onkeyup="commaSeparateNumberversion2('debayd_PS')" disabled>
+    </div>
+    <div style="float:left;margin-left:253px;margin-top:-45px;">
+        <input type="text" style="width:125px" name="debayd_MOOE" id="debayd_MOOE" placeholder="MOOE" onkeyup="commaSeparateNumberversion2('debayd_MOOE')" disabled>
+    </div>
+    <div style="float:left;margin-left:408px;margin-top:-45px;">
+        <input type="text" style="width:125px" name="debayd_CO" id="debayd_CO" placeholder="CO" onkeyup="commaSeparateNumberversion2('debayd_CO')" disabled>
+    </div>
+    <div style="float:left;margin-left:558px;margin-top:-45px;">
+        <input type='checkbox' class='checkbox' id="is_float" onclick=checktest() /> Floating
+    </div>
+    <div style="float:left;margin-left:634px;margin-top:-45px;">
+        <div class="k-button k-button-icontext" style="border-radius:50px;color:#ffffff;background-color:#1FA67A;"onclick="dibayd_na()"> Auto Divide</div>
+    </div>
+    <div style="float:left;margin-left:474px;margin-top:-5px;">
+        <input type="text" style="width:140px" name="total_debayd" id="total_debayd" hidden disabled>
+    </div>
+    <div style="float:left;margin-left:474px;margin-top:-5px;">
+        <input type="text" style="width:140px" name="total_debaydm" id="total_debaydm" hidden disabled>
+    </div>
+    <div style="float:left;margin-left:474px;margin-top:-5px;">
+        <input type="text" style="width:140px" name="total_debaydc" id="total_debaydc" hidden disabled>
+    </div>
+
+    <div style="float:left;margin-left:634px;margin-top:-5px;" id="Rel_">
+        <div class="k-button k-button-icontext eeeewqwdqwd" style="border-radius:12px;color:#ffffff;background-color:#1FA67A;height:50px;width:110px;text-align:center" onclick="Release_Na()" id="Release_GG"> Release</div>
+    </div>
+    <div style="float:left;margin-left:634px;margin-top:-51px; visibility: hidden" id="Rel_float">
+        <div class="k-button k-button-icontext eeeewqwdqwd" style="border-radius:12px;color:#ffffff;background-color:#1FA67A;height:50px;width:110px;text-align:center" onclick="fn_reqSave_Float()" id="Release_GG_FLOAT"> Release Float</div>
+    </div>
+
+    <div style="float:left;margin-left:474px;margin-top:-5px;">
+        <input type="text" style="width:140px" name="s1" id="s1" hidden disabled>
+    </div>
+    <div style="float:left;margin-left:474px;margin-top:-5px;">
+        <input type="text" style="width:140px" name="s2" id="s2" hidden disabled>
+    </div>
+    <div style="float:left;margin-left:474px;margin-top:-5px;">
+        <input type="text" style="width:140px" name="s3" id="s3" hidden disabled>
+    </div>
+
+
+</div>
+<div style="display:none">
+    <input type="text" id="tmp_color" value=""/>
+</div>
+<script>
+    $(document).ready(function(){
+        
+        var url = "@Url.Action("gettemplatecolor", "Maintenance")";
+        $.get(url, function (e) {
+            $("#tmp_color").val(e)
+            ResetColor()
+        }).fail(function () {
+            console.error("Failed to fetch template color from API.");
+        });
+
+    })
+</script>
+
+
+
+@(Html.Kendo().Window()
+        .Name("ReserveWindow")
+        .Title("New Entry")
+        .Width(775)
+        .Height(560)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+        .Events(e => e.Close("Close"))
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+                .Actions(a => { a.Close(); })
+)
+
+@(Html.Kendo().Window()
+        .Name("RealignFromWindow")
+        .Title("New Entry")
+        .Width(770)
+        .Height(430)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+        .Events(e => e.Close("Close"))
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+                .Actions(a => { a.Close(); })
+)
+
+@(Html.Kendo().Window()
+        .Name("RealignedToWindow")
+        .Title("New Entry")
+        .Width(800)
+        .Height(520)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+        .Events(e => e.Close("Close"))
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+                .Actions(a => { a.Close(); })
+)
+
+
+
+
+@(Html.Kendo().Window()
+        .Name("SupplementalWindow")
+        .Title("New Entry")
+        .Width(280 )
+        .Height(175)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+        .Events(e => e.Close("Close"))
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+                .Actions(a => { a.Close(); })
+)
+
+
+@(Html.Kendo().Window()
+        .Name("FloatWindow")
+        .Title("New Entry")
+        .Width(840)
+        .Height(400)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+        .Events(e => e.Close("Close"))
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+                .Actions(a => { a.Close(); })
+)
+
+
+@(Html.Kendo().Window()
+        .Name("ReleaseWindow")
+        .Title("New Entry")
+        .Width(845)
+        .Height(550)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+          .Events(e => e.Close("Close"))
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+                .Actions(a => { a.Close(); })
+)
+
+
+<style>
+    .Minus_desu_GF {
+        /*background-color:#43136b*/ /*//Tacurong city*/
+         background-color:#B43C3C /*//pgas*/
+    }
+    /*.metro td {
+
+     color : #ffffff;
+    }*/
+    .k-grid {
+        font-size: 10px;
+        color: #ffffff;
+    }
+
+        .k-grid td {
+            line-height: 2em;
+        }
+
+    .ChangeStepIncrementBackColor {
+        background-color: #80FF80;
+    }
+
+    .koooo {
+        background-color: #FFFF99;font-size: 20px;font-weight: bold;
+    }
+
+    .red {
+        color: red;
+    }
+
+
+    p.obliqueok {
+    font-style: oblique;
+
+}
+    DIV.eeeewqwdqwd {
+    min-height: 10em;
+    display: table-cell;
+    vertical-align: middle }
+</style>

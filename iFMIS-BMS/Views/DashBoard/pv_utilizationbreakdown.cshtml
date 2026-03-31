@@ -1,0 +1,105 @@
+﻿@model IEnumerable<iFMIS_BMS.BusinessLayer.Models.DashBoard.DashBoardModel>
+    <script>
+        function getBudgetYear() {
+            var ddlYear = $("#ddlYear").val() == "" ? CurrentYear() : $("#ddlYear").val()
+            var fundsource='@Session["fundsource"]'
+            return {
+                year: ddlYear,
+                status: '@Session["status"]',
+                fundsource:fundsource
+            }
+        }
+        function OnPieChartClick(e) {
+
+            CurrentScrollPosition = $(window).scrollTop()
+           
+            var fundname = e.category
+            var ddlYear = $("#ddlYear").val() == "" ? CurrentYear() : $("#ddlYear").val()
+            var status = '@Session["status"]'
+            var fundsource = '@Session["fundsource"]'
+            var url = "@Url.Action("UtilizationDetailPerOffice", "DashBoard")";
+            @*$('#UtilizationBreakdownPerOffice').html('<div style="width:100%;height:100%;"><img src="@Url.Content("~/Content/images/loading.gif")" alt="Loading..." style="position: absolute;top: 20%;left: 30%;margin-top: 0px;margin-left: 0px;" /></div>');*@
+            $.post(url, { fundname: fundname, year: ddlYear, status: status, fundsource: fundsource }, function (pvDataOffice) {
+                $(window).scrollTop(0);
+                $('#UtilizationBreakdownPerOffice').html(pvDataOffice);
+                $('#UtilizationBreakdownPerOffice').data('kendoWindow').title("<i class='fa fa-navicon'> </i> " + fundname + "").center().open();
+            })
+        }
+    </script>
+<div style="width:100%;margin-top:10px;">
+    @(Html.Kendo().Chart(Model)
+            .Name("AppropriationChart")
+            //.Title(title => title
+            //      .Text("Appropriation")
+            //      .Position(ChartTitlSSePosition.Top))
+            .Legend(legend => legend
+                .Visible(true)
+                .Position(ChartLegendPosition.Top)
+            )
+            .Series(series =>
+            {
+                series.Pie(m => m.finamount, m => m.fundname).Labels(labels => labels
+                   .Template("#= category #: \n #=kendo.toString(value, 'c2')# (#= kendo.format('{0:P4}', percentage)#)")
+                   .Background("transparent")
+                   .Visible(true)
+                );
+            })
+            .Tooltip(tooltip => tooltip
+                .Visible(true)
+                .Format("{0:c2}")
+                .Template("#= category #: #= kendo.toString(value,'c2') #")
+            )
+            .Events(e => e.SeriesClick("OnPieChartClick"))
+            .DataSource(source => source.Read(read => read.Action("UtilizationDenom", "Dashboard").Data("getBudgetYear")))
+
+    )
+    </div>
+    <div>
+        <label id="appropriationtotal" style="width:100%;"> </label>
+    </div>
+<script>
+    $(document).ready(function () {
+      //  $("#AppropriationChart").data("kendoChart").dataSource.read();
+
+        if ('@Session["status"]' == "Appropriation"){
+            document.getElementById('appropriationtotal').innerHTML = "&nbspTotal : ₱" + $("#appropriationlabl").val()
+        }
+        else if ('@Session["status"]' == "Allotment"){
+            document.getElementById('appropriationtotal').innerHTML = "&nbspTotal : ₱" + $("#allotmentlabl").val()
+        }
+        else if ('@Session["status"]' == "Pre-Obligation"){
+            document.getElementById('appropriationtotal').innerHTML = "&nbspTotal : ₱" + $("#preobligationlabl").val()
+        }
+        else if ('@Session["status"]' == "Obligation"){
+            document.getElementById('appropriationtotal').innerHTML = "&nbspTotal : ₱" + $("#obligationlabl").val()
+        }
+        else if ('@Session["status"]' == "Disbursement"){
+            document.getElementById('appropriationtotal').innerHTML = "&nbspTotal : ₱" + $("#disbursementlabl").val()
+        }
+        else if ('@Session["status"]' == "Utilization") {
+            document.getElementById('appropriationtotal').innerHTML = "&nbspTotal : ₱" + $("#consumatedlabl").val()
+        }
+        
+        //document.getElementById('AppropriationBreakdown').title = 'xcv'
+    })
+</script>
+
+@(Html.Kendo().Window()
+    .Name("UtilizationBreakdownPerOffice")
+    .Title("Utilization Per Office")
+    .Width(1300)
+    .Height(800)
+    .Visible(false)
+    .Modal(false)
+    .Draggable(true)
+    .AutoFocus(true)
+    // .Events(e=> e.Close("SetCurrentScrollPosition"))
+    .Animation(a =>
+    {
+        a.Open(o => o.SlideIn(SlideDirection.Down));
+        a.Close(c =>
+        {
+            c.SlideIn(SlideDirection.Down);
+            c.Reverse(true);
+        });
+    }).Actions(a => { a.Close(); }))

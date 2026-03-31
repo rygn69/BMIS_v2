@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://tempuri.org/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://tempuri.org/">
+      <s:element name="get_tracking_link">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="unique_refno" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="get_tracking_linkResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="get_tracking_linkResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="save_status_log">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="unique_refno" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="status_code" type="s:int" />
+            <s:element minOccurs="0" maxOccurs="1" name="remarks" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="userid" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="save_status_logResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="save_status_logResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="get_unique_refno">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="IS_reffno" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="IS_ID" type="s:int" />
+            <s:element minOccurs="0" maxOccurs="1" name="key_code" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="particular" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="amount" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="get_unique_refnoResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="get_unique_refnoResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="get_log_transactions">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="unique_refno" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="get_log_transactionsResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="get_log_transactionsResult">
+              <s:complexType>
+                <s:sequence>
+                  <s:element ref="s:schema" />
+                  <s:any />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="get_obrdetails">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="unique_refno" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="get_obrdetailsResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="get_obrdetailsResult">
+              <s:complexType>
+                <s:sequence>
+                  <s:any minOccurs="0" maxOccurs="unbounded" namespace="http://www.w3.org/2001/XMLSchema" processContents="lax" />
+                  <s:any minOccurs="1" namespace="urn:schemas-microsoft-com:xml-diffgram-v1" processContents="lax" />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="get_tracking_linkSoapIn">
+    <wsdl:part name="parameters" element="tns:get_tracking_link" />
+  </wsdl:message>
+  <wsdl:message name="get_tracking_linkSoapOut">
+    <wsdl:part name="parameters" element="tns:get_tracking_linkResponse" />
+  </wsdl:message>
+  <wsdl:message name="save_status_logSoapIn">
+    <wsdl:part name="parameters" element="tns:save_status_log" />
+  </wsdl:message>
+  <wsdl:message name="save_status_logSoapOut">
+    <wsdl:part name="parameters" element="tns:save_status_logResponse" />
+  </wsdl:message>
+  <wsdl:message name="get_unique_refnoSoapIn">
+    <wsdl:part name="parameters" element="tns:get_unique_refno" />
+  </wsdl:message>
+  <wsdl:message name="get_unique_refnoSoapOut">
+    <wsdl:part name="parameters" element="tns:get_unique_refnoResponse" />
+  </wsdl:message>
+  <wsdl:message name="get_log_transactionsSoapIn">
+    <wsdl:part name="parameters" element="tns:get_log_transactions" />
+  </wsdl:message>
+  <wsdl:message name="get_log_transactionsSoapOut">
+    <wsdl:part name="parameters" element="tns:get_log_transactionsResponse" />
+  </wsdl:message>
+  <wsdl:message name="get_obrdetailsSoapIn">
+    <wsdl:part name="parameters" element="tns:get_obrdetails" />
+  </wsdl:message>
+  <wsdl:message name="get_obrdetailsSoapOut">
+    <wsdl:part name="parameters" element="tns:get_obrdetailsResponse" />
+  </wsdl:message>
+  <wsdl:portType name="TrackingSoap">
+    <wsdl:operation name="get_tracking_link">
+      <wsdl:input message="tns:get_tracking_linkSoapIn" />
+      <wsdl:output message="tns:get_tracking_linkSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="save_status_log">
+      <wsdl:input message="tns:save_status_logSoapIn" />
+      <wsdl:output message="tns:save_status_logSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="get_unique_refno">
+      <wsdl:input message="tns:get_unique_refnoSoapIn" />
+      <wsdl:output message="tns:get_unique_refnoSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="get_log_transactions">
+      <wsdl:input message="tns:get_log_transactionsSoapIn" />
+      <wsdl:output message="tns:get_log_transactionsSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="get_obrdetails">
+      <wsdl:input message="tns:get_obrdetailsSoapIn" />
+      <wsdl:output message="tns:get_obrdetailsSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="TrackingSoap" type="tns:TrackingSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="get_tracking_link">
+      <soap:operation soapAction="http://tempuri.org/get_tracking_link" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="save_status_log">
+      <soap:operation soapAction="http://tempuri.org/save_status_log" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="get_unique_refno">
+      <soap:operation soapAction="http://tempuri.org/get_unique_refno" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="get_log_transactions">
+      <soap:operation soapAction="http://tempuri.org/get_log_transactions" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="get_obrdetails">
+      <soap:operation soapAction="http://tempuri.org/get_obrdetails" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="TrackingSoap12" type="tns:TrackingSoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="get_tracking_link">
+      <soap12:operation soapAction="http://tempuri.org/get_tracking_link" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="save_status_log">
+      <soap12:operation soapAction="http://tempuri.org/save_status_log" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="get_unique_refno">
+      <soap12:operation soapAction="http://tempuri.org/get_unique_refno" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="get_log_transactions">
+      <soap12:operation soapAction="http://tempuri.org/get_log_transactions" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="get_obrdetails">
+      <soap12:operation soapAction="http://tempuri.org/get_obrdetails" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="Tracking">
+    <wsdl:port name="TrackingSoap" binding="tns:TrackingSoap">
+      <soap:address location="https://pgas.ph/wsifmis/tracking.asmx" />
+    </wsdl:port>
+    <wsdl:port name="TrackingSoap12" binding="tns:TrackingSoap12">
+      <soap12:address location="https://pgas.ph/wsifmis/tracking.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

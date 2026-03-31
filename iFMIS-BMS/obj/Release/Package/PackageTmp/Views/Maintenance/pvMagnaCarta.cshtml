@@ -1,0 +1,182 @@
+﻿<style>
+    label {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #383434;
+        font-size: 18px;
+    }
+</style>
+<script>
+    function onChangeAmount()
+    {
+        var AccountID = $("#ddlMagnaCarta").data("kendoComboBox").text();
+        document.getElementById("span-AccountName").innerHTML = AccountID;
+        $("#grd_MagnaCarta").data("kendoGrid").dataSource.read();
+    }
+    function AccountData()
+    {
+        var AccountID = $("#ddlMagnaCarta").val();
+        var BudgetYear = $("#ddlYear").val();
+        return {
+            AccountID: AccountID,
+            BudgetYear: BudgetYear
+        }
+    }
+    function SumbitMagnaCarta()
+    {
+        var url = "@Url.Action("BuildupMagnaCarta", "Maintenance")";
+        var Account = $("#ddlMagnaCarta").val();
+        var OfficeID = $("#ddlOffice").val();
+        var type = $("#ddlType").val();
+        var BudgetYear = $("#ddlYear").val();
+        var ProgramID = $("#program_id").val();
+        var AccountName = $("#ddlMagnaCarta").data("kendoComboBox").text();
+        if(Account == "" || OfficeID == "" || type == "" || BudgetYear == "" || ProgramID == "" || AccountName == "")
+        {
+            swal("Error!", "All fields are Required", "error")
+        } else {       
+        $.post(url, { OfficeID: OfficeID, Account: Account, ProgramID: ProgramID, type: type, BudgetYear: BudgetYear, AccountName: AccountName }, function (e) {
+            if(e == "success"){
+                swal("Success!", "Magna Carta Successfully added", "error")
+            } else {
+                swal("Error!", "Something went wrong", "error")
+            }
+        
+        })
+        }
+    }
+</script>
+<div style="width : 100%; margin-top: 10px;margin-left:-5px;border-style: solid; border-color: #1fa67a">
+
+    <div style="width:100%;height : 35px ; background-color:#1fa67a; color: white">
+        <h2 style="margin-left: 5px;color:white"><i class="fa fa-sliders"></i> Magna Carta Configuration</h2>
+    </div>
+    <div style="padding:5px;margin-bottom:50px;">
+        <div style="margin:5px;">
+            <label style="color:#ff0000">*Please Select the Office you want Magna Carta be enabled.</label>
+        </div>
+        <div style="margin-top:20px;margin-left:5px;">
+            <label>
+                Account:
+               @(Html.Kendo().ComboBox()
+                                    .Name("ddlMagnaCarta")
+                                    .DataTextField("AccountName")
+                                    .Placeholder("Select Account . .")
+                                    .Filter("contains")
+                                    .MinLength(2)
+                                    .DataValueField("AccountID")
+                                    .Events(e => e.Change("onChangeAmount"))
+                                    .HtmlAttributes(new { @style = "width: 80%;" })
+                                    .DataSource(source => source.Read(read => read.Action("ddlMagnaCartaAccount", "Dropdowns")))
+                )
+            </label>
+        </div>
+        <div style="margin-top:20px;margin-left:5px;">
+            <label>
+                Office : &nbsp;
+                @(Html.Kendo().ComboBox()
+                                    .Name("ddlOffice")
+                                    .DataTextField("office_name")
+                                    .Placeholder("Select Office . .")
+                                    .Filter("contains")
+                                    .MinLength(2)
+                                    .DataValueField("office_id")
+                                    .HtmlAttributes(new { @style = "width: 80%;" })
+                                    .DataSource(source => source.Read(read => read.Action("ddlOffice", "Dropdowns")))
+
+                )
+            </label>
+        </div>
+        <div style="margin-top:20px;margin-left:5px;">
+            <label>
+                Program:
+                @(Html.Kendo().ComboBox()
+
+                                    .Name("program_id")
+                                    .DataTextField("program_name")
+                                    .Filter(FilterType.Contains)
+                                    .MinLength(2)
+                                    .Placeholder("Select Program . .")
+                                    .DataValueField("program_id")
+                                    .HtmlAttributes(new { @style = "width: 80%;" })
+                                                    .DataSource(source =>
+                                                    {
+                                                        source.Read(read =>
+                                                            {
+                                                                read.Action("ddlCascadeProgram", "Dropdowns")
+                                                                    .Data("filterProgram");
+                                                            })
+                                                            .ServerFiltering(true);
+                                                    })
+                                    .Enable(false)
+                                    .AutoBind(false)
+                                    .CascadeFrom("ddlOffice")
+                )
+            </label>
+            <script>
+                function filterProgram() {
+                    var OfficeDropdown = $("#ddlOffice").val();
+                    return {
+                        OfficeDropdown: OfficeDropdown,
+                        ProgramFilter: $("#program_id").data("kendoComboBox").input.val()
+                    }
+                }
+            </script>
+        </div>
+        <div style="margin-top:20px;margin-left:5px;">
+            <div>
+                <label>
+                    Type : &nbsp;&nbsp;&nbsp;
+                    @(Html.Kendo().ComboBox()
+                                    .Name("ddlType")
+                                    .DataTextField("NameType")
+                                    .Placeholder("Select type . .")
+                                    .Filter("contains")
+                                    .MinLength(2)
+                                    .DataValueField("NameType")
+                                    .SelectedIndex(0)
+                                    .HtmlAttributes(new { @style = "width:30%;" })
+                                    .DataSource(source => source.Read(read => read.Action("ddltype", "Dropdowns")))
+                    )
+
+                    Budget Year :
+                        @(Html.Kendo().DropDownList()
+                        .Name("ddlYear")
+                        .DataTextField("ProposalYear")
+                        .DataValueField("ProposalYear")
+                        .SelectedIndex(0)
+                        .HtmlAttributes(new { @style = "width: 20%;" })
+                        .Events(e => e.Change("onChangeAmount"))
+                        .DataSource(source => source.Read(read => read.Action("GetPropYear", "PYear")))                        
+                        )
+                </label>
+                <label>
+                    
+                </label>
+            </div>
+        </div>
+        <div style="margin-top:20px;margin-left:5px;margin-bottom:100px;">
+            <div class="k-button k-state-active" style="float:right;margin-right:75px;padding:10px;width:200px;" onclick="SumbitMagnaCarta()"><b>Build Up Office Accounts</b></div>
+        </div>
+        <div style="margin-bottom:10px;">
+            <h2>List of Offices who have <span id="span-AccountName">Magna Carta</span> Accounts</h2>
+        </div>
+        @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.EmployeeType>()
+        .Name("grd_MagnaCarta")
+        .Columns(col =>
+        {
+            col.Bound(m => m.OfficeName).Title("Office Name");
+        })
+         .Pageable(page => page.Refresh(true)
+            .Enabled(true)
+            .ButtonCount(4)
+            .PreviousNext(true)
+         )
+         .DataSource(d => d
+         .Ajax()
+         .PageSize(10)
+         .Model(m => m.Id(i => i.OfficeName))
+         .Read(read => read.Action("OfficeWithMagnaCarta", "Maintenance").Data("AccountData"))
+         ))
+       
+    </div>
+</div>

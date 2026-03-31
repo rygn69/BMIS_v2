@@ -1,0 +1,177 @@
+﻿@model IEnumerable<iFMIS_BMS.BusinessLayer.Layers.CurrentControl_Model>
+
+<div style="background-color:#31b55c">
+    <label style="color:white;padding-left:10px;padding-top:10px;padding-bottom:10px;"><span class="fa fa-tasks"></span> Period Setting</label>
+</div>
+<div style="border-style:solid;border-width:.5px;color:cornflowerblue;height:100px;margin-top:-5px">
+    <div style="display:inline-block;margin-left:50px;margin-top:20px">
+        <input type="checkbox" id="1st" value="0" style="zoom:1.2"  onclick="quarter(1)"/>
+        <label style="display:inline-block;color:black" onclick="lblclick(1)"> 1st Quarter</label>
+    </div>
+    <div style="display:inline-block;margin-left:50px;">
+        <input type="checkbox" id="2nd" value="0" style="zoom:1.2"  onclick="quarter(2)" />
+        <label style="display:inline-block;color:black" onclick="lblclick(2)"> 2nd Quarter</label>
+    </div>
+    <div style="display:inline-block;margin-left:50px;">
+        <input type="checkbox" id="3rd" value="0" style="zoom:1.2"  onclick="quarter(3)"/>
+        <label style="display:inline-block;color:black" onclick="lblclick(3)"> 3rd Quarter</label>
+    </div>
+    <div style="display:inline-block;margin-left:50px;">
+        <input type="checkbox" id="4th" value="0" style="zoom:1.2"  onclick="quarter(4)"/>
+        <label style="display:inline-block;color:black" onclick="lblclick(4)"> 4th Quarter</label>
+    </div>
+    <div>
+        <div id="btnSave" class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 100px;float:left; margin-top: 20px; margin-left:285px;border-radius:50px;background-color:cornflowerblue;color:white; margin-bottom:0px" onclick="reqSave()"><span class="fa fa-save"></span> Save</div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        var url = "@Url.Action("getdfpptperiod", "Maintenance")";//SaveWFPdetails();
+        $.get(url, function (e) {
+            $("#1st").val(e.first);
+            $("#2nd").val(e.second);
+            $("#3rd").val(e.third);
+            $("#4th").val(e.fourth);
+            if (e.first == 0) {
+                document.getElementById("1st").value = 0
+                document.getElementById("1st").checked = false
+            }
+            else {
+                document.getElementById("1st").value = 1
+                document.getElementById("1st").checked = true
+            }
+            if (e.second == 0){
+                document.getElementById("2nd").value = 0
+                document.getElementById("2nd").checked = false
+            }
+            else {
+                document.getElementById("2nd").value = 1
+                document.getElementById("2nd").checked = true
+            }
+            if (e.third == 0) {
+                document.getElementById("3rd").value = 0
+                document.getElementById("3rd").checked = false
+            }
+            else {
+                document.getElementById("3rd").value = 1
+                document.getElementById("3rd").checked = true
+            }
+            if (e.fourth == 0) {
+                document.getElementById("4th").value = 0
+                document.getElementById("4th").checked = false
+            }
+            else {
+                document.getElementById("4th").value = 1
+                document.getElementById("4th").checked = true
+            }
+
+        });
+    })
+    function reqSave() {
+        var one = $("#1st").val();
+        var two = $("#2nd").val();
+        var tre = $("#3rd").val();
+        var fur = $("#4th").val();
+    
+        swal({
+            title: "Save Changes?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes",
+            closeOnConfirm: false,
+            showLoaderOnConfirm: true
+        },
+        function (isConfirm) {
+
+            if (isConfirm) {
+                var url = "@Url.Action("updateperiod", "Maintenance")";//SaveWFPdetails();
+                $.get(url, {one:one,two:two,tre:tre,fur:fur}, function (e) {
+
+                    if (e == "success") {
+                        swal("Success", "Saved!", "success");
+                    } else {
+                        swal("Error", e, "error");
+                    }
+                });
+            }
+        });
+    }
+
+    function quarter(per) {
+        if (per == 1) {
+            if (document.getElementById("1st").checked) {
+                document.getElementById("1st").value = 1;
+            }
+            else {
+                document.getElementById("1st").value = 0;
+            }
+        }
+        else if (per == 2) {
+            if (document.getElementById("2nd").checked) {
+                document.getElementById("2nd").value = 1;
+            }
+            else {
+                document.getElementById("2nd").value = 0;
+            }
+        }
+        else if (per == 3) {
+            if (document.getElementById("3rd").checked) {
+                document.getElementById("3rd").value = 1;
+            }
+            else {
+                document.getElementById("3rd").value = 0;
+            }
+        }
+        else {
+            if (document.getElementById("4th").checked) {
+                document.getElementById("4th").value = 1;
+            }
+            else {
+                document.getElementById("4th").value = 0;
+            }
+        }
+    }
+    function lblclick(id) {
+        if (id == 1) {
+            if (document.getElementById("1st").checked) {
+                document.getElementById("1st").value = 0;
+                document.getElementById("1st").checked = false
+            }
+            else {
+                document.getElementById("1st").value = 1;
+                document.getElementById("1st").checked = true
+            }
+        }
+        else if (id == 2) {
+            if (document.getElementById("2nd").checked) {
+                document.getElementById("2nd").value = 0;
+                document.getElementById("2nd").checked = false
+            }
+            else {
+                document.getElementById("2nd").value = 1;
+                document.getElementById("2nd").checked = true
+            }
+        }
+        else if (id == 3) {
+            if (document.getElementById("3rd").checked) {
+                document.getElementById("3rd").value = 0;
+                document.getElementById("3rd").checked = false
+            }
+            else {
+                document.getElementById("3rd").value = 1;
+                document.getElementById("3rd").checked = true
+            }
+        }
+        else {
+            if (document.getElementById("4th").checked) {
+                document.getElementById("4th").value = 0;
+                document.getElementById("4th").checked = false
+            }
+            else {
+                document.getElementById("4th").value = 1;
+                document.getElementById("4th").checked = true
+            }
+        }
+    }
+</script>

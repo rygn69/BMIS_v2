@@ -1,0 +1,35 @@
+﻿@model iFMIS_BMS.BusinessLayer.Models.GrantsModel
+
+<script>
+
+
+
+
+    function reqSave() {
+        var notifi = new $("#popupNotification").data("kendoNotification");
+
+        var url = "@Url.Action("SaveGrants", "Report")";
+
+        var Grants_Name = $('#Grants_Name').val()
+        var Grants_Amount = $('#Grants_Amount').val()
+        var Year = $("#ddlYear").val()
+        $.post(url, { Grants_Name: Grants_Name, Grants_Amount: Grants_Amount, Year: Year }, function (d) {
+
+                $('#addeditgrants').data('kendoWindow').close();
+                $('#GrantsGrid').data('kendoGrid').dataSource.read();
+
+        })
+    }
+
+</script>
+
+
+
+
+<label>Grants Name :</label>
+<input type="text" class="k-textbox" style="width: 310px;" id="Grants_Name" name="Grants_Name" />
+
+<label>Amount :</label>
+<input type="text" class="k-textbox" style="width: 310px;" id="Grants_Amount" name="Grants_Amount" />
+
+<div class="k-button k-button-icontext" style="position: absolute; bottom: 15px; right: 20px;width: 80px;" onclick="reqSave()">Save</div>

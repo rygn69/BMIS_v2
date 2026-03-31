@@ -1,0 +1,589 @@
+﻿<style>
+    .button-ko {
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+}
+    .button-koko {border-radius: 12px;}
+</style>
+<script>
+
+
+    function cakeoedkmpoawdpaw(val) {
+        //while (/(\d+)(\d{3})/.test(val.toString())) {
+        //    val = val.toString().replace(/(\d+)(\d{3})/, '$1' + ',' + '$2');
+        //}
+        //return val;
+        //alert(val.toFixed(2))
+        // val = val.parseFlaot.toFixed(2);
+
+
+
+        val = val.toString().replace(/,/g, ''); //remove existing commas first
+        //var valSplit = val.toFixed(2).split('.'); //then separate decimals
+
+        var valSplit = val.split('.'); //then separate decimals
+        while (/(\d+)(\d{3})/.test(valSplit[0].toString())) {
+            valSplit[0] = valSplit[0].toString().replace(/(\d+)(\d{3})/, '$1' + ',' + '$2');
+        }
+
+        if (valSplit.length == 2) { //if there were decimals
+            val = valSplit[0] + "." + valSplit[1]; //add decimals back
+        } else {
+            val = valSplit[0];
+        }
+
+        return val;
+    }
+    function fn_closeIncome() {
+
+        $("#AnnualWindow_EE").data("kendoWindow").close();
+    }
+    function reqEdit_Income(income_id) {
+        var url = "@Url.Action("income_dedet", "Release")";
+        document.getElementById("inc_id").value = income_id;
+        $.get(url, { income_id: income_id }, function (d) {
+            document.getElementById("amount_incs").value = cakeoedkmpoawdpaw(d);
+        })
+        var lure = "@Url.Action("get_incAmount","Release")";
+
+        $.post(lure, { income_id: income_id }, function (e) {
+
+            document.getElementById("inc_amount").value = e;
+        })
+    }
+
+    function delete_income(income_id) {
+
+        var url = "@Url.Action("delete_income","Release")";
+        var lure = "@Url.Action("get_incAmount","Release")";
+
+        $.post(lure, { income_id: income_id}, function (e) {
+           
+            document.getElementById("inc_amount").value = e;
+        })
+
+        var inc_amount = $('#inc_amount').val()
+        var available_inc = $('#available_inc').val()
+
+        if (Number(available_inc) < Number(inc_amount)) {
+            swal({
+                title: "Sorry!",
+                text: "You can't delete this amount that has been used.",
+                timer: 2000,
+                type: "error",
+                showConfirmButton: false
+            })
+            document.getElementById("inc_amount").value = 0;
+        } else {
+
+         
+            swal({
+                title: "Are you sure?",
+                text: "This item will be removed!",
+                type: "info",
+                showCancelButton: true,
+                closeOnConfirm: false,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes, Remove It!",
+                showLoaderOnConfirm: true,
+            }, function () {
+
+
+            $.get(url, { income_id: income_id }, function (d) {
+
+                if (d == "1") {
+                    swal({
+                        title: "Success!",
+                        text: "Binding has been Removed.",
+                        timer: 2000,
+                        type: "success",
+                        showConfirmButton: false
+                    })
+                    getAvailable_Income();
+                    $('#grd_Income_EE').data('kendoGrid').dataSource.read();
+                    $('#EconomicEnterprise_Grid').data('kendoGrid').dataSource.read();
+                    document.getElementById("inc_amount").value = 0;
+                } else {
+                    swal({
+                        title: "Error!",
+                        text: "System Error! Please try again.",
+                        timer: 2000,
+                        type: "error",
+                        showConfirmButton: false
+                    })
+                }
+            });
+        });
+
+        }
+
+    }
+
+
+
+    function Income_Office() {
+        var office_income = $("#annual_income_EE").val();
+        return
+        {
+            office_income: office_income;
+
+        }
+        $('#grd_Income_EE').data('kendoGrid').dataSource.read();
+    }
+    function Office_inc() {
+        var office_id = $("#annual_income_EE").val();
+        var month_id = $("#Months_income_EE").val();
+
+        return {
+            office_id: office_id,
+            month_id: month_id
+        }
+    }
+    function fn_refresh_Grid_Inc() {
+        getAvailable_Income();
+        $('#grd_Income_EE').data('kendoGrid').dataSource.read();
+    }
+
+    function getAvailable_Income() {
+
+        setTimeout(function () {
+            var url = "@Url.Action("get_Available_Inc", "Release")";
+
+            var office_id = $('#annual_income_EE').val()
+            var year_ = $("#ddlYear").val();
+
+            if (office_id == 0 || office_id == null) { document.getElementById("available_inc").value = 0; } else {
+
+                $.post(url, { office_id: office_id, year_: year_ }, function (e) {
+
+                    document.getElementById("available_inc").value = e;
+                })
+            }
+        }, 100);
+
+    }
+
+
+
+    function incomes_save() {
+
+     
+
+
+
+
+
+        var url = "@Url.Action("Save_Incs", "Release")";
+        var lur = "@Url.Action("Save_Incs_Edit", "Release")";
+
+        var office_id = $("#annual_income_EE").val();
+        var month_id = $("#Months_income_EE").val();
+        var amount_inc = $("#amount_incs").val();
+        var year_ = $("#ddlYear").val();
+
+        var income_ID = $("#inc_id").val();
+
+
+      
+
+        if (income_ID == '' || income_ID == null || income_ID == 0) {
+          
+           swal({
+               title: "Are you sure?",
+               text: "This Income will be SAVED!",
+               type: "info",
+               showCancelButton: true,
+               closeOnConfirm: false,
+               confirmButtonColor: "#1fa67a",
+               confirmButtonText: "Yes, Save It!",
+               showLoaderOnConfirm: true, }, function () {
+                $.post(url, {
+                    office_id: office_id,
+                    month_id: month_id,
+                    amount_inc: ConvertCommasToEmpty(amount_inc),
+                    year_: year_
+
+                }, function (e) {
+
+                    if (e == "1") {
+                        swal({
+                            title: "Success!",
+                            text: "Income has been Added.",
+                            timer: 2000,
+                            type: "success",
+                            showConfirmButton: false
+                        })
+                        $("#grd_Income_EE").data("kendoGrid").dataSource.read();
+                        $('#EconomicEnterprise_Grid').data('kendoGrid').dataSource.read();
+                        document.getElementById("inc_id").value = 0;
+                        document.getElementById("amount_incs").value = 0;
+                        document.getElementById("inc_amount").value = 0;
+                        getAvailable_Income();
+                    } else {
+                        swal({
+                            title: "Error!",
+                            text: "System Error! Please try again.",
+                            timer: 2000,
+                            type: "error",
+                            showConfirmButton: false
+                        })
+                    }
+                });
+            });
+
+
+        }
+        else {
+
+            var inc_amount = $('#inc_amount').val()
+            var available_inc = $('#available_inc').val()
+
+
+            if (Number(amount_inc) < Number(inc_amount)) {
+
+                var difference = Number(amount_inc) < Number(inc_amount);
+
+                if (Number(available_inc) < Number(difference)) {
+                    swal({
+                        title: "Sorry!",
+                        text: "You can't edit this amount.",
+                        timer: 2000,
+                        type: "error",
+                        showConfirmButton: false
+                    })
+
+                }
+                else {
+                    swal({
+                        title: "Are you sure?",
+                        text: "This Income will be SAVED!",
+                        type: "info",
+                        showCancelButton: true,
+                        closeOnConfirm: false,
+                        confirmButtonColor: "#1fa67a",
+                        confirmButtonText: "Yes, Save It!",
+                        showLoaderOnConfirm: true,
+                    }, function () {
+                        $.post(lur, {
+                            office_id: office_id,
+                            month_id: month_id,
+                            amount_inc: ConvertCommasToEmpty(amount_inc),
+                            year_: year_,
+                            income_ID: income_ID
+
+                        }, function (e) {
+
+                            if (e == "1") {
+                                swal({
+                                    title: "Success!",
+                                    text: "Income has been Added.",
+                                    timer: 2000,
+                                    type: "success",
+                                    showConfirmButton: false
+                                })
+                                $("#grd_Income_EE").data("kendoGrid").dataSource.read();
+                                $('#EconomicEnterprise_Grid').data('kendoGrid').dataSource.read();
+                                document.getElementById("inc_id").value = 0;
+                                document.getElementById("amount_incs").value = 0;
+                                document.getElementById("inc_amount").value = 0;
+                                getAvailable_Income();
+                            } else {
+                                swal({
+                                    title: "Error!",
+                                    text: "System Error! Please try again.",
+                                    timer: 2000,
+                                    type: "error",
+                                    showConfirmButton: false
+                                })
+                            }
+                        });
+                    });
+
+
+
+                }
+
+            } else {
+
+
+
+
+            
+
+
+                swal({
+                    title: "Are you sure?",
+                    text: "This Income will be SAVED!",
+                    type: "info",
+                    showCancelButton: true,
+                    closeOnConfirm: false,
+                    confirmButtonColor: "#1fa67a",
+                    confirmButtonText: "Yes, Save It!",
+                    showLoaderOnConfirm: true,
+                }, function () {
+                $.post(lur, {
+                    office_id: office_id,
+                    month_id: month_id,
+                    amount_inc: ConvertCommasToEmpty(amount_inc),
+                    year_: year_,
+                    income_ID: income_ID
+
+                }, function (e) {
+
+                    if (e == "1") {
+                        swal({
+                            title: "Success!",
+                            text: "Income has been Added.",
+                            timer: 2000,
+                            type: "success",
+                            showConfirmButton: false
+                        })
+                        $("#grd_Income_EE").data("kendoGrid").dataSource.read();
+                        $('#EconomicEnterprise_Grid').data('kendoGrid').dataSource.read();
+                        document.getElementById("inc_id").value = 0;
+                        document.getElementById("amount_incs").value = 0;
+                        document.getElementById("inc_amount").value = 0;
+                        getAvailable_Income();
+                    } else {
+                        swal({
+                            title: "Error!",
+                            text: "System Error! Please try again.",
+                            timer: 2000,
+                            type: "error",
+                            showConfirmButton: false
+                        })
+                    }
+                });
+            });
+
+
+          }
+
+
+
+        }
+    }
+</script>
+
+
+
+
+
+
+
+<label style="margin-left: 50px;height:360px">
+
+</label>
+
+
+<div>
+    <div style="margin-top:-360px;">
+      
+        @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Monthly_Annuals>()
+    .Name("grd_Income_EE")
+    .Scrollable()
+    .Columns(col =>
+    {
+
+
+        col.Bound(m => m.income_id).Hidden();
+        
+        col.Bound(m => m.MonthOf)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Month</div></text>)
+                        .Width(120)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+
+        col.Bound(m => m.YearOf).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Year</div></text>)
+                        .Width(60)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+
+        col.Bound(m => m.Amount_inc)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Balance<br />Amount</div></text>)
+                        .Width(100)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div>#=kendo.toString(Amount_inc,'c2')# </div>");
+
+
+
+
+        col.Template(t => { }).ClientTemplate(
+                                     "<div class='k-button k-button-icontext' style='border-radius:50px;color:\\#ffffff;background-color:\\#1FA67A;'    onclick='reqEdit_Income(#=income_id#)'   ><span class='fa fa-pencil-square-o' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'> </span>edit</div> " +
+                                     "<div class='k-button k-button-icontext' style='border-radius:50px;color:\\#ffffff;background-color:\\#DE5555;'   onclick='delete_income(#=income_id#)'   ><span class='fa fa-trash-o' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'> </span>del</div> "
+                                     //"<div class='k-button k-button-icontext' onclick='Delete_sub(#=income_id#)'> del</div> " 
+                                      //"<div class='btn-delete'style='inline-block; height: 15px;width:65px;margin-left:30px;'> " +
+                                      //"<a  title='remove'     onclick='Delete_sub(#=income_id#)'               style='margin-left:2px;'><span class='fa fa-remove' style='font-size: 12pt;'></span></a>" +
+                                      //" </div>"
+                                    ).HtmlAttributes(new { style = "vertical-align: top;" }).Width(85);
+    })
+
+                          .Sortable()
+                          .Scrollable()
+                          .HtmlAttributes(new { style = "height:250px;" })
+                                          .DataSource(d => d
+                                          .Ajax()
+                                          .PageSize(1000)
+                                          .Model(m => m.Id(i => i.income_id))
+                                          .Read(read => read.Action("Income_Grid", "Release").Data("Office_inc")))
+        )
+
+    </div>
+</div><label style="margin-left: 50px;">
+
+
+              <input type="text" style="width:150px" name="inc_id" id="inc_id" hidden disabled>
+         
+</label>
+    <div style="float: none;clear:both;margin-top:50px;">
+
+        <div style="float: left;margin-right:10px;margin-top:5px;">
+            <label style="float:left;margin-left: 50px;">
+                Office    :
+            </label>
+        </div>
+        <div style="float: right;margin-right:85px;margin-top:3px;">
+
+
+            @(Html.Kendo().ComboBox()
+                            .Name("annual_income_EE")
+                            .DataTextField("OfficeName")
+                            .DataValueField("OfficeID")
+                            .Placeholder("Select office...")
+                            .Filter("contains")
+                            .MinLength(1)
+                            .HtmlAttributes(new { @style = "width: 500px;" })
+                            .Events(e => e.Change("fn_refresh_Grid_Inc"))
+                            .DataSource(source => source.Read(read => read.Action("GetOffice_EE", "Release")))
+            )
+
+
+        </div>
+
+
+        <div style="float: left;margin-right:10px;margin-top:15px;">
+            <label style="float:left;margin-left: 50px;">
+                Amount    :
+
+            </label>
+        </div>
+        <div style="float: left;margin-left:40px;margin-top:13px;">
+
+            <input type="text" style="width:150px" name="amount_incs" id="amount_incs" onkeyup="commaSeparateNumberversion2('amount_incs')" onfocus="this.select();">
+    
+        </div>
+
+        <div style="float: left;margin-left:40px;margin-top:-80px;">
+
+            <input type="text" style="width:150px" name="available_inc" id="available_inc" disabled hidden>
+
+        </div>
+
+        <div style="float: left;margin-left:50px;margin-top:-80px;">
+
+            <input type="text" style="width:150px" name="inc_amount" id="inc_amount" disabled hidden>
+
+        </div>
+
+        <div style="float: left;margin-left:35px;margin-top:19px;">
+            <label>
+                Release Month    :
+            </label>
+        </div>
+        <div style="float:left;margin-left:45px;margin-top:15px;">
+            @(Html.Kendo().DropDownList()
+                          .Name("Months_income_EE")
+                          .DataTextField("Text")
+                          .DataValueField("Value")
+                          .Events(e => e.Change("fn_refresh_Grid_Inc"))
+                          .BindTo(new List<SelectListItem>() {
+                              new SelectListItem() {
+                                  Text = "January",
+                                  Value = "1"
+                              },
+                              new SelectListItem() {
+                                  Text = "Febuary",
+                                  Value = "2"
+                              },
+                              new SelectListItem() {
+                                  Text = "March",
+                                  Value = "3"
+                              },
+                              new SelectListItem() {
+                                  Text = "April",
+                                  Value = "4"
+                              },
+                              new SelectListItem() {
+                                  Text = "May",
+                                  Value = "5"
+                              },
+                              new SelectListItem() {
+                                  Text = "June",
+                                  Value = "6"
+                              },
+                              new SelectListItem() {
+                                  Text = "July",
+                                  Value = "7"
+                              },
+                              new SelectListItem() {
+                                  Text = "August",
+                                  Value = "8"
+                              },
+                              new SelectListItem() {
+                                  Text = "September",
+                                  Value = "9"
+                              },
+                              new SelectListItem() {
+                                  Text = "October",
+                                  Value = "10"
+                              },
+                              new SelectListItem() {
+                                  Text = "November",
+                                  Value = "11"
+                              },
+                              new SelectListItem() {
+                                  Text = "December",
+                                  Value = "12"
+                              }
+                          })
+                          .Value(@ViewBag.MonthVaue)
+                          .HtmlAttributes(new { style = "width: 150px" })
+            )
+
+        </div>
+
+
+
+
+
+
+     <div style="float:left;margin-top:56px;margin-left:530px">
+        <div class="k-button k-button-icontext" style=" bottom: 15px; right: 220px;width: 80px; border-radius:50px;color:#ffffff;background-color:#1FA67A;" onclick="incomes_save()"><span class='fa fa-plus-circle' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'></span> Save</div>
+    </div>
+        <div style="float:left;margin-top:-28px;margin-left:617px">
+            <div class="k-button k-button-icontext" style=" bottom: 15px; right: 220px;width: 80px; border-radius:50px;color:#ffffff;background-color:#DE5555;" onclick="fn_closeIncome()"><span class='fa fa-times' style='font-size: 10pt;margin: 1px;margin-top: -1px;margin-left: 5px;margin-right: 3px;'></span> Close</div>
+        </div>
+
+</div><label style="margin-left: 50px;height:170px">
+
+</label>
+
+
+
+
+<script>
+    $(document).ready(function () {
+        var jgjgjl = $('#offs').val()
+        $("#annual_income_EE").data("kendoComboBox").value(jgjgjl);
+        fn_refresh_Grid_Inc();
+    }, 1000);
+</script>

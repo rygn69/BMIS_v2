@@ -1,0 +1,70 @@
+﻿<script>
+    function ReqUpdateProposedAll() {
+        //$('#AccountListGrid').data("kendoGrid").dataSource.read();
+       var url = "@Url.Action("updateAllProposedAccount", "Utility")";
+       $.post(url, function (d) {
+           if (d == 1) {
+               alert('Succesffuly Updated');
+               $('#AccountListGrid').data("kendoGrid").dataSource.read();
+           }
+           else {
+               alert(d);
+           }
+       });
+    }
+</script>
+<div>
+    <div id="btnclose" class="k-button k-button-icontext" style="margin-bottom:5px;display:inline-block;width: 80px;clear:both; margin-top:5px;" onclick="ReqUpdateProposedAll()">Update All Proposed Amount</div>
+</div>
+
+@(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.CopyProposedAmountModel>()
+    .Name("AccountListGrid")
+    .Columns(col =>
+    {
+        col.Bound(m => m.ProposalID).Title("EmployeeID").Hidden();
+        col.Bound(m => m.OfficeID).Title("EmployeeID").Hidden();
+        col.Bound(m => m.OOEID).Title("EmployeeID").Hidden();
+
+
+        col.Bound(c => c.AccountName)
+        .HeaderTemplate(@<text><div style="font-weight:600;">Account Name</div></text>)
+        .HtmlAttributes(new { style = "text-align:center" })
+        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+        //.ClientGroupFooterTemplate("<div style='text-align:center; font-weight:700;color:black'>#=kendo.toString(sum, 'c2')# </div>")
+        .ClientFooterTemplate("<div style='text-align:center; font-weight:700;color:darkgreen'><label>#=count# </label></div>");
+
+        col.Bound(c => c.ProposedAmount)
+        .HeaderTemplate(@<text><div style="font-weight:600;">Proposed Amount</div></text>)
+        .HtmlAttributes(new { style = "text-align:center" })
+        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        //.ClientGroupFooterTemplate("<div style='text-align:center; font-weight:700;color:black'>#=kendo.toString(sum, 'c2')# </div>")
+        //.ClientFooterTemplate("<div style='text-align:center;color:darkgreen'><label>#=kendo.toString(sum, 'c2')# </label></div>");
+
+        col.Bound(c => c.ApprovedAmount)
+        .HeaderTemplate(@<text><div style="font-weight:600;">Approved Amount</div></text>)
+        .HtmlAttributes(new { style = "text-align:center" })
+        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+       // .ClientGroupFooterTemplate("<div style='text-align:center; font-weight:700;color:black'>#=kendo.toString(sum, 'c2')# </div>")
+       // .ClientFooterTemplate("<div style='text-align:center;color:darkgreen'><label>#=kendo.toString(sum, 'c2')# </label></div>");
+    })
+    .Selectable()
+    .DataSource
+    (
+        d => d
+        .Ajax()
+        .Batch(true)
+        .ServerOperation(false)
+            .Aggregates(a =>
+            {
+                a.Add(c => c.AccountName).Count();
+            })
+        .Model(m => m.Id(i => i.ProposalID))
+        .Group(g => {
+            g.Add(c => c.OfficeName);
+            g.Add(c => c.OOEName);
+        })
+        .Read(read => read.Action("GetAllProposedAccounts", "Utility"))
+    ).Groupable(g => g.ShowFooter(true).Messages(m => m.Empty("")))
+    .Scrollable(s => s.Enabled(true))
+    .HtmlAttributes(new { style = "height: 520px" })
+)

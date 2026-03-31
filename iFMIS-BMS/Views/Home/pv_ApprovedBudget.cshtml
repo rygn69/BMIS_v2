@@ -1,0 +1,335 @@
+﻿<style>
+    .btn-delete a {
+        color: #000000;
+        background-color: #ffffff;
+        border-style: solid;
+        border-color: #333333;
+        border-width: 1px;
+        height: auto;
+        width: auto;
+        padding: 3px;
+        padding-left: 5px;
+        padding-right: 5px;
+        cursor: pointer;
+        margin: auto;
+    }
+
+        .btn-delete a:hover {
+            color: #ffffff;
+            background-color: #000000;
+            border-style: solid;
+            border-color: #333333;
+            height: auto;
+            width: auto;
+        }
+</style>
+<script>
+
+    function FilterApprovedGridData() {
+
+        var Program = $("#Progss").val();
+        var OOE = $("#ooe_id").val();
+        var ProgramgGrid = $("#grd_ApprovedBudget").data("kendoGrid").dataSource;
+        ProgramgGrid.filter([
+            {
+                logic: "and",
+                filters: [{
+                    field: "ProgramID",
+                    ignoreCase: false,
+                    operator: "equals",
+                    value: Program
+                },
+                {
+                    field: "OOE",
+                    ignoreCase: false,
+                    operator: "equals",
+                    value: OOE
+                }]
+            }
+        ]);
+    }
+    function FilterProposedGridData() {
+
+        var Program = $("#Progss").val();
+        var OOE = $("#ooe_id").val();
+        var ProposedAccountsGrid = $("#grd_ApprovalBudget").data("kendoGrid").dataSource;
+        ProposedAccountsGrid.filter([
+            {
+                logic: "and",
+                filters: [{
+                    field: "ProgramID",
+                    ignoreCase: false,
+                    operator: "equals",
+                    value: Program
+                },
+                {
+                    field: "OOEID",
+                    ignoreCase: false,
+                    operator: "equals",
+                    value: OOE
+                }]
+            }
+        ]);
+    }
+
+    function reqSave(e) {
+        e.preventDefault();
+        var grid = $("#grd_ApprovalBudget");
+        var dataSource = grid.data("kendoGrid").dataSource;
+        var colCount = grid.find('.k-grid-header colgroup > col').length;
+
+        if (dataSource._view.length == 0) {
+        swal(
+           "Error!", "No Data to save", "warning");
+        } else {
+            swal({
+                title: "Success!",
+                text: "Sucessfully save.",
+                type: "success"
+            },
+            function () {
+                $("#grd_ApprovalBudget").data("kendoGrid").dataSource.read();
+            });
+            //swal("Success!", "Sucessfully save!!!", "success");
+           
+        }
+       
+    }
+
+    function fn_FunctionAccountBudget() {
+        $('#siteContent').html('<div style="width: 100%;height:100%;"><img src="@Url.Content("~/Content/MyTheme/loading_2x.gif")" alt="Loading..." style="position: absolute;top: 40%;left: 60%;margin-top: -16px;margin-left: -16px;" /></div>');
+        $('#webTitle').html("Approved Budget");
+        var url = "@Url.Action("pv_AccountBudget", "Home")";
+        $.get(url, function (d) {
+            $('#siteContent').html(d);
+        })
+    }
+
+    function reqEdit(e) {
+        var url = "@Url.Action("_update", "BG")";
+        $.get(url, { ID: e }, function (d) {
+            $('#siteContent').html(d);
+        })
+
+    }
+
+    @*function LoadChart() {
+        setTimeout(function () {
+            var officeID;
+            var chartYear;
+            officeID = $("#offs").val();
+            chartYear = $("#ddlYear").val();
+            
+            var url = "@Url.Action("LoadChart", "Home")";
+            $.get(url, { OfficeID: officeID, ChartYear: chartYear }, function (d) {
+                $("#chartByOffice").html(d);
+            })
+        }, 500);
+    }*@
+
+</script>
+
+<div style="float: none;clear:both">
+
+
+    <div style="height:10px;">
+
+    </div>
+    <div style="float: left;margin-right:10px;margin-top:0px;">
+<label style="margin-left: 70px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px;">
+
+            Program :
+        </label>
+    </div>
+    <div style="float: right;margin-right:70px;margin-top:2px;">
+    <script>
+       
+
+
+                function fn_refresher(e) {
+                    var SelectedTabIndex = $("#tabstrip").data("kendoTabStrip").select().index();
+                    
+                    if (SelectedTabIndex == 0) {
+                        $("#grd_ApprovedBudget").data("kendoGrid").dataSource.read();
+
+                        var BudgetYear = $("#ddlYear").val();
+                        var PastYear = BudgetYear - 1;
+                        var CurrentYear = BudgetYear;
+                        document.getElementById("actualYearApproved").innerHTML = PastYear;
+                        document.getElementById("estimatesYearApproved").innerHTML = CurrentYear;
+                        document.getElementById("proposedYearApproved").innerHTML = BudgetYear;
+                        FilterApprovedGridData();
+                        
+                    }
+                    if (SelectedTabIndex == 1) {
+                        $("#grd_ApprovalBudget").data("kendoGrid").dataSource.read();
+                        var BudgetYear = $("#ddlYear").val();
+                        var PastYear = BudgetYear - 2;
+                        var CurrentYear = BudgetYear - 1;
+                        document.getElementById("actualYearApproval").innerHTML = PastYear;
+                        document.getElementById("estimatesYearApproval").innerHTML = CurrentYear;
+                        document.getElementById("proposedYearApproval").innerHTML = BudgetYear;
+                        FilterProposedGridData();
+                    }
+                }
+                
+
+            </script>
+
+        @(Html.Kendo().DropDownList()
+                            .Name("Progss")
+                            .DataTextField("ProgramDescription  ")
+                            .DataValueField("ProgramID")
+                            .OptionLabel("Select programs...")
+                            .HtmlAttributes(new { @style = "width: 500px;" })
+                            .AutoBind(false)
+                            .Events(e => e.Open("ProgramDropDownOpen"))
+                            .Events(e => e.Change("fn_refresher"))
+                            .DataSource(source => source.Read(read => read.Action("GetPrograms", "dpPrograms").Data("fn_Offices")))
+        )
+    </div>
+    <script>
+        function ProgramDropDownOpen() {
+            var DropDownDataCount =  $("#Progss").data("kendoDropDownList").dataSource.view().length;
+            if (DropDownDataCount <= 0) {
+                $("#Progss").data("kendoDropDownList").dataSource.read();
+            }
+        }
+        function fn_Offices() {
+            var proyy = $("#ddlYear").val();
+            if(proyy == 0){
+                var n = new Date();
+                var proyy = n.getFullYear() + 1;
+            }
+            
+            return {
+                propYear: proyy
+            }
+        }
+    </script>
+
+    <div style="float:right;margin-right:70px;margin-top:5px;margin-bottom:10px;">
+        <label style="float:left;margin-right:50px;">Expense Class :</label>
+        @(Html.Kendo().DropDownList()
+                        .Name("ooe_id")
+                        .DataTextField("ooe_name")
+                        .DataValueField("ooe_id")
+                        .OptionLabel("Select Expenses...")
+                        .HtmlAttributes(new { @style = "width: 500px;" })
+                        .Events(e => e.Change("fn_refresher"))
+                        .DataSource(source => source.Read(read => read.Action("ddlOOE", "Dropdowns")))
+        )
+    </div>
+</div>
+<div style="height:50px;">
+
+</div>
+<div style="border: outset;clear:both;border-width:1px;border-color:#1fa67a; width: 745px; padding-left:0px;padding-right:0px;padding-top:0px;padding-bottom:7px;margin-top: 10px;">
+    <div style=" width: 0;height: 0; border-right: 5px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;margin-top: -1px; ">
+        <div style="float: left; width: 658px; margin-top:1px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 36px solid #1fa67a; ">
+
+            <div style="float: left; height:28px; margin-left:-59px; margin-top: 5px;">
+                <i class="fa fa-tasks fa-2x fg-white"></i>
+
+            </div>
+            <div style="text-align: right;float: right;margin-right:10px;margin-top:2px;">
+                @(Html.Kendo().DropDownList()
+                        .Name("ddlYear")
+                        .DataTextField("ProposalYear")
+                        .DataValueField("ProposalYear")
+                        .HtmlAttributes(new { @style = "width: 70px;" })
+                        .Events(e => e.Change("fn_dprefresher"))
+                        .DataSource(source => source.Read(read => read.Action("GetPropYear2", "PYear")))
+                )
+            </div>
+            <div style="float: right;margin-right:10px;margin-top:2px;">
+                <i class="fa fa-calendar fa-2x #33333"></i>
+            </div>
+
+        </div>
+    </div>
+    <script>
+        function fn_Program() {
+            var office_ID = @Account.UserInfo.Department;
+            var pro_id = $("#Progss").val();
+            var proYear = $("#ddlYear").val();
+            var ooe_id = $("#ooe_id").val();
+            return {  
+                prog_ID: pro_id,
+                office_ID: office_ID,
+                proy_ID: proYear,
+                ooe_id: ooe_id
+            }
+        }
+        function DataParameter(){
+            var office_ID = @Account.UserInfo.Department;
+            var Program = $("#Progss").val();
+            var OOE = $("#ooe_id").val();
+            var proposalYear = $("#ddlYear").val();
+            return {
+                prog_ID: Program,
+                OOE: OOE,
+                proposalYear: proposalYear
+            }
+        }
+    </script>
+ 
+    <div class="demo-section k-content">
+        @(Html.Kendo().TabStrip()
+          .Name("tabstrip")
+          .Animation(animation =>
+              animation.Open(effect =>
+              effect.Fade(FadeDirection.In)))
+          .Items(tabstrip =>
+          {
+              tabstrip.Add().Text("Approved").LoadContentFrom("ApprovedTab", "Home");
+              tabstrip.Add().Text("Proposed Accounts").Selected(true).LoadContentFrom("ApprovalTab", "Home");
+              tabstrip.Add().Text("Proposed Positions").LoadContentFrom("ProposedPositionsTabOfficeLevel", "Home");
+          })
+          .Events(e => e.Activate("fn_refresher"))
+
+        )
+    </div>
+</div>
+<script>
+    
+    $(document).ready(function () {
+        $("#Progss").data("kendoDropDownList").dataSource.read();
+        
+    });
+
+
+    function fn_dprefresher() {
+
+        $("#Progss").data("kendoDropDownList").dataSource.read();
+        var SelectedTabIndex = $("#tabstrip").data("kendoTabStrip").select().index();
+
+        if (SelectedTabIndex == 0) {
+            $("#grd_ApprovedBudget").data("kendoGrid").dataSource.read();
+
+            var BudgetYear = $("#ddlYear").val();
+            var PastYear = BudgetYear - 1;
+            var CurrentYear = BudgetYear;
+            document.getElementById("actualYearApproved").innerHTML = PastYear;
+            document.getElementById("estimatesYearApproved").innerHTML = CurrentYear;
+            document.getElementById("proposedYearApproved").innerHTML = BudgetYear;
+            FilterApprovedGridData();
+        }
+        if (SelectedTabIndex == 1) {
+            $("#grd_ApprovalBudget").data("kendoGrid").dataSource.read();
+
+            var BudgetYear = $("#ddlYear").val();
+            var PastYear = BudgetYear - 2;
+            var CurrentYear = BudgetYear - 1;
+            document.getElementById("actualYearApproval").innerHTML = PastYear;
+            document.getElementById("estimatesYearApproval").innerHTML = CurrentYear;
+            document.getElementById("proposedYearApproval").innerHTML = BudgetYear;
+            FilterProposedGridData();
+
+            //$("#grd_CancelledBudget").data("kendoGrid").dataSource.read();
+        }
+    }
+
+
+
+</script>

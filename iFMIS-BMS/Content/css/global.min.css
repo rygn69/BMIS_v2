@@ -1,0 +1,490 @@
+﻿
+@font-face {  
+  font-family: uiButtons ;  
+  src: url(../Include/Fonts/seguisym.ttf) format("truetype");  
+}
+
+
+
+
+/*#region MAIN LAYOUT */
+
+.page-container {
+    width: 1000px;
+    text-align:left;
+    margin: auto;
+    border: solid 1px #dadada; 
+    border-top: none;
+    height: auto; 
+    /*overflow-y: auto;*/
+    min-height: 600px;
+    background-color: #fff;
+    position:relative;
+    display:block;
+    -webkit-box-shadow: 0 0 4px 0 #D9D9D9;
+    box-shadow: 0 0 4px 0 #D9D9D9;
+}
+.page-content .index-title {
+    float:right;
+    margin:-3px -3px 10px 0px; 
+    color:#eee;
+    font-size:20px;
+    font-family: 'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;
+    width:780px;
+    height:30px;
+    padding:10px 10px 10px 10px;
+    text-transform:uppercase;
+    
+
+}
+.page-container .page-sidebar-menu {
+    float: left;
+    width: 200px;
+    margin:0px 0px 0px 0px;
+    height:auto;
+    min-height:600px;
+    /*border-right: 1px solid #dadada;*/
+    background: #D9D9D9 repeat-y !important;
+    display:block;
+   
+}
+.page-container .page-content {
+    margin-top:0px;
+    width:793px;
+    height:auto;
+    min-height:600px;
+    padding:3px;
+    float:right;
+}
+.page-content .page-block {
+    width:793px;
+    height:auto;
+    min-height:2px; 
+    display:inline-block;
+   
+}
+.page-content .page-block .page-block-inside{
+    font-size: 15px;
+    border: 1px solid #ccc;   
+}
+.page-content .page-block .title-panel {
+   padding:8px;  
+   color:#eee; 
+   height:20px;      
+}
+.page-container  .page-footer {
+
+    width: 970px;
+    text-align:center;
+    margin: auto;
+    border-top: none;
+    height: auto; 
+    overflow-y: auto;
+    height: 65px;
+  
+    color: #eee;
+    font-size: 8pt;
+    padding: 5px 15px ;
+    font-family: Arial,Helvetica,sans-serif;
+    font-weight: normal;
+    font-style: normal;
+    text-shadow: 0px 1px #000;
+  
+
+}
+
+
+.m-buttom-bg
+{
+    background:#e8e4e4;
+    height:20px;
+    padding:5px 0px 10px 0px;
+    border: 1px #ccc solid;   
+      
+}
+
+.title-panel .icon-panel {
+    float: left;
+    width: 15px;
+    height: 20px;
+    padding: 8px;
+    position: relative;
+    margin: -8px 0px 0 -8px;
+}
+ .title-panel .tri-shape
+{
+    border-top: 36px solid rgb(51, 51, 51); 
+    border-right: 30px solid transparent;
+    color:#fff !important;
+
+    float:left; width:0px;
+    height:0px; position:relative; 
+    margin:-8px 5px 0 0px;
+}
+/*#endregion MAIN LAYOUT */
+
+/*#region IMAGES */
+.photo {
+    border-radius:30px;
+    }
+.hide {
+    display:none;
+}
+.logos_25 {
+    background:url(../images/pgas_25x25.png) no-repeat;
+    width:25px;
+    height:25px;
+    position:absolute;
+    margin-top:-4px;
+    }
+.logos_40 {
+    background:url(../images/pgas_40x40.png) no-repeat;
+    width:40px;
+    height:40px;
+    position:absolute;
+    margin-top:0px;
+    }
+.logos_41 {
+    background:url(../images/pgzn_logo2.png) no-repeat;
+    width:40px;
+    height:40px;
+    position:absolute;
+    margin-top:0px;
+    }
+#ok textarea{
+    height:100px;
+    width:100px;
+}
+/*#endregion IMAGES*/
+
+/*#region MISCELANEOUS*/
+
+.lfloat{float:left;}
+.rfloat{float:right;}
+
+.aleft{text-align:left;}
+.acenter{text-align:center;}
+.aright{text-align:right;}
+
+.borderAll {border:1px solid #cbe9c6;}
+.borderTop {border-top:1px solid #cbe9c6;}
+.borderRight {border-right:1px solid #cbe9c6;}
+.borderBottom {border-bottom:1px solid #cbe9c6;}
+.borderLeft {border-left:1px solid #cbe9c6;}
+
+.padding-5 {padding:5px}
+.no-padding {padding:0 !important}
+.block { display:inline-block; }
+
+.font-stroke
+{
+    color: white;
+    text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000;  
+}
+
+/*#endregion MISCELANEOUS*/
+
+
+
+
+/*#region LOGIN STYLE*/
+
+#log-wrapper {        
+    height:450px;
+    width:360px;
+    margin:60px auto;     
+    background: #fff repeat;
+    font-family: 'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;
+    border:1px solid #ccc;   
+    font-weight: normal;
+    font-style: normal;  
+}
+
+#log-wrapper .log-header {
+    height:90px;
+    width:100%;
+    /*border-bottom:1px solid #eee;*/  
+}
+.log-header .main-Abbr {
+    font-size:60px;
+    width:340px;
+    text-align:left;
+    font-weight:600;
+}
+.log-header .main-Title {
+    font-size:20px;
+    width:340px;
+    text-align:left;
+   
+}
+.log-header .page-block {
+    display:inline-block;
+    height:auto;
+    width:100%;
+    padding:10px;
+}
+
+#log-wrapper .log-page-content {
+    height:200px;
+    width:auto;
+    border-bottom:1px solid #eee;
+    padding:20px 0 0 0;
+    
+    background: #eee;
+    font-family: 'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;
+}
+
+#log-wrapper .log-panel {
+    height:45px;
+    width:100%;
+    
+}
+#log-wrapper .log-footer {
+    height:60px;
+    width:100%;
+    font-size:11px;
+    color:#565555;
+    
+}
+
+/*#endregion LOGIN STYLE*/
+
+
+
+.menuheader {
+    height:50px;
+    font-size:19px;
+    font-weight:100;
+    border-left:#fff 1px solid;
+    
+    border-bottom:none;
+    margin-left:-7px;
+    
+    font-family: "Trebuchet MS", Verdana, Helvetica, Sans-Serif;
+    margin-top:-1px;
+    display: inline-block;
+    width:207px;
+    z-index:1;
+    margin-bottom:5px;
+}
+.menuheader .title {
+    line-height:2.5;
+    color:#fff;
+    margin-left:10px;
+    }
+
+
+.header {
+    width: 1000px;
+    height:125px;
+    background:#fff repeat-x;
+    margin:0 0 0px 0;
+    /*border-bottom:1px solid #cbe9c6;*/
+     /*-webkit-box-shadow: 0px 0px 1px 0px rgba(128, 128, 128, 0.3);
+    box-shadow: 0px 0px 1px 0px rgba(128, 128, 128, 0.3);*/ 
+    padding:0px 0px 0px 0px;
+	
+}
+    .header .pgas-logo {
+        background:url("pgas-logo.png") no-repeat;
+        height:96px;
+        width:96px;
+        margin:0px 0 0 3px;
+        position:absolute;
+        float:left;
+    }
+
+    .header .logo
+    {
+         /*border:1px solid rgba(128, 128, 128, 0.3);*/
+         width:70px;
+         height:20px;
+         float:left;
+    }
+    .header .title
+    {
+        width:650px;
+        min-height:60px;
+        height:auto;
+        float:left;
+        margin-left:10px;
+        margin-top:0px;
+        position:absolute;
+        /*border:1px solid rgba(128, 128, 128, 0.3);*/
+    }
+    .header .title .toptitle
+    {
+        font-size:18px;font-family:Calibri;width:450px;height:25px;
+        text-align:left;margin-bottom:0px;
+        /*border:1px solid rgba(128, 128, 128, 0.3);*/
+    }
+    .header .title .maintitle
+    {
+        font-size:40px;font-family:Calibri;width:840px;height:20px;
+        /*border:1px solid rgba(128, 128, 128, 0.3);*/
+        text-align:left;
+        font-weight:100;letter-spacing:0.005em;
+    }
+    .header .version
+    {
+        font-size:15px;font-family:Calibri;width:100px;height:20px;
+        margin-top:17px;padding-right:30px;
+        color:#000;text-align:right;text-transform:uppercase;
+        
+        /*border:1px solid rgba(128, 128, 128, 0.3);*/
+    }
+    .header .secondColor
+    {
+        color:#9702A7;
+    }
+
+
+
+.border-m
+{
+    -webkit-box-shadow:  0px 0px 1px 1px rgba(125, 125, 125, 0.2);
+    box-shadow:  0px 0px 1px 1px rgba(125, 125, 125, 0.2); 
+    border:3px solid #fff;
+    border-left:none;
+    border-right:none;
+    
+}
+
+
+.fitem
+{
+    text-align:left;
+}
+/*#endregion Styles for Main Layout */
+
+
+
+
+ /*#region CONTENTS */
+
+.m-block {
+    padding-bottom:0px;
+    width:100%;
+    height:auto;
+    min-height:2px; 
+    /*border: 1px solid #dadada;*/
+    display:inline-block;
+}
+.m-field
+{
+    width:350px;
+    float:left;
+    margin: 2px 0 0 4px;
+    font-family: 'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;
+    font-weight: normal;
+    font-style: normal;
+    color: #000;
+    font-size: 11pt;
+    line-height: 15pt;
+    letter-spacing: .02em;
+    /*border: 1px solid #dadada;*/
+}
+
+.m_cursor
+{
+    cursor:pointer;
+}
+
+.m-label {
+    text-align: right;
+    font-family: 'Segoe UI';
+    font-size: 14px;
+    font-weight:400;
+    color: #001442;
+    padding:3px;
+    float:left;
+    width: 150px;
+    line-height:2.0;
+}
+
+.title-grid
+    {
+        color: #000; text-transform:none; font-weight:100; 
+        font-size: 22px; text-align:center; line-height:2.0;
+        margin-bottom:0px; padding-bottom:0px; font-family:'Segoe UI Semilight','Segoe UI';
+        /*border:1px solid #dadada;*/
+    }
+
+.l-overlay {
+    opacity: 0; 
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: none;
+}
+
+.theader {
+    text-align: right;
+    font-family: 'Segoe UI';
+    font-size: 15px;
+    font-weight: 500;
+    color: #fff;
+    padding:4px 8px 8px 10px ;
+    margin: 0 0 30px 0; 
+}
+
+.tback
+{
+    background : url("../images/left_round_white.png") no-repeat;
+    width:26px;
+    height:26px;
+    margin:0 5px 0 0;
+    cursor:pointer;
+}
+
+.flabel {
+    text-align: right;
+    font-family: 'Segoe UI';
+    font-size: 12px;
+    font-weight:400;
+    color: #001442;
+    padding: 5px;
+    float:left;
+    width: 75px;
+}
+
+.entry {
+    float: left;
+    width: auto;
+    text-align:left;
+    padding-left: 5px;
+    height: 20px;
+}
+
+.small_m-label {
+    font-family: 'Sege UI';
+    font-size: 10px;
+    font-weight:400;
+    color: #817f7f;
+    width: 100%;
+    text-transform:uppercase;
+}
+.b_m-field {
+   
+    font-family: 'Segoe UI';
+    font-size: 14px;
+    font-weight:400;
+    color: #333333;
+    width: 100%;
+    margin-left:5px;
+}
+
+
+
+
+.clear {
+	clear: both;
+}
+
+

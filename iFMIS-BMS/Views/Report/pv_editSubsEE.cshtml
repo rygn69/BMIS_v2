@@ -1,0 +1,127 @@
+﻿@model iFMIS_BMS.BusinessLayer.Models.LBPone_EESub2Model
+
+
+<script>
+
+    function GetFundID() {
+        return {
+            Eco_Type_ID: '@Session["Eco_Type_ID"]',
+            Year_Of: '@Session["Year_Of"]'
+        }
+    }
+
+
+    function reqSaveEdtEE() {
+        var notifi = new $("#popupNotification").data("kendoNotification");
+
+        var url = "@Url.Action("UpdateSubEE", "Report")";
+
+
+        var EE_Sub2_ID = $('#EE_Sub2_ID').val()
+        var EE_Sub1_Desc = $('#Sub1_Desc').val()
+        var EE_Sub2_Desc = $('#Sub2_Desc').val()
+        var Year1_AmountEE = $('#Past_year').val()
+        var Year2_AmountEE = $('#Current_year').val()
+        var Year3_AmountEE = $('#Budget_year').val()
+
+        var Account_Code = $('#Account_Code').val()
+        var Class_ID = $('#dll_ClassiEE').val()
+
+
+        $.post(url, { EE_Sub2_ID: EE_Sub2_ID, EE_Sub1_Desc: EE_Sub1_Desc, EE_Sub2_Desc: EE_Sub2_Desc, Year1_AmountEE: Year1_AmountEE, Year2_AmountEE: Year2_AmountEE, Year3_AmountEE: Year3_AmountEE, Eco_Type_ID: '@Session["Eco_Type_ID"]', Year_Of: '@Session["Year_Of"]', Account_Code: Account_Code, Class_ID: Class_ID }, function (e) {
+                if (e == "1") {
+                    swal({
+                        title: "Success!",
+                        text: "Successfully Updated.",
+                        timer: 2000,
+                        type: "success",
+                        showConfirmButton: false
+                    })
+                    $('#newAccounts').data('kendoWindow').close();
+                    //$('#EETypeGrid').data('kendoGrid').dataSource.read();
+                    $('#grid_' + '@Session["Eco_Type_ID"]').data('kendoGrid').dataSource.read();
+
+                } else {
+                    swal({
+                        title: "Error!",
+                        text: "System Error! Please try again.",
+                        timer: 2000,
+                        type: "error",
+                        showConfirmButton: false
+                    })
+                }
+
+
+        });
+
+
+            $('#newAccounts').data('kendoWindow').close();
+            $('#Typegrid').data('kendoGrid').dataSource.read();
+
+
+    }
+
+    function reqAddSub2() {
+        $("#ComboSub").css("visibility", "visible")
+        $("#addSub").css("visibility", "hidden")
+    }
+</script>
+<div style="border: outset;border-width:1px;border-color:#038603; width: 580px; padding-left:0px;padding-right:0px;padding-top:0px;padding-bottom:0px;margin-top: 10px;">
+    <div style=" width: 0;height: 0; border-right: 5px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;margin-top: -1px; ">
+        <div style="width: 513px; margin-top:1px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 37px solid #1fa67a; ">
+
+            <div style="float: left; height:28px; margin-left:-59px; margin-top: 5px;">
+                <i class="fa fa-edit fa-2x fg-white"></i>
+            </div>
+
+        </div>
+    </div>
+    <div style="float:inherit; margin-left:50px; margin-top:30px; margin-bottom:50px">
+
+        @Html.HiddenFor(m => m.EE_Sub2_ID)
+
+        <div style="margin-left:0px;margin-top:5px;display:inline-block">
+            Type of Fund :  
+            <input type="text" class="k-textbox" style="width: 380px;" id="Sub1_Desc" name="Sub1_Desc" value="@Model.EE_Sub1_Desc" readonly />
+        </div>
+        <div style="margin-left:0px;margin-top:5px;display:inline-block">
+            Sub :  
+        <input type="text" class="k-textbox" style="width: 380px; margin-left:55px" id="Sub2_Desc" name="Sub2_Desc" value="@Model.EE_Sub2_Desc" />
+        </div>
+
+        <div style="margin-left:0px;margin-top:5px;display:inline-block">
+            Income Classif. :  
+
+            @(Html.Kendo().DropDownListFor(m => m.Class_ID)
+                        .Name("dll_ClassiEE")
+                        .DataTextField("Class_Desc")
+                        .DataValueField("Class_ID")
+                        .HtmlAttributes(new { @style = "width: 140px;" })
+                        .DataSource(source => source.Read(read => read.Action("SubCombo3EE", "Report"))
+
+
+            ))
+        </div>
+
+        <div style="margin-left:15px;margin-top:0px;margin-right:0px;display:inline-block">
+            Acc. Code :
+            <input type="text" class="k-textbox" style="width: 140px;" id="Account_Code" name="Account_Code" value="@Model.Account_Code" />
+        </div>
+        
+        <div style="margin-left:0px;margin-top:5px;display:inline-block">
+            Past Year :
+            <input type="text" class="k-textbox" style="width: 380px;margin-left:20px" id="Past_year" name="Past_year" value="@Model.Year1_AmountEE" />
+        </div>
+        <div style="margin-left:0px;margin-top:5px;display:inline-block">
+            Current Year :
+            <input type="text" class="k-textbox" style="width: 380px;" id="Current_year" name="Current_year" value="@Model.Year2_AmountEE" />
+        </div>
+        <div style="margin-left:0px;margin-top:5px;display:inline-block">
+            Budget Year :
+            <input type="text" class="k-textbox" style="width: 380px;" id="Budget_year" name="Budget_year" value="@Model.Year3_AmountEE" />
+        </div>
+
+        <div class="k-button k-button-icontext" style="display:inline-block ; float:right;margin-top:10px; margin-right: 10px;width: 80px;" onclick="reqSaveEdtEE()">Save</div>
+    </div>
+</div>
+

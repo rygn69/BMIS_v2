@@ -1,0 +1,571 @@
+﻿<script src="~/Scripts/BMS/Release/otherfunction.js"></script>
+<script>
+    function RealGridSubmitted() {
+        var office_id = $('#office_realigned_to_null').val()
+        var program_id = $('#Program_realigned_to_null').val() == "" ? 0 : $('#Program_realigned_to_null').val()
+        var account_id = $('#account_list_realigned_to_null').val() == "" ? 0 : $('#account_list_realigned_to_null').val()
+        var subaccount = 0
+        var ooe_id_from = $("#ooe_id_realigned_to_null").val() == "" ? 0 : $("#ooe_id_realigned_to_null").val();
+        return {
+            office_id: office_id,
+            program_id: program_id,
+            account_id: account_id,
+            yearof: $("#ddlYear").val(),
+            subaccount: subaccount,
+            submit: 1,
+            approved: 0,
+            posted: 0,
+            ooe_id_from: ooe_id_from
+        }
+    }
+    function searchforapproval() {
+        var $filter = new Array();
+        $filter = [];
+
+        if ($('#SearchRealignApproval').val().length > 0) {
+            $filter.push({ field: "accountfrom", operator: "contains", value: $('#SearchRealignApproval').val() }),
+            $filter.push({ field: "ppafrom", operator: "contains", value: $('#SearchRealignApproval').val() }),
+            $filter.push({ field: "accountto", operator: "contains", value: $('#SearchRealignApproval').val() }),
+            $filter.push({ field: "ppato", operator: "contains", value: $('#SearchRealignApproval').val() });
+        }
+
+        $('#grd_realignforappropval').data('kendoGrid').dataSource.filter({
+            logic: "or",
+            filters: $filter
+        });
+
+    }
+
+    $(function () {
+        $("#SearchRealignApproval").keypress(function (e) {
+            if (e.keyCode == 13) {
+                searchforapproval();
+            }
+        });
+    });
+    function frmRealignclose() {
+        $("#realignForApproval").data("kendoWindow").close();
+        $("#grd_realignoffice").data("kendoGrid").dataSource.read();
+    }
+    //function CheckAll(e) {
+    //    $("#grd_realignforappropval tbody input:checkbox").prop("checked", e.checked);
+    //}
+
+    function sync2() {
+        var availableamount = covert_empty($("#available_amount_approval").val())
+        var realignamount_from = $("#amount_orig").val()
+        var realignamount = covert_empty($("#amounttorealign_approval").val())
+        var toberealign_null = covert_empty($("#toberealign_approval").val())
+        var toAmount_orig = covert_empty($("#amount_orig").val())
+        var toAmount_null = covert_empty($("#toAmount_approval").val())
+        var available_amount_realign = covert_empty($("#available_amount_realign_approval").val())
+        var realignamount_to = $("#amount_orig").val()
+       
+        var bal = parseFloat((Number(availableamount) + Number(realignamount_from)) - Number(realignamount)).toFixed(2)
+        var bal2 = parseFloat((Number(toberealign_null) + Number(toAmount_orig)) - Number(toAmount_null)).toFixed(2)
+        var bal3 = parseFloat(Number(available_amount_realign) - Number(toAmount_null)).toFixed(2)
+        var bal4 = parseFloat(Number(toberealign_null) + Number(toAmount_orig)).toFixed(2)
+      
+        if (bal < 0 )
+        {
+            swal("Warning","Please be reminded, the amount to realign must not be greater than the available amount!","warning")
+            $("#amounttorealign_approval").val(realignamount_from)
+        }
+        if ((Number(toAmount_null) > Number(bal4)) && Number(toAmount_null) > Number(toAmount_orig)) {
+            swal("Warning", "Please be reminded, the realign amount must not be greater than the total available amount to realign or the available amount!", "warning")
+            $("#toAmount_approval").val(toAmount_orig)
+        }
+    }
+</script>
+<div id="searchAccountid" style="height: 30px; margin-top: -5px; float: right;">
+    <input type="text" style="width:271.5px;border-collapse:collapse;margin:0px;border-style:solid;margin-left:0px;height:70%;outline:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;font-size:14px" placeholder="Search..." id="SearchRealignApproval" name="SearchRealignApproval">
+    <div class="k-button k-button-icontext" style="height:30px;width:40px;border-style:solid;" onclick="searchforapproval()"><span class="mif-search"></span></div>
+</div>
+<br />
+<div style="margin-top:6px;">
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Monthly_DD_Model>()
+    .Name("grd_realignforappropval")
+    // .Scrollable()
+    .Columns(col =>
+    {
+        @*col.Template(@<text></text>)
+                    .ClientTemplate("<input id='check#=realignmentid#' type='checkbox'  class='checkbox'/>")
+                    .Title("<input onclick=CheckAll(this) type='checkbox'  class='checkbox'/> <span style='text - align:center; vertical - align:middle; height: 30px;font-weight:600;font-size:14px;'>Approve</span> ")
+                    .Width(100)
+                    .HtmlAttributes(new { style = "text-align:center;height:30px;font-size:12px;" })
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });*@
+        col.Template(@<text></text>).HtmlAttributes(new { style = "text-align:  left;height:30px;font-size:10px;" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center;font-size:14px; vertical-align: middle; overflow: visible; white-space: normal;">Account <br />(From)</div></text>)
+                        .Width(150)
+                        .ClientTemplate("<div>#=accountfrom# </div>")
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientFooterTemplate("<div style='text-align:center;color:darkgreen;font-size:10px'><label>Total </label></div>");
+        col.Template(@<text></text>).HtmlAttributes(new { style = "text-align:left;height:30px;font-size:10px;" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center;font-size:14px; vertical-align: middle; overflow: visible; white-space: normal;">Sub-Acount <br />(From)</div></text>)
+                        .Width(150)
+                        .ClientTemplate("<div>#=ppafrom# </div>")
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Bound(m => m.Amountfrom)
+                        .HtmlAttributes(new { style = "text-align:right;height:30px;font-size:10px;font-size:10px;" })
+                        .HeaderTemplate(@<text><div style="font-weight:200;font-size:11px;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Amount <br />(From)</div></text>)
+                        .Width(75)
+                        .ClientTemplate("<div>#=kendo.toString(Amountfrom,'c2')# </div>")
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientFooterTemplate("<div style='text-align:right;color:darkgreen;font-size:10px'><label> </label><label> ₱#=kendo.toString(sum, 'c2')#</label></div>");
+        col.Template(@<text></text>).HtmlAttributes(new { style = "text-align:left;height:30px;font-size:12px;font-size:10px;" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center;font-size:14px; vertical-align: middle; overflow: visible; white-space: normal;">Account <br />(To)</div></text>)
+                        .Width(150)
+                        .ClientTemplate("<div>#=accountto# </div>")
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Template(@<text></text>).HtmlAttributes(new { style = "text-align:left;height:30px;font-size:10px;" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center;font-size:14px; vertical-align: middle; overflow: visible; white-space: normal;">Sub-Account <br />(To)</div></text>)
+                        .Width(150)
+                        .ClientTemplate("<div>#=ppato# </div>")
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Bound(m => m.Amount)
+                        .HtmlAttributes(new { style = "text-align:right;height:30px;font-size:10px;" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center;font-size:14px; vertical-align: middle; overflow: visible; white-space: normal;">Amount</div></text>)
+                        .Width(120)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div>#=kendo.toString(Amount,'c2')# </div>")
+                        .ClientFooterTemplate("<div style='text-align:right;color:darkgreen;font-size:10px'><label> </label><label> ₱#=kendo.toString(sum, 'c2')#</label></div>");
+        col.Template(@<text></text>)
+                        .HtmlAttributes(new { style = "text-align:right;height:30px;font-size:10px;" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center;font-size:14px; vertical-align: middle; overflow: visible; white-space: normal;">Date and Time <br />Submitted</div></text>)
+                        .Width(170)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div>#=datetimesubmit# </div>");
+        col.Bound(m => m.purposereturn)
+                    .HtmlAttributes(new { style = "text-align:right;height:30px;font-size:12px;" })
+                    .HeaderTemplate(@<text><div style="font-weight:600;text-align:center;font-size:14px; vertical-align: middle; overflow: visible; white-space: normal;">Reason</div></text>)
+                    .Width(170)
+                    .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+                   // .ClientTemplate("<div>#=purposereturn# </div>");
+        col.Template(t => { }).ClientTemplate(
+                    "<div class='k-button k-button-icontext' style='border-radius:50px;color:\\#ffffff;background-color:\\cornflowerblue;' onclick='realigneditapproval(#=realignmentid#,#=fromprogram#,#=fromaccount#,#=toprogram#,#=toaccount#,#=subaccount#,#=Amount#,#=tooffice#,#=fromoffice#,\"#=accountfrom#\",\"#=ppafrom#\",\"#=accountto#\",\"#=ppato#\",#=Amountfrom#)'><span class='fa fa-pencil-square-o' style='font-size:10pt;margin:1px;margin-top:-1px;margin-left:1px;margin-right:1px;'> </span>edit</div> " +
+                    "<div class='k-button k-button-icontext' style='border-radius:50px;color:\\#ffffff;background-color:\\#DE5555;'onclick='realign_return(#=realignmentid#,#=fromprogram#,#=fromaccount#,#=toprogram#,#=toaccount#,#=subaccount#,#=Amount#,#=tooffice#,#=fromoffice#,\"#=accountfrom#\",\"#=ppafrom#\",\"#=accountto#\",\"#=ppato#\")'   ><span class='fa fa-undo' style='font-size: 10pt;margin: 1px;margin-top:-1px;margin-left:1px;margin-right:1px;'> </span>Return</div> "
+                    ).HtmlAttributes(new { style = "vertical-align: top;" }).Width(165);
+        col.Bound(m => m.realignmentid).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">id</div></text>)
+                        .Hidden()
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Bound(m => m.fromprogram).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">program(from)</div></text>)
+                        .Hidden()
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Bound(m => m.fromaccount).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">account(from)</div></text>)
+                        .Hidden()
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Bound(m => m.toprogram).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">program(to)</div></text>)
+                        .Hidden()
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Bound(m => m.toaccount).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">account(to)</div></text>)
+                        .Hidden()
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Bound(m => m.subaccount).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">sub-account</div></text>)
+                        .Hidden()
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Bound(m => m.tooffice).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">office(to)</div></text>)
+                        .Hidden()
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+        col.Bound(m => m.fromoffice).HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">office(from)</div></text>)
+                        .Hidden()
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+    })
+    //.ToolBar(toolbar =>
+    //    {
+    //        toolbar.Custom().Text("<span id='spanthumbsup' class='fa fa-save'> </span><span id='SpanOnApproveProgress' style='display:none' class='fa fa-spinner fa-spin'></span> Post Realignment").Name("btnApprove").Url("javascript:void(0)").HtmlAttributes(new { onclick = "btnPostRealign()" });
+    //        // toolbar.Save();
+    //    })
+        .Editable(editable => editable.Mode(GridEditMode.InCell))
+        .Navigatable()
+        .Sortable()
+        .Scrollable()
+        .Selectable()
+        .AutoBind(false)
+        //    .Events(e => e.Change("WFPgrid"))
+        .HtmlAttributes(new { style = "height:400px;" })
+        .Pageable(pageable => pageable
+            .Refresh(true)
+            .ButtonCount(2))
+        .DataSource(d => d
+        .Ajax()
+         .Aggregates(a =>
+        {
+            a.Add(c => c.Amount).Sum();
+            a.Add(c => c.Amountfrom).Sum();
+        })
+        .PageSize(1000)
+        .Model(m => m.Id(i => i.supplementalbudget_id))
+        .Read(read => read.Action("Load_Realign_Req", "Release").Data("RealGridSubmitted")))
+    )
+
+</div>
+<div style="clear:both"></div>
+<div style="display:inline-block;margin-top:10px">
+    <div style="float:left;margin-left:256.5px;margin-top:30px;">
+        <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;font-size:14px">
+            Account :
+        </label>
+    </div>
+    <div style="float:left;margin-left:30px;margin-top:7px;">
+        <textarea type="text" style="width:300px;height:35px;" name="account" id="account_approval" disabled> </textarea>
+    </div>
+</div>
+<div style="display:inline-block">
+    
+    <div style="float:left;margin-left:198.5px;margin-top:10px;">
+        <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;font-size:14px">
+            Available Amount :
+        </label>
+
+    </div>
+
+    <div style="float: right;margin-right:374px;margin-top:5px;">
+        <input type="text" style="width:180px;color: #2c9a0c" name="available_amount_approval" id="available_amount_approval" onkeyup="commaSeparateNumberversion_realignapproval('available_amount_approval')" step="0.01" disabled>
+    </div>
+
+    <div style="float:left;margin-left:-178px;margin-top:42px;">
+        <label style="margin-left:50px;margin-right:5px;margin-top:0px;margin-bottom:2px;font-size:14px">
+            Amount to Realign :
+        </label>
+    </div>
+    <div style="float: right;margin-right:374px;margin-top:5px;">
+        <input type="text" style="width:180px; color: red" name="amounttorealign_approval" id="amounttorealign_approval" onkeyup="commaSeparateNumberversion_realignapproval('amounttorealign_approval')" >
+    </div>
+
+    <div style="float: left;margin-left:225px;margin-top:34px;">
+        <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;font-size:14px">
+            Total Amount <br />to Realign &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:
+        </label>
+    </div>
+    <div style="float:right;margin-right:373.8px;margin-top:5px;">
+        <input type="text" style="width:180px; color: #0501fa" name="toberealign_approval" id="toberealign_approval" onkeyup="commaSeparateNumberversion_realignapproval('toberealign_approval')" disabled>
+    </div>
+
+    <div style="float: left;margin-right:10px;margin-top:20px;">
+        <label style="margin-left: 90px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px; color:red;font-size:14px;">
+            <u>  Aligned To:</u>  
+        </label>
+    </div>
+    <div style="float:left;margin-left:-287px;margin-top:70px;">
+        <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;font-size:14px">
+            Account :
+        </label>
+    </div>
+    <div style="float:left;margin-left:-143px;margin-top:48px;">
+        <textarea type="text" style="width:300px;height:35px;vertical-align:middle" name="accountto_approval" id="accountto_approval" disabled> </textarea>
+    </div>
+    <div style="float: left;margin-left:-514px;margin-top:105px;">
+        <label style="margin-left: 50px;margin-right: 5px;margin-top: 0px;margin-bottom: 2px;font-size:14px;">
+            Available Amount :
+        </label>
+    </div>
+    <div style="float: right;margin-right:374px;margin-top:5px;">
+        <input type="text" style="width:180px;color: #2c9a0c" name="available_amount_realign_approval" id="available_amount_realign_approval" onkeyup="commaSeparateNumberversion_realignapproval('available_amount_realign_approval')" step="0.01" disabled>
+    </div>
+
+    <div style="float:right;margin-right:601px;margin-top:12px;">
+        <label style="margin-left: 0px;margin-right: 0px;margin-top: 0px;margin-bottom: 2px;font-size:14px;">
+            Realign Amount :
+        </label>
+    </div>
+    <div style="float: right;margin-right:374px;margin-top:-29px;">
+        <input type="text" style="width:180px; color: red" name="toAmount_approval" id="toAmount_approval" value="0.00" onkeyup="commaSeparateNumberversion_realignapproval('toAmount_approval')" >
+    </div>
+</div>
+<br />
+<div class="k-button k-button-icontext" style="float:left; bottom: 15px; right: 25px;width: 100px;border-radius:50px;margin-top:15px;margin-left:300px" onclick="frmRealignclear()"><span class='fa fa-eraser'></span> Clear</div>
+@*<div class="k-button k-button-icontext" style="float:left; bottom: 15px; right: 25px;width: 100px;border-radius:50px;margin-left:10px;margin-top:15px;" onclick="frmPreview()"><span class="fa fa-print"></span> Preview</div>*@
+<div class="k-button k-button-icontext" style="float:left; bottom: 15px; right: 25px;width: 100px;background-color:cornflowerblue; color:white;border-radius:50px;margin-left:10px;margin-top:15px;" onclick="frmRealignUpdate()"><span class="fa fa-edit"></span> Update</div>
+<div class="k-button k-button-icontext" style="float:left; bottom: 15px; right: 25px;width: 100px;background-color:cornflowerblue; color:white;border-radius:50px;margin-left:10px;margin-top:15px;" onclick="frmRealignApprove()"><span class="fa fa-thumbs-o-up"></span> Review</div>
+<div class="k-button k-button-icontext" style="float:left; bottom: 15px; right: 25px;width: 100px;background-color:indianred; color:white;border-radius:50px;margin-left:10px;margin-top:15px;" onclick="frmRealignclose()"><span class="fa fa-close"></span> Close</div>
+
+<div style="display:none">
+    <input type="number" id="officeid_from" value="0"/>
+    <input type="number" id="programid_from" value="0" />
+    <input type="number" id="accountid_from" value="0" />
+    <input type="number" id="officeid_to" value="0" />
+    <input type="number" id="programid_to" value="0" />
+    <input type="number" id="accountid_to" value="0" />
+    <input type="number" id="subaccountid" value="0" />
+    <input type="number" id="realigid" value="0" />
+    <input type="number" id="amount_orig" value="0" />
+    <input type="number" id="realignamount_from" value="0" />
+</div>
+<script>
+    $(document).ready(function () {
+        $("#grd_realignforappropval").data("kendoGrid").dataSource.read();
+    })
+
+    function frmPreview() {
+        var program_id = $('#Program_realigned_to_null').val() == "" ? 0 : $('#Program_realigned_to_null').val()
+        var accountid = $('#account_list_realigned_to_null').val() == "" ? 0 : $('#account_list_realigned_to_null').val()
+        var yearof = $("#ddlYear").val()
+        var office = $('#office_realigned_to_null').data("kendoComboBox").text()
+        var officeid = $('#office_realigned_to_null').val()
+        var repHistory = 0//$('#repHistory').val()
+        $.ajax({
+            async: false,
+            dataType: 'html',
+            success: window.open("../Reports/ReportViewer.aspx?rid=39&programID=" + program_id + "&accountID=" + accountid + "&yearof=" + yearof + "&OfficeName=" + office + "&OfficeID=" + officeid + "&mode=2&repHistory=" + repHistory + "&source=1")
+        });
+    }
+    function frmRealignUpdate() {
+        var availableamount = covert_empty($("#available_amount_approval").val())
+        var realignamount_from = $("#amount_orig").val()
+        var realignamount = covert_empty($("#amounttorealign_approval").val())
+        var toberealign_null = covert_empty($("#toberealign_approval").val())
+
+        var bal = parseFloat((Number(availableamount) + Number(realignamount_from)) - Number(realignamount)).toFixed(2)
+        var bal2 = parseFloat(Number(toberealign_null) - (Number(realignamount_from) - Number(realignamount))).toFixed(2)
+
+        var realigid = $("#realigid").val()
+        var accountid_to = $("#accountid_to").val()
+
+        if (accountid_to == 0) {
+            var amount = covert_empty($("#amounttorealign_approval").val())
+        }
+        else {
+            var amount = covert_empty($("#toAmount_approval").val())
+        }
+        var url = "@Url.Action("realigforapprovalupdate", "Release")";
+        if (bal < 0) {
+            swal("Warning", "Please be reminded, the amount to realign must not be greater than the available amount!", "warning")
+            $("#amounttorealign_approval").val(realignamount_from)
+        }else if (bal2 < 0) {
+            swal("Warning", "Insufficient amount! Realign amount might be already used for realignment.", "warning")
+            $("#amounttorealign_approval").val(realignamount_from)
+        }
+        else {
+            $.post(url, { realigid: realigid, accountid_to: accountid_to, amount: amount}, function (e) {
+                if (e == "success") {
+                    swal("Success", "Realign amount successfully updated!", "success")
+                    $("#grd_realignforappropval").data("kendoGrid").dataSource.read()
+                }
+                else {    
+                    swal("Error",e,"error")
+                }
+            })
+        }
+    }
+    function frmRealignApprove() {
+        var office_id = $('#office_realigned_to_null').val()
+        var program_id = $('#Program_realigned_to_null').val() == "" ? 0 : $('#Program_realigned_to_null').val()
+        var account_id = $('#account_list_realigned_to_null').val() == "" ? 0 : $('#account_list_realigned_to_null').val()
+        var subaccount = 0
+        var yearof = $("#ddlYear").val()
+        var submit= 1
+        var approved= 0
+        var url='@Url.Action("Approve_Realign", "Release")'
+        swal({
+            title: "Confirmation!",
+            text: "This will approve the realigned appropriation in the above list. Do you want to proceed?",
+            type: "warning",
+            showCancelButton: true,
+            closeOnConfirm: false,
+            confirmButtonColor: "#1fa67a",
+            confirmButtonText: "Yes",
+            showLoaderOnConfirm: true,
+        }, function (isConfirm) {
+            if (isConfirm) {
+                $.post(url, { office_id: office_id, program_id: program_id, account_id: account_id, yearof: yearof, submit: submit, approved: approved }, function (d) {
+                    if (d == "success") {
+                        swal({ title: "Success!", text: "Realignment of appropriation has been approved!", timer: 1000, showConfirmButton: false, type: "success" });
+                        $("#grd_realignforappropval").data("kendoGrid").dataSource.read();
+                    }
+                    else {
+                        swal("Something Went Wrong!", d, "error");
+                    }
+                });
+            }
+            else {
+                $('#SpanOnApproveProgress').css("display", "none");
+                $('#spanthumbsup').css("display", "auto");
+            }
+        })
+    }
+    function frmRealignclear() {
+        $("#realigid").val(0)
+        $("#officeid_from").val(0)
+        $("#programid_from").val(0)
+        $("#accountid_from").val(0)
+        $("#officeid_to").val(0)
+        $("#programid_to").val(0)
+        $("#accountid_to").val(0)
+        $("#subaccountid").val(0)
+        $("#account_approval").val("")
+        $("#available_amount_approval").val("0.00")
+        $("#amounttorealign_approval").val("0.00")
+        $("#toberealign_approval").val("0.00")
+        $("#accountto_approval").val("")
+        $("#available_amount_realign_approval").val("0.00")
+        $("#toAmount_approval").val("0.00")
+    }
+    function realigneditapproval(realignmentid, fromprogram, fromaccount, toprogram, toaccount, subaccount, Amount, tooffice, fromoffice, accountfrom, ppafrom, accountto, ppato, Amountfrom) {
+
+        frmRealignclear()
+        $("#realigid").val(realignmentid)
+        $("#officeid_from").val(fromoffice)
+        $("#programid_from").val(fromprogram)
+        $("#accountid_from").val(fromaccount)
+        $("#officeid_to").val(tooffice)
+        $("#programid_to").val(toprogram)
+        $("#accountid_to").val(toaccount)
+        $("#subaccountid").val(subaccount)
+        $("#amount_orig").val(Amount)
+
+        getbalances()
+        if (toaccount == "") {
+            if (ppafrom == "") {
+                $("#account_approval").val(accountfrom)
+            }
+            else {
+                $("#account_approval").val(ppafrom)
+            }
+            $("#amounttorealign_approval").val(Amountfrom)
+        }
+        else {
+            if (subaccount == "") {
+                $("#accountto_approval").val(accountto)
+            }
+            else {
+                $("#accountto_approval").val(ppato)
+            }
+            $("#toAmount_approval").val(Amount)
+            getbalances_to()
+        }
+    }
+    function realign_return(realignmentid, fromprogram, fromaccount, toprogram, toaccount, subaccount, Amount, tooffice, fromoffice, accountfrom, ppafrom, accountto, ppato) {
+        frmRealignclear()
+
+        var gview = $("#grd_realignforappropval").data("kendoGrid");
+        var selectedItem = gview.dataItem(gview.select());
+        var purposereturn = selectedItem.purposereturn == "" ? 0 : selectedItem.purposereturn;
+        
+        $("#realigid").val(realignmentid)
+        $("#officeid_from").val(fromoffice)
+        $("#programid_from").val(fromprogram)
+        $("#accountid_from").val(fromaccount)
+        $("#officeid_to").val(tooffice)
+        $("#programid_to").val(toprogram)
+        $("#accountid_to").val(toaccount)
+        $("#subaccountid").val(subaccount)
+        $("#amount_orig").val(Amount)
+        var year = $("#ddlYear").val();
+        var url="@Url.Action("realignreturn", "Release")";
+        
+        if (toaccount == "" || toaccount == 0) {
+            if (ppafrom == "") {
+                $("#account_approval").val(accountfrom)
+            }
+            else {
+                $("#account_approval").val(ppafrom)
+            }
+            $("#amounttorealign_approval").val(Amount)
+            swal("Warning","Transaction can't be return!", "warning")
+        }
+        else {
+            if (subaccount == "") {
+                $("#accountto_approval").val(accountto)
+            }
+            else {
+                $("#accountto_approval").val(ppato)
+            }
+            $("#toAmount_approval").val(Amount)
+        }
+        if (purposereturn == "0" || purposereturn.length == 0 || purposereturn == " " || purposereturn == "") {
+            swal("", "Please enter something in the reason column!", "info")
+        }
+        else {
+            swal({
+                title: "Warning?",
+                text: "Return this transaction?",
+                type: "info",
+                showCancelButton: true,
+                closeOnConfirm: false,
+                confirmButtonColor: "#1fa67a",
+                confirmButtonText: "Yes",
+                showLoaderOnConfirm: true,
+            }, function () {
+
+                $.post(url, {
+                    realignmentid: realignmentid, fromoffice: fromoffice, fromprogram: fromprogram, fromaccount: fromaccount, tooffice: tooffice, toprogram: toprogram, toaccount: toaccount, subaccount: subaccount, Amount: Amount, year: year, purposereturn: purposereturn
+                }, function (e) {
+
+                    if (e == "success") {
+                        swal({
+                            title: "Success!",
+                            text: "Transaction has been returned!",
+                            timer: 2000,
+                            type: "success",
+                            showConfirmButton: false
+                        })
+                        $('#grd_realignforappropval').data('kendoGrid').dataSource.read();
+                    } else {
+                        swal({
+                            title: "Error!",
+                            text: e,
+                            timer: 2000,
+                            type: "error",
+                            showConfirmButton: false
+                        })
+                    }
+                });
+            })
+        }
+    }
+    function getbalances() {
+        setTimeout(function () {
+
+            var lru = "@Url.Action("thatassET", "Release")";
+            var year_ = $("#ddlYear").val();
+            var officeid = $("#officeid_from").val()
+            var subppaid = $("#subaccountid").val() == "" ? 0 : $("#subaccountid").val()
+            $.post(lru, { year_: year_, officeid: officeid }, function (e) {
+                document.getElementById("toberealign_approval").value = commaSeparateNumberRealignment(e);
+
+            })
+        }, 1000);
+
+        setTimeout(function () {
+            var url = "@Url.Action("datassV2", "Release")";
+            var office_id = $("#officeid_from").val()
+            var program_id = $("#programid_from").val()
+            var account_id = $("#accountid_from").val()
+            var year_ = $("#ddlYear").val();
+            var subppaid = $("#subaccountid").val() == "" ? 0 : $("#subaccountid").val()
+
+            $.post(url, { office_id: office_id, program_id: program_id, account_id: account_id, year_: year_, subppaid: subppaid }, function (e) {
+                document.getElementById("available_amount_approval").value = commaSeparateNumberRealignment(e);
+            })
+            }, 1000);
+
+    }
+    function getbalances_to() {
+        setTimeout(function () {
+            var url = "@Url.Action("datassV2", "Release")";
+
+            var office_id = $('#officeid_to').val()
+            var program_id = $('#programid_to').val()
+            var account_id = $('#accountid_to').val() == "" ? 0 : $('#accountid_to').val()
+            var subppaid = $("#subaccountid").val() == "" ? 0 : $("#subaccountid").val()
+            var year_ = $("#ddlYear").val();
+            $.post(url, { office_id: office_id, program_id: program_id, account_id: account_id, year_: year_, subppaid: subppaid }, function (e) {
+                if (account_id = 0 || account_id == null || account_id == '') {
+                    document.getElementById("available_amount_realign").value = '';
+                } else {
+                    document.getElementById("available_amount_realign_approval").value = commaSeparateNumberRealignment(e);
+                }
+                $('#grd_realignforappropval').data('kendoGrid').dataSource.read();
+            })
+        }, 1000);
+    }
+
+</script>

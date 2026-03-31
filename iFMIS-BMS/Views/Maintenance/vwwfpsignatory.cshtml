@@ -1,0 +1,78 @@
+﻿
+@*@{
+    ViewBag.Title = "vw_wfppreparer";
+}*@
+<h2 style="font-size:18px;font-weight:bold"><span class="fa fa-tasks"></span> Work and Financial Plan Signatory</h2>
+<label style="display:inline-block;margin-left:10px;margin-top:15px;">
+    Provincial Governor
+</label>
+<div style="margin-left:10px;width:500px;">
+    @(Html.Kendo().ComboBox()
+            .Name("gov")
+            .DataTextField("EmpNameFull")
+            .DataValueField("eid")
+            .AutoBind(true)
+            .Placeholder("Select a name!")
+            .Filter("contains")
+            .MinLength(3)
+            //.Events(e => e.Change("fnOffice_sel"))
+            //       .SelectedIndex(0)
+            .HtmlAttributes(new { style = "width:100%; height:100%", @class = "form-control autoselect" })
+            .DataSource(source =>
+            {
+                source.Read(read =>
+                {
+                    read.Action("wfpsig", "Maintenance");
+                })
+            .ServerFiltering(false);
+            })
+    )
+</div>
+
+<div id="btnSave" class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 100px;float:left; margin-top: 10px; margin-left:15px;border-radius:50px;background-color:cornflowerblue;color:white; margin-bottom:0px" onclick="reqSave()"><span class="fa fa-save"></span> Save</div>
+
+<script>
+    $(document).ready(function () {
+        var url = "@Url.Action("getgovsig", "Maintenance")";
+        $.get(url,function(e){
+            if (e != 0){
+                $("#gov").data("kendoComboBox").value(e)
+            }
+        })
+    })
+
+    function reqSave() {
+        var eid = $("#gov").val();
+        var signame = $("#gov").data("kendoComboBox").text();
+
+        if ($("#gov").val() == "") {
+            swal("Warning", "Please select a name from the combo box!", "warning")
+        }
+        else {
+            swal({
+                title: "WFP Signatory Update",
+                text: "Would you like to update the signatory for the Governor?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: status,
+                closeOnConfirm: false,
+                showLoaderOnConfirm: true
+            },
+            function (isConfirm) {
+                if (isConfirm) {
+                    var url = "@Url.Action("SaveWFPsignatory", "Maintenance")";
+                    $.get(url, { eid: eid, signame: signame }, function (e) {
+
+                        if (e == "success") {
+                                swal("Success", "WFP signatory for the governor has been updated!", "success");
+
+                        } else {
+                            swal("Warning", e, "warning");
+                        }
+                    });
+                }
+            });
+        }
+    }
+</script>

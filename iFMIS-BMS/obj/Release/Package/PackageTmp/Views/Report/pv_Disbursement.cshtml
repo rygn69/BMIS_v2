@@ -1,0 +1,567 @@
+﻿@*@model IEnumerable<iFMIS_BMS.BusinessLayer.Models.DashBoard.DashBoardModel>*@
+@model IEnumerable<iFMIS_BMS.Base.SAAODA>
+<script>
+    function onData() {
+        var year = $("#ddlYear").val()
+        var month = $("#Months").val()
+        var office = $("#offs").val()
+        var byaccount= $("#byaccount").val()
+        return {
+            year: year,
+            month: month,
+            office: office,
+            byaccount: byaccount
+        }
+    }
+    $(function () {
+        $("#SearchData").keypress(function (e) {
+            if (e.keyCode == 13) {
+                searchAccount();
+            }
+        });
+    });
+
+    var thisculture = kendo.culture();
+    thisculture.numberFormat.currency.symbol = ' '; // Script For Changing The Currency Sign
+
+    function getParam(){
+        return {
+            yearof: $("#ddlYear").val(),
+            office: $("#offs").val(),
+            month: $("#Months").val(),
+            byaccount: $("#byaccount").val()
+        }
+    }
+    
+    //$(function() {
+    //    // Clear up the loading indicator for this chart
+    //    var loading = $(".chart-loading", e.sender.element.parent());
+    //    kendo.ui.progress(loading, false);
+    //});
+
+</script>
+
+<h2 style="font-size:20px;font-weight:bold"><span class="fa fa-print"></span> Status of Appropriation, Allotment, Obligated, Disbursed and Accounted Report</h2>
+    
+<br /><br />
+<div style="width : 100%; margin-top: -25px;height:80px;border-style: solid; border-color: #1fa67a">
+    <div style="width:100%;height : 35px ; background-color:#1fa67a; color: white">
+        <h2 style="margin-left: 5px;color:white;font-size:25px"><i style="margin-bottom:5px;width:30px;height:27px" class="fa fa-sliders"></i>  Search Category</h2>
+    </div>
+
+    <div style="float:left;margin-left:10px;width:200px;margin-top:15px;" >
+        <input type="radio" id="byoffice" name="byoffice" checked="checked" value="1" onclick="byofficeclick()"/>
+        <font style="float:left;font-size:15px;font-weight:bold;margin-top:-19px;margin-left:180px">Office</font>
+    </div>
+    <div style="float:left;margin-left:-15px;margin-top:14px;position:relative">
+        <input type="radio" id="byaccount" name="byaccount"  value="0" onclick="byaccountclick()"/>
+        <font style="font-size:15px;font-weight:bold;margin-top:1px;margin-left:-118px;position:absolute">Account</font>
+    </div>
+</div>
+<br /><br />
+<div style="float: none;clear:both;margin-top:-20px">
+
+    <div style="float: left;margin-left:50px;margin-top:-2px;position:absolute">
+        <label id="officelabel">
+            Office     :
+        </label>
+    </div>
+
+    @*<div style="float: right;margin-right:70px;margin-top:0px;">*@
+    <div style="float:left;margin-left:150px;margin-top:-5px;position:absolute  ">
+        @(Html.Kendo().ComboBox()
+            .Name("offs")
+            .DataTextField("OfficeName")
+            .DataValueField("OfficeID")
+            .Placeholder("--Select office--")
+            .Filter("contains")
+            .MinLength(1)
+            .HtmlAttributes(new { @style = "width: 509px;" })
+            .Events(e => e.Change("onClickOffice"))
+            .DataSource(source => source.Read(read => read.Action("GetOfficeAllFunds", "Release").Data("getOfficeandAccounts")))
+        )
+    </div>
+
+    <div style="height:10px;">
+
+    </div>
+</div>
+   
+
+    <div id="MonthDepartment" style="float: none;clear:both; margin-top: 20px">
+
+        <div style="float:left;margin-left:45px;margin-top:2px;">
+            <label>
+                Month    :
+            </label>
+        </div>
+        <div style="float:left;margin-left:48px;margin-top:2px;">
+
+              @(Html.Kendo().DropDownList()
+  .Name("Months")
+  .DataTextField("Text")
+  .DataValueField("Value")
+  //.Events(e => e.Change("change"))
+  .BindTo(new List<SelectListItem>() {
+                new SelectListItem() {
+                    Text = "January",
+                    Value = "1"
+                },
+                new SelectListItem() {
+                    Text = "Febuary",
+                    Value = "2"
+                },
+                new SelectListItem() {
+                    Text = "March",
+                    Value = "3"
+                },
+                new SelectListItem() {
+                    Text = "April",
+                    Value = "4"
+                },
+                new SelectListItem() {
+                    Text = "May",
+                    Value = "5"
+                },
+                new SelectListItem() {
+                    Text = "June",
+                    Value = "6"
+                },
+                new SelectListItem() {
+                    Text = "July",
+                    Value = "7"
+                },
+                new SelectListItem() {
+                    Text = "August",
+                    Value = "8"
+                },
+                new SelectListItem() {
+                    Text = "September",
+                    Value = "9"
+                },
+                new SelectListItem() {
+                    Text = "October",
+                    Value = "10"
+                },
+                new SelectListItem() {
+                    Text = "November",
+                    Value = "11"
+                },
+                new SelectListItem() {
+                    Text = "December",
+                    Value = "12"
+                }
+  })
+  .Value(@ViewBag.MonthVaue)
+  .HtmlAttributes(new { style = "width: 150px" })
+  .SelectedIndex(DateTime.ParseExact(DateTime.Now.ToString("MMM"), "MMM", null).Month - 1)
+        )
+        </div>
+
+        <div style="float:left;margin-left:-238.5px;margin-top:40px;">
+            <label>
+                Year    :
+            </label>
+        </div>
+        <div style="float:left;margin-left:-150px;margin-top:40px;">
+
+            @(Html.Kendo().DropDownList()
+                .Name("ddlYear")
+                .DataTextField("ProposalYear")
+                .DataValueField("ProposalYear")
+                .SelectedIndex(0)
+                .HtmlAttributes(new { @style = "width: 95px;" })
+                // .Events(e => e.Change("ocake"))
+                .DataSource(source => source.Read(read => read.Action("GetPropYear3", "PYear")))
+            )
+        </div>
+            @*<div id="btnPrint" class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 90px;float:right; margin-top: 55px; margin-right:69px; margin-bottom:0px;border-radius:7px;" onclick="reqPrint()"><span class="fa fa-print"></span> Preview</div> *@
+
+        <div style="float:left;margin-left:-25px;width:200px;margin-top:85px;">
+            <input type="checkbox" id="viewbg" name="viewbg" onclick="viewbargraph()" />
+            <font style="float:left;font-size:15px;font-weight:bold;margin-top:0px;margin-left:15px;position:absolute">Show Bar Graph</font>
+
+            @*<input type="checkbox" id="viewbraphid" name="viewbgraphid" onclick="viewbargraph()" />
+            <font style="float:left;font-size:15px;font-weight:bold;margin-top:0px;margin-left:15px;position:absolute">View Bar Graph</font>*@
+        </div>
+        <div style="float:left;margin-left:-15px;margin-top:85px;">
+            <input type="checkbox" id="viewgv" name="viewgv"  onclick="viewgridview()" />
+            <font style="font-size:15px;font-weight:bold;margin-top:1px;margin-left:15px;position:absolute">Show Tabular Form </font>
+        </div>
+        <div id="reloadid" class="k-button k-button-icontext" style="float:left;margin-left:175px;margin-top:85px;border-radius:7px;background-color:#808080;color:white" onclick="reloadSAAODA()">
+            <span class="fa fa-refresh"></span> Reload Data
+        </div>
+    </div>
+<div style="clear:both"></div>
+<div id="chartlegend" style="display:none;margin-top:5px;">
+    <div style="width:100%;height : 30px ; background-color:#1fa67a; color: white">
+        <label style="font-size:16px;margin-top:3px;float:left;margin-left:3px">Graph Legend</label>
+    </div>
+    <div><span style="background-color:#0026ff;color:#0026ff" class="fa fa-square-o"></span> Appropriation</div>
+    <div style="float:left;margin-left:120px;margin-top:-19px"><span style="background-color:#00ff21;color:#00ff21;" class="fa fa-square-o"></span> Allotment</div>
+    <div style="float:left;margin-left:25px;margin-top:-19px"><span style="background-color:#ff0000;color:#ff0000;" class="fa fa-square-o"></span> Obligated</div>
+    <div style="float:left;margin-left:25px;margin-top:-19px"><span style="background-color:#ffd800;color:#ffd800;" class="fa fa-square-o"></span> Disbursed</div>
+    <div style="float:left;margin-left:25px;margin-top:-19px"><span style="background-color:#00ffff;color:#00ffff;" class="fa fa-square-o"></span> Accounted</div>
+    </div>
+<div id="bargraphlabel" class = "metro-header" style="width: 732px; height: 1px; margin-top: 5px; display: block;">
+    <label style="font-size:12px;font-weight:900;margin-top:-7px"><u> BAR GRAPH</u></label> 
+</div>
+<div id ="utichart" class="parent-container" style="width:100%;border-color:#808080;border-style:solid;border-width:2px;height:100%;margin-top:0px;">
+    <div id="utichartchild" kendo-chart k-options="line" class="chart-container" style="">
+        @(Html.Kendo().Chart(Model)
+        .Name("PCUtilization")
+        .Legend(legend => legend
+        .Visible(false)
+        .Position(ChartLegendPosition.Top)
+        )
+        .Series(series =>
+        {
+            series.Column(m => m.Appropriation).ColorField("").Color("#0026ff").Labels(labels => labels
+                .Template(" #=value# (#= kendo.format('{0:P4}', percentage)#)")
+                .Background("transparent")
+
+            //.Visible(true)
+            //.Rotation(180)
+            );
+            series.Column(m => m.Allotment).ColorField("").Color("#00ff21").Labels(labels => labels
+               .Template(" #=value# (#= kendo.format('{0:P4}', percentage)#)")
+               .Background("transparent")
+           //.Visible(false)
+           //.Rotation(180)
+           );
+            series.Column(m => m.Obligation).ColorField("").Color("#ff0000").Labels(labels => labels
+                .Template(" #=value# (#= kendo.format('{0:P4}', percentage)#)")
+                .Background("transparent")
+            //.Visible(false)
+            //.Rotation(180)
+            );
+            series.Column(m => m.Disbursed).ColorField("").Color("#ffd800").Labels(labels => labels
+                .Template(" #=value# (#= kendo.format('{0:P4}', percentage)#)")
+                .Background("transparent")
+            //.Visible(false)
+            //.Rotation(180)
+            );
+            series.Column(m => m.Accounted).ColorField("").Color("#00ffff").Labels(labels => labels
+                .Template(" #=value# (#= kendo.format('{0:P4}', percentage)#)")
+                .Background("transparent")
+
+            //.Visible(false)
+            //.Rotation(180)
+            );
+
+        })
+        .CategoryAxis(axis => axis
+            .Categories(m => m.AccountName)
+            .MajorGridLines(lines => lines.Visible(true))
+            .Labels(labels => labels.Rotation(-45))
+
+        )
+        .Tooltip(tooltip => tooltip
+            .Visible(true)
+            @*.BackColor("#050303")*@
+            @* .Color("#D40000")*@
+            .Format("{0:c2}")
+
+        )
+
+        .HtmlAttributes(new { style = "height:600px;width:100%" })
+        //.Zoomable()
+
+        .DataSource(source => source.Read(read => read.Action("GetSAAODA", "Report").Data("getParam")))
+        
+        )
+    </div>
+</div>
+
+
+<div style="clear:both"></div>  
+
+<div id="searchAccountid" style="height: 30px; margin-top: 15px; float: left;">
+    <div  class = "metro-header" style="width:702px;height:15px">
+        <label style="font-size:12px;font-weight:900;margin-top:-5px;"><u>TABULAR FORM</u></label> 
+        <input type="text" style="width:400px;border-collapse:collapse;margin:0px;border-style:solid;border-color:darkseagreen;margin-right:40px;margin-top:-25px;height:21px;outline:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:right;" placeholder="Search account..." id="SearchData" name="SearchData">
+        <div class="k-button k-button-icontext" style="height:30px;width:40px;border-style:solid;border-color:darkseagreen;margin-top:-25px;float:right;margin-right:-450px" onclick="searchAccount()"><span class="mif-search"></span></div>
+    </div>
+</div>
+<div class="transition animated fadeInUp" style="margin-top:60px;color:#0ef5ee">
+    @(Html.Kendo().Grid<iFMIS_BMS.Base.SAAODA>()
+        .Name("accountedGrid")
+        .Scrollable()
+        .Columns(col =>
+        {
+        col.Template(@<text></text>).Hidden().ClientTemplate("<div>#=trnno# </div>");
+        col.Template(@<text>Office</text>)
+            .HeaderTemplate(@<text>Office</text>)
+            .Width(270)
+            .HtmlAttributes(new { style = "text-align:left;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;height:20px;", @class = "metro-header" })
+            .ClientTemplate("<div>#=OfficeName# </div>");
+        col.Template(@<text>Office</text>)
+            .HeaderTemplate(@<text>Program</text>)
+            .Width(270)
+            .HtmlAttributes(new { style = "text-align:left;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;height:20px;", @class = "metro-header" })
+            .ClientTemplate("<div>#=ProgramDescription# </div>");
+        col.Template(@<text></text>)
+            .HeaderTemplate(@<text>Account</text>)
+            .Width(270)
+            .HtmlAttributes(new { style = "text-align:left;" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;height:20px;", @class = "metro-header" })
+            .ClientTemplate("<div>#=AccountName# </div>")
+            .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> TOTAL  : </label></div>");
+        col.Bound(c => c.Appropriation)
+            .HeaderTemplate(@<text>Appropriation</text>)
+            .Width(125)
+            .HtmlAttributes(new { style = "text-align:right;height:30px" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;height:30px;", @class = "metro-header" })
+            .ClientTemplate("<div>#=kendo.toString(Appropriation,'c2')# </div>")
+            .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> </label><label> #=kendo.toString(sum, 'c2')#</label></div>");
+        col.Bound(c => c.Allotment)
+            .HeaderTemplate(@<text>Allotment</text>)
+            .Width(135)
+            .HtmlAttributes(new { style = "text-align:right;height:30px" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;height:30px;", @class = "metro-header" })
+            .ClientTemplate("<div>#=kendo.toString(Allotment,'c2')# </div>")
+            .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> </label><label> #=kendo.toString(sum, 'c2')#</label></div>");
+        col.Bound(c => c.Obligation)
+            .HeaderTemplate(@<text>Obligation</text>)
+            .Width(135)
+            .HtmlAttributes(new { style = "text-align:right;height:30px" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;height:30px;", @class = "metro-header" })
+            .ClientTemplate("<div>#=kendo.toString(Obligation,'c2')# </div>")
+            .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> </label><label> #=kendo.toString(sum, 'c2')#</label></div>");
+        col.Bound(c => c.Disbursed)
+            .HeaderTemplate(@<text>Disbursed</text>)
+            .Width(135)
+            .HtmlAttributes(new { style = "text-align:right;height:30px" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;height:30px;", @class = "metro-header" })
+            .ClientTemplate("<div>#=kendo.toString(Disbursed,'c2')# </div>")
+            .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> </label><label> #=kendo.toString(sum, 'c2')#</label></div>");
+         col.Bound(c => c.Accounted)
+            .HeaderTemplate(@<text>Accounted</text>)
+            .Width(135)
+            .HtmlAttributes(new { style = "text-align:right;height:30px" })
+            .HeaderHtmlAttributes(new { style = "text-align:center;height:30px;", @class = "metro-header" })
+            .ClientTemplate("<div>#=kendo.toString(Accounted,'c2')# </div>")
+            .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> </label><label> #=kendo.toString(sum, 'c2')#</label></div>");
+
+        })
+        .Pageable(pageable => pageable
+        .Refresh(true)
+        .ButtonCount(4))
+        .HtmlAttributes(new { @class = "table-responsive", style = "height:410px;width:750px; overflow-x:hidden;" })
+        .Selectable(selectable => selectable
+        .Mode(GridSelectionMode.Single)
+        .Type(GridSelectionType.Row))
+        //.Events(e => e.Change("GridClick"))
+        .DataSource(dataSource => dataSource
+        .Ajax()
+        .Batch(true)
+        .Model(m => m.Id(i => i.trnno))
+        .ServerOperation(false)
+        .Aggregates(a =>
+        {
+            a.Add(c => c.Appropriation).Sum();
+            a.Add(c => c.Allotment).Sum();
+            a.Add(c => c.Obligation).Sum();
+            a.Add(c => c.Disbursed).Sum();
+            a.Add(c => c.Accounted).Sum();
+        })
+            .PageSize(12)
+            .Read(read => read.Action("utilizationAccounted", "Report").Data("onData"))
+        )
+)
+</div>
+<style>
+    .parent-container {
+    overflow-y: scroll; 
+    width: 1000px;
+}
+    .chart-container {
+    overflow: auto; 
+    width: 2000px;
+}
+     .k-i {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        font-size: 64px;
+        background-color: rgba(255,255,255,.3);
+        color: #ff6757;
+      }
+</style>
+<script>
+    $(document).ready(function () {
+        //$("#accountedGrid").find("Office").hide()
+        //var grid = $("#accountedGrid").data("kendoGrid");
+        //grid.hide("Office");
+        // kendo.ui.progress($(".chart-loading"), true);
+        $("#offs").data("kendoComboBox").dataSource.read();
+        $("#PCUtilization").hide();
+        $("#accountedGrid").hide();
+        $("#searchAccountid").hide();
+        $("#utichart").hide()
+        $("#utichartchild").hide();
+        $("#bargraphlabel").hide();
+        $("#chartlegend").hide();
+
+    })
+    function getOfficeandAccounts() {
+        return {
+            officeaccounts: $("#byoffice").val() =="null"? 0:$("#byoffice").val(),
+            year: $("#ddlYear").val()
+        }
+    }
+    function onClickOffice() {
+        $("#accountedGrid").data("kendoGrid").dataSource.data([]);
+        if ($("#offs").val() != 0) {
+            if ($("#offs").val() != 0 && $("#offs").val() != 43 && $("#byaccount").val() == 0) {
+                var grid = $("#accountedGrid").data("kendoGrid");
+                grid.hideColumn(grid.columns[1]);
+                grid.hideColumn(grid.columns[2]);
+                grid.showColumn(grid.columns[3]);
+            }
+            else if ($("#offs").val() != 0 && $("#offs").val() != 43 && $("#byaccount").val() != 0) {
+                var grid = $("#accountedGrid").data("kendoGrid");
+                grid.showColumn(grid.columns[1]);
+                grid.hideColumn(grid.columns[2]);
+                grid.hideColumn(grid.columns[3]);
+
+            } else {
+                var grid = $("#accountedGrid").data("kendoGrid");
+                grid.hideColumn(grid.columns[1]);
+                grid.showColumn(grid.columns[2]);
+                grid.showColumn(grid.columns[3]);
+            }
+            $("#accountedGrid").data("kendoGrid").dataSource.read();
+            $("#PCUtilization").data("kendoChart").dataSource.read();
+        }
+        else {
+            $("#PCUtilization").hide();
+        }
+    }
+    function reqPrint() {
+        //var OfficeID = $("#offs").val();
+        //var Disyear = $("#ddlYear").val();
+        //var Dismonth = $("#Months").val();
+        //var type_pgo = $("#type_pgo").val();
+
+        //$.ajax({
+        //    async: false,
+        //    dataType: 'html',
+        //    success: window.open("../Reports/ReportViewer.aspx?rid=28&Disyear=" + Disyear + "&Dismonth=" + Dismonth + "&OfficeID=" + OfficeID + "&type_pgo=" + type_pgo + "")
+        //});
+        $("#accountedGrid").data("kendoGrid").dataSource.read();
+        // $("#cafgrid").data("kendoGrid").dataSource.read();
+
+    }
+    //function GridClick() {
+        
+    //    var entityGrid = $("#accountedGrid").data("kendoGrid");
+    //    var selectedItem = entityGrid.dataItem(entityGrid.select());
+    //    alert(selectedItem.AccountName)
+    //    //$("#Office").data("kendoComboBox").value(selectedItem.grOffice);
+    //    //$("#OfficeID").val(selectedItem.grOffice)
+
+    //    dfrdGridClickSetGenInfo.resolve();
+    //    return dfrdGridClickSetGenInfo.promise();
+    //}
+
+    function searchAccount() {
+        var $filter = new Array();
+        $filter = [];
+
+        if ($('#SearchData').val().length > 0) {
+            $filter.push({ field: "AccountName", operator: "contains", value: $('#SearchData').val() });
+        }
+
+        $('#accountedGrid').data('kendoGrid').dataSource.filter({
+            logic: "or",
+            filters: $filter
+        });
+
+    }
+    function byofficeclick() {
+        document.getElementById("byoffice").value = "1";
+        document.getElementById("byaccount").value = "0";
+        document.getElementById("byoffice").checked = true;
+        document.getElementById("byaccount").checked = false;
+        document.getElementById("officelabel").innerHTML = "Office     :"
+        document.getElementById("officelabel").style = "float: left; margin-left: .5px; margin-top: -2px;"
+
+        var comboBox = $("#offs").data("kendoComboBox");
+        $(comboBox.input).attr('placeholder', '--Select office--');
+        $("#offs").data("kendoComboBox").value("");
+        $("#offs").data("kendoComboBox").dataSource.read();
+      
+    }
+    function byaccountclick() {
+        document.getElementById("byoffice").value = "0";
+        document.getElementById("byaccount").value = "1";
+        document.getElementById("byoffice").checked = false;
+        document.getElementById("byaccount").checked = true;
+        document.getElementById("officelabel").innerHTML = "Account     :"
+        document.getElementById("officelabel").style = "float: left; margin-left: -16px; margin-top: -2px;"
+        $("#offs").data("kendoComboBox").value("");
+
+        var comboBox = $("#offs").data("kendoComboBox");
+        $(comboBox.input).attr('placeholder', '--Select account--');
+        $("#offs").data("kendoComboBox").dataSource.read();
+
+    }
+    function viewgridview() {
+        if (document.getElementById('viewgv').checked) {
+            $("#accountedGrid").show();
+            $("#searchAccountid").show();
+        }
+        else {
+            $("#accountedGrid").hide();
+            $("#searchAccountid").hide();
+        }
+    }
+    function viewbargraph() {
+        if (document.getElementById('viewbg').checked) {
+            $("#PCUtilization").show();
+            $("#utichart").show()
+            $("#bargraphlabel").show();
+            $("#chartlegend").show();
+            $("#utichartchild").show();
+            
+        }
+        else {
+            $("#PCUtilization").hide();
+            $("#utichart").hide()
+            $("#bargraphlabel").hide();
+            $("#chartlegend").hide();
+        } 
+    }
+    function reloadSAAODA() {
+        var year = $("#ddlYear").val()
+        var month = $("#Months").val()
+        var office = $("#offs").val()
+        var byaccount = $("#byaccount").val()
+        if ($("#offs").val() <= 0) {
+            swal("", "Please select office or account!", "warning")
+        }
+        else {
+            
+            swal({
+                title: "",
+                text: "This will take several minutes! Do you want to proceed?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                closeOnConfirm: true
+            }, function () {
+                url = "@Url.Action("ReloadSAAODA","Report")"
+                $.get(url, { year: year, month: month, office: office, byaccount: byaccount }, function (d) {
+                    //alert(d)
+                    onClickOffice()
+                })
+            });
+        }
+    }
+</script>

@@ -1,0 +1,29 @@
+﻿<script>
+    function RefreshGrid() {
+        var SelectedTabIndex = $("#ProposedPositionTab").data("kendoTabStrip").select().index();
+
+        if (SelectedTabIndex == 0) {        
+            $("#grProposedPositionList").data("kendoGrid").dataSource.read();
+        }
+        else if (SelectedTabIndex == 1) {
+            $("#grProposedPositionListVerified").data("kendoGrid").dataSource.read();
+        }
+        
+    }
+</script>
+<div class="demo-section k-content">
+    @(Html.Kendo().TabStrip()
+          .Name("ProposedPositionTab")
+          .Navigatable(false)
+          .Animation(animation =>
+              animation.Open(effect =>
+              effect.Fade(FadeDirection.In)))
+          .Items(tabstrip =>
+          {
+              tabstrip.Add().Text("For Verification").Selected(true).LoadContentFrom("ShowUnverifiedPosition", "Home");
+              tabstrip.Add().Text("Verified").LoadContentFrom("ShowVerifiedPosition", "Home");
+          })
+         .Events(e => e.Activate("RefreshGrid"))
+
+    )
+</div>

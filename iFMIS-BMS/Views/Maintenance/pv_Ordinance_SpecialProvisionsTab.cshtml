@@ -1,0 +1,145 @@
+﻿<script>
+    function AddSpecialProvision() {
+        var url = "@Url.Action("AddSpecialProvisionWindow", "Maintenance")";
+        $.post(url, function (d) {
+            $(window).scrollTop(0);
+            $('#NewSpecialProvisionWindow').html(d);
+            $('#NewSpecialProvisionWindow').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Add Special Provision").center().open();
+        })
+
+    }
+    function ResizeSpecialProvisionDIV() {
+        var gridname = 'Grid_SpecialProvisionDIV';
+        if (document.getElementById("SpecialProvisionDIVIndicator").value == 0) {
+            MaximizeDIV(gridname);
+            document.getElementById("SpecialProvisionDIVIndicator").value = 1
+            $('#grSpecialProvisionList').css("height", "550px");
+            $("#grSpecialProvisionList").data("kendoGrid").dataSource.read();
+        }
+        else {
+            MinimizeDIV(gridname)
+            document.getElementById("SpecialProvisionDIVIndicator").value = 0
+            $('#grSpecialProvisionList').css("height", "300px");
+            $("#grSpecialProvisionList").data("kendoGrid").dataSource.read();
+        }
+    }
+    function reqEditSpecialProvision(SeriesID) {
+        var url = "@Url.Action("EditSpecialProvisionWindow", "Maintenance")";
+        $.post(url, { SeriesID: SeriesID }, function (d) {
+            $(window).scrollTop(0);
+            $('#NewSpecialProvisionWindow').html(d);
+            $('#NewSpecialProvisionWindow').data('kendoWindow').title("<i class='fa fa-navicon'> </i> Add Special Provision").center().open();
+        })
+    }
+    function reqRemoveSpecialProvision(SeriesID) {
+        swal({
+            title: "Are you sure?",
+            text: "This Action Will Remove The Selected Special Provision.",
+            type: "info",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes!",
+            closeOnConfirm: false
+        }, function () {
+            var url = "@Url.Action("RemoveSpecialProvision", "Maintenance")";
+            $.post(url, { SeriesID: SeriesID }, function (d) {
+                if (d == 1) {
+                    swal({
+                        title: "Success!",
+                        text: "Special Provision Succesffuly Removed!",
+                        type: "success",
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    $("#grSpecialProvisionList").data("kendoGrid").dataSource.read();
+                }
+                else {
+                    swal({
+                        title: "Something went wrong!",
+                        text: d,
+                        type: "error",
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                }
+            })
+        });
+    }
+</script>
+
+<div id="Grid_SpecialProvisionDIV">
+    <input type="hidden" value="0" id="SpecialProvisionDIVIndicator" />
+    <div style="border: outset;clear:both;border-width:1px;border-color:#1fa67a; width: 100%; padding-left:0px;padding-right:0px;padding-top:0px;padding-bottom:7px;margin-top: 10px;">
+        <div style=" width: 91.5%;height: 100%; border-right: 0px solid #333333; border-bottom: 37px solid #333333; border-left: 65px solid #333333;margin-top: -1px; ">
+            <div style="float: left; width: 100%; margin-top:1px;margin-bottom:-97px;margin-left:-33px; height: 0; border-left: 35px solid #333333; border-bottom: 36px solid #1fa67a; ">
+
+                <div style="float: left; height:28px; margin-left:-59px; margin-top: 5px;">
+                    <i class="fa fa-tasks fa-2x fg-white"> <span>Special Provisions</span></i>
+                </div>
+                <div style="float:right">
+                    <div style="float:right;margin-right:6px;margin-top:5px;">
+                        <button class="k-button k-button-icontext" onclick="ResizeSpecialProvisionDIV()"> <i class="fa fa-arrows-alt"></i> </button>
+                        <button class="k-button k-button-icontext" onclick="AddSpecialProvision()"> <i class="fa fa-plus-circle"></i> Add Special Provision </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.Maintenance.OrdinanceSpecialProvisionsModel>()
+                .Name("grSpecialProvisionList")
+                .Columns(columns =>
+                {
+                    columns.Bound(c => c.SeriesID).Hidden();
+                    columns.Bound(c => c.OfficeName).Hidden()
+                        .ClientGroupHeaderTemplate("<div style='display:inline-block'>#= value #</div>");
+                    columns.Bound(c => c.OrderNo).Title("No. ").Width(30)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+                    columns.Bound(c => c.Description).Title("Description").Width(250)
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" });
+                    columns.Template(t => { }).ClientTemplate("# if(SeriesID == 0) { #" +
+                                               "" +
+                                               "# } else { #" +
+                                               "<div class='k-button' onclick='reqEditSpecialProvision(#=SeriesID#)' style='inline-block' title='Edit Item (?)'> <span class='fa fa-edit'></span> Edit</div>" +
+                                               "<div class='k-button' onclick='reqRemoveSpecialProvision(#=SeriesID#)' style='inline-block' title='Remove Item'> <span class='fa fa-times'></span>Remove</div>" +
+                                               "# }#"
+                        ).Width(100);
+                    columns.Bound(c => c.OfficeOrder).Hidden();
+                })
+                .HtmlAttributes(new { style = "height: 300px;" })
+                .Scrollable(s => s.Enabled(true))
+                .Selectable()
+                .DataSource(dataSource => dataSource
+                    .Ajax()
+                    .Sort(a =>
+                        {
+                            a.Add("OfficeOrder").Ascending();
+                            a.Add("OrderNo").Ascending();
+                        })
+                    .Batch(true)
+                    .ServerOperation(false)
+                    .Aggregates(a => a.Add(c => c.OfficeName))
+                    .Read(read => read.Action("ReadOrdinanceSpecialProvisions", "Maintenance"))
+                    .Group(g=> g.Add(c => c.OfficeName))
+                )
+        )
+    </div>
+</div>
+
+@(Html.Kendo().Window()
+    .Name("NewSpecialProvisionWindow")
+    .Title("Add New Special Provision")
+    .Width(530)
+    .Height(320)
+    .Visible(false)
+    .Modal(true)
+    .Draggable(true)
+    .AutoFocus(true)
+    .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        }).Actions(a => { a.Close(); })
+)

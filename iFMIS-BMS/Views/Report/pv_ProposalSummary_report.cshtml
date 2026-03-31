@@ -1,0 +1,174 @@
+﻿<script>
+    var thisculture = kendo.culture();
+    thisculture.numberFormat.currency.symbol = '';
+    function getparitem() {
+        return {
+            tyear: '@Session["tyear"]'
+        }
+    }
+    function SearchAccount_click() {
+        var $filter = new Array();
+        $filter = [];
+
+        if ($('#SearchAssessment').val().length > 0) {
+            $filter.push({ field: "office", operator: "contains", value: $('#SearchAssessment').val() }),
+            $filter.push({ field: "accountname", operator: "contains", value: $('#SearchAssessment').val() }),
+            $filter.push({ field: "itemname", operator: "contains", value: $('#SearchAssessment').val() })
+        }
+
+        $('#grid_proposalict').data('kendoGrid').dataSource.filter({
+            logic: "or",
+            filters: $filter
+        });
+
+    }
+
+    $(function () {
+        $("#SearchAssessment").keypress(function (e) {
+            if (e.keyCode == 13) {
+                SearchAccount_click();
+            }
+        });
+    });
+
+    function onDataBoundPerItem(e) {
+        //$(".k-hierarchy-cell").hide();
+        //$(".k-hierarchy-col").hide();
+        var grid = $("#grid_proposalict").data("kendoGrid")
+        var ds = grid.dataSource.view();
+        var rows = e.sender.tbody.children();
+        var isassessed = 0;
+        for (var i = 0; i < ds.length; i++) {
+            isassessed = ds[i].isassessed;
+
+            var row = $(rows[i]);
+            if (isassessed == 1) {
+                row.addClass("ChangeBackColor");
+            }
+        }
+    }
+</script>
+<div id="searchAccountid" style="height: 20px; margin-top: 5px; float: right;">
+    <input type="text" style="width:372px;border-collapse:collapse;margin:0px;border-style:solid;margin-left:0px;height:100%;outline:none;font-family:'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;float:left;" placeholder="Search..." id="SearchAssessment" name="SearchAssessment">
+    <div class="k-button k-button-icontext" style="height:30px;width:40px;border-style:solid;" onclick="SearchAccount_click()"><span class="mif-search"></span></div>
+</div>
+<div style="display:inline-block;margin-top:10px">
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.WFPrepare>()
+        .Name("grid_proposalict")
+        .HtmlAttributes(new { style = "" })
+        .Scrollable()
+        .Columns(col =>
+        {
+        col.Bound(c => c.office)
+        .HeaderTemplate(@<text>Office</text>)
+        .Width(70)
+        .HtmlAttributes(new { style = "text-align:left;vertical-align:top;;font-size:12px" })
+        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:15px;background-color:#ff6a00;font-size:14px;color:beige;" })
+        .ClientTemplate("<div>#=office# </div>");
+
+         col.Bound(c => c.accountname)
+        .HeaderTemplate(@<text>Account</text>)
+        .Width(135)
+        .HtmlAttributes(new { style = "text-align:left;vertical-align:top;font-size:12px" })
+        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:15px;background-color:#ff6a00;font-size:14px;color:beige;" })
+        .ClientTemplate("<div>#=accountname# </div>")
+        .ClientFooterTemplate("<div style='text-align:center;color:darkgreen;font-size:10px'><label> </label><label> Total</label></div>");
+
+        col.Bound(c => c.itemname)
+        .HeaderTemplate(@<text>Item Name</text>)
+        .Width(300)
+        .HtmlAttributes(new { style = "text-align:top;font-size:12px" })
+        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:15px;background-color:#ff6a00;font-size:14px;color:beige;" })
+        .ClientTemplate("<div>#=itemname# </div>");
+
+        col.Bound(c => c.qty2)
+        .HeaderTemplate(@<text>Qty <br>(Proposed)</text>)
+        .Width(80)
+        .HtmlAttributes(new { style = "text-align:center;vertical-align:top;font-size:12px" })
+        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:15px;background-color:#ff6a00;font-size:14px;color:beige;" })
+        .ClientTemplate("<div>#=qty2# </div>");
+
+        col.Bound(c => c.qty)
+        .HeaderTemplate(@<text>Qty<br />(Assessed)</text>)
+        .Width(80)
+        .HtmlAttributes(new { style = "text-align:center;vertical-align:top;font-size:12px" })
+        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:15px;background-color:#ff6a00;font-size:14px;color:beige;" })
+        .ClientTemplate("<div>#=qty# </div>");
+
+
+        //col.Template(@<text></text>)
+        col.Bound(x=> x.proposeamount)
+        .HeaderTemplate(@<text>Proposed <br />Amount</text>)
+        .Width(100)
+        .HtmlAttributes(new { style = "text-align:right;vertical-align:top;" })
+        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:15px;background-color:#ff6a00;font-size:14px;color:beige;" })
+        @*.HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal"})*@
+        .ClientTemplate("<div>#=kendo.toString(proposeamount,'c2')# </div>")
+        .ClientFooterTemplate("<div style='text-align:right;color:darkgreen;font-size:10px'><label> </label><label> ₱#=kendo.toString(sum, 'c2')#</label></div>");
+
+        //col.Template(@<text></text>)
+        
+        col.Bound(c => c.amount)
+        .HeaderTemplate(@<text> Amount Per <br /> Item</text>)
+        .Width(100)
+        .HtmlAttributes(new { style = "text-align:right;vertical-align:top;font-size:12px" })
+        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:15px;background-color:#ff6a00;font-size:14px;color:beige;" })
+        .ClientTemplate("<div>#=kendo.toString(amount,'c2')# </div>")
+        .ClientFooterTemplate("<div style='text-align:right;color:darkgreen;font-size:10px'><label> </label><label> ₱#=kendo.toString(sum, 'c2')#</label></div>");
+
+        col.Bound(x=> x.slashamount)
+        .HeaderTemplate(@<text>Total Assessed <br />Amount</text>)
+        .Width(120)
+        .HtmlAttributes(new { style = "text-align:right;vertical-align:top;" })
+        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:15px;background-color:#ff6a00;font-size:14px;color:beige;" })
+        @*.HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal"})*@
+        .ClientTemplate("<div>#=kendo.toString(slashamount,'c2')# </div>")
+        .ClientFooterTemplate("<div style='text-align:right;color:darkgreen;font-size:10px'><label> </label><label> ₱#=kendo.toString(sum, 'c2')#</label></div>");
+
+         col.Bound(x=> x.diffamount)
+        .HeaderTemplate(@<text>Difference</text>)
+        .Width(110)
+        .HtmlAttributes(new { style = "text-align:right;vertical-align:top;" })
+        .HeaderHtmlAttributes(new { style = "text-align:center;vertical-align:middle;height:15px;background-color:#ff6a00;font-size:14px;color:beige;" })
+        @*.HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal"})*@
+        .ClientTemplate("<div>#=kendo.toString(diffamount,'c2')# </div>")
+        .ClientFooterTemplate("<div style='text-align:right;color:darkgreen;font-size:10px'><label> </label><label> ₱#=kendo.toString(sum, 'c2')#</label></div>");
+        })
+
+        //.Editable(editable => editable.Mode(GridEditMode.InCell))
+        .Resizable(e => e.Columns(true))
+        .Pageable(pageable => pageable
+        .Refresh(true)
+        .ButtonCount(5))
+        .HtmlAttributes(new { @class = "table-responsive", style = "height:580px;" })
+        .Selectable()
+         .Events(e => e.DataBound("onDataBoundPerItem"))
+        .DataSource(dataSource => dataSource
+        .Ajax()
+        .Batch(true)
+        .Model(m => m.Id(i => i.itemid))
+        .ServerOperation(false)
+         .Aggregates(a =>
+            {
+                a.Add(c => c.proposeamount).Sum();
+                a.Add(c => c.slashamount).Sum();
+                a.Add(c => c.amount).Sum();
+                a.Add(c => c.diffamount).Sum();
+            })
+        .PageSize(10000)
+        .Read(read => read.Action("Getictsummary", "Report").Data("getparitem"))
+        )
+    )
+</div>
+<div style="background-color:#54625E;margin-top:0px;padding-top:5px;padding-bottom:5px;float:left;">
+    <span style="font-weight:bold;color:white;margin-left:5px">Note: </span> <span style="color:yellow;margin-right:10px"> The amount with a difference is highlighted in YELLOW color.</span>
+</div>
+<style>
+    .ChangeBackColor {
+        background-color: #FFFF80;
+    }
+
+    .ChangeBackColor_child {
+        background-color: cyan;
+    }
+</style>

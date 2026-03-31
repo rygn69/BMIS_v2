@@ -1,0 +1,343 @@
+﻿<script>
+    
+
+    //function covert_empty(str) {
+    //    str = str.toString().replace(/,/g, "");
+    //    parseInt(str, 20);
+    //    return str;
+    //}
+
+    function OnSelectPosition(){
+        var position=$("#position").val()
+        var proyear= $("#ddlYear").val()
+        var url="@Url.Action("getsalarybyposition", "Home")"
+        $.get(url, { position: position,proyear:proyear }, function (d) {
+            $("#monsalary").val(d)
+            newdatesel()
+        });
+    }
+    function fn_Program(){
+        return{
+            programid:'@Session["ProgramID"]',
+            accountid:'@Session["AccountID"]',
+            yearof:'@Session["proyear"]'
+        }
+    }
+    function EditJOCOS(id,positionid,Salary,appointmentdate,programid,accountid){
+        
+        $("#monsalary_origamount").val(Salary)
+        $("#monsalary").val(Salary)
+        $("#position").data("kendoComboBox").value(positionid)
+        $("#datepicker").data("kendoDatePicker").value(appointmentdate)
+        $("#id_temp").val(id)
+
+        var monsalary = Number($("#monsalary").val())
+        var monselected= 13 - Number($("#datepicker").data("kendoDatePicker").value().getMonth() + 1);
+        var totalSalaryEdit= parseFloat(Number(monselected) * Number(Salary)).toFixed(2)
+        var propbal=Number(totalSalaryEdit)
+
+        $("#month_orig").val(monselected)
+        $("#totsalary").val(coma_sepa(propbal))
+        $("#totsalary_temp").val(propbal)
+
+        newdatesel()
+        document.getElementById("btnSave").innerHTML = '<span class="fa fa-edit"></span> Update'
+        
+    }
+    function DeleteJOCOS(id){
+        var url="@Url.Action("RemoveBreakdown", "Home")"
+        swal({
+            title: "Confirmation!",
+            text: "Do you want to remove this particular denomination?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes",
+            closeOnConfirm: false
+        }, function () {
+            $.get(url, {id:id }, function (d) {
+            
+                if (d="success"){
+                    swal("","Denomination successfully removed.","success")
+                    $("#grd_PlantillaSched").data("kendoGrid").dataSource.read()
+                    totalamountdenom()
+                    btnClear()
+                }
+                else{
+                    swal("Error",d,"error")
+                }
+            })
+        });
+       
+    }
+    function totalamountdenom(){
+        var url="@Url.Action("TotalBreakdown", "Home")"
+        $.get(url, {proyear:@Session["proyear"],programid:@Session["ProgramID"],accountid:@Session["AccountID"] }, function (d) {
+            $("#monsalary_totalamount").val(d)
+        })
+    }
+    function newdatesel(){
+        var status=$("#id_temp").val()
+        var noOfPosition=$("#noOfPosition").val();
+
+        if (status == 0){ //New Entry
+            var monsalary = Number($("#monsalary").val())
+            var monselected= 13 - Number($("#datepicker").data("kendoDatePicker").value().getMonth()+1);
+            var bal1 = parseFloat((Number(monsalary) * Number(monselected)) * Number(noOfPosition)).toFixed(2)
+            $("#totsalary").val(coma_sepa(bal1))
+            var propbal=parseFloat(Number($("#proposedamount").val()) -(Number($("#monsalary_totalamount").val())+ Number(bal1))).toFixed(2)
+            $("#probal").val(coma_sepa(propbal))
+            $("#probal_temp").val(propbal)
+        }
+        else{ //update entry
+            var monsalary_orig= $("#monsalary_origamount").val()
+            var monselected_orig= $("#month_orig").val()
+            var salarytotal_orig= parseFloat(Number(monsalary_orig) * Number(monselected_orig)).toFixed(2)
+            var monsalarytotalamount=parseFloat(Number($("#monsalary_totalamount").val()) - Number(salarytotal_orig)).toFixed(2)
+
+            var monsalary = Number($("#monsalary").val())
+            var monselected= 13 - Number($("#datepicker").data("kendoDatePicker").value().getMonth()+1);
+            var bal1 = parseFloat((Number(monsalary) * Number(monselected)) * Number(noOfPosition)).toFixed(2)
+            var propbal=parseFloat(Number($("#proposedamount").val()) -(Number(monsalarytotalamount)+ Number(bal1))).toFixed(2)
+            
+            $("#totsalary").val(coma_sepa(bal1))
+
+            $("#probal").val(coma_sepa(propbal))
+            $("#probal_temp").val(propbal)
+        }
+    }
+    $(function(){
+        $("#monsalary").keyup(function (event) {
+            newdatesel()
+        });
+        $("#monsalary").on(function (event) {
+            newdatesel()
+        });
+    })
+    function sync(){
+        newdatesel()
+    }
+</script>
+<div>
+
+</div>
+<div>
+    @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.BudgetControlModel>()
+        .Name("grd_PlantillaSched")
+        .HtmlAttributes(new { style = "height:475px;width:850px" })
+        .Scrollable()
+    .Columns(col =>
+    {
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;">Position</div></text>)
+                        .Width(270)
+                        .HtmlAttributes(new { style = "text-align:left;height:30px" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div>#=posname# </div>")
+                        .ClientFooterTemplate("<div style='text-align:center;font-weight:bold'> TOTAL </div>");
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">SG</div></text>)
+                        .Width(30)
+                        .HtmlAttributes(new { style = "text-align:center;height:30px" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div>#=sg# </div>");
+        col.Bound(m => m.Salary)
+                        .HtmlAttributes(new { style = "font-weight:600;text-align:right; vertical-align: middle; overflow: visible; white-space: normal;" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Monthy <br /> Salary</div></text>    )
+                        .HeaderHtmlAttributes(new { style = "text-align:center" })
+                        .Width(100)
+                        .ClientTemplate("<div>#=kendo.toString(Salary,'c2')# </div>");
+                        //.ClientFooterTemplate("<div  style='text-align:right'><label> </label><label> #=kendo.toString(sum, 'c2')#</label></div>");
+        col.Bound(m => m.totalSalary)
+                        .HtmlAttributes(new { style = "font-weight:600;text-align:right; vertical-align: middle; overflow: visible; white-space: normal;" })
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Total <br /> Salary</div></text>    )
+                        .HeaderHtmlAttributes(new { style = "text-align:center" })
+                        .Width(100)
+                        .ClientTemplate("<div>#=kendo.toString(totalSalary,'c2')# </div>")
+                        .ClientFooterTemplate("<div  style='text-align:right'><label> </label><label> #=kendo.toString(sum, 'c2')#</label></div>");
+        col.Template(@<text></text>)
+                        .HeaderTemplate(@<text><div style="font-weight:600;text-align:center; vertical-align: middle; overflow: visible; white-space: normal;">Appointment Date</div></text>)
+                        .Width(90)
+                        .HtmlAttributes(new { style = "text-align:center;height:30px" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .ClientTemplate("<div>#=appointmentdate# </div>");
+        col.Template(t =>
+        {
+        }).ClientTemplate(
+                            "<div onclick='EditJOCOS(#=scheduleid#,#=positionid#,#=Salary#,\"#=appointmentdate#\",#=programidplantilla#,#=accountidplantilla#)' style='float:left;width:20px;background-color:cornflowerblue;color:white;text-align:center' title='Edit'> <span class='fa fa-pencil-square-o'></span> </div> " +
+                            "<div onclick='DeleteJOCOS(#=scheduleid#)' style='float:left;margin-top:-20px;margin-left:21px;width:20px;background-color:indianred;color:white;text-align:center' title ='Remove'> <span class='fa fa-trash-o'></span> </div>")
+                        .Width(50);
+        col.Bound(m => m.scheduleid).Title("ID").Hidden();
+        col.Bound(m => m.positionid).Title("Position ID").Hidden();
+        col.Bound(m => m.programidplantilla).Title("Program ID").Hidden();
+        col.Bound(m => m.accountidplantilla).Title("Account ID").Hidden();
+
+        //
+
+    })
+         .AutoBind(false)
+         .Pageable(page => page.Refresh(true)
+            .Enabled(true)
+            .ButtonCount(4)
+            .PreviousNext(true)
+         )
+         //    .ClientDetailTemplateId("template")
+         .Selectable()
+         //  .Events(e => e.DataBound("onDataBound"))
+         //  .Scrollable()
+
+         .DataSource(d => d
+         .Ajax()
+         .Batch(true)
+         .ServerOperation(false)
+          .Aggregates(a =>
+          {
+              a.Add(c => c.totalSalary).Sum();
+          })
+         .PageSize(8)
+         .Model(m => m.Id(i => i.scheduleid))
+         .Read(read => read.Action("Plantilla_JOS", "Home").Data("fn_Program"))
+         )
+)
+</div>
+<div style="margin-top:15px;">
+    <div style="display:inline-block">
+        No. of Position :
+    </div>
+    <div style="display:inline-block;margin-left:34px">
+        <input type="number" id="noOfPosition" min="1" value="1"  onkeyup="sync()" onclick="sync()"  style="width:50px;" />
+    </div>
+    <br />
+    <div style="display:inline-block;margin-top:15px">
+        Position :
+    </div>
+    <div style="display:inline-block;margin-left:74px">
+        @(Html.Kendo().ComboBox()
+            .Name("position")
+            .DataTextField("Pos_Name")
+            .DataValueField("PositionCode")
+            .Filter("contains")
+            .MinLength(1)
+            .Placeholder("Select position...")
+            // .OptionLabel("Select position...")
+            .HtmlAttributes(new { @style = "width: 450px;" })
+            .Events(e => e.Change("OnSelectPosition"))
+            .DataSource(source => source.Read(read => read.Action("getposition", "Home")))
+        )
+    </div>
+    <br />
+    <div style="display:inline-block;margin-top:15px;">
+         Monthly Salary :
+    </div>
+    <div style="display:inline-block;margin-left:32px;margin-top:0px">
+        <input type="number" id="monsalary" name="monsalary" min="0" value="0" onkeyup="sync()" onclick="sync()" style="width:130px;" />
+    </div>
+    <div style="display:inline-block;margin-top:15px;margin-left:54px">
+        Total Salary :
+    </div>
+    <div style="display:inline-block;margin-left:32px;margin-top:0px">
+        <input type="text" id="totsalary" min="0" value="0" readonly style="width:130px;" />
+        <span> (Monthly Salary * Appointment Date(Month))</span>
+    </div>
+    <br />
+    <div style="float:left;margin-top:10px;margin-left:0px;width:100px;">
+        Proposed Amount Bal. :
+    </div>
+    <div style="display:inline-block;margin-left:32px;margin-top:12px">
+        <input type="text" id="probal" min="0" value="0" readonly style="width:130px;" />
+    </div>
+    <br />
+    <div style="float:left;margin-top:18px;margin-left:-99px">
+        Appointment Date :
+    </div>
+    <div style="display:inline-block;margin-left:14.5px;margin-top:13px">
+        <input id="datepicker" title="datepicker" onchange="newdatesel()" style="width: 140.5px; float: left; margin-left: 0px;" />
+    </div>
+</div>
+<div id="btnSave" class="k-button k-button-icontext" style="bottom: 15px; right: 15px;width: 90px;float:left; margin-left:420px; margin-bottom:0px;margin-top:30px;border-radius: 50px;background-color:cornflowerblue;color:white" onclick="btnSave()"><span class="fa fa-save"></span> Save </div>
+<div id="btnClear"  class="k-button k-button-icontext" style="bottom: 15px; right: 15px;width: 90px;border-radius: 50px;display:inline-block;margin-left:-190px;margin-top:30px" onclick="btnClear()"><span></span> Clear </div>
+<div class="k-button k-button-icontext" style="bottom: 15px; right: 15px;margin-top:30px;margin-left:110px;width: 90px;float:left;border-radius: 50px;background-color:indianred;color:white" onclick="btnClose()"><span class="fa fa-close"></span> Close </div>
+<div style="display:none">
+    <input id="monsalary_origamount" type="number" value="0"/>
+    <input id="monsalary_totalamount" type="number" value="0" />
+    <input id="tmpdate" type="text" value=""/>
+    <input id="proposedamount" type="number" value="0"/>
+    <input id="id_temp" type="number" value="0" />
+    <input id="totsalary_temp" type="number" value="0" />
+    <input id="month_orig" type="number" value="0" />
+    <input id="probal_temp" type="number" value="0" />
+</div>
+<script>
+    $(document).ready(function () {
+        $("#datepicker").kendoDatePicker({
+            value: new Date(@Session["proyear"], 1, 0),
+                format: "MMM yyyy",
+                parseFormats: ["MMM yyyy"],
+                depth: "year",
+                start: "year"
+        });
+
+        $("#proposedamount").val(@Session["ProposalAmmount"])
+        $("#tmpdate").val($("#datepicker").val())
+        $("#grd_PlantillaSched").data("kendoGrid").dataSource.read()
+
+        totalamountdenom()
+    });
+
+    function btnSave() {
+
+        var progid= @Session["ProgramID"];
+        var accountid=@Session["AccountID"];
+        var propyear=@Session["proyear"];
+        var position = $("#position").val()
+        var monsalary = Number($("#monsalary").val())
+        var datepicker = $("#datepicker").val()
+        var noOfPosition=$("#noOfPosition").val()
+        var monselected= 13 - Number($("#datepicker").data("kendoDatePicker").value().getMonth()+1);
+        var bal1 = Number(monsalary) * Number(monselected)
+        var probal_temp=$("#probal_temp").val()
+        var status=$("#id_temp").val()
+
+        if (Number(probal_temp) < 0){
+            swal("WARNING","Please check your entry! The total salary amount denomination must not be greater than proposed amount.","warning")
+        }
+        else {
+   
+            if (position <= 0 || position == "" || monsalary <= 0 || noOfPosition <=0  || position.length > 6){
+                swal("","Please fill out all the fields!","warning")
+            }
+            else{
+             
+                var url = "@Url.Action("insertscheduledonom", "Home")"
+                $.get(url, { progid: progid, accountid: accountid, propyear: propyear, position: position, monsalary: monsalary, datepicker: datepicker,noOfPosition:noOfPosition,status:status }, function (d) {
+                    if (d == "success") {
+                        swal("","Transaction successfully saved!","success")
+                        $("#grd_PlantillaSched").data("kendoGrid").dataSource.read()
+                        btnClear()
+                        totalamountdenom()
+                    }
+                    else {
+                        swal("Error",d,"error")
+                    }
+                });
+            }
+        }
+    }
+    function btnClear(){
+        document.getElementById("btnSave").innerHTML = '<span class="fa fa-save"></span> Save'
+        $("#noOfPosition").val(1)
+        $("#position").data("kendoComboBox").value("")
+        $("#monsalary").val(0)
+        $("#datepicker").data("kendoDatePicker").value($("#tmpdate").val())
+        $("#monsalary_origamount").val(0)
+        $("#id_temp").val(0)
+        $("#totsalary").val(0)
+        $("#totsalary_temp").val(0)
+        $("#month_orig").val(0)
+        $("#probal").val(0)
+        $("#probal_temp").val(0)
+    }
+    function btnClose() {
+        $("#UpdatePlantillaWin").data("kendoWindow").close();
+    }
+</script>

@@ -1,0 +1,78 @@
+﻿<script>
+</script>
+<div style="display:inline-block;margin-top:10px">
+    <label>
+        Item Name :
+    </label>
+    <div style="float:left;margin-top:-27px;width:400px;margin-left:100px">
+       
+        @(Html.Kendo().ComboBox()
+            .Name("item")
+            .DataTextField("itemname")
+            .DataValueField("ppmpitem_id")
+            .AutoBind(true)
+            .Placeholder("Select Office...")
+            .Filter("contains")
+            .MinLength(3)
+            .Events(e => e.Change("fnOffice_sel"))
+            .SelectedIndex(-1)
+            .HtmlAttributes(new { style = "width:100%; height:100%", @class = "form-control autoselect" })
+            .DataSource(source =>
+            {
+                source.Read(read =>
+                {
+                    read.Action("GetWFitem", "Report");
+                })
+            .ServerFiltering(false);
+            })
+        )
+    </div>
+</div>
+
+<div>
+    <div id="btnclose" class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 100px;float:left; margin-top: 20px; margin-left:255px;border-radius:50px;background-color:indianred;color:white; margin-bottom:0px" onclick="reqClose_link()"><span class="fa fa-close"></span> Close</div>
+    <div id="btnPrintSubmitted" class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 100px;float:right; margin-top:20px; margin-right:40px;border-radius:50px;margin-bottom:0px;background-color:cornflowerblue;color:white" onclick="reqlinkitem()"><span class="fa fa-link"></span> Link</div>
+</div>
+<script>
+    function reqClose_link() {
+        $("#wfplink").data("kendoWindow").close()
+    }
+    function reqlinkitem() {
+        var office = @Session["office"]
+        var program= @Session["program"] ;
+        var account= @Session["account"];
+        var breakdownid = @Session["breakdownid"];
+        var tyear= @Session["tyear"];
+        var item=$("#item").val() ==""? 0 : $("#item").val() 
+        //alert(item)
+        if (item != 0)
+        {
+            swal({
+                title: "",
+                text: "This item will link to eProcurement System. Do you want to proceed?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: status,
+                closeOnConfirm: false,
+                showLoaderOnConfirm: true
+            },
+            function (isConfirm) {
+                if (isConfirm) {
+                    var url = "@Url.Action("linkitemeproc", "Report")";
+                    $.get(url, { officeid: office, programid: program, accountid: account, breakdownid: breakdownid, tyear: tyear,itemid:item }, function (e) {
+                        if (e == "success") {
+                            swal("Success", "Item has been linked!", "success");
+                            //$("#WFPPrepareGrid").data("kendoGrid").dataSource.read();
+                            fnaccount_sel()
+                            $("#wfplink").data("kendoWindow").close()
+
+                        } else {
+                            swal("Error", e, "error");
+                        }
+                    });
+                }
+            });
+        }
+    }
+</script>

@@ -1,0 +1,462 @@
+﻿@model iFMIS_BMS.BusinessLayer.Models.OfficesModel
+
+@{
+    ViewBag.Title = "Login";
+    Layout = "~/Views/Shared/_LogInLayout.cshtml";
+}
+
+<link href="~/Content/sweetalert-master/dist/sweetalert.css" rel="stylesheet" />
+<script src="~/Content/sweetalert-master/dist/sweetalert-dev.js"></script>
+<script src="~/Content/sweetalert-master/dist/sweetalert.min.js"></script>
+<script src="@Url.Content("~/Scripts/myJScripts.js")"></script>
+
+
+<style>
+    .small-box-login {
+        background-color: #1fa67a;
+        width: 20px;
+        height: 20px;
+        float: left;
+    }
+    .small-box-login1 {
+        background-color: #1fa67a;
+        width: 20px;
+        height: 20px;
+        float: left;
+    }
+    #log-wrapper {
+        height: 450px;
+        width: 360px;
+        margin: 60px auto;
+        background: #fff repeat;
+        font-family: 'Segoe UI Light_','Open Sans Light',Verdana,Arial,Helvetica,sans-serif;
+        border: 1px solid #ccc;
+        font-weight: normal;
+        font-style: normal;
+    }
+    #log-wrapper .log-header {
+            height: 90px;
+            width: 100%; 
+    }
+
+       /*.lfloat, .rfloat {
+        display: flex;
+    }
+
+    .small-box-login {
+        width: 100%;
+        height: 20px;
+        background-color: gray;
+        margin: 2px 0;
+    }*/
+        .lfloat, .rfloat {
+        display: flex;
+    }
+    .small-box-login {
+        width: 100%;
+        height: 20px;
+        margin: 2px 0;
+    }
+</style>
+    
+<script>
+
+    function createBoxes(containerId, widths, opacityGroups, color) {
+        let container = document.getElementById(containerId);
+        container.innerHTML = ""; // Clear previous boxes
+
+        widths.forEach((width, colIndex) => {
+            let column = document.createElement("div");
+            column.style.width = width + "px";
+
+            opacityGroups[colIndex].forEach(opacity => {
+                let box = document.createElement("div");
+                box.className = "small-box-login";
+                box.style.opacity = opacity;
+                box.style.backgroundColor = color; // Apply selected color
+                column.appendChild(box);
+            });
+
+            container.appendChild(column);
+        });
+    }
+
+    function updateColor() {
+        let selectedColor = document.getElementById("colorPicker").value;
+        createBoxes("leftContainer", leftWidths, leftOpacities, selectedColor);
+        createBoxes("rightContainer", rightWidths, rightOpacities, selectedColor);
+    }
+
+    let leftWidths = [20, 20, 20, 20, 20, 20];
+    let leftOpacities = [
+        [0.9, 0.3, 0.7, 0.1, 0.02, 0.05],
+        [0.8, 0.7, 0.5, 0.3, 0.05, 0.02],
+        [0.5, 0.9, 0.6, 0.02, 0.01, 0.02],
+        [0.7, 0.4, 0.5, 0.03, 0.02, 0.02],
+        [0.6, 0.2, 0.7, 0.03, 0.02, 0.05],
+        [0.1, 0.5, 0.1, 0.5, 0.03, 0.01]
+    ];
+
+    let rightWidths = [20, 20, 20, 20, 20, 20];
+    let rightOpacities = [
+        [0.03, 0.3, 0.5, 0.8],
+        [0.02, 0.4, 0.2, 0.6],
+        [0.01, 0.04, 0.5, 0.6],
+        [0.03, 0.01, 0.07, 0.8],
+        [0.01, 0.09, 0.05, 0.5],
+        [0.4, 0.03, 0.4, 0.08]
+    ];
+
+    // Initial load with default color
+    window.onload = () => updateColor();
+
+
+    function ResetColor() {
+        //$("#colorPicker").val("#b2752e");
+        var url = "@Url.Action("gettemplatecolor", "Login")";
+        $.post(url, function (e) {
+            //alert(e)
+            $("#colorPicker").val(e);
+            $("#loguserid").css("background-color", e); 
+            updateColor()
+        })
+    }
+
+</script>
+<div id="log-wrapper">
+    <div class="log-header">
+        <input style="display:none" type="color" id="colorPicker" value="#1fa67a">
+        @*<button onclick="updateColor()">Apply Color</button>*@
+        <div class="lfloat" id="leftContainer">
+            @*<div style="width:120px">
+                <div class="small-box-login" style="opacity:.9"></div>
+                <div class="small-box-login" style="opacity:.3"></div>
+                <div class="small-box-login" style="opacity:.7"></div>
+                <div class="small-box-login" style="opacity:.1"></div>
+                <div class="small-box-login" style="opacity:.02"></div>
+                <div class="small-box-login" style="opacity:.05"></div>
+            </div>
+            <div style="width:120px">
+                <div class="small-box-login" style="opacity:.8"></div>
+                <div class="small-box-login" style="opacity:.7"></div>
+                <div class="small-box-login" style="opacity:.5"></div>
+                <div class="small-box-login" style="opacity:.3"></div>
+                <div class="small-box-login" style="opacity:.05"></div>
+                <div class="small-box-login" style="opacity:.02"></div>
+
+            </div>
+            <div style="width:120px">
+                <div class="small-box-login" style="opacity:.5"></div>
+                <div class="small-box-login" style="opacity:.9"></div>
+                <div class="small-box-login" style="opacity:.6"></div>
+                <div class="small-box-login" style="opacity:.02"></div>
+                <div class="small-box-login" style="opacity:.01"></div>
+                <div class="small-box-login" style="opacity:.02"></div>
+            </div>
+            <div style="width:120px">
+                <div class="small-box-login" style="opacity:.7"></div>
+                <div class="small-box-login" style="opacity:.4"></div>
+                <div class="small-box-login" style="opacity:.5"></div>
+                <div class="small-box-login" style="opacity:.03"></div>
+                <div class="small-box-login" style="opacity:.02"></div>
+                <div class="small-box-login" style="opacity:.02"></div>
+            </div>
+            <div style="width:120px">
+                <div class="small-box-login" style="opacity:.6"></div>
+                <div class="small-box-login" style="opacity:.2"></div>
+                <div class="small-box-login" style="opacity:.7"></div>
+                <div class="small-box-login" style="opacity:.03"></div>
+                <div class="small-box-login" style="opacity:.02"></div>
+                <div class="small-box-login" style="opacity:.05"></div>
+            </div>
+            <div style="width:120px">
+                <div class="small-box-login" style="opacity:.1"></div>
+                <div class="small-box-login" style="opacity:.5"></div>
+                <div class="small-box-login" style="opacity:.1"></div>
+                <div class="small-box-login" style="opacity:.5"></div>
+                <div class="small-box-login" style="opacity:.03"></div>
+                <div class="small-box-login" style="opacity:.01"></div>
+            </div>*@
+        </div>
+        <div class="rfloat" id="rightContainer">
+            @*<div style="width:80px">
+                <div class="small-box-login" style="opacity:.03"></div>
+                <div class="small-box-login" style="opacity:.3"></div>
+                <div class="small-box-login" style="opacity:.5"></div>
+                <div class="small-box-login" style="opacity:.8"></div>
+            </div>
+            <div style="width:80px">
+                <div class="small-box-login" style="opacity:.02"></div>
+                <div class="small-box-login" style="opacity:.4"></div>
+                <div class="small-box-login" style="opacity:.2"></div>
+                <div class="small-box-login" style="opacity:.6"></div>
+            </div>
+            <div style="width:80px">
+                <div class="small-box-login" style="opacity:.01"></div>
+                <div class="small-box-login" style="opacity:.04"></div>
+                <div class="small-box-login" style="opacity:.5"></div>
+                <div class="small-box-login" style="opacity:.6"></div>
+            </div>
+            <div style="width:80px">
+                <div class="small-box-login" style="opacity:.03"></div>
+                <div class="small-box-login" style="opacity:.01"></div>
+                <div class="small-box-login" style="opacity:.07"></div>
+                <div class="small-box-login" style="opacity:.8"></div>
+            </div>
+            <div style="width:80px">
+                <div class="small-box-login" style="opacity:.01"></div>
+                <div class="small-box-login" style="opacity:.09"></div>
+                <div class="small-box-login" style="opacity:.05"></div>
+                <div class="small-box-login" style="opacity:.5"></div>
+            </div>
+            <div style="width:80px">
+                <div class="small-box-login" style="opacity:.4"></div>
+                <div class="small-box-login" style="opacity:.03"></div>
+                <div class="small-box-login" style="opacity:.4"></div>
+                <div class="small-box-login" style="opacity:.08"></div>
+            </div>*@
+        </div>
+        <div style="position:absolute;">
+            <img style="float:left;margin-left:3px;margin-top:2px; width:70px;height:70px;" id="lgu_logo" src="~/images/PGAS_LOGO2026.png">
+            @*<img style="float:left;margin-left:3px;margin-top:2px; width:70px;height:70px;" id="lgu_logo" src="~/Images/tacurong.png">*@
+            @*<img style="float:left;margin-left:3px;margin-top:2px; width:70px;height:70px;" id="lgu_logo" src="~/Images/PPC2.png">*@
+            @*<img style="float:left;margin-left:3px;margin-top:2px; width:70px;height:70px;" id="lgu_logo" src="~/Images/pgzn_logo2.png">*@
+            <div class="main-Abbr font-stroke" style="margin:-10px 0 0 120px;font-size:56px; ">iFMIS@*@ThemeSelector.Base.themeSelector.THEME.webAppsAbbr*@
+           </div>
+            @*<img style="height:60px;width:60px;position:relative;margin-left:10px;" src="@Url.Content("~/Images/login-header.png")" alt=" find" /></div>*@
+            <div class="main-Title font-stroke" style="margin:-5px 0 35px 25px;font-size:20px;z-index:-1;  ">Integrated Financial Management Information System@*@ThemeSelector.Base.themeSelector.THEME.webAppsName*@</div>
+        </div>
+
+    </div>
+   
+    <div class="log-panel bg-darker" style="height:30px"></div>
+    <div class="log-panel font-stroke fg-white " id="loguserid" style="font-size:20px;height:40px; font-weight:100;line-height:2.0; text-align:center;background-color:#1fa67a;"><span style="margin-left:-120px">Login using HRIS account</span></div>
+    @*1fa67a*@
+    <div class="log-page-content">
+        @*<div class="page-block aleft" style="width:340px; font-size:14px; margin-left:21px; margin-top:-15px">
+            <span style="font-weight:bold">NOTE:</span> <span style="background-color:red;color:white"> Username is case sensitive.</span> 
+        </div>*@
+        <div class="page-block acenter">
+            <div class="input-control text" style="width:320px">
+                <input id="username" class="autoselect" type="text" placeholder="Username" autocomplete="off"/>
+            </div>
+        </div>
+        <div class="page-block acenter"  style="margin-top:5px">
+            <div class="input-control password" style="width:320px">
+                <input id="pwd" class="autoselect" type="password" placeholder="Password" autocomplete="off" />
+                <button class="btn-reveal" onmousedown="RevealPassword()" onmouseup="HidePassword()"></button>
+            </div>
+        </div>
+        <div id="ButtonID" class="page-block aright" style="width:345px; margin-bottom:-25px; visibility:visible;margin-top:5px">
+            
+            <button class="k-button" onclick="checkParameter()"> Login <i class="icon-arrow-right-3"></i></button>
+            
+        </div>
+        <div id="DropDown"  style="width:345px; margin-bottom:-10px;margin-left:20px ; visibility:hidden;margin-top:1px">
+            @Html.HiddenFor(m => m.UserTypeID)
+            @(Html.Kendo().ComboBox()
+                        .Name("ddlOffices")
+                         .DataTextField("OfficeName")
+                         .DataValueField("OfficeID")
+                         .Filter("contains")
+                         .MinLength(1)
+                        .Placeholder("Select User Type...")
+                        .HtmlAttributes(new { @style ="width: 330px;" })
+                       .AutoBind(false)
+                       .DataSource(source => source.Read(read => read.Action("ddlOfficeOF", "LogIn").Data("getEID")))
+                       
+            )
+            <div style="width:345px; margin-bottom:0px;margin-left:230px;margin-top:5px">
+                <button class="k-button" onclick="sendOffice()"> Login <i class="icon-arrow-right-3"></i></button>
+            </div>
+        </div>
+
+        @*<div class="page-block aleft" style="width:340px; font-size:20px; margin-left:20px;margin-top:20px">
+            Contact Us : 
+        </div>
+        <div class="page-block aleft" style="width:340px; font-size:12px; margin-left:20px;">
+            Local LANDLINE : 310 <br />
+            MOBILE : 09489424477(Smart)
+        </div>*@
+        <label> </label>
+        
+
+        </div>
+    <div class="log-footer">
+        <div class="page-block acenter" style="margin-top:10px">
+            <span>Copyright © 2017 - 2025. All Rights Reserved. </span>
+            <span id="loginfooter" style="display:block">Province of Agusan del Sur</span>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+
+        ResetColor();
+      
+        //setTimeout(ResetColor, 200);
+
+        var url = "@Url.Action("loginfooteraddress", "LogIn")";
+        $.post(url, function (e) {
+            document.getElementById("loginfooter").innerHTML = e.lgu;
+            //$('#lgu_logo').attr(src, 'new-image.jpg');
+            //$('#lgu_logo').attr("~/Images/pgzn_logo.png", 'new-image.jpg');
+        
+        })
+        $("#username").focus()
+
+       
+        
+    })
+
+    
+    
+    var eids = "";
+    function getEID() {
+
+        return {
+            eid : eids
+        }
+    }
+
+    function sentEmail()
+    {
+
+        var username =  $('#username').val()
+        if (username.length > 0) {
+
+        }
+        else {
+            alert('please specify username')
+        }
+    }
+    document.getElementById('username').onkeydown = function (event) {
+        if (event.keyCode == 13) {
+            if ($("#pwd").val() == "") {
+                $("#pwd").focus()
+            }
+            else {
+                checkParameter();
+            }
+        }
+    }
+    document.getElementById('pwd').onkeydown = function (event) {
+        if (event.keyCode == 13) {
+            checkParameter();
+        }
+    }
+    function sendOffice() {
+
+        var userID = $("#userID").val()
+        var OfficeID = $('#ddlOffices').data('kendoComboBox');
+        var extDomain = "pgas.ph"
+        //var extDomain = "cgpp.gov.ph"
+        //var extDomain = "tacurong.gov.ph"
+        //var extDomain = "pgzn.ph"
+        var email = $('#username').val().toLowerCase();
+        var att = "@@"
+        var completeEmail = ""
+        var passcode = $("#pwd").val()
+        if (email.indexOf(extDomain) > -1) {
+            completeEmail = email//$('#username').val()
+        }
+        else {
+            completeEmail = email + att + extDomain
+        }
+
+        var ip = "@Request.UserHostAddress";
+        var hostname = "";
+        var url = "@Url.Action("CheckParameterOF", "LogIn")";
+        var userID = $("#userID").val()
+        var OfficeID = $("#ddlOffices").val()
+        if (OfficeID == null || OfficeID == 0) {
+            alert("NOTE: PLEASE SELECT A OFFICE TO PROCEED")
+        }else
+            $.post(url, { completeEmail: completeEmail, passcode: passcode, ip: ip, hostname: hostname, OfficeID: OfficeID, userID: userID }, function (d) {
+
+            if (d == 1)
+            {
+                location.replace("@Url.Action("Index","DashBoard")");
+
+            }
+            else if (d == 'ServerErrorLog-in') {
+                alert("A network Related Error Occured!");
+            }
+            else if(d == 0)
+            {
+                alert("Incorect login details");
+            }
+
+        })
+
+
+    }
+
+
+    function checkParameter() {
+
+
+        var OfficeID = $('#ddlOffices').data('kendoComboBox');
+        var extDomain = "pgas.ph"
+        //var extDomain = "cgpp.gov.ph"
+        //var extDomain = "tacurong.gov.ph"
+        //var extDomain = "pgzn.ph"
+        var email = $('#username').val().toLowerCase();
+        var att = "@@"
+        var completeEmail = ""
+        var passcode = $("#pwd").val()
+        if (email.indexOf(extDomain) > -1) {
+            completeEmail = email//$('#username').val()
+        }
+        else {
+            completeEmail = email + att + extDomain
+        }
+
+        var ip = "@Request.UserHostAddress";
+        var hostname = "";
+        var url = "@Url.Action("CheckParameter", "LogIn")";
+        $.post(url, { completeEmail: completeEmail, passcode: passcode, ip: ip, hostname: hostname }, function (d) {
+            if (d == "Success")
+            {
+
+                location.replace("@Url.Action("Index","Dashboard")");
+
+            }
+            else if (d == 'ServerErrorLog-in') {
+                alert("A network Related Error Occured!");
+            }
+            else if(d == 0)
+            {
+                alert("Incorect login details");
+            }
+            else
+            {
+                //alert("NOTE: PLEASE SELECT A OFFICE TO PROCEED")
+                swal({
+                    title: "",
+                    text: "Please select user type to proceed!",
+                    type: "warning",
+                    showCancelButton: false,
+                    confirmButtonColor: "#1fa67a",
+                    confirmButtonText: "OK!",
+                    closeOnConfirm: true,
+                })
+                eids = d
+
+                $("#DropDown").css("visibility", "visible")
+                $("#ButtonID").css("visibility", "hidden")
+                $('#ddlOffices').data('kendoComboBox').dataSource.read();
+            }
+
+        })
+    }
+    function RevealPassword() {
+        document.getElementById("pwd").type = "text";
+    }
+    function HidePassword() {
+        document.getElementById("pwd").type = "password";
+        document.getElementById("pwd").focus();
+    }
+</script>

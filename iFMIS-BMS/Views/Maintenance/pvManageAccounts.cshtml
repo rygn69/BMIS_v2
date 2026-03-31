@@ -1,0 +1,132 @@
+﻿<!-- This Part is Develop by Ranel Cator -->
+<style>
+    .btn-delete a {
+        color: #000000;
+        background-color: #ffffff;
+        border-style: solid;
+        border-color: #333333;
+        border-width: 1px;
+        height: auto;
+        width: auto;
+        padding: 3px;
+        padding-left: 5px;
+        padding-right: 5px;
+        cursor: pointer;
+        margin: auto;
+    }
+
+        .btn-delete a:hover {
+            color: #ffffff;
+            background-color: #000000;
+            border-style: solid;
+            border-color: #333333;
+            height: auto;
+            width: auto;
+        }
+   
+</style>
+<script>
+    function searchAccount() {
+
+        var SearchProgramData = $("#SearchData").val();
+        $("#grAccount").data("kendoGrid").dataSource.filter([
+            {
+                field: "account_desc",
+                operator: "contains",
+                value: SearchProgramData
+            }
+        ]);
+    }
+    function searchDeletedProgram() {
+
+        var SearchProgramData = $("#SearchDeletedData").val();
+        $("#grAccountDelete").data("kendoGrid").dataSource.filter([
+            {
+                field: "account_desc",
+                operator: "contains",
+                value: SearchProgramData
+            }
+        ]);
+    }
+    function deleteAccount(id) {
+        var url = "@Url.Action("DeleteAccount", "Maintenance")";
+        var account_id = id;
+        swal({
+            title: "Are you sure you want to Delete this Account?",
+            text: "This Account can be Recovered!",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, delete it!",
+            closeOnConfirm: false
+        },
+        function () {
+
+            $.get(url, { account_id: id }, function (d) {
+                if (d == "Success") {
+                    swal("Success!", "Account has been Deleted!", "success");
+                    $("#grAccount").data("kendoGrid").dataSource.read();
+                    $("#grAccountDelete").data("kendoGrid").dataSource.read();
+
+                } else {
+                    swal("Failed!", d, "error")
+                }
+
+            });
+        });
+    }
+    function restoreAccount(id) {
+        var url = "@Url.Action("RestoreAccount", "Maintenance")";
+        var account_id = id;
+        swal({
+            title: "Are you sure you want to Restore this Account?",
+            text: "Restoring this Account will cause to be Active.",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, Restore it!",
+            closeOnConfirm: false
+        },
+        function () {
+            $.get(url, { account_id: id }, function (d) {
+                if (d == "Success") {
+                    swal("Success!", "Account has been Restored!", "success");
+                    $("#grAccount").data("kendoGrid").dataSource.read();
+                    $("#grAccountDelete").data("kendoGrid").dataSource.read();
+                } else {
+                    swal("Failed!", "An error has been occured!", "error")
+                }
+
+            });
+        });
+    }
+    function SearchNewCreatedAccount() {
+        var SearchProgramData = $("#SearchNewCreatedAccount").val();
+        $("#grNewCreatedAccounts").data("kendoGrid").dataSource.filter([
+            {
+                field: "AccountName",
+                operator: "contains",
+                value: SearchProgramData
+            }
+        ]);
+    }
+</script>
+
+
+
+@(Html.Kendo().TabStrip()
+              .Name("ManageAccountsTabStrip")
+              .Navigatable(false)
+              .Animation(animation =>
+                  animation.Open(effect =>
+                  effect.Fade(FadeDirection.In)))
+              .Items(tabstrip =>
+              {
+                  tabstrip.Add().Text("Newly Created Accounts From the Proposal").Selected(true).LoadContentFrom("NewAccountsTab", "Maintenance");
+                  tabstrip.Add().Text("Active Accounts").LoadContentFrom("ActiveAccountsTab", "Maintenance");
+                  tabstrip.Add().Text("Non-Active Accounts").LoadContentFrom("NonActiveAccountsTab", "Maintenance");
+              })
+)
+
+
+

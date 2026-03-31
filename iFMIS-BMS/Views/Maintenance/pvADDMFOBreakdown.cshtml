@@ -1,0 +1,120 @@
+﻿@model iFMIS_BMS.BusinessLayer.Models.lbp5
+<script>
+    function OfficeID() {
+        var OfficeID = @Account.UserInfo.Department;
+        return {
+            OfficeID: OfficeID
+        }
+    }
+    function submitMFOBreakdown(){
+        var PPA_CodeRef = document.getElementById("PPA_CodeRef").value;
+        var PPA_DescriptionID = $("#PPADescription").val();
+        var PPADescription = $("#PPADescription").data("kendoComboBox").text();
+        var AccountList = $("#AccountList").val();
+        var PPA_TARGET = document.getElementById("PPA_TARGET").value;
+        var PPA_Output_Indicator = document.getElementById("PPA_Output_Indicator").value;
+        var From = document.getElementById("From").value;
+        var To = document.getElementById("To").value;
+        var Send_MFO_ID = document.getElementById("Send_MFO_ID").value;
+
+        var url = "@Url.Action("MFOBreakdown","Maintenance")";
+        
+        $.get(url, { PPA_CodeRef: PPA_CodeRef, PPADescription: PPADescription, AccountList: AccountList, PPA_TARGET: PPA_TARGET, PPA_Output_Indicator: PPA_Output_Indicator, From: From, To: To, Send_MFO_ID: Send_MFO_ID, PPA_DescriptionID: PPA_DescriptionID }, function(e){
+            if(e){
+                $('#PPA_CodeRef').val('');
+                $('#PPA_TARGET').val('');
+                $('#PPA_Output_Indicator').val('');
+                $('#AccountList').val('');;
+                $('#PPADescription').data('kendoComboBox').value('');
+                swal({   
+                    title: "Success",   
+                    text: "MFO Breakdown Succesfully Added",   
+                    timer: 2000,
+                    type: "success",
+                    showConfirmButton: false 
+                });
+                $("#grid_"+ @Model.PPA_MFO_ID).data("kendoGrid").dataSource.read();
+                
+
+            }else{
+                swal({   
+                    title: "Error",   
+                    text: "Something went wrong.",   
+                    timer: 2000,
+                    type: "error",
+                    showConfirmButton: false 
+                });
+            }
+        
+        });
+        
+    }
+    function oncloseWindowBreakdown() {
+        if ($("#PPASizeIndicator").val() == 0) {
+            document.documentElement.style.overflow = 'auto';  // firefox, chrome
+            document.body.scroll = "yes";
+            $(window).scrollTop(CurrentScrollPosition);
+        }
+        $("#windowAddMFOBreakdown").data("kendoWindow").close();
+    }
+</script>
+    <input type="text" id="Send_MFO_ID" name="Send_MFO_ID" value="@Model.Send_MFO_ID" hidden="hidden" />
+    <div style="margin-top:5px;margin-left:5px;float:left;width:100%;display:inline-block">
+        <div style="float:left;width:150px; display:inline-block">
+            <label>Code Reference</label>
+            <input type="text" id="PPA_CodeRef" name="PPA_CodeRef" style="width:100%" />
+        </div>
+        <div style="float:left;margin-left:20px;width:630px;display:inline-block">
+            <label>Program/Activity/Project Description</label>
+            <script>
+                function PPP_DESCparam(){
+                    var OfficeID = @Account.UserInfo.Department;
+                    var MFO_ID = @Model.Send_MFO_ID;
+                    return {
+                        OfficeID: OfficeID,
+                        MFO_ID: MFO_ID
+                    }
+                }
+            </script>
+            @(Html.Kendo().ComboBox()
+              .Name("PPADescription")
+              .DataTextField("PPA_Description")
+              .Placeholder("Select Description . . .")
+              .Filter("contains")
+              .MinLength(2)
+              .DataValueField("PPA_ID")
+              .HtmlAttributes(new { @style = "width:100%;height:110%;" })
+              .DataSource(source => source.Read(read => read.Action("ddlPPA_DESC", "Dropdowns").Data("PPP_DESCparam"))))
+        </div>
+    </div>
+
+
+    <div style="margin-top:5px;margin-left:5px;float:left; display:inline-block;">
+        <div style="float:left;width:350px;">
+            <label>Cost</label>
+            <input type="number" id="AccountList" name="AccountList" style="width:500px;">
+        </div>
+        <div style="float:left;margin-left:180px">
+            <label>Target</label>
+            <input type="text" id="PPA_TARGET" name="PPA_TARGET" style="width:260px;" />
+        </div>
+    </div>
+    <div style="margin-top:0px;margin-left:5px;width:100%;display:inline-block;">
+        <label>Output Indicator</label>
+        <input type="text" id="PPA_Output_Indicator" name="PPA_Outpput_Indicator" style="width:94%" />
+    </div>
+    <div style="margin-top:5px;margin-left:5px;display:inline-block;">
+        <label>Implementation</label>
+        <div style="float:left;width:300px">
+            <label>FROM</label>
+            <input type="text" id="From" name="From" value="January" />
+        </div>
+        <div style="float:left;width:300px;margin-left:35px;display:inline-block;">
+            <label>TO</label>
+            <input type="text" id="To" name="To" value="December" />
+        </div>
+    </div>
+    <div style="margin-top:10px;float:right;margin-right:5px;display:inline-block;">
+        <div class="k-button k-state-active" onclick="submitMFOBreakdown()"><i class="fa fa-plus"></i> ADD Breakdown</div>
+        <div class="k-button" onclick="oncloseWindowBreakdown()"><i class="fa fa-close"></i> Close</div>
+    </div>

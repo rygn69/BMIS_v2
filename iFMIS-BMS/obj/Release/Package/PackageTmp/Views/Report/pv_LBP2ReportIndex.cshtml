@@ -1,0 +1,323 @@
+﻿<script>
+
+
+    function reqPrint(e) {
+        var officeID = $("#ddlOffices").val()
+        var ReportType = $('input[name=ReportTypeRadioButton]:checked').val();
+        var includeLBP1 = $("#includeLBP1").val();
+        var includeLBP2_SP = $("#includeLBP2_SP").val();
+        var Year = $("#ddlYear").val()
+        var userid=@Account.UserInfo.eid.ToString();
+        var includezero=$("#includezero").val();
+        var lbp2export=$("#lbp2export").val();
+        var reloadlbp2=$("#reloadlbp2").val();
+        var sectoral=$("#sectoral").val();
+        var includeCOE=$("#includeCOE").val();
+        var eco=$("#eco").val();
+
+        if (officeID != "" || eco != 0) {
+            if (ReportType == 4) {
+                $.ajax({
+                    async: false,
+                    dataType: 'html',
+                    success: window.open("../Reports/ReportViewer.aspx?rid=24&OfficeID=" + officeID + "&ReportTypeID=3&Year=" + Year + "&includeLBP1=" + includeLBP1 + "&pagnoid=" + $("#pagnoid").val() + "&includeLBP2_SP=" + includeLBP2_SP + "&eid="+ userid +"&includezero="+ includezero +"&lbp2export="+ lbp2export +"&reloadlbp2="+ reloadlbp2 +"&sectoral="+ sectoral +"&includeCOE="+ includeCOE +"&eco="+ eco +"")
+                });
+            }
+            else if (ReportType == 5) {
+                $.ajax({
+                    async: false,
+                    dataType: 'html',
+                    success: window.open("../Reports/ReportViewer.aspx?rid=25&OfficeID=0&ReportTypeID=4&Year=" + Year + "")
+                });
+            }
+            else {
+                $.ajax({
+                    async: false,
+                    dataType: 'html',
+                    success: window.open("../Reports/ReportViewer.aspx?rid=19&OfficeID=" + officeID + "&ReportTypeID=" + ReportType + "&Year=" + Year + "&eid="+ userid +"&reloadlbp2="+ reloadlbp2 +"")
+                });
+            }
+        }
+        else {
+            alert("Please Select Office");
+        }
+    }
+    function OnDropDownListChange() {
+        if ($("#ddlOffices").val() == 0) {
+            document.getElementById("rbPrepaired").disabled = true;
+            if ($('input[name=ReportTypeRadioButton]:checked').val() == 1) {
+                document.getElementById("rbProposed").checked = true;
+                swal()
+            }
+        }
+        else {
+            document.getElementById("rbPrepaired").disabled = false;
+        }
+    }
+    function fn_includeLBP1() {
+        if (document.getElementById("includeLBP1").checked ) {
+            document.getElementById("includeLBP1").value = 1;
+        }
+        else {
+            document.getElementById("includeLBP1").value = 0;
+            swal({
+                title: "Please be reminded to enter the starting page number of LBP Form No. 2!",
+                type: "warning",
+                showCancelButton: false,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Ok",
+                closeOnConfirm: true
+                // showLoaderOnConfirm: true
+            })
+        }
+    }
+    function fn_includeCOE(){
+        if (document.getElementById("includeCOE").checked ) {
+            document.getElementById("includeCOE").value = 1;
+        }
+        else {
+            document.getElementById("includeCOE").value = 0;
+        }
+    }
+    function sectoral() {
+        if (document.getElementById("sectoral").checked ) {
+            document.getElementById("sectoral").value = 1;
+        }
+        else {
+            document.getElementById("sectoral").value = 0;
+        }
+    }
+    function fn_includeLBP2_SP() {
+        if (document.getElementById("includeLBP2_SP").checked) {
+            document.getElementById("includeLBP2_SP").value = 1;
+        }
+        else {
+            document.getElementById("includeLBP2_SP").value = 0;
+        }   
+    }
+    function fn_includezero(){
+        if (document.getElementById("includezero").checked) {
+            document.getElementById("includezero").value = 1;
+        }
+        else {
+            document.getElementById("includezero").value = 0;
+        }   
+    }
+    function fn_lbp2toexcel(){
+        
+        if (document.getElementById("lbp2export").checked) {
+            document.getElementById("lbp2export").value = 1;
+        }
+        else {
+            document.getElementById("lbp2export").value = 0;
+        }   
+
+    }
+    function reloadlbp2(){
+        
+        if (document.getElementById("reloadlbp2").checked) {
+            document.getElementById("reloadlbp2").value = 1;
+        }
+        else {
+            document.getElementById("reloadlbp2").value = 0;
+        }  
+    }
+    function econ(){
+        if (document.getElementById("eco").checked) {
+            document.getElementById("eco").value = 1;
+        }
+        else {
+            document.getElementById("eco").value = 0;
+        }  
+    }
+</script>
+
+<div style="width : 90%; margin-top: 0px;border-style: solid; border-color: #1fa67a;">
+    <div style="width:100%;height : 25px ; background-color:#1fa67a; color: white">
+        <label class="fa fa-file-text-o fa-lg" style="margin-left: 5px; display:inline-block">  PRINT LBP2 REPORT</label>
+    </div>
+    <div style="margin-left: 5px; margin-bottom:5px">
+        <label style="margin-left: 85px;margin-top: 10px;margin-bottom: 2px; display : inline-block">
+            Office :
+            @(Html.Kendo().DropDownList()
+                         .Name("ddlOffices")
+                         .DataTextField("OfficeName")
+                         .DataValueField("OfficeID")
+                         .Filter("contains")
+                         .MinLength(1)
+                         .OptionLabel("Select Office...")
+                         .HtmlAttributes(new { @style = "width: 512px;" })
+                         .Events(e => e.Change("OnDropDownListChange"))
+                         .DataSource(source => source.Read(read => read.Action("ddlOfficeWithAll", "User")))
+            )
+
+        </label>
+        <label style="margin-left: 40px;margin-right: 5px;margin-top: 10px;margin-bottom: 2px; display : inline-block">
+            Budget Year : @(Html.Kendo().DropDownList()
+                        .Name("ddlYear")
+                        .DataTextField("ProposalYear")
+                        .DataValueField("ProposalYear")
+                        .SelectedIndex(0)
+                        .HtmlAttributes(new { @style = "width: 90px;" })
+                        .DataSource(source => source.Read(read => read.Action("GetPropYear", "PYear")))
+            )
+        </label>
+        <label style="margin-left: 1px;margin-top: 10px;margin-bottom: 2px;">
+            Starting Page No. :
+            <input class="k-input" id="pagnoid" name="pagnoid" type="number" min="1" value="1" style="width:70px;font-size:large;text-align:center " />
+            
+        </label>
+    </div>
+    <div style="display:inline-block;width:100%; margin-left:5px;margin-top: 10px">
+    @*temporary disabled/hide-xXx - 8/15/2018*@
+        <input type="radio" name="ReportTypeRadioButton" id="rbPrepaired" style="width:15px" value="1" >
+        <label style="display:inline-block" for="rbPrepaired">Prepared</label>
+
+        <input type="radio" name="ReportTypeRadioButton" id="rbProposed" style="width:15px" value="2"   >
+        <label style="display:inline-block" for="rbProposed">Proposed</label>
+
+        <input type="radio" name="ReportTypeRadioButton" id="rbConsolidated" style="width:15px" value="4" checked="checked"  >
+        <label style="display:inline-block" for="rbConsolidated">Consolidated</label>
+
+        <input type="radio" name="ReportTypeRadioButton" id="rbApproved" style="width:15px" value="3">
+        <label style="display:inline-block" for="rbApproved">Approved</label>
+
+        <input type="radio" name="ReportTypeRadioButton" id="rbSummary" hidden="true" style="width:15px" value="5">
+
+        @*<label style="display:inline-block" for="rbSummary">Summary</label>*@
+    </div>
+    <div style="display:inline-block;width:100%; margin-left:5px;margin-top:10px">
+      
+        <div style="margin-left:-22px;margin-top:7px;">
+            <input type='checkbox' class='checkbox' style="zoom:1.5;margin-left:15px" id="includezero"  value="0" onclick=fn_includezero() />
+            <label style="display:inline-block">Include Zero Amount</label>
+        </div>
+        <div style="float:left;margin-top:0px">
+            <input type='checkbox' class='checkbox' style="zoom:1.5;margin-top:-29px" id="lbp2export" value="0" onclick=fn_lbp2toexcel() />
+            <label style="display:inline-block;margin-top:10px;width:150px">Export To Excel <br /> (1 sheet only)</label>
+        </div>
+        <div style="float:left;margin-top:2px;margin-left:20px">
+            <input type='checkbox' class='checkbox' style="zoom:1.5;margin-top:-15px;float:left;margin-left:8px;" id="reloadlbp2" checked="checked" value="1" onclick=reloadlbp2() />
+            <label style="float:left;margin-top:-24px;width:160px;margin-left:35px;">Update LBPF 2</label>
+        </div>
+       @if (@Account.UserInfo.UserTypeID.ToString() == "4" || @Account.UserInfo.UserTypeID.ToString() == "5") //lfc access rights or system admin
+       {
+        <div style="float:left;margin-top:-24px;margin-left:-40px">
+            <input type='checkbox' class='checkbox' style="zoom:1.5" id="includeLBP1" value="0" onclick=fn_includeLBP1() />
+            <label style="display:inline-block">Include LBP Form 1</label>
+        </div>
+        <div style="float:left;margin-top:-24px;margin-left:160px">
+            <input type='checkbox' class='checkbox' style="zoom:1.5" id="includeCOE" value="0" onclick=fn_includeCOE() />
+            <label style="display:inline-block">COE</label>
+        </div>
+        <div style="float:left;margin-top:10px;margin-left:-237px">
+            <input type='checkbox' class='checkbox' style="zoom:1.5;margin-left:15px" id="includeLBP2_SP" value="0" onclick=fn_includeLBP2_SP() />
+            <label style="display:inline-block">LBP Form 2 for SP</label>
+        </div>
+
+        <div style="margin-left:367.5px;width:200px;margin-top:34px">
+            <input type='checkbox' class='checkbox' style="zoom:1.5;margin-top:-15px;float:left;margin-left:8px;" id="sectoral" value="0" onclick=sectoral() />
+            <label style="float:left;margin-top:-24px;width:160px;margin-left:35px;">Sectoral</label>
+        </div>
+
+        <div style="margin-left:568px;width:200px;margin-top:34px">
+            <input type='checkbox' class='checkbox' style="zoom:1.5;margin-top:-15px;float:left;margin-left:8px;" id="eco" value="0" onclick=econ() />
+            <label style="float:left;margin-top:-24px;width:160px;margin-left:35px;">Eco</label>
+        </div>
+       }
+    </div>
+        <div style="display:inline-block;width:100%">
+            @*<div id="" class="k-button k-button-icontext" style=" bottom: 15px; right: 25px;width: 150px;float:left; margin-top: 10px;border-radius:50px; margin-left:246px; margin-bottom:-35px" onclick="reqPrintStatus()"><span class=""></span>&nbsp;DGSign Status</div>*@
+            @*<div id="btnPrintDGsign" class="k-button k-button-icontext" style="  bottom: 15px; right: 25px;width: 160px;float:left; margin-top: 5px;background-color:cornflowerblue;color:white;border-radius:50px; margin-left:405px; margin-bottom:5px" onclick="reqPrintDGsign()"><span class="fa fa-search"></span>&nbsp;Preview Via DGSign</div>*@
+            <div id="btnPrint" class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 100px;float:right; margin-top: 5px;background-color:cornflowerblue;color:white;border-radius:50px; margin-right:10px; margin-bottom:5px" onclick="reqPrint()"><span class="fa fa-search"></span>&nbsp;Preview</div>
+        </div>
+    </div>
+<script>
+    function reqPrintDGsign(){
+        var officeID = $("#ddlOffices").val()
+        var ReportType = $('input[name=ReportTypeRadioButton]:checked').val();
+        var Year = $("#ddlYear").val()
+        var includeLBP1 = $("#includeLBP1").val();
+        var includeLBP2_SP = $("#includeLBP2_SP").val();
+        var Year = $("#ddlYear").val()
+        var userid=@Account.UserInfo.eid.ToString();
+        var includezero=$("#includezero").val();
+        var lbp2export=$("#lbp2export").val();
+        var reloadlbp2=$("#reloadlbp2").val();
+        var sectoral=$("#sectoral").val();
+        var includeCOE=$("#includeCOE").val();
+        var eco=$("#eco").val();
+
+        var url = "@Url.Action("dgsignreport", "Report")";
+        swal({
+            title: "Confirmation!",
+            text: "Would you like to create a document for digital signature? \n\n",
+            type: "info",
+            showCancelButton: true,
+            closeOnConfirm: false,
+            confirmButtonColor: "#1fa67a",
+            confirmButtonText: "Yes",
+            showLoaderOnConfirm: true,
+        },
+        //includeLBP1=" + includeLBP1 + "&pagnoid=" + $("#pagnoid").val() + "&includeLBP2_SP=" + includeLBP2_SP + "&eid="+ userid +"&includezero="+ includezero +"&lbp2export="+ lbp2export +"&reloadlbp2="+ reloadlbp2 +"&sectoral="+ sectoral +"&includeCOE="+ includeCOE +"&eco="+ eco +"
+            function (isConfirm) {
+                if (isConfirm) {
+                    $.post(url, { YearOf:Year,OfficeID:officeID, ReportTypeID:ReportType,docuid:11,reloadlbp4:1,includeLBP1:includeLBP1,pagnoid:$("#pagnoid").val(),includeLBP2_SP:includeLBP2_SP,eid:userid,includezero:includezero,lbp2export:lbp2export,reloadlbp2:reloadlbp2,sectoral:sectoral,includeCOE:includeCOE,eco:eco,purpose:"",note:"", sort_: 0  }, function (d) {
+                        if (d != "") {
+                            //swal.close();
+                            swal("Success","A Local Budget Preparation Form 2 or 4 (LBP Form) is pending your signature in the Dgsign App.","success")
+                            //success: window.open(d)
+                        }
+                        else {
+                            swal("Something Went Wrong!", d, "error");
+                        }
+                    })
+                }
+            })
+    }
+    function reqPrintStatus() {
+        $(window).scrollTop(0);
+        var url = "@Url.Action("LBPDGSiginstatus", "Report")";
+        var office = $("#office").val();
+        var program = $("#ooe").val()
+        var account = $("#account").val()
+        var tyear = $("#wfpyear").val();
+
+
+        $.get(url,
+            {
+                office: $("#office").val(),
+                program:program,
+                account:account,
+                tyear: tyear,
+                docuid : 4
+            },
+        function (d) {
+            $('#LBPstatusform').html(d);
+        })
+        $('#LBPstatusform').data('kendoWindow').title("<i class='fa fa-navicon'> </i> LBP DGsign Status").center().open();
+
+    }
+</script>
+
+@(Html.Kendo().Window()
+        .Name("LBPstatusform")
+        //.Title("")
+        .Width(1010)
+        .Height(625)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+        //  .Events(e => e.Close("closewfpapproved_lce"))
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+                .Actions(a => { a.Close(); })
+)
