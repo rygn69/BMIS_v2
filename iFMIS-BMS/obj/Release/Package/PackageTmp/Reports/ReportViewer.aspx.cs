@@ -891,7 +891,7 @@ namespace iFMIS_BMS.Reports
                     using (SqlConnection con = new SqlConnection(Common.MyConn()))
                     {
 
-                        SqlCommand com = new SqlCommand(@" select FundCode,FundName from IFMIS.dbo.tbl_R_BMSFunds where FundID in (1,2,5) and actioncode=1  order by FundCode ", con);
+                        SqlCommand com = new SqlCommand(@" select FundCode,FundName from IFMIS.dbo.tbl_R_BMSFunds where FundID in (1,2,5,14) and actioncode=1  order by FundCode ", con);
                         con.Open();
                         FundID_.Load(com.ExecuteReader());
                     }

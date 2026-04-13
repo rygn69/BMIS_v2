@@ -20,9 +20,9 @@ namespace iFMIS_BMS.Reports
     /// </summary>
     public partial class SAAO : Telerik.Reporting.Report
     {
-        public SAAO(int? OfficeID, int? month_, int? month_To, int? year, int? classtype, int? SAAO_type,int? earmark_type,int? repxmlhistory)
+        public SAAO(int? OfficeID, int? month_, int? month_To, int? year, int? classtype, int? SAAO_type, int? earmark_type, int? repxmlhistory)
         {
-         
+
             InitializeComponent();
 
             DataTable dt = new DataTable();
@@ -30,7 +30,7 @@ namespace iFMIS_BMS.Reports
             DataTable dt3 = new DataTable();
 
             var dte = "";
-           
+
             if (repxmlhistory != 0)
             {
                 DataTable _dt2 = new DataTable();
@@ -40,7 +40,7 @@ namespace iFMIS_BMS.Reports
                 textBox35.Value = _dt2.Rows[0][2].ToString();
                 textBox44.Value = _dt2.Rows[0][3].ToString();
                 txt_todaydate.Value = "Date Printed : " + _dt2.Rows[0][1].ToString();
-                textBox36.Value= _dt2.Rows[0][4].ToString();
+                textBox36.Value = _dt2.Rows[0][4].ToString();
                 textBox43.Value = _dt2.Rows[0][5].ToString();
                 barcode1.Value = _dt2.Rows[0][6].ToString();
             }
@@ -51,7 +51,7 @@ namespace iFMIS_BMS.Reports
                 _dt2 = OleDbHelper.ExecuteDataset(ConfigurationManager.ConnectionStrings["pmisqldb"].ToString(), CommandType.Text, _sqlQuery2).Tables[0];
                 if (_dt2.Rows.Count > 0)
                 {
-                    textBox35.Value =  _dt2.Rows[0][0].ToString();
+                    textBox35.Value = _dt2.Rows[0][0].ToString();
                     textBox44.Value = _dt2.Rows[0][1].ToString();
                     txt_user.Value = "Printed By : " + Account.UserInfo.empName;
                 }
@@ -78,14 +78,14 @@ namespace iFMIS_BMS.Reports
                 using (SqlConnection con = new SqlConnection(Common.MyConn()))
                 {
                     if (repxmlhistory != 0) {
-                        SqlCommand com = new SqlCommand(@"exec sp_BMS_ReportXML_read 1," + repxmlhistory + ",0,"+ OfficeID + "", con);
+                        SqlCommand com = new SqlCommand(@"exec sp_BMS_ReportXML_read 1," + repxmlhistory + ",0," + OfficeID + "", con);
                         com.CommandTimeout = 0;
                         con.Open();
                         dt3.Load(com.ExecuteReader());
                     }
                     else
                     {
-                        SqlCommand com = new SqlCommand(@"IFMIS.dbo.sp_Monthly_SAAO_REPORT_Test '" + month_ + "','" + month_To + "','" + year + "','" + OfficeID + "',2," + earmark_type + "," + Account.UserInfo.eid + ",'"+ barcode1.Value + "','" + textBox35.Value + "','" + textBox44.Value + "','JAVE NHORIEL N. BORDAJE, CPA','Provincial Budget Officer','"+ dte + "',0", con);
+                        SqlCommand com = new SqlCommand(@"IFMIS.dbo.sp_Monthly_SAAO_REPORT_Test '" + month_ + "','" + month_To + "','" + year + "','" + OfficeID + "',2," + earmark_type + "," + Account.UserInfo.eid + ",'" + barcode1.Value + "','" + textBox35.Value + "','" + textBox44.Value + "','JAVE NHORIEL N. BORDAJE, CPA','Provincial Budget Officer','" + dte + "',0", con);
                         com.CommandTimeout = 0;
                         con.Open();
                         dt3.Load(com.ExecuteReader());
@@ -104,11 +104,11 @@ namespace iFMIS_BMS.Reports
 
                 }
                 this.table3.DataSource = dt3;
-               // this.table1.DataSource = dt3;
-               // this.table2.DataSource = dt3;
+                // this.table1.DataSource = dt3;
+                // this.table2.DataSource = dt3;
             }
 
-           
+
 
             using (SqlConnection con = new SqlConnection(Common.MyConn()))
             {
@@ -149,13 +149,30 @@ namespace iFMIS_BMS.Reports
             {
                 TXT_office_name.Value = "";
             }
-           
-            using (SqlConnection con = new SqlConnection(Common.MyConn()))
-            {
-                SqlCommand com = new SqlCommand(@"select Class_Type FROM IFMIS.dbo.tbl_R_BMS_A_Class where Class_ID = '1'", con);
-                con.Open();
-                TXT_fund_type.Value = com.ExecuteScalar().ToString();
 
+            //using (SqlConnection con = new SqlConnection(Common.MyConn()))
+            //{
+            //    SqlCommand com = new SqlCommand(@"select Class_Type FROM IFMIS.dbo.tbl_R_BMS_A_Class where Class_ID = '1'", con);
+            //    con.Open();
+            //    TXT_fund_type.Value = com.ExecuteScalar().ToString();
+
+            //}
+
+            if (OfficeID == 116)
+            {
+                TXT_fund_type.Value = "Special Health Fund";
+            }
+            else if (OfficeID == 105)
+            {
+                TXT_fund_type.Value = "Special Education Fund";
+            }
+            else if (OfficeID == 37 || OfficeID ==38 || OfficeID ==41)
+            {
+                TXT_fund_type.Value = "Economic Enterprise Fund";
+            }
+            else
+            {
+                TXT_fund_type.Value = "General Fund";
             }
             //barcode1.Value = FUNCTION.GeneratePISControl();
             DataTable reportlog = new DataTable();
