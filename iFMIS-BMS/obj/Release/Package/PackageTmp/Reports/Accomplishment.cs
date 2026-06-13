@@ -48,17 +48,22 @@ namespace iFMIS_BMS.Reports
                 //SqlCommand com = new SqlCommand(@"SELECT CONCAT((SELECT DATENAME(month, DATEADD(month, '" + month_ + "'-1, CAST('2008-01-01' AS datetime)))), " +
                 //                               " ' - ', (SELECT DATENAME(month, DATEADD(month, '" + month_To + "'-1, CAST('2008-01-01' AS datetime))))) + ' ' + '" + year + "'", con);
 
-                SqlCommand com = new SqlCommand(@"SELECT case when '" + month_ + "' =  '" + month_To + "' then (SELECT DATENAME(month, DATEADD(month,  '" + month_To + "'-1, CAST('2008-01-01' AS datetime)))) " +
-                                                "else  CONCAT((SELECT DATENAME(month, DATEADD(month, '" + month_ + "'-1, CAST('2008-01-01' AS datetime)))), " +
-                                                " ' - ', (SELECT DATENAME(month, DATEADD(month,  '" + month_To + "'-1, CAST('2008-01-01' AS datetime))))) end + ' ' + '" + year + "'", con);
+                //SqlCommand com = new SqlCommand(@"SELECT case when '" + month_ + "' =  '" + month_To + "' then (SELECT DATENAME(month, DATEADD(month,  '" + month_To + "'-1, CAST('2008-01-01' AS datetime)))) " +
+                //                                "else  CONCAT((SELECT DATENAME(month, DATEADD(month, '" + month_ + "'-1, CAST('2008-01-01' AS datetime)))), " +
+                //                                " ' - ', (SELECT DATENAME(month, DATEADD(month,  '" + month_To + "'-1, CAST('2008-01-01' AS datetime))))) end + ' ' + '" + year + "'", con);
+                SqlCommand com = new SqlCommand(@"ifmis.sp_BMS_Accomplishment_Period "+ month_ + ","+ month_To + ","+ year + "", con);
                 con.Open();
+
+                DataTable _dt2 = new DataTable();
+                string _sqlQuery2 = "ifmis.dbo.sp_BMS_Accomplishment_Period " + month_ + "," + month_To + "," + year + "";
+                _dt2 = OleDbHelper.ExecuteDataset(ConfigurationManager.ConnectionStrings["sqldb"].ToString(), CommandType.Text, _sqlQuery2).Tables[0];
                 if (month_To == 1)
                 {
                     TXT_for_the.Value = "For the period of January " + year;
                 }
                 else
                 {
-                    TXT_for_the.Value = "For the period of " + com.ExecuteScalar().ToString();
+                    TXT_for_the.Value =_dt2.Rows[0][0].ToString();// com.ExecuteScalar().ToString();
                 }
 
             }

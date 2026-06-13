@@ -10,7 +10,7 @@ using Kendo.Mvc.UI;
 using Kendo.Mvc.Extensions;
 using System.Net;
 using System.Data.SqlClient;
-using System.Data;
+using System.Data;  
 using System.Web.Script.Serialization;
 using System.Configuration;
 using System.IO;
@@ -7579,6 +7579,13 @@ namespace iFMIS_BMS.Controllers
                             //    wfperr = Convert.ToString(wfperrep.ExecuteScalar());
                             //    retstr = "ErrorNAS";
                             //}
+                            //delete the PDF file
+                            if (System.IO.File.Exists(networkPath2))
+                            {
+                                System.IO.File.Delete(filePath);
+                                Console.WriteLine("File deleted successfully.");
+                            }
+                            //pdf to binary file - END
                         }
                         catch (Exception ex)
                         {
@@ -7619,7 +7626,7 @@ namespace iFMIS_BMS.Controllers
                             {
                                 prep_userid = Convert.ToInt32(prep_id.Rows[0][4]);
                                 prep_dephead = Convert.ToInt32(prep_id.Rows[0][3]);
-                                sig_usertype = Convert.ToInt32(prep_id.Rows[0][0]);
+                                sig_usertype = Convert.ToInt32(prep_id.Rows[0][8]);
                                 prep_officeid = Convert.ToInt32(prep_id.Rows[0][2]);
                             }
 
