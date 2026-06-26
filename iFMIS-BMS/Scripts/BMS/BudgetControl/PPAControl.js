@@ -488,6 +488,7 @@ function refreshProgram() {
 }
 
 function refreshExpenditure() {
+    $("#PPAObjOfExpenditure").data("kendoComboBox").value("");
     $("#PPAObjOfExpenditure").data("kendoComboBox").dataSource.read()
 }
 function PPAProgram() {
