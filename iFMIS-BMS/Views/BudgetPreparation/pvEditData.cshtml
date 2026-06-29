@@ -92,6 +92,7 @@
                     var n3 = document.getElementById("EditTotalDenominationAmount");
                     var n4 = document.getElementById("EditDenominationMonth");
                     var n5 =0.00;
+                    //alert($("#AIPTotalAmount").val())
                     var AIPTotalAmount=$("#AIPTotalAmount").val();
                     var TotAmountExpClass=$("#TotAmountExpClass").val();
                     var EditDenominationAmount=$("#EditDenominationAmount").val()
@@ -124,10 +125,11 @@
               
 
                     var r2=parseFloat(Number(AIPTotalAmount) - (Number(x3) + Number(r1))).toFixed(2)
-                   
+                    var rf=parseFloat(Number(AIPTotalAmount)-parseFloat(Number($("#EditQuantityPercentage").val()) *  Number($("#EditDenominationAmount").val()) * Number($("#EditDenominationMonth").val())).toFixed(2)).toFixed(2);
                     ////if ((Number(n5) < 0 || Number(n6) < 0 || Number(n7) < 0) && $("#fundid").val() != 201) //By expense class
-              
-                    if (Number(r2) < 0 && $("#fundid").val() != 201) //by account
+                                     
+                    //if (Number(r2) < 0 && $("#fundid").val() != 201) //by account
+                    if (Number(rf) < 0 && $("#fundid").val() != 201) //by account
                     {
                         swal({
                             title: "W A R N I N G ! ! !",
