@@ -87,6 +87,9 @@
         <div style="margin-bottom:5px;margin-top:5px;margin-left:5px;margin-right:15px;display:inline-block;">
             <script>
                 function sync() {
+                    var ooeid=$("#ddlOOE").val();
+                    var program_t=$("#program_t").val();
+                    
                     var n1 = $("#EditQuantityPercentage").val();
                     var n2 = document.getElementById("EditDenominationAmount");
                     var n3 = document.getElementById("EditTotalDenominationAmount");
@@ -125,12 +128,18 @@
               
 
                     var r2=parseFloat(Number(AIPTotalAmount) - (Number(x3) + Number(r1))).toFixed(2)
-                    var rf=parseFloat(Number(AIPTotalAmount)-parseFloat(Number($("#EditQuantityPercentage").val()) *  Number($("#EditDenominationAmount").val()) * Number($("#EditDenominationMonth").val())).toFixed(2)).toFixed(2);
+                    
+                    var rf=parseFloat(Number(EditTotalDenominationAmount_orig)-parseFloat(Number($("#EditQuantityPercentage").val()) *  Number($("#EditDenominationAmount").val()) * Number($("#EditDenominationMonth").val())).toFixed(2)).toFixed(2);
                     ////if ((Number(n5) < 0 || Number(n6) < 0 || Number(n7) < 0) && $("#fundid").val() != 201) //By expense class
                                      
-                    //if (Number(r2) < 0 && $("#fundid").val() != 201) //by account
-                    if (Number(rf) < 0 && $("#fundid").val() != 201) //by account
-                    {
+                  
+                    if ((ooeid != 2 && (program_t != "Special Projects/Activities" && program_t !="Special Purpose Appropriation/Special Projects")) ||
+                        (ooeid == 2 && (program_t == "Special Projects/Activities" || program_t =="Special Purpose Appropriation/Special Projects")) ||
+                        (ooeid == 3 && (program_t == "Special Projects/Activities" || program_t =="Special Purpose Appropriation/Special Projects")))
+                    { 
+                        if (Number(rf) < 0 && $("#fundid").val() != 201) //by account
+                        //if ((Number(n5) < 0 || Number(n6) < 0 || Number(n7) < 0) && $("#fundid").val() != 201) //By expense class
+                        {
                         swal({
                             title: "W A R N I N G ! ! !",
                             text: "The proposed budget must not be greater than the approved AIP!\n",
@@ -140,12 +149,13 @@
                             confirmButtonText: "OK!",
                             closeOnConfirm: true,
                         }, function(){
-                        $("#EditDenominationAmount").val(DenominationAmount_Orig);
-                        $("#EditDenominationMonth").val(EditDenominationMonth_orig);
-                        $('#EditQuantityPercentage').siblings('input:visible').focus();
-                        $('#EditQuantityPercentage').val(EditQuantityPercentage_orig);
+                            $("#EditDenominationAmount").val(DenominationAmount_Orig);
+                            $("#EditDenominationMonth").val(EditDenominationMonth_orig);
+                            $('#EditQuantityPercentage').siblings('input:visible').focus();
+                            $('#EditQuantityPercentage').val(EditQuantityPercentage_orig);
                             sync();
                         })
+                        }
                     }
                 }
             </script>

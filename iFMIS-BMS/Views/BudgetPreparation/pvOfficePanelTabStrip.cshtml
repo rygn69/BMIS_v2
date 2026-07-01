@@ -42,7 +42,7 @@
     var TotalProposed = 0;
     function getOfficeCeiling() {
         if ($("#OfficeTotalCieling").attr("class") != 'fa fa-spinner fa-pulse fa-spin fa-fw') {
-            document.getElementById("OfficeTotalCieling").innerHTML = "";
+            document.getElementById("OfficeTotalCieling").innerHTML = '₱ ';
             $("#OfficeTotalCieling").attr('class', 'fa fa-spinner fa-pulse fa-spin fa-fw');
             var OfficeID = @Session["selectedOfficeID"];
             var ProgramID = @Session["ProgID1"];
@@ -565,10 +565,12 @@
         document.getElementById("PastYear").innerHTML = PastYear;
         document.getElementById("CurrentYear").innerHTML = CurrentYear;
 
-        function EditData(AccountID,AccountDenominationID,DenominationName,DenominationAmount,TotalAmount,QuantityPercentage,DenominationMonth,isPPMP) {
+        function EditData(AccountID,AccountDenominationID,DenominationName,DenominationAmount,TotalAmount,QuantityPercentage,DenominationMonth,isPPMP,Program) {
 
             var DenominationAmount_Var = DenominationAmount.replace("₱","")
             var TotalAmount_Var = TotalAmount.replace("₱","")
+            $("#program_t").val(Program)
+           
             var url = "@Url.Action("EditData", "BudgetPreparation")";
             //$('#EditDetails').html("<div style='text-align:center;height:100%;width:100%;margin:auto;'><span class='fa fa-spinner fa-pulse fa-spin fa-fw fa-2x'></span>Please Wait ...</div>");
             $('#EditDetails').html("<div class='center'><span class='fa fa-spinner fa-pulse fa-spin fa-fw fa-2x'></span>Please Wait ...</div>");
@@ -1218,6 +1220,9 @@
                 ))
     </div>
 </div>
+<div style="display:none">
+    <input type="text" value="" id="program_t"/>
+</div>
 <script id="template" type="text/kendo-tmpl">
     @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.AccountDenomination>()
             .Name("grid_#=AccountID#") // template expression, to be evaluated in the master context
@@ -1277,7 +1282,7 @@
                          "\\# if( isPPMP == 9) { \\# " +
                         "<div class='k-button k-state-disabled' title='Edit Details (?)' '> <span class='fa fa-edit' style='font-size: 12pt;'></span> Edit </div>" +
                         "\\# } else if(isPPMP == 0 || isPPMP == 1){ \\#" +
-                        "<div style=\"font-size: 8.5pt;\" class=\"k-button\" title=\"Edit Details (?)\" onclick=\"EditData( #=AccountID#,\\#=AccountDenominationID\\#,'\\#=DenominationName\\#','\\#=DenominationAmount\\#','\\#=TotalDenominationAmount\\#','\\#=QuantityPercentage\\#','\\#=DenominationMonth\\#','\\#=isPPMP\\#')\"> <span class='fa fa-edit'></span> Edit </div>" +
+                        "<div style=\"font-size: 8.5pt;\" class=\"k-button\" title=\"Edit Details (?)\" onclick=\"EditData( #=AccountID#,\\#=AccountDenominationID\\#,'\\#=DenominationName\\#','\\#=DenominationAmount\\#','\\#=AIPDenominationAmount\\#','\\#=QuantityPercentage\\#','\\#=DenominationMonth\\#','\\#=isPPMP\\#','\\#=program\\#')\"> <span class='fa fa-edit'></span> Edit </div>" +
                         "\\# } else if(isPPMP == 2){ \\#" +
                         "<div class='k-button k-state-disabled' title='Edit Details (?)' '> <span class='fa fa-edit' style='font-size: 12pt;'></span> Edit </div>" +
                         "\\# } \\#").Width(30);
@@ -1472,8 +1477,9 @@
        
         $.get(url, {OfficeID:OfficeID,proyear:proyear}, function (d) {
             CeilingStatus = d
-           
+           alert(d)
             if (d == "1") {
+                //alert(23)
                 getOfficeCeiling();
                 getTotalProposed();
                 //UpdateTotalProposed();

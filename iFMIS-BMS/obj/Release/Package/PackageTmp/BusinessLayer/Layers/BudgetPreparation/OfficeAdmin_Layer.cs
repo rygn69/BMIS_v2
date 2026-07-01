@@ -1763,6 +1763,8 @@ namespace iFMIS_BMS.BusinessLayer.Layers.BudgetPreparation
                         emp.TotalDenominationAmount = Convert.ToDecimal(reader.GetValue(5));
                         emp.DenominationMonth = Convert.ToDecimal(reader.GetValue(6));
                         emp.specificactivity = Convert.ToString(reader.GetValue(8));
+                        emp.program = Convert.ToString(reader.GetValue(9));
+                        emp.AIPDenominationAmount = Convert.ToDecimal(reader.GetValue(10));
                         prog.Add(emp);
                     }
                    
@@ -2445,7 +2447,7 @@ namespace iFMIS_BMS.BusinessLayer.Layers.BudgetPreparation
                     if (Account.UserInfo.lgu == 0)
                     {
                         con.Close();
-                        SqlCommand query_program = new SqlCommand(@"exec sp_BMS_SubmitProposed_v2 '" + AccountID + "', " + Account.UserInfo.eid + "," + ProgramID + ", " + ProposalYear + "  ," + caseStatement + "," + Amount + "," + regularaipid + "", con);
+                        SqlCommand query_program = new SqlCommand(@"exec     '" + AccountID + "', " + Account.UserInfo.eid + "," + ProgramID + ", " + ProposalYear + "  ," + caseStatement + "," + Amount + "," + regularaipid + "", con);
                         con.Open();
                         retstr = query_program.ExecuteScalar().ToString();
                         return retstr;
