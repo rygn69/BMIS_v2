@@ -2447,7 +2447,7 @@ namespace iFMIS_BMS.BusinessLayer.Layers.BudgetPreparation
                     if (Account.UserInfo.lgu == 0)
                     {
                         con.Close();
-                        SqlCommand query_program = new SqlCommand(@"exec     '" + AccountID + "', " + Account.UserInfo.eid + "," + ProgramID + ", " + ProposalYear + "  ," + caseStatement + "," + Amount + "," + regularaipid + "", con);
+                        SqlCommand query_program = new SqlCommand(@"exec sp_BMS_SubmitProposed_v2 '" + AccountID + "', " + Account.UserInfo.eid + "," + ProgramID + ", " + ProposalYear + "  ," + caseStatement + "," + Amount + "," + regularaipid + "", con);
                         con.Open();
                         retstr = query_program.ExecuteScalar().ToString();
                         return retstr;

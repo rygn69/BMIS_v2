@@ -37,12 +37,13 @@
 </style>
 
 <script>
-    var CeilingStatus = 0;
+    @*var CeilingStatus = 0;
     var OfficeCieling = 0;
     var TotalProposed = 0;
     function getOfficeCeiling() {
+
         if ($("#OfficeTotalCieling").attr("class") != 'fa fa-spinner fa-pulse fa-spin fa-fw') {
-            document.getElementById("OfficeTotalCieling").innerHTML = "";
+            document.getElementById("OfficeTotalCieling").innerHTML = ' ';
             $("#OfficeTotalCieling").attr('class', 'fa fa-spinner fa-pulse fa-spin fa-fw');
             var OfficeID = @Session["selectedOfficeID"];
             var ProgramID = @Session["ProgID1"];
@@ -66,7 +67,7 @@
                 $("#OfficeTotalCieling").removeClass('fa fa-spinner fa-pulse fa-spin fa-fw');
             });
         }
-    }
+    }*@
     function getTotalProposed() {
        // if ($("#OfficeTotalProposed").attr("class") != 'fa fa-spinner fa-pulse fa-spin fa-fw') {
             document.getElementById("OfficeTotalProposed").innerHTML = "";
@@ -82,12 +83,12 @@
                 document.getElementById("OfficeTotalProposed").innerHTML = '₱ '+ formatCurrency(d)
                 $("#totalproposalamount").val(d)
                 if (CeilingStatus == "0") {
-                    if (OfficeID == 37 || OfficeID == 38 || OfficeID == 41){
-                        TotalProposed = parseFloat(formatCurrency(d).replace(/,/g,''));
-                    }
-                    else{
+                    //if (OfficeID == 371 || OfficeID == 38 || OfficeID == 41){
+                    //    TotalProposed = parseFloat(formatCurrency(d).replace(/,/g,''));
+                    //}
+                    //else{
                         TotalProposed = 0;
-                    }
+                    //}
                 }
                 else {
                     TotalProposed = parseFloat(formatCurrency(d).replace(/,/g,''));
@@ -116,10 +117,15 @@
         $.get(url, {OfficeID:OfficeID, YearOf: YearOf,ProgramID:ProgramID,ProgramDescription:ProgramDescription}, function (d) {
                 //document.getElementById("OfficeTotalProposed").innerHTML = '₱ '+ formatCurrency(d)
             if (d == 1) {
-                if (OfficeID == 37 || OfficeID == 38 || OfficeID == 41){
-                    OfficeCieling = 999999999;
-                    document.getElementById("OfficeTotalCieling").innerHTML = '₱ '+ formatCurrency(OfficeCieling);
-                }
+                //if (OfficeID == 371 || OfficeID == 38 || OfficeID == 41){
+                //    OfficeCieling = 999999999;
+                //    //document.getElementById("OfficeTotalCieling").innerHTML = '₱ '+ formatCurrency(OfficeCieling);
+                //    var $office = $("#OfficeTotalCieling");
+
+                //    if ($office.length) {
+                //        $office.html("₱ " + formatCurrency(OfficeCieling));
+                //    }
+                //}
                 getTotalProposed();
                 
             }
@@ -162,8 +168,10 @@
     }
     function FilterByOOE() {
         $("#AccountsGrid").data("kendoGrid").dataSource.read();
-        getOfficeCeiling()
+        
+        getOfficeCeiling();
         UpdateTotalProposed();
+        //getTotalProposed();
         GetDifference();
     }
 
@@ -892,7 +900,7 @@
                 $('#ComputationDetails').html('<div style="width: 100%;height:100%;"><img src="@Url.Content("~/Content/images/loading.gif")" alt="Loading..." style="position: absolute;top: 20%;left: 30%;margin-top: 0px;margin-left: 0px;" /></div>');
                 $.post(url, {AccountID:AccountIDParam,refYear:refYear} , function (d) {
                     if (d == NewAccountID  && $("#supplementalaipid").val() == 0) {
-                        console.log(NewAccountID)
+                        
                         if (@Session["selectedOfficeID"] == 1 && NewAccountID == 311) {
                             var $this = $("a." + NewAccountID + "").parent();
                             var $Button = $this.parent();
@@ -905,7 +913,7 @@
                             //swal({ title: "Notice!", text: "No Computation Available in this Account!", timer: 1000, showConfirmButton: false, type: "info" });
                         }
                         else {
-                            console.log("sdf")
+                            
                             $(window).scrollTop(0);
                             var url2 = "@Url.Action("viewComputationDetails", "BudgetPreparation")";
                             $.get(url2, {AccountID:AccountIDParam, OfficeID:OfficeID, refYear:refYear,ProposalYear: ProposalYear} ,function (pvData) {
@@ -1113,9 +1121,6 @@
             var parentGrid = $("#AccountsGrid").data("kendoGrid"); // Replace with actual grid ID
             var selectedRow = parentGrid.select(); // Get selected row
             var rowData = parentGrid.dataItem(selectedRow); // Get dataItem from the selected row
-
-            console.log(rowData.NewProgramID)
-            console.log(rowData.NewAccountID)
 
             return {
                 ProgramID: rowData.NewProgramID , // From parent grid
@@ -1466,35 +1471,34 @@
     $(document).ready(function () {
         var OfficeID = @Session["selectedOfficeID"];
         var proyear = $("#propsYears").val()
-        
+
         var url = "@Url.Action("getOffiCeiling", "Maintenance")";
-        
+
         $('#SubmitID').css("display", "none");
-        
-        if (OfficeID == 37 || OfficeID == 38 || OfficeID == 41){
-            document.getElementById("ceilingamountid").innerHTML ="Ceiling Amount ";
-        }
-       
-        $.get(url, {OfficeID:OfficeID,proyear:proyear}, function (d) {
+
+        //if (OfficeID == 37 || OfficeID == 38 || OfficeID == 41){
+        //    document.getElementById("ceilingamountid").innerHTML ="Ceiling Amount ";
+        //}
+
+        $.get(url, {OfficeID:OfficeID,proyear:proyear}).done(function (d) {
             CeilingStatus = d
-           
             if (d == "1") {
-                //alert(23)
-                getOfficeCeiling();
-                getTotalProposed();
+              
+                //getOfficeCeiling();
+                //getTotalProposed();
                 //UpdateTotalProposed();
                 $("#CeilingDiv").css("display","inline-block");
             }
             else {
                 $("#CeilingDiv").css("display","none");
                 //OfficeCieling - TotalProposed <= 0
-                if (OfficeID == 37 || OfficeID == 38 || OfficeID == 41){
-                    OfficeCieling = 999999999;
-                }
-                else{
+                //if (OfficeID == 371 || OfficeID == 38 || OfficeID == 41){
+                //    OfficeCieling = 999999999;
+                //}
+                //else{
                     OfficeCieling = 1;
                     TotalProposed = 0;
-                }
+                //}
             }
         });
         //  FilterByOOE()
@@ -1503,6 +1507,75 @@
             document.getElementById("header-label").innerHTML = "Program :";
         }
     });
+
+    var CeilingStatus = 0;
+    var OfficeCieling = 0;
+    var TotalProposed = 0;
+    function getOfficeCeiling() {
+        if ($("#OfficeTotalCieling").attr("class") != 'fa fa-spinner fa-pulse fa-spin fa-fw') {
+            //document.getElementById("OfficeTotalCieling").innerHTML = ' ';
+            $("#OfficeTotalCieling").attr('class', 'fa fa-spinner fa-pulse fa-spin fa-fw');
+            var OfficeID = @Session["selectedOfficeID"];
+            var ProgramID = @Session["ProgID1"];
+            var YearOf = $("#propsYears").val();
+            var url = "@Url.Action("getOfficeTotalCieling", "Maintenance")";
+            $.get(url, {OfficeID:OfficeID, YearOf: YearOf, ProgramID: ProgramID  }, function (d) {
+                //document.getElementById("OfficeTotalCieling").innerHTML = '₱ '+ formatCurrency(d);
+                var $office = $("#OfficeTotalCieling");
+
+                if ($office.length) {
+                    $office.html("₱ " + formatCurrency(d));
+                }
+                
+                $("#totalceilingamount").val(d)
+                if (CeilingStatus == "0") {
+                    //if (OfficeID == 371 || OfficeID == 38 || OfficeID == 41){
+                    //    OfficeCieling = 999999999;
+                    //}
+                    //else{
+                        OfficeCieling=0;
+                    //}
+                }
+                else {
+                    OfficeCieling = parseFloat(formatCurrency(d).replace(/,/g,''));
+                }
+                GetDifference();
+                $("#OfficeTotalCieling").removeClass('fa fa-spinner fa-pulse fa-spin fa-fw');
+            });
+        }
+    }
+
+    @*var officeRequest = null;
+
+    function getOfficeCeiling() {
+
+        var OfficeID = @Session["selectedOfficeID"];
+        var ProgramID = @Session["ProgID1"];
+        var YearOf = $("#propsYears").val();
+        if (officeRequest) {
+            officeRequest.abort();
+        }
+        var url = "@Url.Action("getOfficeTotalCieling", "Maintenance")";
+        officeRequest = $.get(url,
+        {
+            OfficeID: OfficeID,
+            YearOf: YearOf,
+            ProgramID: ProgramID
+        });
+
+        officeRequest.done(function (d) {
+
+            var $office = $("#OfficeTotalCieling");
+
+            if ($office.length === 0)
+                return;
+
+            $office.html("₱ " + formatCurrency(d));
+
+        });
+
+    }*@
+
     function DownloadAIP(){
         var OfficeID=@Session["selectedOfficeID"]
         var ProgramID=@Session["ProgID1"]
