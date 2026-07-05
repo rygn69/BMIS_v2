@@ -76,7 +76,7 @@ namespace iFMIS_BMS.Reports
                     DataTable _dt4 = new DataTable();
                     var isfloat = 0;
                     var budgetype = 0;
-                    string _sqlQuery4 = "SELECT arono,format(cast(dateissued as date),'M/d/yyyy'),[recommendedby],[approvedby],[note],[purpose],[ooeid],isnull([isfloat],0) isfloat,[budgetype] FROM  [IFMIS].[dbo].[ ] where aro_id=" + reporthistory + "";
+                    string _sqlQuery4 = "SELECT arono,format(cast(dateissued as date),'M/d/yyyy'),[recommendedby],[approvedby],[note],[purpose],[ooeid],isnull([isfloat],0) isfloat,[budgetype] FROM  [IFMIS].[dbo].[tbl_T_BMSARO_xml] where aro_id=" + reporthistory + "";
                     _dt4 = OleDbHelper.ExecuteDataset(ConfigurationManager.ConnectionStrings["sqldb"].ToString(), CommandType.Text, _sqlQuery4).Tables[0];
 
                     textBox8.Value = _dt4.Rows[0][0].ToString();//ARO no.
@@ -283,16 +283,17 @@ namespace iFMIS_BMS.Reports
             //}
             if (OfficeID == 14 || OfficeID == 49 || OfficeID == 57)
             {
-                textBox55.Value = "PATRICIA ANNE B. PLAZA";
-                textBox56.Value = "Vice Governor";
-               // textBox56.Value = "Acting Governor";
+                //textBox55.Value = "PATRICIA ANNE B. PLAZA";
+                //textBox56.Value = "Vice Governor";
+                textBox55.Value = " GINA A. CEBALLOS";
+                textBox56.Value = "Acting Vice Governor";
             }
             else
             {
-                textBox55.Value = "SANTIAGO B. CANE, JR.";
-                textBox56.Value = "Governor";
-                //textBox55.Value = "PATRICIA ANNE B. PLAZA";
-                //textBox56.Value = "Acting Governor";
+                //textBox55.Value = "SANTIAGO B. CANE, JR.";
+                //textBox56.Value = "Governor";
+                textBox55.Value = "SAMUEL E. TORTOR";
+                textBox56.Value = "Acting Governor";
             }
 
             DataTable prepsig = new DataTable();

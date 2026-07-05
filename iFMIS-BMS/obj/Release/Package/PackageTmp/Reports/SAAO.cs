@@ -200,7 +200,17 @@ namespace iFMIS_BMS.Reports
                 con.Close();
                 SqlCommand com = new SqlCommand(@"select  controlno from ifmis.dbo.tbl_T_BMSReportXML where qrcode='" + barcode1.Value + "' and office=" + OfficeID + " and yearof= " + year + " ", con);
                 con.Open();
-                textBox14.Value = com.ExecuteScalar().ToString();
+                //textBox14.Value = com.ExecuteScalar().ToString();
+                object result = com.ExecuteScalar();
+
+                if (result != null && result != DBNull.Value)
+                {
+                    textBox14.Value = result.ToString();
+                }
+                else
+                {
+                    textBox14.Value = "";   // or any default value
+                }
 
             }
         }
