@@ -283,17 +283,17 @@ namespace iFMIS_BMS.Reports
             //}
             if (OfficeID == 14 || OfficeID == 49 || OfficeID == 57)
             {
-                //textBox55.Value = "PATRICIA ANNE B. PLAZA";
-                //textBox56.Value = "Vice Governor";
-                textBox55.Value = " GINA A. CEBALLOS";
-                textBox56.Value = "Acting Vice Governor";
+                textBox55.Value = "PATRICIA ANNE B. PLAZA";
+                textBox56.Value = "Vice Governor";
+                //textBox55.Value = " GINA A. CEBALLOS";
+                //textBox56.Value = "Acting Vice Governor";
             }
             else
             {
-                //textBox55.Value = "SANTIAGO B. CANE, JR.";
-                //textBox56.Value = "Governor";
-                textBox55.Value = "SAMUEL E. TORTOR";
-                textBox56.Value = "Acting Governor";
+                textBox55.Value = "SANTIAGO B. CANE, JR.";
+                textBox56.Value = "Governor";
+                //textBox55.Value = "SAMUEL E. TORTOR";
+                //textBox56.Value = "Acting Governor";
             }
 
             DataTable prepsig = new DataTable();
