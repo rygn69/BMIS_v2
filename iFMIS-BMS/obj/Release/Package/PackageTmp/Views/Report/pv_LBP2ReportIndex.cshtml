@@ -173,10 +173,10 @@
         <input type="radio" name="ReportTypeRadioButton" id="rbPrepaired" style="width:15px" value="1" >
         <label style="display:inline-block" for="rbPrepaired">Prepared</label>
 
-        <input type="radio" name="ReportTypeRadioButton" id="rbProposed" style="width:15px" value="2"   >
+        <input type="radio" name="ReportTypeRadioButton" id="rbProposed" style="width:15px" value="2" checked="checked"  >
         <label style="display:inline-block" for="rbProposed">Proposed</label>
 
-        <input type="radio" name="ReportTypeRadioButton" id="rbConsolidated" style="width:15px" value="4" checked="checked"  >
+        <input type="radio" name="ReportTypeRadioButton" id="rbConsolidated" style="width:15px" value="4"   >
         <label style="display:inline-block" for="rbConsolidated">Consolidated</label>
 
         <input type="radio" name="ReportTypeRadioButton" id="rbApproved" style="width:15px" value="3">
@@ -227,8 +227,8 @@
        }
     </div>
         <div style="display:inline-block;width:100%">
-            @*<div id="" class="k-button k-button-icontext" style=" bottom: 15px; right: 25px;width: 150px;float:left; margin-top: 10px;border-radius:50px; margin-left:246px; margin-bottom:-35px" onclick="reqPrintStatus()"><span class=""></span>&nbsp;DGSign Status</div>*@
-            @*<div id="btnPrintDGsign" class="k-button k-button-icontext" style="  bottom: 15px; right: 25px;width: 160px;float:left; margin-top: 5px;background-color:cornflowerblue;color:white;border-radius:50px; margin-left:405px; margin-bottom:5px" onclick="reqPrintDGsign()"><span class="fa fa-search"></span>&nbsp;Preview Via DGSign</div>*@
+            <div id="" class="k-button k-button-icontext" style=" bottom: 15px; right: 25px;width: 150px;float:left; margin-top: 10px;background-color:cornflowerblue;color:white;border-radius:50px; margin-left:246px; margin-bottom:-35px" onclick="reqPrintStatus()"><span class=""></span>&nbsp;DGSign Status</div>
+            <div id="btnPrintDGsign" class="k-button k-button-icontext" style="  bottom: 15px; right: 25px;width: 160px;float:left; margin-top: 5px;background-color:cornflowerblue;color:white;border-radius:50px; margin-left:405px; margin-bottom:5px" onclick="reqPrintDGsign()"><span class="fa fa-search"></span>&nbsp;Submit Via DGSign</div>
             <div id="btnPrint" class="k-button k-button-icontext" style="bottom: 15px; right: 25px;width: 100px;float:right; margin-top: 5px;background-color:cornflowerblue;color:white;border-radius:50px; margin-right:10px; margin-bottom:5px" onclick="reqPrint()"><span class="fa fa-search"></span>&nbsp;Preview</div>
         </div>
     </div>
@@ -249,31 +249,45 @@
         var eco=$("#eco").val();
 
         var url = "@Url.Action("dgsignreport", "Report")";
-        swal({
-            title: "Confirmation!",
-            text: "Would you like to create a document for digital signature? \n\n",
-            type: "info",
-            showCancelButton: true,
-            closeOnConfirm: false,
-            confirmButtonColor: "#1fa67a",
-            confirmButtonText: "Yes",
-            showLoaderOnConfirm: true,
-        },
-        //includeLBP1=" + includeLBP1 + "&pagnoid=" + $("#pagnoid").val() + "&includeLBP2_SP=" + includeLBP2_SP + "&eid="+ userid +"&includezero="+ includezero +"&lbp2export="+ lbp2export +"&reloadlbp2="+ reloadlbp2 +"&sectoral="+ sectoral +"&includeCOE="+ includeCOE +"&eco="+ eco +"
-            function (isConfirm) {
-                if (isConfirm) {
-                    $.post(url, { YearOf:Year,OfficeID:officeID, ReportTypeID:ReportType,docuid:11,reloadlbp4:1,includeLBP1:includeLBP1,pagnoid:$("#pagnoid").val(),includeLBP2_SP:includeLBP2_SP,eid:userid,includezero:includezero,lbp2export:lbp2export,reloadlbp2:reloadlbp2,sectoral:sectoral,includeCOE:includeCOE,eco:eco,purpose:"",note:"", sort_: 0  }, function (d) {
-                        if (d != "") {
-                            //swal.close();
-                            swal("Success","A Local Budget Preparation Form 2 or 4 (LBP Form) is pending your signature in the Dgsign App.","success")
-                            //success: window.open(d)
-                        }
-                        else {
-                            swal("Something Went Wrong!", d, "error");
-                        }
-                    })
+        var url_check = "@Url.Action("dgsigncheck", "Report")";
+        if (officeID != 0) {
+            $.get(url_check,{officeID:officeID,FormType:1,Year:Year},function(r){
+                if (r == '0'){
+                    swal({
+                        title: "Confirmation!",
+                        text: "Please be informed that a document for digital signature can only be generated once. Would you like to continue? \n\n",
+                        type: "info",
+                        showCancelButton: true,
+                        closeOnConfirm: false,
+                        confirmButtonColor: "#1fa67a",
+                        confirmButtonText: "Yes",
+                        showLoaderOnConfirm: true,
+                    },
+            //includeLBP1=" + includeLBP1 + "&pagnoid=" + $("#pagnoid").val() + "&includeLBP2_SP=" + includeLBP2_SP + "&eid="+ userid +"&includezero="+ includezero +"&lbp2export="+ lbp2export +"&reloadlbp2="+ reloadlbp2 +"&sectoral="+ sectoral +"&includeCOE="+ includeCOE +"&eco="+ eco +"
+                function (isConfirm) {
+                    if (isConfirm) {
+                        $.post(url, { YearOf:Year,OfficeID:officeID, ReportTypeID:ReportType,docuid:11,reloadlbp4:1,includeLBP1:includeLBP1,pagnoid:$("#pagnoid").val(),includeLBP2_SP:includeLBP2_SP,eid:userid,includezero:includezero,lbp2export:lbp2export,reloadlbp2:reloadlbp2,sectoral:sectoral,includeCOE:includeCOE,eco:eco,purpose:"",note:"", sort_: 0  }, function (d) {
+                            if (d != "") {
+                                //swal.close();
+                                swal("Success","A Local Budget Preparation Form 2 or 4 (LBP Form) is pending your signature in the Dgsign App.","success")
+                                //success: window.open(d)
+                            }
+                            else {
+                                swal("Something Went Wrong!", d, "error");
+                            }
+                        })
+                    }
+                })
+                }
+                else{
+                    swal("Warning!", "Sorry! A document has already been generated for digital signature. Please check the DGSign Web Application.", "warning");
                 }
             })
+        }
+        else {
+            swal("Warning!", "Please select an office from the dropdown list.", "warning");
+        }
+        
     }
     function reqPrintStatus() {
         $(window).scrollTop(0);

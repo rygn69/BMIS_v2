@@ -96,7 +96,7 @@
         {
             columns.Bound(c => c.DivName).Title("EmploymentStatus").Hidden()
                 .ClientGroupHeaderTemplate("<div style='display:inline-block'>#= value #</div>");
-            columns.Bound(c => c.EmployeeName).Title("Name").Width(200)
+            columns.Bound(c => c.EmployeeName).Title("Namess").Width(200)
                 .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
                 .ClientGroupHeaderTemplate("<label style='display:inline-block'>: #=count#</label>")
                 .ClientGroupFooterTemplate("<label style='display:inline-block'>Employee Count: #=count# </br> Sub Total</label>")

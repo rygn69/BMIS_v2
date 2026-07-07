@@ -1224,7 +1224,7 @@ namespace iFMIS_BMS.Reports
             this.textBox134.Style.Font.Bold = false;
             this.textBox134.Style.TextAlign = Telerik.Reporting.Drawing.HorizontalAlign.Left;
             this.textBox134.Style.VerticalAlign = Telerik.Reporting.Drawing.VerticalAlign.Middle;
-            this.textBox134.Style.Visible = true;
+            this.textBox134.Style.Visible = false;
             this.textBox134.StyleName = "";
             this.textBox134.Value = "Reviewed : Local Finance Committee";
             // 
@@ -1241,7 +1241,7 @@ namespace iFMIS_BMS.Reports
             this.textBox135.Style.BorderStyle.Top = Telerik.Reporting.Drawing.BorderType.None;
             this.textBox135.Style.TextAlign = Telerik.Reporting.Drawing.HorizontalAlign.Center;
             this.textBox135.Style.VerticalAlign = Telerik.Reporting.Drawing.VerticalAlign.Bottom;
-            this.textBox135.Style.Visible = true;
+            this.textBox135.Style.Visible = false;
             this.textBox135.StyleName = "";
             this.textBox135.Value = "=getTextBoxValue(CInt(2))";
             // 
@@ -1258,7 +1258,7 @@ namespace iFMIS_BMS.Reports
             this.textBox136.Style.BorderStyle.Top = Telerik.Reporting.Drawing.BorderType.None;
             this.textBox136.Style.TextAlign = Telerik.Reporting.Drawing.HorizontalAlign.Center;
             this.textBox136.Style.VerticalAlign = Telerik.Reporting.Drawing.VerticalAlign.Middle;
-            this.textBox136.Style.Visible = true;
+            this.textBox136.Style.Visible = false;
             this.textBox136.StyleName = "";
             this.textBox136.Value = "=getTextBoxValue(CInt(3))";
             // 
@@ -1275,7 +1275,7 @@ namespace iFMIS_BMS.Reports
             this.textBox137.Style.BorderStyle.Top = Telerik.Reporting.Drawing.BorderType.None;
             this.textBox137.Style.TextAlign = Telerik.Reporting.Drawing.HorizontalAlign.Center;
             this.textBox137.Style.VerticalAlign = Telerik.Reporting.Drawing.VerticalAlign.Bottom;
-            this.textBox137.Style.Visible = true;
+            this.textBox137.Style.Visible = false;
             this.textBox137.StyleName = "";
             this.textBox137.Value = "=getTextBoxValue(CInt(5))";
             // 
@@ -1292,7 +1292,7 @@ namespace iFMIS_BMS.Reports
             this.textBox138.Style.BorderStyle.Top = Telerik.Reporting.Drawing.BorderType.None;
             this.textBox138.Style.TextAlign = Telerik.Reporting.Drawing.HorizontalAlign.Center;
             this.textBox138.Style.VerticalAlign = Telerik.Reporting.Drawing.VerticalAlign.Middle;
-            this.textBox138.Style.Visible = true;
+            this.textBox138.Style.Visible = false;
             this.textBox138.StyleName = "";
             this.textBox138.Value = "=getTextBoxValue(CInt(4))";
             // 
@@ -1309,7 +1309,7 @@ namespace iFMIS_BMS.Reports
             this.textBox141.Style.BorderStyle.Top = Telerik.Reporting.Drawing.BorderType.None;
             this.textBox141.Style.TextAlign = Telerik.Reporting.Drawing.HorizontalAlign.Left;
             this.textBox141.Style.VerticalAlign = Telerik.Reporting.Drawing.VerticalAlign.Bottom;
-            this.textBox141.Style.Visible = true;
+            this.textBox141.Style.Visible = false;
             this.textBox141.StyleName = "";
             this.textBox141.Value = "Approved :";
             // 
@@ -1326,7 +1326,7 @@ namespace iFMIS_BMS.Reports
             this.textBox142.Style.BorderStyle.Top = Telerik.Reporting.Drawing.BorderType.None;
             this.textBox142.Style.TextAlign = Telerik.Reporting.Drawing.HorizontalAlign.Center;
             this.textBox142.Style.VerticalAlign = Telerik.Reporting.Drawing.VerticalAlign.Bottom;
-            this.textBox142.Style.Visible = true;
+            this.textBox142.Style.Visible = false;
             this.textBox142.StyleName = "";
             this.textBox142.Value = "=getTextBoxValue(CInt(6))";
             // 
@@ -1343,7 +1343,7 @@ namespace iFMIS_BMS.Reports
             this.textBox143.Style.BorderStyle.Top = Telerik.Reporting.Drawing.BorderType.None;
             this.textBox143.Style.TextAlign = Telerik.Reporting.Drawing.HorizontalAlign.Center;
             this.textBox143.Style.VerticalAlign = Telerik.Reporting.Drawing.VerticalAlign.Top;
-            this.textBox143.Style.Visible = true;
+            this.textBox143.Style.Visible = false;
             this.textBox143.StyleName = "";
             this.textBox143.Value = "=getTextBoxValue(CInt(7))";
             // 
@@ -1360,7 +1360,7 @@ namespace iFMIS_BMS.Reports
             this.textBox35.Style.BorderStyle.Top = Telerik.Reporting.Drawing.BorderType.None;
             this.textBox35.Style.TextAlign = Telerik.Reporting.Drawing.HorizontalAlign.Center;
             this.textBox35.Style.VerticalAlign = Telerik.Reporting.Drawing.VerticalAlign.Middle;
-            this.textBox35.Style.Visible = true;
+            this.textBox35.Style.Visible = false;
             this.textBox35.StyleName = "";
             this.textBox35.Value = "";
             // 
@@ -1377,7 +1377,7 @@ namespace iFMIS_BMS.Reports
             this.textBox46.Style.BorderStyle.Top = Telerik.Reporting.Drawing.BorderType.None;
             this.textBox46.Style.TextAlign = Telerik.Reporting.Drawing.HorizontalAlign.Center;
             this.textBox46.Style.VerticalAlign = Telerik.Reporting.Drawing.VerticalAlign.Bottom;
-            this.textBox46.Style.Visible = true;
+            this.textBox46.Style.Visible = false;
             this.textBox46.StyleName = "";
             this.textBox46.Value = "";
             // 

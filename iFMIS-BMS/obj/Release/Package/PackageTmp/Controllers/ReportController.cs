@@ -5470,56 +5470,81 @@ namespace iFMIS_BMS.Controllers
                                                                                       "values(@doc_name,@doc_type,@doc_attachement,@location,@doc_description,@doc_status_id,@doc_designated,@doc_datetime,@doc_eid,@doc_datetime_update,@doc_code,@doc_signatory_type,@doc_is,@doc_type_id) ", con))
                         {
                             //consolidation
-                            if (OfficeID == 14 || OfficeID == 49 || OfficeID == 57)
+                            if (ReportTypeID != 1 && ReportTypeID != 2)
                             {
-                                cmd.Parameters.AddWithValue("@doc_name", fileName);
-                                cmd.Parameters.AddWithValue("@doc_type", "0");
-                                cmd.Parameters.AddWithValue("@location", "'bms/Report'");
-                                cmd.Parameters.AddWithValue("@doc_description", strwfpnofile.Replace("'", "''").ToString());
-                                cmd.Parameters.AddWithValue("@doc_status_id", "1");
-                                cmd.Parameters.AddWithValue("@doc_designated", "354982," + officeheadid + "," + repsig);
-                                cmd.Parameters.AddWithValue("@doc_datetime", DateTime.Now);
-                                cmd.Parameters.AddWithValue("@doc_eid", "354982");
-                                cmd.Parameters.AddWithValue("@doc_datetime_update", "");
-                                cmd.Parameters.AddWithValue("@doc_code", str_random);
-                                cmd.Parameters.AddWithValue("@doc_signatory_type", "1");
-                                cmd.Parameters.AddWithValue("@doc_is", "11");
-                                cmd.Parameters.AddWithValue("@doc_type_id", doctypeid);
-                                cmd.Parameters.Add("@doc_attachement", SqlDbType.VarBinary).Value = fileData;
+                                if (OfficeID == 14 || OfficeID == 49 || OfficeID == 57)
+                                {
+                                    cmd.Parameters.AddWithValue("@doc_name", fileName);
+                                    cmd.Parameters.AddWithValue("@doc_type", "0");
+                                    cmd.Parameters.AddWithValue("@location", "'bms/Report'");
+                                    cmd.Parameters.AddWithValue("@doc_description", strwfpnofile.Replace("'", "''").ToString());
+                                    cmd.Parameters.AddWithValue("@doc_status_id", "1");
+                                    cmd.Parameters.AddWithValue("@doc_designated", "354982," + officeheadid + "," + repsig);
+                                    cmd.Parameters.AddWithValue("@doc_datetime", DateTime.Now);
+                                    cmd.Parameters.AddWithValue("@doc_eid", "354982");
+                                    cmd.Parameters.AddWithValue("@doc_datetime_update", "");
+                                    cmd.Parameters.AddWithValue("@doc_code", str_random);
+                                    cmd.Parameters.AddWithValue("@doc_signatory_type", "1");
+                                    cmd.Parameters.AddWithValue("@doc_is", "11");
+                                    cmd.Parameters.AddWithValue("@doc_type_id", doctypeid);
+                                    cmd.Parameters.Add("@doc_attachement", SqlDbType.VarBinary).Value = fileData;
+                                }
+                                else
+                                {
+                                    cmd.Parameters.AddWithValue("@doc_name", fileName);
+                                    cmd.Parameters.AddWithValue("@doc_type", "0");
+                                    cmd.Parameters.AddWithValue("@location", "'bms/Report'");
+                                    cmd.Parameters.AddWithValue("@doc_description", strwfpnofile.Replace("'", "''").ToString());
+                                    cmd.Parameters.AddWithValue("@doc_status_id", "1");
+                                    cmd.Parameters.AddWithValue("@doc_designated", officeheadid + "," + repsig);
+                                    cmd.Parameters.AddWithValue("@doc_datetime", DateTime.Now);
+                                    cmd.Parameters.AddWithValue("@doc_eid", officeheadid);
+                                    cmd.Parameters.AddWithValue("@doc_datetime_update", "");
+                                    cmd.Parameters.AddWithValue("@doc_code", str_random);
+                                    cmd.Parameters.AddWithValue("@doc_signatory_type", "1");
+                                    cmd.Parameters.AddWithValue("@doc_is", "11");
+                                    cmd.Parameters.AddWithValue("@doc_type_id", doctypeid);
+                                    cmd.Parameters.Add("@doc_attachement", SqlDbType.VarBinary).Value = fileData;
+                                }
                             }
                             else
                             {
-                                cmd.Parameters.AddWithValue("@doc_name", fileName);
-                                cmd.Parameters.AddWithValue("@doc_type", "0");
-                                cmd.Parameters.AddWithValue("@location", "'bms/Report'");
-                                cmd.Parameters.AddWithValue("@doc_description", strwfpnofile.Replace("'", "''").ToString());
-                                cmd.Parameters.AddWithValue("@doc_status_id", "1");
-                                cmd.Parameters.AddWithValue("@doc_designated", officeheadid + "," + repsig);
-                                cmd.Parameters.AddWithValue("@doc_datetime", DateTime.Now);
-                                cmd.Parameters.AddWithValue("@doc_eid", officeheadid);
-                                cmd.Parameters.AddWithValue("@doc_datetime_update", "");
-                                cmd.Parameters.AddWithValue("@doc_code", str_random);
-                                cmd.Parameters.AddWithValue("@doc_signatory_type", "1");
-                                cmd.Parameters.AddWithValue("@doc_is", "11");
-                                cmd.Parameters.AddWithValue("@doc_type_id", doctypeid);
-                                cmd.Parameters.Add("@doc_attachement", SqlDbType.VarBinary).Value = fileData;
+                                //preparation
+                                if (OfficeID == 14 || OfficeID == 49 || OfficeID == 57)
+                                {
+                                    cmd.Parameters.AddWithValue("@doc_name", fileName);
+                                    cmd.Parameters.AddWithValue("@doc_type", "0");
+                                    cmd.Parameters.AddWithValue("@location", "'bms/Report'");
+                                    cmd.Parameters.AddWithValue("@doc_description", strwfpnofile.Replace("'", "''").ToString());
+                                    cmd.Parameters.AddWithValue("@doc_status_id", "1");
+                                    cmd.Parameters.AddWithValue("@doc_designated", "354982," + officeheadid);
+                                    cmd.Parameters.AddWithValue("@doc_datetime", DateTime.Now);
+                                    cmd.Parameters.AddWithValue("@doc_eid", "354982");
+                                    cmd.Parameters.AddWithValue("@doc_datetime_update", "");
+                                    cmd.Parameters.AddWithValue("@doc_code", str_random);
+                                    cmd.Parameters.AddWithValue("@doc_signatory_type", "1");
+                                    cmd.Parameters.AddWithValue("@doc_is", "11");
+                                    cmd.Parameters.AddWithValue("@doc_type_id", doctypeid);
+                                    cmd.Parameters.Add("@doc_attachement", SqlDbType.VarBinary).Value = fileData;
+                                }
+                                else
+                                {
+                                    cmd.Parameters.AddWithValue("@doc_name", fileName);
+                                    cmd.Parameters.AddWithValue("@doc_type", "0");
+                                    cmd.Parameters.AddWithValue("@location", "'bms/Report'");
+                                    cmd.Parameters.AddWithValue("@doc_description", strwfpnofile.Replace("'", "''").ToString());
+                                    cmd.Parameters.AddWithValue("@doc_status_id", "1");
+                                    cmd.Parameters.AddWithValue("@doc_designated", officeheadid);
+                                    cmd.Parameters.AddWithValue("@doc_datetime", DateTime.Now);
+                                    cmd.Parameters.AddWithValue("@doc_eid", officeheadid);
+                                    cmd.Parameters.AddWithValue("@doc_datetime_update", "");
+                                    cmd.Parameters.AddWithValue("@doc_code", str_random);
+                                    cmd.Parameters.AddWithValue("@doc_signatory_type", "1");
+                                    cmd.Parameters.AddWithValue("@doc_is", "11");
+                                    cmd.Parameters.AddWithValue("@doc_type_id", doctypeid);
+                                    cmd.Parameters.Add("@doc_attachement", SqlDbType.VarBinary).Value = fileData;
+                                }
                             }
-                            //preparation
-                            //cmd.Parameters.AddWithValue("@doc_name", fileName);
-                            //cmd.Parameters.AddWithValue("@doc_type", "0");
-                            //cmd.Parameters.AddWithValue("@location", "'bms/Report'");
-                            //cmd.Parameters.AddWithValue("@doc_description", strwfpnofile.Replace("'", "''").ToString());
-                            //cmd.Parameters.AddWithValue("@doc_status_id", "1");
-                            //cmd.Parameters.AddWithValue("@doc_designated", officeheadid);
-                            //cmd.Parameters.AddWithValue("@doc_datetime", DateTime.Now);
-                            //cmd.Parameters.AddWithValue("@doc_eid", officeheadid);
-                            //cmd.Parameters.AddWithValue("@doc_datetime_update", "");
-                            //cmd.Parameters.AddWithValue("@doc_code", str_random);
-                            //cmd.Parameters.AddWithValue("@doc_signatory_type", "1");
-                            //cmd.Parameters.AddWithValue("@doc_is", "11");
-                            //cmd.Parameters.AddWithValue("@doc_type_id", doctypeid);
-                            //cmd.Parameters.Add("@doc_attachement", SqlDbType.VarBinary).Value = fileData;
-
                             con.Open();
                             cmd.ExecuteNonQuery();
                         }
@@ -5573,6 +5598,42 @@ namespace iFMIS_BMS.Controllers
                                                                                      "values(@doc_name,@doc_type,@doc_attachement,@location,@doc_description,@doc_status_id,@doc_designated,@doc_datetime,@doc_eid,@doc_datetime_update,@doc_code,@doc_signatory_type,@doc_is,@doc_type_id) ", con))
                         {
                             //consolidation
+                            //if (OfficeID == 14 || OfficeID == 49 || OfficeID == 57)
+                            //{
+                            //    cmd.Parameters.AddWithValue("@doc_name", fileName);
+                            //    cmd.Parameters.AddWithValue("@doc_type", "0");
+                            //    cmd.Parameters.AddWithValue("@location", "'bms/Report'");
+                            //    cmd.Parameters.AddWithValue("@doc_description", strwfpnofile.Replace("'", "''").ToString());
+                            //    cmd.Parameters.AddWithValue("@doc_status_id", "1");
+                            //    cmd.Parameters.AddWithValue("@doc_designated", "354982," + officeheadid + "," + repsig);
+                            //    cmd.Parameters.AddWithValue("@doc_datetime", DateTime.Now);
+                            //    cmd.Parameters.AddWithValue("@doc_eid", "354982");
+                            //    cmd.Parameters.AddWithValue("@doc_datetime_update", "");
+                            //    cmd.Parameters.AddWithValue("@doc_code", str_random);
+                            //    cmd.Parameters.AddWithValue("@doc_signatory_type", "1");
+                            //    cmd.Parameters.AddWithValue("@doc_is", "11");
+                            //    cmd.Parameters.AddWithValue("@doc_type_id", doctypeid);
+                            //    cmd.Parameters.Add("@doc_attachement", SqlDbType.VarBinary).Value = fileData;
+                            //}
+                            //else
+                            //{
+                            //    cmd.Parameters.AddWithValue("@doc_name", fileName);
+                            //    cmd.Parameters.AddWithValue("@doc_type", "0");
+                            //    cmd.Parameters.AddWithValue("@location", "'bms/Report'");
+                            //    cmd.Parameters.AddWithValue("@doc_description", strwfpnofile.Replace("'", "''").ToString());
+                            //    cmd.Parameters.AddWithValue("@doc_status_id", "1");
+                            //    cmd.Parameters.AddWithValue("@doc_designated", officeheadid + "," + repsig);
+                            //    cmd.Parameters.AddWithValue("@doc_datetime", DateTime.Now);
+                            //    cmd.Parameters.AddWithValue("@doc_eid", officeheadid);
+                            //    cmd.Parameters.AddWithValue("@doc_datetime_update", "");
+                            //    cmd.Parameters.AddWithValue("@doc_code", str_random);
+                            //    cmd.Parameters.AddWithValue("@doc_signatory_type", "1");
+                            //    cmd.Parameters.AddWithValue("@doc_is", "11");
+                            //    cmd.Parameters.AddWithValue("@doc_type_id", doctypeid);
+                            //    cmd.Parameters.Add("@doc_attachement", SqlDbType.VarBinary).Value = fileData;
+                                
+                            //}
+                            //preparation
                             if (OfficeID == 14 || OfficeID == 49 || OfficeID == 57)
                             {
                                 cmd.Parameters.AddWithValue("@doc_name", fileName);
@@ -5580,7 +5641,7 @@ namespace iFMIS_BMS.Controllers
                                 cmd.Parameters.AddWithValue("@location", "'bms/Report'");
                                 cmd.Parameters.AddWithValue("@doc_description", strwfpnofile.Replace("'", "''").ToString());
                                 cmd.Parameters.AddWithValue("@doc_status_id", "1");
-                                cmd.Parameters.AddWithValue("@doc_designated", "354982," + officeheadid + "," + repsig);
+                                cmd.Parameters.AddWithValue("@doc_designated", "354982," + officeheadid);
                                 cmd.Parameters.AddWithValue("@doc_datetime", DateTime.Now);
                                 cmd.Parameters.AddWithValue("@doc_eid", "354982");
                                 cmd.Parameters.AddWithValue("@doc_datetime_update", "");
@@ -5597,7 +5658,7 @@ namespace iFMIS_BMS.Controllers
                                 cmd.Parameters.AddWithValue("@location", "'bms/Report'");
                                 cmd.Parameters.AddWithValue("@doc_description", strwfpnofile.Replace("'", "''").ToString());
                                 cmd.Parameters.AddWithValue("@doc_status_id", "1");
-                                cmd.Parameters.AddWithValue("@doc_designated", officeheadid + "," + repsig);
+                                cmd.Parameters.AddWithValue("@doc_designated", officeheadid);
                                 cmd.Parameters.AddWithValue("@doc_datetime", DateTime.Now);
                                 cmd.Parameters.AddWithValue("@doc_eid", officeheadid);
                                 cmd.Parameters.AddWithValue("@doc_datetime_update", "");
@@ -5607,25 +5668,9 @@ namespace iFMIS_BMS.Controllers
                                 cmd.Parameters.AddWithValue("@doc_type_id", doctypeid);
                                 cmd.Parameters.Add("@doc_attachement", SqlDbType.VarBinary).Value = fileData;
 
-                                //preparation
-                                //cmd.Parameters.AddWithValue("@doc_name", fileName);
-                                //cmd.Parameters.AddWithValue("@doc_type", "0");
-                                //cmd.Parameters.AddWithValue("@location", "'bms/Report'");
-                                //cmd.Parameters.AddWithValue("@doc_description", strwfpnofile.Replace("'", "''").ToString());
-                                //cmd.Parameters.AddWithValue("@doc_status_id", "1");
-                                //cmd.Parameters.AddWithValue("@doc_designated", officeheadid);
-                                //cmd.Parameters.AddWithValue("@doc_datetime", DateTime.Now);
-                                //cmd.Parameters.AddWithValue("@doc_eid", officeheadid);
-                                //cmd.Parameters.AddWithValue("@doc_datetime_update", "");
-                                //cmd.Parameters.AddWithValue("@doc_code", str_random);
-                                //cmd.Parameters.AddWithValue("@doc_signatory_type", "1");
-                                //cmd.Parameters.AddWithValue("@doc_is", "11");
-                                //cmd.Parameters.AddWithValue("@doc_type_id", doctypeid);
-                                //cmd.Parameters.Add("@doc_attachement", SqlDbType.VarBinary).Value = fileData;
-
-                                con.Open();
-                                cmd.ExecuteNonQuery();
                             }
+                            con.Open();
+                            cmd.ExecuteNonQuery();
                         }
                     }
                     else if (docuid == 14) // ARO
@@ -5855,7 +5900,7 @@ namespace iFMIS_BMS.Controllers
 
                     var datarep = "";
                     con.Close();
-                    SqlCommand com3 = new SqlCommand(@"exec [bacpdfsign].[dbo].sp_bms_wfpsignatory '" + strfileonly + "'," + opndocid + ",'" + str_random + "',0,0," + YearOf + ",0", con);
+                    SqlCommand com3 = new SqlCommand(@"exec [bacpdfsign].[dbo].sp_bms_wfpsignatory_v2 '" + strfileonly + "'," + opndocid + ",'" + str_random + "',0,0," + YearOf + ",0,"+ OfficeID  + ","+ Account.UserInfo.eid +"", con);
                     con.Open();
                     datarep = Convert.ToString(com3.ExecuteScalar());
 
@@ -8412,6 +8457,24 @@ namespace iFMIS_BMS.Controllers
                     con.Open();
                     data = Convert.ToString(com.ExecuteScalar());
                     return "success";
+                }
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
+        public string dgsigncheck(int? officeID=0, int? FormType = 0 , int? Year=0)
+        {
+            try
+            {
+                using (SqlConnection con = new SqlConnection(Common.MyConn()))
+                {
+                    var data = "";
+                    SqlCommand com = new SqlCommand(@"select ifmis.dbo.[fn_BMS_CheckDgsign] (" + officeID + "," + FormType + "," + Year + ")", con);
+                    con.Open();
+                    data = Convert.ToString(com.ExecuteScalar());
+                    return data;
                 }
             }
             catch (Exception ex)
