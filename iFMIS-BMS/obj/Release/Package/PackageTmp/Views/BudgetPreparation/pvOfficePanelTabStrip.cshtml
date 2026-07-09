@@ -578,7 +578,7 @@
             var DenominationAmount_Var = DenominationAmount.replace("₱","")
             var TotalAmount_Var = TotalAmount.replace("₱","")
             $("#program_t").val(Program)
-           
+            $("#account_t").val(AccountID)
             var url = "@Url.Action("EditData", "BudgetPreparation")";
             //$('#EditDetails').html("<div style='text-align:center;height:100%;width:100%;margin:auto;'><span class='fa fa-spinner fa-pulse fa-spin fa-fw fa-2x'></span>Please Wait ...</div>");
             $('#EditDetails').html("<div class='center'><span class='fa fa-spinner fa-pulse fa-spin fa-fw fa-2x'></span>Please Wait ...</div>");
@@ -1227,6 +1227,7 @@
 </div>
 <div style="display:none">
     <input type="text" value="" id="program_t"/>
+    <input type="text" value="" id="account_t" />
 </div>
 <script id="template" type="text/kendo-tmpl">
     @(Html.Kendo().Grid<iFMIS_BMS.BusinessLayer.Models.AccountDenomination>()
