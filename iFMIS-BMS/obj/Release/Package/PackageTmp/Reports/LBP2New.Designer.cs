@@ -322,6 +322,8 @@ namespace iFMIS_BMS.Reports
             this.table2.ColumnGroups.Add(tableGroup6);
             this.table2.ColumnGroups.Add(tableGroup7);
             this.table2.ColumnHeadersPrintOnEveryPage = true;
+            this.table2.FreezeColumnHeaders = false;
+            this.table2.FreezeRowHeaders = false;
             this.table2.Items.AddRange(new Telerik.Reporting.ReportItemBase[] {
             this.textBox5,
             this.textBox6,
@@ -1689,7 +1691,7 @@ namespace iFMIS_BMS.Reports
             // 
             // pageHeaderSection1
             // 
-            this.pageHeaderSection1.Height = Telerik.Reporting.Drawing.Unit.Cm(2.124D);
+            this.pageHeaderSection1.Height = Telerik.Reporting.Drawing.Unit.Cm(2.125D);
             this.pageHeaderSection1.Items.AddRange(new Telerik.Reporting.ReportItemBase[] {
             this.textBox26,
             this.textBox27,
@@ -1711,6 +1713,7 @@ namespace iFMIS_BMS.Reports
             this.textBox46});
             this.pageHeaderSection1.Name = "pageHeaderSection1";
             this.pageHeaderSection1.PrintOnFirstPage = false;
+            this.pageHeaderSection1.Style.Visible = true;
             // 
             // textBox26
             // 
