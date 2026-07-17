@@ -1,5 +1,5 @@
-R:\IS\GitHub\BMIS_v2\iFMIS-BMS\bin\iFMIS_BMS.dll.config
 R:\IS\GitHub\BMIS_v2\iFMIS-BMS\bin\iFMIS_BMS.dll
+R:\IS\GitHub\BMIS_v2\iFMIS-BMS\bin\iFMIS_BMS.dll.config
 R:\IS\GitHub\BMIS_v2\iFMIS-BMS\bin\iFMIS_BMS.pdb
 R:\IS\GitHub\BMIS_v2\iFMIS-BMS\bin\System.Net.Http.dll
 R:\IS\GitHub\BMIS_v2\iFMIS-BMS\bin\System.Net.Http.Formatting.dll
