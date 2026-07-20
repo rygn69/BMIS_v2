@@ -1,5 +1,5 @@
-R:\IS\GitHub\BMIS_v2\iFMIS-BMS\bin\iFMIS_BMS.dll
 R:\IS\GitHub\BMIS_v2\iFMIS-BMS\bin\iFMIS_BMS.dll.config
+R:\IS\GitHub\BMIS_v2\iFMIS-BMS\bin\iFMIS_BMS.dll
 R:\IS\GitHub\BMIS_v2\iFMIS-BMS\bin\iFMIS_BMS.pdb
 R:\IS\GitHub\BMIS_v2\iFMIS-BMS\bin\System.Net.Http.dll
 R:\IS\GitHub\BMIS_v2\iFMIS-BMS\bin\System.Net.Http.Formatting.dll
@@ -19,6 +19,7 @@ R:\IS\GitHub\BMIS_v2\iFMIS-BMS\bin\Telerik.ReportViewer.WebForms.pdb
 R:\IS\GitHub\BMIS_v2\iFMIS-BMS\bin\Telerik.ReportViewer.WebForms.xml
 R:\IS\GitHub\BMIS_v2\iFMIS-BMS\bin\Telerik.ReportViewer.WinForms.pdb
 R:\IS\GitHub\BMIS_v2\iFMIS-BMS\bin\Telerik.ReportViewer.WinForms.xml
+R:\IS\GitHub\BMIS_v2\iFMIS-BMS\obj\Debug\iFMIS_BMS.csprojResolveAssemblyReference.cache
 R:\IS\GitHub\BMIS_v2\iFMIS-BMS\obj\Debug\iFMIS_BMS.Properties.Resources.resources
 R:\IS\GitHub\BMIS_v2\iFMIS-BMS\obj\Debug\iFMIS_BMS.Reports.AIPPreperationReport.resources
 R:\IS\GitHub\BMIS_v2\iFMIS-BMS\obj\Debug\iFMIS_BMS.Reports.ARO.resources

@@ -928,6 +928,31 @@
         });
         $('#CreateNewDenominationAccount').data('kendoWindow').title("<i class='fa fa-navicon'> </i>").center().open();
     }
+    function AddProItem(AccountID){
+        $(window).scrollTop(0);
+
+        var officeid = $("#offs").val() == "" ? 0 : $("#offs").val()
+        var programid = $("#Progss").val() == "" ? 0 : $("#Progss").val()
+        var accountid = AccountID;//$("#account").val() == "" ? 0 : $("#account").val()
+        var tyear =  parseInt($("#ddlYear").val(), 10) - 1;
+        var fundid = 0;//$("#gfid").val() == 1 ? 0 : 1
+        var mode_trans= 1;//$("#gf_currentid").val()
+        var ooeclass=$("#ooe_id").val()
+      
+        var url = "@Url.Action("AddProcurementitem", "Home")";
+        $.get(url, {
+            office: officeid,
+            program: programid,
+            account: accountid,
+            tyear: tyear,
+            fundid:fundid,
+            mode_trans:mode_trans,
+            ooeclass:ooeclass }, function (d) {
+
+                $('#wfpadditem').html(d);
+        });
+        $('#wfpadditem').data('kendoWindow').title("<i class='fa fa-navicon'> </i>").center().open();
+    }
     function PlantillaSummary() {
         $(window).scrollTop(0);
 
@@ -1457,6 +1482,7 @@
             })
             .ToolBar(toolbar =>
             {
+                toolbar.Custom().Text("<span class='fa fa-plus'> </span> Add Item").Name("btnAddParticular").Url("javascript:void(0)").HtmlAttributes(new { onclick = "AddProItem( #=AccountID# )" });
                 toolbar.Custom().Text("<span class='fa fa-plus'> </span> Add Particular").Name("btnAddParticular").Url("javascript:void(0)").HtmlAttributes(new { onclick = "AddParticular( #=AccountID# )" });
                 toolbar.Custom().Text("View All Details").Name("btnHideMonth").Url("javascript:void(0)").HtmlAttributes(new { onclick = "HideMonthCollumn(#=AccountID#)", id = "btnHideMonth" });
                 toolbar.Save();
@@ -2021,5 +2047,25 @@
         background-color: #AAD86B;
     }
 </style>
-
+@(Html.Kendo().Window()
+        .Name("wfpadditem")
+        //.Title("")
+        .Width(1020)
+        .Height(610)
+        .Visible(false)
+        .Modal(true)
+        .Draggable(true)
+        .AutoFocus(true)
+        //  .Events(e => e.Close("closewfpapproved_lce"))
+        .Animation(a =>
+        {
+            a.Open(o => o.SlideIn(SlideDirection.Down));
+            a.Close(c =>
+            {
+                c.SlideIn(SlideDirection.Down);
+                c.Reverse(true);
+            });
+        })
+                .Actions(a => { a.Close(); })
+)
 @Html.Raw(@ViewBag.ok)

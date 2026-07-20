@@ -5627,6 +5627,7 @@
     <Content Include="Views\Report\pv_WFPDetail.cshtml" />
     <Content Include="Views\Report\pv_WFPCancel.cshtml" />
     <Content Include="Views\Maintenance\pv_WFPAddAccountItem.cshtml" />
+    <Content Include="Views\Home\pvAddProposalProcurement.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

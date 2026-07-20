@@ -1474,5 +1474,41 @@ namespace iFMIS_BMS.Controllers
                 return 0;
             }
         }
+        public PartialViewResult AddProcurementitem(int? office = 0, int? program = 0, int? account = 0, int? tyear = 0, int? fundid = 0, int? mode_trans = 0, int? ooeclass = 0)
+        {
+            Session["office"] = office;
+            Session["program"] = program;
+            Session["account"] = account;
+            Session["tyear"] = tyear;
+            Session["fundid"] = fundid;
+            Session["mode_trans"] = mode_trans;
+            Session["ooeclass"] = ooeclass;
+            return PartialView("pvAddProposalProcurement");
+        }
+        public JsonResult GetPPPMPitem_Proc([DataSourceRequest]DataSourceRequest request, int? office = 0, int? program = 0, int? account = 0, int? tyear = 0, int? fundid = 0, int? mode_trans = 0, int? ooeclass = 0,int? expendableid=0)
+        {
+            List<WFPrepare> prog = new List<WFPrepare>();
+            using (SqlConnection con = new SqlConnection(Common.MyConn()))
+            {
+                SqlCommand com = new SqlCommand(@"exec sp_BMS_Proposalppmpitem " + office + "," + program + "," + account + "," + tyear + "," + ooeclass + "," + Account.UserInfo.eid + ","+ expendableid + "", con);
+                con.Open();
+                com.CommandTimeout = 0;
+                SqlDataReader reader = com.ExecuteReader();
+                while (reader.Read())
+                {
+                    WFPrepare loc = new WFPrepare();
+                    loc.itemid = Convert.ToInt32(reader.GetValue(0));
+                    loc.itemname = reader.GetValue(1).ToString().Replace("'", "''").ToString();
+                    loc.unitcost = Convert.ToDouble(reader.GetValue(2));
+                    loc.unit = Convert.ToString(reader.GetValue(3));
+                    prog.Add(loc);
+                }
+            }
+
+            var jsonResult = Json(prog.ToDataSourceResult(request), JsonRequestBehavior.AllowGet);
+            jsonResult.MaxJsonLength = int.MaxValue;
+            return jsonResult;
+            //return Json(prog.ToDataSourceResult(request));
+        }
     }
 }
