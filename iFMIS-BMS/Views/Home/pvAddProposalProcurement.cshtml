@@ -51,25 +51,32 @@
         document.getElementById("expendableid").checked=true
         document.getElementById("semiexpendableid").value=0
         document.getElementById("semiexpendableid").checked=false
+        grd_reload()
     }
     function semiexpendable_click(){
         document.getElementById("expendableid").value=0
         document.getElementById("expendableid").checked=false
         document.getElementById("semiexpendableid").value=1
         document.getElementById("semiexpendableid").checked=true
+        grd_reload()
     }
     $("#expendableid").on("click", function () {
         document.getElementById("expendableid").value=1
         document.getElementById("expendableid").checked=true
         document.getElementById("semiexpendableid").value=0
         document.getElementById("semiexpendableid").checked=false
+        grd_reload()
     });
     $("#semiexpendableid").on("click", function () {
         document.getElementById("expendableid").value=0
         document.getElementById("expendableid").checked=false
         document.getElementById("semiexpendableid").value=1
         document.getElementById("semiexpendableid").checked=true
+        grd_reload()
     });
+    function grd_reload(){
+        $("#grid_additem").data("kendoGrid").dataSource.read();
+    }
 </script>
 <div style="float:left">
     <input type="radio" id="expendableid" value="1" checked style="width:20px;zoom:1.0"/> <label style="display:inline-block" onclick="expendable_click()">Expendable</label>
@@ -159,16 +166,18 @@
         var office = @Session["office"]
         var program= @Session["program"] ;
         var account= @Session["account"];
-        var tyear= @Session["tyear"] ;
+        var tyear= @Session["tyear"] + 1;
         var item=$("#item").val()
         var fundid=@Session["fundid"];
         var mode_trans=@Session["mode_trans"];
-    
+        var ooeclass=@Session["ooeclass"];
+        var expendableid =$("#expendableid").val();
+        
         if ($('#SpanOnApproveProgress').css("display") == 'none') {
             $('#SpanOnApproveProgress').css("display", "auto");
         $('#spanthumbsup').css("display", "none");
         @*var url = "@Url.Action("ApproveWFP", "Report")";*@
-        var url = "@Url.Action("additemeproc", "Report")";
+        var url = "@Url.Action("additemepropose", "Home")";
         var idsToSend = [];
         var grid = $("#grid_additem").data("kendoGrid")
         var ds = grid.dataSource.view();
@@ -184,15 +193,6 @@
             swal({ title: "Warning!", text: "Please ticked the checkbox first!", timer: 2500, showConfirmButton: false, type: "warning" });
             $('#SpanOnApproveProgress').css("display", "none");
             $('#spanthumbsup').css("display", "auto");
-        }
-        else if ((office ==0 || program ==0 || account==0 || tyear==0) && fundid == 0 && mode_trans == 1){ //gf
-            swal("","Please select office, program and account respectively!","info")
-        }
-        else if ((office ==0 || account==0) && fundid == 1){ //tf
-            swal("","Please select office and account respectively!","info")
-        }
-        else if ((office ==0 || account==0) && mode_trans == 0){ //tf
-            swal("","Please select office and account respectively!","info")
         }
         else {
             $.post(url, { transno: idsToSend,officeid: office, programid: program, accountid: account, tyear: tyear,fundid:fundid,mode_trans:mode_trans}, function (d) {

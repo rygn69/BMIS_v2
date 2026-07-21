@@ -1508,7 +1508,41 @@ namespace iFMIS_BMS.Controllers
             var jsonResult = Json(prog.ToDataSourceResult(request), JsonRequestBehavior.AllowGet);
             jsonResult.MaxJsonLength = int.MaxValue;
             return jsonResult;
-            //return Json(prog.ToDataSourceResult(request));
+        }
+        public string additemepropose(string[] transno, int? officeid = 0, int? programid = 0, int? accountid = 0, int? tyear = 0, int? fundid = 0, int? mode_trans = 0)
+        {
+            try
+            {
+                DataTable dt = new DataTable();
+                dt.Columns.Add("transno");
+                var idx = 0;
+                foreach (var trnno in transno)
+                {
+                    DataRow dr = dt.NewRow();
+                    dr[0] = transno[idx];
+                    dt.Rows.Add(dr);
+                    idx++;
+                }
+                using (SqlConnection con = new SqlConnection(Common.MyConn()))
+                {
+                    SqlCommand com = new SqlCommand("dbo.[sp_BMS_ProposeItemADD]", con);
+                    com.CommandType = System.Data.CommandType.StoredProcedure;
+                    com.Parameters.Add(new SqlParameter("@trnno", dt));
+                    com.Parameters.Add(new SqlParameter("@UserID", Account.UserInfo.eid));
+                    com.Parameters.Add(new SqlParameter("@officeid", officeid));
+                    com.Parameters.Add(new SqlParameter("@programid", programid));
+                    com.Parameters.Add(new SqlParameter("@accountid", accountid));
+                    com.Parameters.Add(new SqlParameter("@year", tyear));
+                    con.Open();
+
+                    return com.ExecuteScalar().ToString();
+                }
+                    
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
         }
     }
 }
