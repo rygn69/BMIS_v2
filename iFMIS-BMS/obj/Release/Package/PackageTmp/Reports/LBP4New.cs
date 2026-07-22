@@ -126,8 +126,8 @@ namespace iFMIS_BMS.Reports
                         using (SqlConnection con = new SqlConnection(Common.MyConn()))
                         {
                             /*SqlCommand com2 = new SqlCommand(@"exec sp_BMS_LBP4_LBP2 " + OfficeID + "," + YearOf + "," + reloadlbp4 + "", con);*/ //preparation - OLD
-                            SqlCommand com2 = new SqlCommand(@"exec sp_BMS_LBP4_LBP2_v3 " + OfficeID + "," + YearOf + "," + reloadlbp4 + "", con); //preparation - NEW
-                            //SqlCommand com2 = new SqlCommand(@"exec sp_BMS_LBP4_LBP2_consolidate " + OfficeID + "," + YearOf + "," + reloadlbp4 + "", con); //consolidation
+                            //SqlCommand com2 = new SqlCommand(@"exec sp_BMS_LBP4_LBP2_v3 " + OfficeID + "," + YearOf + "," + reloadlbp4 + "", con); //preparation - NEW
+                            SqlCommand com2 = new SqlCommand(@"exec sp_BMS_LBP4_LBP2_consolidate " + OfficeID + "," + YearOf + "," + reloadlbp4 + "", con); //consolidation
                             com2.CommandTimeout = 0;
                             con.Open();
                             dt.Load(com2.ExecuteReader());
