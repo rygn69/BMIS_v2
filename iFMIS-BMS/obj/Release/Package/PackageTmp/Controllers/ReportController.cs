@@ -8464,14 +8464,14 @@ namespace iFMIS_BMS.Controllers
                 return ex.Message;
             }
         }
-        public string dgsigncheck(int? officeID=0, int? FormType = 0 , int? Year=0)
+        public string dgsigncheck(int? officeID=0, int? FormType = 0 , int? Year=0,int? ReportType=0)
         {
             try
             {
                 using (SqlConnection con = new SqlConnection(Common.MyConn()))
                 {
                     var data = "";
-                    SqlCommand com = new SqlCommand(@"select ifmis.dbo.[fn_BMS_CheckDgsign] (" + officeID + "," + FormType + "," + Year + ")", con);
+                    SqlCommand com = new SqlCommand(@"select ifmis.dbo.[fn_BMS_CheckDgsign] (" + officeID + "," + FormType + "," + Year + ","+ ReportType + ")", con);
                     con.Open();
                     data = Convert.ToString(com.ExecuteScalar());
                     return data;

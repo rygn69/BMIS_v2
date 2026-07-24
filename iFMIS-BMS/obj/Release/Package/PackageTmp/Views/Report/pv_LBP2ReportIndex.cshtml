@@ -251,7 +251,7 @@
         var url = "@Url.Action("dgsignreport", "Report")";
         var url_check = "@Url.Action("dgsigncheck", "Report")";
         if (officeID != 0) {
-            $.get(url_check,{officeID:officeID,FormType:1,Year:Year},function(r){
+            $.get(url_check,{officeID:officeID,FormType:1,Year:Year,ReportType:ReportType},function(r){
                 if (r == '0'){
                     swal({
                         title: "Confirmation!",
