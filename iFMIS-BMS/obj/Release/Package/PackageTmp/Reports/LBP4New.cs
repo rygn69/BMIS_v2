@@ -137,7 +137,7 @@ namespace iFMIS_BMS.Reports
                     {
                         using (SqlConnection con = new SqlConnection(Common.MyConn()))
                         {
-                            SqlCommand com2 = new SqlCommand(@"exec sp_BMS_LBP4 9999,9999,1", con);
+                            SqlCommand com2 = new SqlCommand(@"exec sp_BMS_LBP4 9999,9999,3", con);
                             con.Open();
                             dt.Load(com2.ExecuteReader());
                         }             

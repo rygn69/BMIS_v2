@@ -106,3 +106,4 @@ R:\IS\GitHub\BMIS_v2\iFMIS-BMS\obj\Debug\iFMIS_BMS.csproj.GenerateResource.Cache
 R:\IS\GitHub\BMIS_v2\iFMIS-BMS\obj\Debug\iFMIS_BMS.dll.licenses
 R:\IS\GitHub\BMIS_v2\iFMIS-BMS\obj\Debug\iFMIS_BMS.dll
 R:\IS\GitHub\BMIS_v2\iFMIS-BMS\obj\Debug\iFMIS_BMS.pdb
+R:\IS\GitHub\BMIS_v2\iFMIS-BMS\obj\Debug\iFMIS_BMS.csprojResolveAssemblyReference.cache
