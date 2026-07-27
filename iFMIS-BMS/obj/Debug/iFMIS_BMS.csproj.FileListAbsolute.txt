@@ -52,6 +52,7 @@ R:\IS\GitHub\BMIS_v2\iFMIS-BMS\obj\Debug\iFMIS_BMS.Reports.LBP3.resources
 R:\IS\GitHub\BMIS_v2\iFMIS-BMS\obj\Debug\iFMIS_BMS.Reports.LBP3New.resources
 R:\IS\GitHub\BMIS_v2\iFMIS-BMS\obj\Debug\Public_TAMS.Reports.Design.LBP3New_COS.resources
 R:\IS\GitHub\BMIS_v2\iFMIS-BMS\obj\Debug\Public_TAMS.Reports.Design.LBP3New_JO.resources
+R:\IS\GitHub\BMIS_v2\iFMIS-BMS\obj\Debug\iFMIS_BMS.Reports.LBP4PerProgram.resources
 R:\IS\GitHub\BMIS_v2\iFMIS-BMS\obj\Debug\iFMIS_BMS.Reports.LBP4New.resources
 R:\IS\GitHub\BMIS_v2\iFMIS-BMS\obj\Debug\iFMIS_BMS.Reports.LBP4New_Original.resources
 R:\IS\GitHub\BMIS_v2\iFMIS-BMS\obj\Debug\iFMIS_BMS.Reports.LBP4_LFC.resources

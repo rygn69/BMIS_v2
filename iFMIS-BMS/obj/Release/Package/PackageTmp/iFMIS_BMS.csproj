@@ -612,6 +612,12 @@
     <Compile Include="Reports\LBP3New_JO.designer.cs">
       <DependentUpon>LBP3New_JO.cs</DependentUpon>
     </Compile>
+    <Compile Include="Reports\LBP4PerProgram.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reports\LBP4PerProgram.Designer.cs">
+      <DependentUpon>LBP4PerProgram.cs</DependentUpon>
+    </Compile>
     <Compile Include="Reports\LBP4New.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -5828,6 +5834,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Reports\LBP3New_JO.resx">
       <DependentUpon>LBP3New_JO.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\LBP4PerProgram.resx">
+      <DependentUpon>LBP4PerProgram.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Reports\LBP4New.resx">
       <DependentUpon>LBP4New.cs</DependentUpon>
