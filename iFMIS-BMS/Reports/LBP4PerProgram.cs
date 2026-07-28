@@ -149,7 +149,7 @@ namespace iFMIS_BMS.Reports
             }
             //this.table1.DataSource = dt;
             this.table1.DataSource = dt;
-            this.table2.DataSource = dt;
+            this.table3.DataSource = dt;
             this.ReportParameters["BudgetYear"].Value = YearOf;
 
             DataTable _dt2 = new DataTable();
