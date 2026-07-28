@@ -1959,7 +1959,7 @@ namespace iFMIS_BMS.Reports
             this.textBox181.Style.BorderStyle.Default = Telerik.Reporting.Drawing.BorderType.Solid;
             this.textBox181.Style.Font.Bold = true;
             this.textBox181.Style.Font.Size = Telerik.Reporting.Drawing.Unit.Point(8D);
-            this.textBox181.Style.TextAlign = Telerik.Reporting.Drawing.HorizontalAlign.Center;
+            this.textBox181.Style.TextAlign = Telerik.Reporting.Drawing.HorizontalAlign.Left;
             this.textBox181.Style.VerticalAlign = Telerik.Reporting.Drawing.VerticalAlign.Middle;
             this.textBox181.StyleName = "";
             this.textBox181.Value = "=\"Subtotal- \" + Fields.fund";
