@@ -5700,7 +5700,7 @@ namespace iFMIS_BMS.Controllers
                                 cmd.Parameters.AddWithValue("@location", "'bms/Report'");
                                 cmd.Parameters.AddWithValue("@doc_description", strwfpnofile.Replace("'", "''").ToString());
                                 cmd.Parameters.AddWithValue("@doc_status_id", "1");
-                                cmd.Parameters.AddWithValue("@doc_designated", aroprepid + ",314227,2635,344880," + sign_eid_gov);
+                                cmd.Parameters.AddWithValue("@doc_designated", aroprepid + ",314227,2635," + sign_eid_gov);
                                 cmd.Parameters.AddWithValue("@doc_datetime", DateTime.Now);
                                 cmd.Parameters.AddWithValue("@doc_eid", aroprepid);
                                 cmd.Parameters.AddWithValue("@doc_datetime_update", "");
@@ -5725,7 +5725,7 @@ namespace iFMIS_BMS.Controllers
                                 cmd.Parameters.AddWithValue("@location", "'bms/Report'");
                                 cmd.Parameters.AddWithValue("@doc_description", strwfpnofile.Replace("'", "''").ToString());
                                 cmd.Parameters.AddWithValue("@doc_status_id", "1");
-                                cmd.Parameters.AddWithValue("@doc_designated", aroprepid + ",314227,2635,344880," + sign_eid_gov);
+                                cmd.Parameters.AddWithValue("@doc_designated", aroprepid + ",314227,2635," + sign_eid_gov);
                                 cmd.Parameters.AddWithValue("@doc_datetime", DateTime.Now);
                                 cmd.Parameters.AddWithValue("@doc_eid", aroprepid);
                                 cmd.Parameters.AddWithValue("@doc_datetime_update", "");
@@ -5791,7 +5791,7 @@ namespace iFMIS_BMS.Controllers
                                 cmd.Parameters.AddWithValue("@location", "'bms/Report'");
                                 cmd.Parameters.AddWithValue("@doc_description", strwfpnofile.Replace("'", "''").ToString());
                                 cmd.Parameters.AddWithValue("@doc_status_id", "1");
-                                cmd.Parameters.AddWithValue("@doc_designated", reloadlbp4 + ",354982," + officeheadid + "," + mafprepid + ",2635,344880," + sign_eid_gov);
+                                cmd.Parameters.AddWithValue("@doc_designated", reloadlbp4 + ",354982," + officeheadid + "," + mafprepid + ",2635," + sign_eid_gov);
                                 cmd.Parameters.AddWithValue("@doc_datetime", DateTime.Now);
                                 cmd.Parameters.AddWithValue("@doc_eid", reloadlbp4);
                                 cmd.Parameters.AddWithValue("@doc_datetime_update", "");
@@ -5817,7 +5817,7 @@ namespace iFMIS_BMS.Controllers
                                 cmd.Parameters.AddWithValue("@location", "'bms/Report'");
                                 cmd.Parameters.AddWithValue("@doc_description", strwfpnofile.Replace("'", "''").ToString());
                                 cmd.Parameters.AddWithValue("@doc_status_id", "1");
-                                cmd.Parameters.AddWithValue("@doc_designated", reloadlbp4 + ",365263," + officeheadid + "," + mafprepid + ",2635,344880," + sign_eid_gov);
+                                cmd.Parameters.AddWithValue("@doc_designated", reloadlbp4 + ",365263," + officeheadid + "," + mafprepid + ",2635," + sign_eid_gov);
                                 cmd.Parameters.AddWithValue("@doc_datetime", DateTime.Now);
                                 cmd.Parameters.AddWithValue("@doc_eid", reloadlbp4);
                                 cmd.Parameters.AddWithValue("@doc_datetime_update", "");
@@ -5842,7 +5842,7 @@ namespace iFMIS_BMS.Controllers
                                 cmd.Parameters.AddWithValue("@location", "'bms/Report'");
                                 cmd.Parameters.AddWithValue("@doc_description", strwfpnofile.Replace("'", "''").ToString());
                                 cmd.Parameters.AddWithValue("@doc_status_id", "1");
-                                cmd.Parameters.AddWithValue("@doc_designated", reloadlbp4 + "," + officeheadid + "," + mafprepid + ",2635,344880," + sign_eid_gov);
+                                cmd.Parameters.AddWithValue("@doc_designated", reloadlbp4 + "," + officeheadid + "," + mafprepid + ",2635," + sign_eid_gov);
                                 cmd.Parameters.AddWithValue("@doc_datetime", DateTime.Now);
                                 cmd.Parameters.AddWithValue("@doc_eid", reloadlbp4);
                                 cmd.Parameters.AddWithValue("@doc_datetime_update", "");

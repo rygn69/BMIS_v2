@@ -1143,6 +1143,7 @@ namespace iFMIS_BMS.Reports
             tableGroup47.Name = "group94";
             tableGroup48.Groupings.Add(new Telerik.Reporting.Grouping(null));
             tableGroup48.Name = "detailTableGroup";
+            tableGroup48.Sortings.Add(new Telerik.Reporting.Sorting("=Fields.AIPRefCode", Telerik.Reporting.SortDirection.Asc));
             tableGroup49.Name = "group98";
             tableGroup46.ChildGroups.Add(tableGroup47);
             tableGroup46.ChildGroups.Add(tableGroup48);
@@ -1431,6 +1432,7 @@ namespace iFMIS_BMS.Reports
             // 
             // textBox180
             // 
+            this.textBox180.CanShrink = true;
             this.textBox180.Name = "textBox180";
             this.textBox180.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(1.114D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
             this.textBox180.Style.BorderStyle.Default = Telerik.Reporting.Drawing.BorderType.Solid;
@@ -1442,6 +1444,7 @@ namespace iFMIS_BMS.Reports
             // 
             // textBox182
             // 
+            this.textBox182.CanShrink = true;
             this.textBox182.Name = "textBox182";
             this.textBox182.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(1.26D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
             this.textBox182.Style.BorderStyle.Default = Telerik.Reporting.Drawing.BorderType.Solid;
@@ -1453,6 +1456,7 @@ namespace iFMIS_BMS.Reports
             // 
             // textBox183
             // 
+            this.textBox183.CanShrink = true;
             this.textBox183.Name = "textBox183";
             this.textBox183.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(1.365D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
             this.textBox183.Style.BorderStyle.Default = Telerik.Reporting.Drawing.BorderType.Solid;
@@ -1464,6 +1468,7 @@ namespace iFMIS_BMS.Reports
             // 
             // textBox184
             // 
+            this.textBox184.CanShrink = true;
             this.textBox184.Name = "textBox184";
             this.textBox184.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(1.094D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
             this.textBox184.Style.BorderStyle.Default = Telerik.Reporting.Drawing.BorderType.Solid;
@@ -1475,6 +1480,7 @@ namespace iFMIS_BMS.Reports
             // 
             // textBox185
             // 
+            this.textBox185.CanShrink = true;
             this.textBox185.Name = "textBox185";
             this.textBox185.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(1.05D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
             this.textBox185.Style.BorderStyle.Default = Telerik.Reporting.Drawing.BorderType.Solid;
@@ -1488,6 +1494,7 @@ namespace iFMIS_BMS.Reports
             // 
             // textBox186
             // 
+            this.textBox186.CanShrink = true;
             this.textBox186.Name = "textBox186";
             this.textBox186.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(1.05D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
             this.textBox186.Style.BorderStyle.Default = Telerik.Reporting.Drawing.BorderType.Solid;
@@ -1501,6 +1508,7 @@ namespace iFMIS_BMS.Reports
             // 
             // textBox187
             // 
+            this.textBox187.CanShrink = true;
             this.textBox187.Name = "textBox187";
             this.textBox187.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(1.05D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
             this.textBox187.Style.BorderStyle.Default = Telerik.Reporting.Drawing.BorderType.Solid;
@@ -1514,6 +1522,7 @@ namespace iFMIS_BMS.Reports
             // 
             // textBox188
             // 
+            this.textBox188.CanShrink = true;
             this.textBox188.Name = "textBox188";
             this.textBox188.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(1.05D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
             this.textBox188.Style.BorderStyle.Default = Telerik.Reporting.Drawing.BorderType.Solid;
@@ -1527,6 +1536,7 @@ namespace iFMIS_BMS.Reports
             // 
             // textBox189
             // 
+            this.textBox189.CanShrink = true;
             this.textBox189.Name = "textBox189";
             this.textBox189.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(1.05D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
             this.textBox189.Style.BorderStyle.Default = Telerik.Reporting.Drawing.BorderType.Solid;
@@ -1871,6 +1881,7 @@ namespace iFMIS_BMS.Reports
             // 
             // textBox210
             // 
+            this.textBox210.CanShrink = true;
             this.textBox210.KeepTogether = false;
             this.textBox210.Name = "textBox210";
             this.textBox210.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(1.906D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
@@ -1878,6 +1889,7 @@ namespace iFMIS_BMS.Reports
             this.textBox210.Style.Font.Bold = true;
             this.textBox210.Style.Padding.Bottom = Telerik.Reporting.Drawing.Unit.Point(2D);
             this.textBox210.Style.Padding.Top = Telerik.Reporting.Drawing.Unit.Point(2D);
+            this.textBox210.Style.Visible = true;
             this.textBox210.StyleName = "";
             this.textBox210.Value = "=Fields.fund";
             // 

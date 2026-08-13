@@ -112,7 +112,8 @@
         var account_id = $('#account_list').val()
         var year_ = $("#ddlYear").val();
 
-        $.post(url, { office_id: office_id, program_id: program_id,  account_id: account_id, year_: year_ }, function (e) {
+        $.post(url, { office_id: office_id, program_id: program_id, account_id: account_id, year_: year_ }, function (e) {
+            alert(e)
             document.getElementById("available_EEOK").value = e;
            // alert(e);
         })

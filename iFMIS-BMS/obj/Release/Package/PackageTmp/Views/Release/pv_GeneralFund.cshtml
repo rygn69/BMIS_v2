@@ -625,15 +625,15 @@
             acc_available = Number(parseFloat(ConvertCommasToEmpty(acc_available)).toFixed(2));
 
 
-            //alert(release_ps);
-            //alert(release_mooe);
-            //alert(release_co);
-            //alert(acc_available);
+            console.log(release_ps);
+            console.log(release_mooe);
+            console.log(release_co);
+            console.log(acc_available);
             //if (parseFloat(ConvertCommasToEmpty(release_ps)).toFixed(2) > parseFloat(ConvertCommasToEmpty(acc_available)).toFixed(2) || parseFloat(ConvertCommasToEmpty(release_mooe)).toFixed(2) > parseFloat(ConvertCommasToEmpty(acc_available)).toFixed(2) || parseFloat(ConvertCommasToEmpty(release_co)).toFixed(2) > parseFloat(ConvertCommasToEmpty(acc_available)).toFixed(2)) {
             if (release_ps > acc_available || release_mooe > acc_available || release_co > acc_available) {
             swal({
                 title: "Error!",
-                text: "System Error! Please check balance of appropriation.",
+                text: "System Error! Please check balance of appropriation..",
                 timer: 2000,
                 type: "error",
                 showConfirmButton: false
