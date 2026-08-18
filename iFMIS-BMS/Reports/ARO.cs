@@ -290,10 +290,12 @@ namespace iFMIS_BMS.Reports
             }
             else
             {
-                textBox55.Value = "SANTIAGO B. CANE, JR.";
-                textBox56.Value = "Governor";
+                //textBox55.Value = "SANTIAGO B. CANE, JR.";
+                //textBox56.Value = "Governor";
                 //textBox55.Value = "SAMUEL E. TORTOR";
                 //textBox56.Value = "Acting Governor";
+                textBox55.Value = "PATRICIA ANNE B. PLAZA";
+                textBox56.Value = "Acting Governor";
             }
 
             DataTable prepsig = new DataTable();
