@@ -52,7 +52,7 @@ namespace iFMIS_BMS.Reports
                 textBox1.Value = _dt4.Rows[0][0].ToString();
                 textBox2.Value = _dt4.Rows[0][1].ToString();
                 textBox3.Value = _dt4.Rows[0][2].ToString();
-                textBox48.Value = _dt4.Rows[0][0].ToString() + " - Making your task easier...";
+                //textBox48.Value = _dt4.Rows[0][0].ToString() + " - Making your task easier...";
             }
         }
     }

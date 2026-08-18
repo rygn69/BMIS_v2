@@ -98,7 +98,7 @@ namespace iFMIS_BMS.Reports
             if (_dt4.Rows.Count > 0)
             {
                 //textBox3.Value = _dt4.Rows[0][2].ToString();
-                textBox21.Value = _dt4.Rows[0][0].ToString();// + "- Abante Tayo! Asenso Tacurong!";
+                //textBox21.Value = _dt4.Rows[0][0].ToString();// + "- Abante Tayo! Asenso Tacurong!";
                 textBox36.Value = _dt4.Rows[0][3].ToString();
                 textBox43.Value = _dt4.Rows[0][4].ToString();
             }

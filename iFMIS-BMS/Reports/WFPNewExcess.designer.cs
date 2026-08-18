@@ -77,6 +77,7 @@ namespace iFMIS_BMS.Reports
             this.textBox10 = new Telerik.Reporting.TextBox();
             this.textBox11 = new Telerik.Reporting.TextBox();
             this.textBox14 = new Telerik.Reporting.TextBox();
+            this.textBox3 = new Telerik.Reporting.TextBox();
             this.detail = new Telerik.Reporting.DetailSection();
             this.table1 = new Telerik.Reporting.Table();
             this.textBox28 = new Telerik.Reporting.TextBox();
@@ -137,7 +138,6 @@ namespace iFMIS_BMS.Reports
             this.textBox2 = new Telerik.Reporting.TextBox();
             this.textBox5 = new Telerik.Reporting.TextBox();
             this.pageFooterSection1 = new Telerik.Reporting.PageFooterSection();
-            this.textBox82 = new Telerik.Reporting.TextBox();
             this.textBox81 = new Telerik.Reporting.TextBox();
             this.textBox83 = new Telerik.Reporting.TextBox();
             this.textBox84 = new Telerik.Reporting.TextBox();
@@ -159,7 +159,6 @@ namespace iFMIS_BMS.Reports
             this.textBox25 = new Telerik.Reporting.TextBox();
             this.textBox30 = new Telerik.Reporting.TextBox();
             this.textBox31 = new Telerik.Reporting.TextBox();
-            this.textBox3 = new Telerik.Reporting.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this)).BeginInit();
             // 
             // textBox21
@@ -504,6 +503,14 @@ namespace iFMIS_BMS.Reports
             this.textBox14.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(1.342D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
             this.textBox14.Style.VerticalAlign = Telerik.Reporting.Drawing.VerticalAlign.Bottom;
             this.textBox14.Value = "";
+            // 
+            // textBox3
+            // 
+            this.textBox3.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(0D), Telerik.Reporting.Drawing.Unit.Inch(0.006D));
+            this.textBox3.Name = "textBox3";
+            this.textBox3.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(9.213D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
+            this.textBox3.Style.VerticalAlign = Telerik.Reporting.Drawing.VerticalAlign.Bottom;
+            this.textBox3.Value = "PROGRAM TITLE : ";
             // 
             // detail
             // 
@@ -1738,7 +1745,6 @@ namespace iFMIS_BMS.Reports
             // 
             this.pageFooterSection1.Height = Telerik.Reporting.Drawing.Unit.Cm(1.778D);
             this.pageFooterSection1.Items.AddRange(new Telerik.Reporting.ReportItemBase[] {
-            this.textBox82,
             this.textBox81,
             this.textBox83,
             this.textBox84,
@@ -1747,21 +1753,11 @@ namespace iFMIS_BMS.Reports
             this.pageFooterSection1.Name = "pageFooterSection1";
             this.pageFooterSection1.Style.BorderStyle.Top = Telerik.Reporting.Drawing.BorderType.Solid;
             // 
-            // textBox82
-            // 
-            this.textBox82.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Cm(0D), Telerik.Reporting.Drawing.Unit.Cm(0D));
-            this.textBox82.Name = "textBox82";
-            this.textBox82.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Cm(14.478D), Telerik.Reporting.Drawing.Unit.Cm(0.495D));
-            this.textBox82.Style.Font.Size = Telerik.Reporting.Drawing.Unit.Point(8D);
-            this.textBox82.Style.TextAlign = Telerik.Reporting.Drawing.HorizontalAlign.Left;
-            this.textBox82.Style.VerticalAlign = Telerik.Reporting.Drawing.VerticalAlign.Middle;
-            this.textBox82.Value = "Provincial Information Management Office - \"Making your task easier...\" ";
-            // 
             // textBox81
             // 
-            this.textBox81.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Cm(0.8D), Telerik.Reporting.Drawing.Unit.Cm(0.001D));
+            this.textBox81.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Cm(0.033D), Telerik.Reporting.Drawing.Unit.Cm(0.001D));
             this.textBox81.Name = "textBox81";
-            this.textBox81.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Cm(26.416D), Telerik.Reporting.Drawing.Unit.Cm(0.494D));
+            this.textBox81.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Cm(27.183D), Telerik.Reporting.Drawing.Unit.Cm(0.494D));
             this.textBox81.Style.Font.Size = Telerik.Reporting.Drawing.Unit.Point(8D);
             this.textBox81.Style.TextAlign = Telerik.Reporting.Drawing.HorizontalAlign.Center;
             this.textBox81.Style.VerticalAlign = Telerik.Reporting.Drawing.VerticalAlign.Middle;
@@ -2049,14 +2045,6 @@ namespace iFMIS_BMS.Reports
             this.textBox31.Style.VerticalAlign = Telerik.Reporting.Drawing.VerticalAlign.Top;
             this.textBox31.Value = "Fund Administrator (If applicable only)";
             // 
-            // textBox3
-            // 
-            this.textBox3.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(0D), Telerik.Reporting.Drawing.Unit.Inch(0.006D));
-            this.textBox3.Name = "textBox3";
-            this.textBox3.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(9.213D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
-            this.textBox3.Style.VerticalAlign = Telerik.Reporting.Drawing.VerticalAlign.Bottom;
-            this.textBox3.Value = "PROGRAM TITLE : ";
-            // 
             // WFPNewExcess
             // 
             group1.GroupFooter = this.groupFooterSection;
@@ -2098,7 +2086,6 @@ namespace iFMIS_BMS.Reports
         private Telerik.Reporting.TextBox textBox7;
         private Telerik.Reporting.TextBox textBox5;
         private Telerik.Reporting.PageFooterSection pageFooterSection1;
-        private Telerik.Reporting.TextBox textBox82;
         private Telerik.Reporting.TextBox textBox81;
         private Telerik.Reporting.TextBox textBox83;
         private Telerik.Reporting.Barcode qrcode;

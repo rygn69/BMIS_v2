@@ -138,7 +138,6 @@ namespace iFMIS_BMS.Reports
             this.textBox2 = new Telerik.Reporting.TextBox();
             this.textBox5 = new Telerik.Reporting.TextBox();
             this.pageFooterSection1 = new Telerik.Reporting.PageFooterSection();
-            this.textBox82 = new Telerik.Reporting.TextBox();
             this.textBox83 = new Telerik.Reporting.TextBox();
             this.textBox84 = new Telerik.Reporting.TextBox();
             this.qrcode = new Telerik.Reporting.Barcode();
@@ -1747,7 +1746,6 @@ namespace iFMIS_BMS.Reports
             // 
             this.pageFooterSection1.Height = Telerik.Reporting.Drawing.Unit.Cm(1.778D);
             this.pageFooterSection1.Items.AddRange(new Telerik.Reporting.ReportItemBase[] {
-            this.textBox82,
             this.textBox83,
             this.textBox84,
             this.qrcode,
@@ -1755,16 +1753,6 @@ namespace iFMIS_BMS.Reports
             this.textBox81});
             this.pageFooterSection1.Name = "pageFooterSection1";
             this.pageFooterSection1.Style.BorderStyle.Top = Telerik.Reporting.Drawing.BorderType.Solid;
-            // 
-            // textBox82
-            // 
-            this.textBox82.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Cm(0D), Telerik.Reporting.Drawing.Unit.Cm(0D));
-            this.textBox82.Name = "textBox82";
-            this.textBox82.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Cm(14.478D), Telerik.Reporting.Drawing.Unit.Cm(0.495D));
-            this.textBox82.Style.Font.Size = Telerik.Reporting.Drawing.Unit.Point(8D);
-            this.textBox82.Style.TextAlign = Telerik.Reporting.Drawing.HorizontalAlign.Left;
-            this.textBox82.Style.VerticalAlign = Telerik.Reporting.Drawing.VerticalAlign.Middle;
-            this.textBox82.Value = "Provincial Information Management Office - \"Making your task easier...\" ";
             // 
             // textBox83
             // 
@@ -1822,9 +1810,9 @@ namespace iFMIS_BMS.Reports
             // 
             // textBox81
             // 
-            this.textBox81.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Cm(0.8D), Telerik.Reporting.Drawing.Unit.Cm(0.001D));
+            this.textBox81.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Cm(0.033D), Telerik.Reporting.Drawing.Unit.Cm(0.001D));
             this.textBox81.Name = "textBox81";
-            this.textBox81.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Cm(26.416D), Telerik.Reporting.Drawing.Unit.Cm(0.494D));
+            this.textBox81.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Cm(27.183D), Telerik.Reporting.Drawing.Unit.Cm(0.494D));
             this.textBox81.Style.Font.Size = Telerik.Reporting.Drawing.Unit.Point(8D);
             this.textBox81.Style.TextAlign = Telerik.Reporting.Drawing.HorizontalAlign.Center;
             this.textBox81.Style.VerticalAlign = Telerik.Reporting.Drawing.VerticalAlign.Middle;
@@ -2100,7 +2088,6 @@ namespace iFMIS_BMS.Reports
         private Telerik.Reporting.TextBox textBox7;
         private Telerik.Reporting.TextBox textBox5;
         private Telerik.Reporting.PageFooterSection pageFooterSection1;
-        private Telerik.Reporting.TextBox textBox82;
         private Telerik.Reporting.TextBox textBox81;
         private Telerik.Reporting.TextBox textBox83;
         private Telerik.Reporting.Barcode qrcode;

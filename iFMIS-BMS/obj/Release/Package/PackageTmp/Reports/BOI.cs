@@ -183,7 +183,7 @@ namespace iFMIS_BMS.Reports
             {
                 textBox13.Value = _dt4.Rows[0][0].ToString();
                 textBox19.Value = _dt4.Rows[0][2].ToString();
-                textBox40.Value = _dt4.Rows[0][0].ToString() + " - Making your task easier...";
+                //textBox40.Value = _dt4.Rows[0][0].ToString() + " - Making your task easier...";
             }
 
             txt_todaydate.Value = "Date Printed : " + DateTime.Now.ToString();

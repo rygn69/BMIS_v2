@@ -99,7 +99,6 @@
             this.pageFooterSection1 = new Telerik.Reporting.PageFooterSection();
             this.textBox18 = new Telerik.Reporting.TextBox();
             this.___ = new Telerik.Reporting.TextBox();
-            this.textBox48 = new Telerik.Reporting.TextBox();
             this.textBox23 = new Telerik.Reporting.TextBox();
             this.bcode = new Telerik.Reporting.Barcode();
             this.reportHeaderSection1 = new Telerik.Reporting.ReportHeaderSection();
@@ -1050,20 +1049,19 @@
             this.pageFooterSection1.Items.AddRange(new Telerik.Reporting.ReportItemBase[] {
             this.textBox18,
             this.___,
-            this.textBox48,
             this.textBox23,
             this.bcode});
             this.pageFooterSection1.Name = "pageFooterSection1";
             // 
             // textBox18
             // 
-            this.textBox18.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Cm(5.588D), Telerik.Reporting.Drawing.Unit.Cm(1.266D));
+            this.textBox18.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Cm(0.015D), Telerik.Reporting.Drawing.Unit.Cm(1.266D));
             this.textBox18.Name = "textBox18";
-            this.textBox18.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Cm(13.888D), Telerik.Reporting.Drawing.Unit.Cm(0.508D));
+            this.textBox18.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Cm(19.461D), Telerik.Reporting.Drawing.Unit.Cm(0.508D));
             this.textBox18.Style.Font.Size = Telerik.Reporting.Drawing.Unit.Point(8D);
             this.textBox18.Style.TextAlign = Telerik.Reporting.Drawing.HorizontalAlign.Center;
             this.textBox18.Style.VerticalAlign = Telerik.Reporting.Drawing.VerticalAlign.Middle;
-            this.textBox18.Value = "        (This is a system generated document.)\r\n";
+            this.textBox18.Value = "        (This is a system generated report.)\r\n";
             // 
             // ___
             // 
@@ -1077,16 +1075,6 @@
             this.___.Style.Font.Size = Telerik.Reporting.Drawing.Unit.Point(12D);
             this.___.Style.TextAlign = Telerik.Reporting.Drawing.HorizontalAlign.Center;
             this.___.Value = "";
-            // 
-            // textBox48
-            // 
-            this.textBox48.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Cm(0.016D), Telerik.Reporting.Drawing.Unit.Cm(1.27D));
-            this.textBox48.Name = "textBox48";
-            this.textBox48.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Cm(10.668D), Telerik.Reporting.Drawing.Unit.Cm(0.508D));
-            this.textBox48.Style.Font.Size = Telerik.Reporting.Drawing.Unit.Point(8D);
-            this.textBox48.Style.TextAlign = Telerik.Reporting.Drawing.HorizontalAlign.Left;
-            this.textBox48.Style.VerticalAlign = Telerik.Reporting.Drawing.VerticalAlign.Middle;
-            this.textBox48.Value = "Provincial Information Management Office - \"Making your task easier...\" ";
             // 
             // textBox23
             // 
@@ -1459,7 +1447,6 @@
         private Telerik.Reporting.TextBox txt_purpose;
         private Telerik.Reporting.TextBox textBox2;
         private Telerik.Reporting.TextBox textBox18;
-        private Telerik.Reporting.TextBox textBox48;
         private Telerik.Reporting.TextBox textBox19;
         private Telerik.Reporting.TextBox textBox21;
         private Telerik.Reporting.TextBox textBox35;

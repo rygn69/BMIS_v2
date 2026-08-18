@@ -294,7 +294,7 @@
                 textBox3.Value = _dt4.Rows[0][0].ToString();
                 textBox4.Value = _dt4.Rows[0][1].ToString();
                 //textBox3.Value = _dt4.Rows[0][2].ToString();
-                textBox40.Value = _dt4.Rows[0][0].ToString();// + "- Abante Tayo! Asenso Tacurong!"; //tacurong city
+                //textBox40.Value = _dt4.Rows[0][0].ToString();// + "- Abante Tayo! Asenso Tacurong!"; //tacurong city
 
                 textBox36.Value = "CITY BUDGET OFFICE";
             }

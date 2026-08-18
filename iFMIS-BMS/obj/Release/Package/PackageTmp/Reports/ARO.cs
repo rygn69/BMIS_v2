@@ -315,7 +315,7 @@ namespace iFMIS_BMS.Reports
                 textBox35.Value = _lgusig.Rows[0][3].ToString();
                 textBox36.Value = _lgusig.Rows[0][4].ToString();
                 textBox10.Value= _lgusig.Rows[0][0].ToString();
-                textBox48.Value = _lgusig.Rows[0][0].ToString() +  " " + _lgusig.Rows[0][7].ToString();
+                //textBox48.Value = _lgusig.Rows[0][0].ToString() +  " " + _lgusig.Rows[0][7].ToString();
             }
         }
     }

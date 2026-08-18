@@ -46,10 +46,10 @@ namespace iFMIS_BMS.Reports
             this.txt_air = new Telerik.Reporting.TextBox();
             this.textBox31 = new Telerik.Reporting.TextBox();
             this.textBox32 = new Telerik.Reporting.TextBox();
+            this.textBox37 = new Telerik.Reporting.TextBox();
             this.pageFooterSection1 = new Telerik.Reporting.PageFooterSection();
             this.textBox38 = new Telerik.Reporting.TextBox();
             this.txt_todaydate = new Telerik.Reporting.TextBox();
-            this.textBox40 = new Telerik.Reporting.TextBox();
             this.textBox2 = new Telerik.Reporting.TextBox();
             this.txt_user = new Telerik.Reporting.TextBox();
             this.___ = new Telerik.Reporting.TextBox();
@@ -74,9 +74,8 @@ namespace iFMIS_BMS.Reports
             this.textBox13 = new Telerik.Reporting.TextBox();
             this.textBox14 = new Telerik.Reporting.TextBox();
             this.textBox15 = new Telerik.Reporting.TextBox();
-            this.textBox34 = new Telerik.Reporting.TextBox();
             this.textBox36 = new Telerik.Reporting.TextBox();
-            this.textBox37 = new Telerik.Reporting.TextBox();
+            this.textBox34 = new Telerik.Reporting.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this)).BeginInit();
             // 
             // textBox17
@@ -502,13 +501,30 @@ namespace iFMIS_BMS.Reports
             this.textBox32.Style.VerticalAlign = Telerik.Reporting.Drawing.VerticalAlign.Middle;
             this.textBox32.Value = "";
             // 
+            // textBox37
+            // 
+            this.textBox37.Format = "{0:N2}";
+            this.textBox37.KeepTogether = false;
+            this.textBox37.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Cm(21.915D), Telerik.Reporting.Drawing.Unit.Cm(1.873D));
+            this.textBox37.Name = "textBox37";
+            this.textBox37.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Cm(3.064D), Telerik.Reporting.Drawing.Unit.Cm(0.727D));
+            this.textBox37.Style.BorderStyle.Default = Telerik.Reporting.Drawing.BorderType.Solid;
+            this.textBox37.Style.BorderStyle.Left = Telerik.Reporting.Drawing.BorderType.Solid;
+            this.textBox37.Style.BorderStyle.Right = Telerik.Reporting.Drawing.BorderType.None;
+            this.textBox37.Style.BorderStyle.Top = Telerik.Reporting.Drawing.BorderType.None;
+            this.textBox37.Style.BorderWidth.Default = Telerik.Reporting.Drawing.Unit.Point(1.3D);
+            this.textBox37.Style.Font.Bold = true;
+            this.textBox37.Style.Font.Size = Telerik.Reporting.Drawing.Unit.Point(10D);
+            this.textBox37.Style.TextAlign = Telerik.Reporting.Drawing.HorizontalAlign.Right;
+            this.textBox37.Style.VerticalAlign = Telerik.Reporting.Drawing.VerticalAlign.Middle;
+            this.textBox37.Value = "";
+            // 
             // pageFooterSection1
             // 
             this.pageFooterSection1.Height = Telerik.Reporting.Drawing.Unit.Cm(1.5D);
             this.pageFooterSection1.Items.AddRange(new Telerik.Reporting.ReportItemBase[] {
             this.textBox38,
             this.txt_todaydate,
-            this.textBox40,
             this.textBox2,
             this.txt_user});
             this.pageFooterSection1.Name = "pageFooterSection1";
@@ -533,15 +549,6 @@ namespace iFMIS_BMS.Reports
             this.txt_todaydate.Style.TextAlign = Telerik.Reporting.Drawing.HorizontalAlign.Right;
             this.txt_todaydate.Style.VerticalAlign = Telerik.Reporting.Drawing.VerticalAlign.Middle;
             this.txt_todaydate.Value = " tn";
-            // 
-            // textBox40
-            // 
-            this.textBox40.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Cm(0.016D), Telerik.Reporting.Drawing.Unit.Cm(0.523D));
-            this.textBox40.Name = "textBox40";
-            this.textBox40.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Cm(24.62D), Telerik.Reporting.Drawing.Unit.Cm(0.7D));
-            this.textBox40.Style.TextAlign = Telerik.Reporting.Drawing.HorizontalAlign.Left;
-            this.textBox40.Style.VerticalAlign = Telerik.Reporting.Drawing.VerticalAlign.Middle;
-            this.textBox40.Value = "Provincial Information Management Office - \"Making your task easier...\" ";
             // 
             // textBox2
             // 
@@ -788,6 +795,16 @@ namespace iFMIS_BMS.Reports
             this.textBox15.Style.TextAlign = Telerik.Reporting.Drawing.HorizontalAlign.Left;
             this.textBox15.Value = ":";
             // 
+            // textBox36
+            // 
+            this.textBox36.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Cm(0D), Telerik.Reporting.Drawing.Unit.Cm(2.032D));
+            this.textBox36.Name = "textBox36";
+            this.textBox36.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Cm(28.684D), Telerik.Reporting.Drawing.Unit.Cm(0.47D));
+            this.textBox36.Style.Font.Name = "Microsoft Sans Serif";
+            this.textBox36.Style.Font.Size = Telerik.Reporting.Drawing.Unit.Point(10D);
+            this.textBox36.Style.TextAlign = Telerik.Reporting.Drawing.HorizontalAlign.Center;
+            this.textBox36.Value = "Office";
+            // 
             // textBox34
             // 
             this.textBox34.CanShrink = true;
@@ -805,34 +822,6 @@ namespace iFMIS_BMS.Reports
             this.textBox34.Style.TextAlign = Telerik.Reporting.Drawing.HorizontalAlign.Right;
             this.textBox34.Style.VerticalAlign = Telerik.Reporting.Drawing.VerticalAlign.Middle;
             this.textBox34.Value = "=fields.transno";
-            // 
-            // textBox36
-            // 
-            this.textBox36.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Cm(0D), Telerik.Reporting.Drawing.Unit.Cm(2.032D));
-            this.textBox36.Name = "textBox36";
-            this.textBox36.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Cm(28.684D), Telerik.Reporting.Drawing.Unit.Cm(0.47D));
-            this.textBox36.Style.Font.Name = "Microsoft Sans Serif";
-            this.textBox36.Style.Font.Size = Telerik.Reporting.Drawing.Unit.Point(10D);
-            this.textBox36.Style.TextAlign = Telerik.Reporting.Drawing.HorizontalAlign.Center;
-            this.textBox36.Value = "Office";
-            // 
-            // textBox37
-            // 
-            this.textBox37.Format = "{0:N2}";
-            this.textBox37.KeepTogether = false;
-            this.textBox37.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Cm(21.915D), Telerik.Reporting.Drawing.Unit.Cm(1.873D));
-            this.textBox37.Name = "textBox37";
-            this.textBox37.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Cm(3.064D), Telerik.Reporting.Drawing.Unit.Cm(0.727D));
-            this.textBox37.Style.BorderStyle.Default = Telerik.Reporting.Drawing.BorderType.Solid;
-            this.textBox37.Style.BorderStyle.Left = Telerik.Reporting.Drawing.BorderType.Solid;
-            this.textBox37.Style.BorderStyle.Right = Telerik.Reporting.Drawing.BorderType.None;
-            this.textBox37.Style.BorderStyle.Top = Telerik.Reporting.Drawing.BorderType.None;
-            this.textBox37.Style.BorderWidth.Default = Telerik.Reporting.Drawing.Unit.Point(1.3D);
-            this.textBox37.Style.Font.Bold = true;
-            this.textBox37.Style.Font.Size = Telerik.Reporting.Drawing.Unit.Point(10D);
-            this.textBox37.Style.TextAlign = Telerik.Reporting.Drawing.HorizontalAlign.Right;
-            this.textBox37.Style.VerticalAlign = Telerik.Reporting.Drawing.VerticalAlign.Middle;
-            this.textBox37.Value = "";
             // 
             // RegistryofAllotments
             // 
@@ -892,7 +881,6 @@ namespace iFMIS_BMS.Reports
         private Telerik.Reporting.TextBox txt_appropraite;
         private Telerik.Reporting.TextBox ___;
         private Telerik.Reporting.TextBox textBox38;
-        private Telerik.Reporting.TextBox textBox40;
         private Telerik.Reporting.TextBox txt_user;
         private Telerik.Reporting.TextBox txt_todaydate;
         private Telerik.Reporting.TextBox textBox2;

@@ -129,11 +129,11 @@ namespace iFMIS_BMS.Reports
             this.textBox7 = new Telerik.Reporting.TextBox();
             this.pageFooterSection1 = new Telerik.Reporting.PageFooterSection();
             this.textBox20 = new Telerik.Reporting.TextBox();
-            this.textBox21 = new Telerik.Reporting.TextBox();
             this.txt_todaydate = new Telerik.Reporting.TextBox();
             this.txt_user = new Telerik.Reporting.TextBox();
             this.textBox34 = new Telerik.Reporting.TextBox();
             this.barcode1 = new Telerik.Reporting.Barcode();
+            this.textBox14 = new Telerik.Reporting.TextBox();
             this.reportHeaderSection1 = new Telerik.Reporting.ReportHeaderSection();
             this.textBox1 = new Telerik.Reporting.TextBox();
             this.textBox2 = new Telerik.Reporting.TextBox();
@@ -149,7 +149,6 @@ namespace iFMIS_BMS.Reports
             this.textBox11 = new Telerik.Reporting.TextBox();
             this.textBox12 = new Telerik.Reporting.TextBox();
             this.textBox13 = new Telerik.Reporting.TextBox();
-            this.textBox14 = new Telerik.Reporting.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this)).BeginInit();
             // 
             // detail
@@ -1249,7 +1248,6 @@ namespace iFMIS_BMS.Reports
             this.pageFooterSection1.Height = Telerik.Reporting.Drawing.Unit.Cm(2.5D);
             this.pageFooterSection1.Items.AddRange(new Telerik.Reporting.ReportItemBase[] {
             this.textBox20,
-            this.textBox21,
             this.txt_todaydate,
             this.txt_user,
             this.textBox34,
@@ -1268,16 +1266,6 @@ namespace iFMIS_BMS.Reports
             this.textBox20.Style.TextAlign = Telerik.Reporting.Drawing.HorizontalAlign.Center;
             this.textBox20.Style.VerticalAlign = Telerik.Reporting.Drawing.VerticalAlign.Top;
             this.textBox20.Value = "(This is a system generated report.)\r\n";
-            // 
-            // textBox21
-            // 
-            this.textBox21.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Cm(0.004D), Telerik.Reporting.Drawing.Unit.Cm(0.7D));
-            this.textBox21.Name = "textBox21";
-            this.textBox21.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Cm(24.7D), Telerik.Reporting.Drawing.Unit.Cm(0.495D));
-            this.textBox21.Style.Font.Size = Telerik.Reporting.Drawing.Unit.Point(8D);
-            this.textBox21.Style.TextAlign = Telerik.Reporting.Drawing.HorizontalAlign.Left;
-            this.textBox21.Style.VerticalAlign = Telerik.Reporting.Drawing.VerticalAlign.Top;
-            this.textBox21.Value = "Provincial Information Management Office - \"Making your task easier...\" ";
             // 
             // txt_todaydate
             // 
@@ -1321,6 +1309,16 @@ namespace iFMIS_BMS.Reports
             this.barcode1.Style.TextAlign = Telerik.Reporting.Drawing.HorizontalAlign.Center;
             this.barcode1.Style.VerticalAlign = Telerik.Reporting.Drawing.VerticalAlign.Bottom;
             this.barcode1.Value = "";
+            // 
+            // textBox14
+            // 
+            this.textBox14.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Cm(1.926D), Telerik.Reporting.Drawing.Unit.Cm(1.615D));
+            this.textBox14.Name = "textBox14";
+            this.textBox14.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Cm(3.556D), Telerik.Reporting.Drawing.Unit.Cm(0.59D));
+            this.textBox14.Style.Font.Size = Telerik.Reporting.Drawing.Unit.Point(8D);
+            this.textBox14.Style.Font.Underline = true;
+            this.textBox14.Style.VerticalAlign = Telerik.Reporting.Drawing.VerticalAlign.Middle;
+            this.textBox14.Value = "";
             // 
             // reportHeaderSection1
             // 
@@ -1485,16 +1483,6 @@ namespace iFMIS_BMS.Reports
             this.textBox13.Style.VerticalAlign = Telerik.Reporting.Drawing.VerticalAlign.Middle;
             this.textBox13.Value = "App. Balance";
             // 
-            // textBox14
-            // 
-            this.textBox14.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Cm(1.926D), Telerik.Reporting.Drawing.Unit.Cm(1.615D));
-            this.textBox14.Name = "textBox14";
-            this.textBox14.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Cm(3.556D), Telerik.Reporting.Drawing.Unit.Cm(0.59D));
-            this.textBox14.Style.Font.Size = Telerik.Reporting.Drawing.Unit.Point(8D);
-            this.textBox14.Style.Font.Underline = true;
-            this.textBox14.Style.VerticalAlign = Telerik.Reporting.Drawing.VerticalAlign.Middle;
-            this.textBox14.Value = "";
-            // 
             // SAAO
             // 
             this.Items.AddRange(new Telerik.Reporting.ReportItemBase[] {
@@ -1530,7 +1518,6 @@ namespace iFMIS_BMS.Reports
         private Telerik.Reporting.TextBox TXT_for_the;
         private Telerik.Reporting.TextBox TXT_fund_type;
         private Telerik.Reporting.TextBox textBox20;
-        private Telerik.Reporting.TextBox textBox21;
         private Telerik.Reporting.TextBox txt_todaydate;
         private Telerik.Reporting.TextBox txt_user;
         private Telerik.Reporting.TextBox textBox34;
