@@ -1157,7 +1157,7 @@ namespace iFMIS_BMS.Reports
             tableGroup44.ChildGroups.Add(tableGroup50);
             tableGroup44.Groupings.Add(new Telerik.Reporting.Grouping("=Fields.program"));
             tableGroup44.Name = "project1";
-            tableGroup44.Sortings.Add(new Telerik.Reporting.Sorting("=Fields.program_order", Telerik.Reporting.SortDirection.Asc));
+            tableGroup44.Sortings.Add(new Telerik.Reporting.Sorting("=Fields.program", Telerik.Reporting.SortDirection.Asc));
             tableGroup51.Name = "group80";
             tableGroup42.ChildGroups.Add(tableGroup43);
             tableGroup42.ChildGroups.Add(tableGroup44);
