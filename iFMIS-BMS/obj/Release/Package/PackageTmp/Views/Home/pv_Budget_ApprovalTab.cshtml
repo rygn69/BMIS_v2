@@ -1406,7 +1406,7 @@
                 columns.Template(@<text></text>)
                         .HeaderTemplate(@<text>
                 <div style="font-weight:600;">Particular Name</div></text>)
-                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: top; overflow: visible; white-space: normal" })
                         .ClientTemplate(
                          "\\# if( isPPMP == 1) { \\# " +
                         "<div> <span class='fa fa-circle' style='color:blue'></span> \\#=DenominationName\\# </div>" +
@@ -1416,16 +1416,16 @@
                 columns.Template(@<text></text>)
                         .HeaderTemplate(@<text>
                         <div style="font-weight:600;">Qty/% (Proposed)</div></text>)
-                        .HtmlAttributes(new { style = "text-align:center" })
-                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .HtmlAttributes(new { style = "text-align:center; vertical-align: top" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: top; overflow: visible; white-space: normal" })
                         .ClientTemplate("<div>\\#=kendo.toString(QuantityPercentage)\\# </div>").Width(80).Hidden();
                 columns.Bound(e => e.AccountDenominationID).Hidden();
                 if (Account.UserInfo.UserTypeDesc == "Budget Committee / Local Finance Committee")
                 { 
                     columns.Bound(e => e.QuantityPercentageHistory)
                         .HeaderTemplate(@<text><div id="QuantityPercentageHeader" style="font-weight:600;">Qty/% (Approve)</div></text>)
-                        .HtmlAttributes(new { style = "text-align:center" })
-                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .HtmlAttributes(new { style = "text-align:center; vertical-align: top" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: top; overflow: visible; white-space: normal" })
                         .ClientTemplate("<div>\\#=kendo.toString(QuantityPercentageHistory)\\# </div>").Width(80).Hidden();
                 }
                 else
@@ -1433,41 +1433,41 @@
                     columns.Template(@<text></text>)
                             .HeaderTemplate(@<text>
                             <div id="QuantityPercentageHeader" style="font-weight:600;">Qty/% (Approve)</div></text>)
-                        .HtmlAttributes(new { style = "text-align:center" })
-                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .HtmlAttributes(new { style = "text-align:center; vertical-align: top" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: top; overflow: visible; white-space: normal" })
                         .ClientTemplate("<div>\\#=kendo.toString(QuantityPercentageHistory)\\# </div>").Width(80).Hidden();
                 }
                 columns.Template(@<text></text>)
                         .HeaderTemplate(@<text>
                         <div style="font-weight:600;">Months</div></text>)
-                        .HtmlAttributes(new { style = "text-align:center" })
-                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .HtmlAttributes(new { style = "text-align:center; vertical-align: top" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: top; overflow: visible; white-space: normal" })
                         .ClientTemplate("<div>\\#=kendo.toString(DenominationMonth)\\# </div>").Width(80).Hidden();
                 columns.Template(@<text></text>)
                         .HeaderTemplate(@<text>
             <div style="font-weight:600;">Rate/Amount</div></text>)
                         .Width(120)
-                        .HtmlAttributes(new { style = "text-align:left" })
-                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .HtmlAttributes(new { style = "text-align:left; vertical-align: top" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: top; overflow: visible; white-space: normal" })
                         .ClientTemplate("<div>\\#=kendo.toString(DenominationAmount, 'c2')\\# </div>").Hidden();
                 columns.Template(@<text></text>)
                         .HeaderTemplate(@<text>
                             <div style="font-weight:600;">Total Amount (Proposed)</div></text>)
-                        .HtmlAttributes(new { style = "text-align:left" })
-                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .HtmlAttributes(new { style = "text-align:left; vertical-align: top" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: top; overflow: visible; white-space: normal" })
                         .ClientFooterTemplate("<div style='text-align:center;color:red'><label>Sub Total :</label></div>")
                         .ClientTemplate("<div>\\#=kendo.toString(TotalDenominationAmount, 'c2')\\# </div>").Width(100);
                 columns.Bound(e => e.TotalDenominationAmountHistory)
                         .HeaderTemplate(@<text>
                             <div style="font-weight:600;">Total Amount (Approve)</div></text>)
-                        .HtmlAttributes(new { style = "text-align:left" })
-                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .HtmlAttributes(new { style = "text-align:left; vertical-align: top" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: top; overflow: visible; white-space: normal" })
                         .ClientFooterTemplate("<div style='text-align:center;color:red'><label>\\#=kendo.toString(sum, 'c2')\\#</label></div>")
                         .ClientTemplate("<div>\\#=kendo.toString(TotalDenominationAmountHistory, 'c2')\\# </div>").Width(100);
                 columns.Bound(e => e.Remarks)
                         .HeaderTemplate(@<text><div style="font-weight:600;">Remarks</div></text>)
-                        .HtmlAttributes(new { style = "text-align:center" })
-                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: middle; overflow: visible; white-space: normal" })
+                        .HtmlAttributes(new { style = "text-align:center; vertical-align: top" })
+                        .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: top; overflow: visible; white-space: normal" })
                         .ClientTemplate("<div>\\#=Remarks\\# </div>").Width(200).Hidden();
                 //columns.Bound(e => e.Total).Width(100);
                 //columns.Bound(e => e.DenominationAmount).Width(150);
