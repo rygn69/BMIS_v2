@@ -1058,6 +1058,7 @@ INNER JOIN pmis.dbo.vwMergeAllEmployee ON dbo.tbl_R_BMSProposalRemark.UserID = p
                             emp.AmountStatus = 3;
                         }
                     }
+                    var difper = 0.00;
                     if (regularaipid == 1)
                     {
                         emp.Difference = emp.SlashAmount - emp.PastProposalAmmount;
@@ -1066,7 +1067,16 @@ INNER JOIN pmis.dbo.vwMergeAllEmployee ON dbo.tbl_R_BMSProposalRemark.UserID = p
                     {
                         emp.Difference = (emp.SlashAmount + emp.ProposalAmmount) - emp.PastProposalAmmount;
                     }
-                   //emp.Difference = emp.PastProposalAmmount - emp.SlashAmount ;
+                    if (emp.Difference != 0)
+                    {
+                        difper = Convert.ToDouble((emp.Difference / emp.PastProposalAmmount) * 100);
+                        emp.difference_per = " (" + difper.ToString("n2") + "%)";
+                    }
+                    else
+                    {
+                        emp.difference_per = "(0.00%)";
+                    }
+                    //emp.Difference = emp.PastProposalAmmount - emp.SlashAmount ;
                     var programID = emp.ProgramID.ToString();//prog_ID.ToString();
                     emp.PastYear = getPastYearAmount(proy_ID, reader.GetValue(1).ToString(), emp.OldOffice, programID, prog_ID);
                     // emp.PastYear = getPastYearAmount(proy_ID, reader.GetValue(1), office_ID);

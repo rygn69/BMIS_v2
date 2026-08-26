@@ -74,5 +74,6 @@ namespace iFMIS_BMS.BusinessLayer.Models
         public double supplemental_amount { get; set; }
         public int aipversion { get; set; }
         public double appropriation { get; set; }
+        public string difference_per { get; set; }
     }
 }

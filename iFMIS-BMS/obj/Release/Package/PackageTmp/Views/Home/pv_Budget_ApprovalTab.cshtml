@@ -1296,11 +1296,11 @@
                 .Width(150)
                 .ClientTemplate("<div> " +
                 "# if (Difference < 0) { #" +
-                "<span style='color:red'> <b> #=kendo.toString(Difference, 'c2')# </b> </span>" +
+                "<span style='color:red'> <b> #=kendo.toString(Difference, 'c2')# +  #=kendo.toString(difference_per)# </b> </span>" + 
                 "# } else if(Difference > 0){ #" +
-                "<span style='color:black'> #=kendo.toString(Difference, 'c2')# </span>" +
+                "<span style='color:black'> #=kendo.toString(Difference, 'c2')# +  #=kendo.toString(difference_per)# </span>" +
                 "# } else { # " +
-                " #=kendo.toString(Difference, 'c2')# " +
+                " #=kendo.toString(Difference, 'c2')# +  #=kendo.toString(difference_per)# " +
                 "# } # " +
                 "</div>")
                 .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> </label><label> #=kendo.toString(sum, 'c2')#</label></div>")
