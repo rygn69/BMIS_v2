@@ -1067,7 +1067,7 @@ INNER JOIN pmis.dbo.vwMergeAllEmployee ON dbo.tbl_R_BMSProposalRemark.UserID = p
                     {
                         emp.Difference = (emp.SlashAmount + emp.ProposalAmmount) - emp.PastProposalAmmount;
                     }
-                    if (emp.Difference != 0)
+                    if (emp.Difference != 0 && emp.PastProposalAmmount !=0)
                     {
                         difper = Convert.ToDouble((emp.Difference / emp.PastProposalAmmount) * 100);
                         emp.difference_per = " (" + difper.ToString("n2") + "%)";
