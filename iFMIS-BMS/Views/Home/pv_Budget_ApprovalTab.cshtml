@@ -1304,7 +1304,7 @@
                 "# } # " +
                 "</div>")
                 .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> </label><label> #=kendo.toString(sum, 'c2')# "+
-                "#=kendo.toString((sum / data.PastProposalAmmount.sum) * 100, 'c2')#%" +
+                " (+#=kendo.toString((sum / data.PastProposalAmmount.sum) * 100, 'n2')#% +)" +
                 "</label></div>")
                 ;
         if (Account.UserInfo.UserTypeDesc == "Budget Committee / Local Finance Committee" || Account.UserInfo.UserTypeDesc == "Super Admin")
