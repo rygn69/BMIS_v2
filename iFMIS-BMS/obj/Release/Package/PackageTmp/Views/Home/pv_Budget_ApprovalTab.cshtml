@@ -1301,11 +1301,17 @@
                 "<span style='color:black'> #=kendo.toString(Difference, 'c2')# +  #=kendo.toString(difference_per)# </span>" +
                 "# } else { # " +
                 " #=kendo.toString(Difference, 'c2')# +  #=kendo.toString(difference_per)# " +
-                "# } # " +
+                "# } # " +  
                 "</div>")
-                .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'><label> </label><label> #=kendo.toString(sum, 'c2')# "+
-                " (+#=kendo.toString((sum / data.PastProposalAmmount.sum) * 100, 'n2')#% +)" +
-                "</label></div>")
+                .ClientFooterTemplate("<div style='text-align:right;color:darkgreen'>" +
+                "<label>#=kendo.toString(sum, 'c2')# " +
+                "# if (data.PastProposalAmmount.sum == 0) { #" +
+                    "(+0.00%)" +
+                "# } else { #" +
+                    "(+#=kendo.toString((sum / data.PastProposalAmmount.sum) * 100, 'n2')#%)" +
+                "# } #" +
+                "</label>" +
+                "</div>")
                 ;
         if (Account.UserInfo.UserTypeDesc == "Budget Committee / Local Finance Committee" || Account.UserInfo.UserTypeDesc == "Super Admin")
         {

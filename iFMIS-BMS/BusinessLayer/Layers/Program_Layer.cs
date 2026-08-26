@@ -1129,6 +1129,7 @@ INNER JOIN pmis.dbo.vwMergeAllEmployee ON dbo.tbl_R_BMSProposalRemark.UserID = p
                     }
                     ForFundingAccount.PastProposalAmmount = 0;
                     ForFundingAccount.Difference = ForFundingAccount.SlashAmount;
+                    ForFundingAccount.difference_per = "(0.00%)";
                     if (getCountUnreviewedPosition(proy_ID, office_ID, "StatusLFC") != 0)
                     {
                         prog.Add(ForFundingAccount);
@@ -1197,6 +1198,7 @@ INNER JOIN pmis.dbo.vwMergeAllEmployee ON dbo.tbl_R_BMSProposalRemark.UserID = p
                     var programID = prog_ID.ToString();
                     PNAlist.PastYear = getPastYearAmount(proy_ID, reader_PNA.GetValue(13).ToString(), Convert.ToInt32(reader_PNA.GetValue(17).ToString()), reader_PNA.GetValue(12).ToString(), prog_ID);
                     PNAlist.Difference = PNAlist.SlashAmount; //- emp.PastProposalAmmount;
+                    PNAlist.difference_per = "(0.00%)";
                     prog.Add(PNAlist);
                 }
                 reader_PNA.Close();
