@@ -2676,7 +2676,7 @@ namespace iFMIS_BMS.Reports
             this.textBox23.Style.TextAlign = Telerik.Reporting.Drawing.HorizontalAlign.Center;
             this.textBox23.Style.VerticalAlign = Telerik.Reporting.Drawing.VerticalAlign.Bottom;
             this.textBox23.Style.Visible = false;
-            this.textBox23.Value = "TRISHAH FE R. GOLORAN ";
+            this.textBox23.Value = "ENGR. CYNTHIA P. LUMANTA";
             // 
             // textBox25
             // 
