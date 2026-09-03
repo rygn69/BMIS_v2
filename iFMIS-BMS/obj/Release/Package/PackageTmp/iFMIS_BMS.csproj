@@ -612,6 +612,12 @@
     <Compile Include="Reports\LBP3New_JO.designer.cs">
       <DependentUpon>LBP3New_JO.cs</DependentUpon>
     </Compile>
+    <Compile Include="Reports\LBP4PerFund_GroupActivity.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reports\LBP4PerFund_GroupActivity.Designer.cs">
+      <DependentUpon>LBP4PerFund_GroupActivity.cs</DependentUpon>
+    </Compile>
     <Compile Include="Reports\LBP4PerFund.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -5840,6 +5846,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Reports\LBP3New_JO.resx">
       <DependentUpon>LBP3New_JO.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\LBP4PerFund_GroupActivity.resx">
+      <DependentUpon>LBP4PerFund_GroupActivity.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Reports\LBP4PerFund.resx">
       <DependentUpon>LBP4PerFund.cs</DependentUpon>
