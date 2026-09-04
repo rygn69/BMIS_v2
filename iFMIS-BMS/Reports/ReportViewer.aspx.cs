@@ -1053,7 +1053,7 @@ namespace iFMIS_BMS.Reports
 
                             //var ReportDocument = new LBP4New(Convert.ToInt32(OfficeID_.Rows[i][0]), year, isNonOffice, reloadlbp4);
                             //var ReportDocument = new LBP4PerFund(Convert.ToInt32(OfficeID_.Rows[i][0]), year, isNonOffice, reloadlbp4);
-                            var ReportDocument = new LBP4PerFund_GroupActivity(Convert.ToInt32(OfficeID_.Rows[i][0]), year, isNonOffice, reloadlbp4);
+                            var ReportDocument = new LBP4PerFund_GroupActivity_v2(Convert.ToInt32(OfficeID_.Rows[i][0]), year, isNonOffice, reloadlbp4);
                             rbf4.Reports.Add(ReportDocument);
                         }
                        // con.Close();
@@ -1067,7 +1067,7 @@ namespace iFMIS_BMS.Reports
                 {
                     //rs.ReportDocument = new LBP4New(OfficeID, year, isNonOffice, reloadlbp4);
                     //rs.ReportDocument = new LBP4PerFund(OfficeID, year, isNonOffice, reloadlbp4);
-                    rs.ReportDocument = new LBP4PerFund_GroupActivity(OfficeID, year, isNonOffice, reloadlbp4);
+                    rs.ReportDocument = new LBP4PerFund_GroupActivity_v2(OfficeID, year, isNonOffice, reloadlbp4);
                     RV.ViewMode = Telerik.ReportViewer.WebForms.ViewMode.PrintPreview;
                     RV.ReportSource = rs;
                 }
