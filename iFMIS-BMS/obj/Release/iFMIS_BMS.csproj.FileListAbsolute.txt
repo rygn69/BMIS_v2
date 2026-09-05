@@ -109,3 +109,4 @@ R:\IS\GitHub\BMIS_v2\iFMIS-BMS\obj\Release\iFMIS_BMS.pdb
 R:\IS\GitHub\BMIS_v2\iFMIS-BMS\obj\Release\iFMIS_BMS.Reports.LBP4PerProgram.resources
 R:\IS\GitHub\BMIS_v2\iFMIS-BMS\obj\Release\iFMIS_BMS.Reports.LBP4PerFund.resources
 R:\IS\GitHub\BMIS_v2\iFMIS-BMS\obj\Release\iFMIS_BMS.Reports.LBP4PerFund_GroupActivity.resources
+R:\IS\GitHub\BMIS_v2\iFMIS-BMS\obj\Release\iFMIS_BMS.Reports.LBP4PerFund_GroupActivity_v2.resources
