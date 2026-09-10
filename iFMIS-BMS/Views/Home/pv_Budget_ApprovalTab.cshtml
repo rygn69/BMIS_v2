@@ -977,6 +977,42 @@
 
         var input = arg.container.find("input[name=QuantityPercentageHistory]");
         var input2 = arg.container.find("input[name=TotalDenominationAmountHistory]");
+        var input3 = arg.container.find("input[name=DenominationMonth]");//DenominationMonth
+        
+        
+        input3.keydown(function (event) {
+            if (input3.val().indexOf(".") > -1) {
+                DisableLetters(event);
+            }
+            else {
+                if (event.keyCode != 190) {
+                    DisableLetters(event);
+                }
+            }
+        })
+        input3.keyup(function () {
+            var gridName = $("#" + arg.sender.element[0].id).data('kendoGrid');
+            var ds = gridName.dataSource.view();
+            var row = $(this).closest("tr");
+            var rowIdx = $("tr", gridName.tbody).index(row);
+            var Quantity =  ds[rowIdx].QuantityPercentageHistory;;
+            var Months = input3.val();//ds[rowIdx].DenominationMonth;
+            var Rate = ds[rowIdx].DenominationAmount;
+            if (true) {
+
+            }
+            if ($("#offs").val() == 43) {
+                // var Result = arg.model.set("TotalDenominationAmountHistory", Quantity * Months * Rate)  // set the total amount
+            }
+            else {
+                var Result = arg.model.set("TotalDenominationAmountHistory", Quantity * Months * Rate)  // set the total amount
+            }
+            if (Quantity == "" || Quantity == "0") {
+                input3.val(0);
+                arg.model.set("QuantityPercentageHistory", 0)
+            }
+        });
+
         input2.keydown(function (event) {
             if (input2.val().indexOf(".") > -1) {
                 DisableLetters(event);
@@ -1445,7 +1481,8 @@
                         .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: top; overflow: visible; white-space: normal" })
                         .ClientTemplate("<div>\\#=kendo.toString(QuantityPercentageHistory)\\# </div>").Width(80).Hidden();
                 }
-                columns.Template(@<text></text>)
+                //columns.Template(@<text></text>)
+                columns.Bound(e => e.DenominationMonth)
                         .HeaderTemplate(@<text>
                         <div style="font-weight:600;">Months</div></text>)
                         .HtmlAttributes(new { style = "text-align:center; vertical-align: top" })
