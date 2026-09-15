@@ -45,5 +45,6 @@ namespace iFMIS_BMS.BusinessLayer.Models.BudgetControl
         public string otherindividual { get; set; }
         public string datetimeverified { get; set; }
         public long? approveby { get; set; }
+        public int officeid { get; set; }
     }
 }

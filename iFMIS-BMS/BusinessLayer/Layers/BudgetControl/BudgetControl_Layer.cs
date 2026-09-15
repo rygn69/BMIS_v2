@@ -343,8 +343,9 @@ namespace iFMIS_BMS.BusinessLayer.Layers.BudgetControl
                         data.UserIDOut = Convert.ToInt32(reader.GetValue(8));
                         data.OBRNowithFnCode = Convert.ToString(reader.GetValue(9));
                         data.id = Convert.ToInt32(reader.GetValue(10));
-                        data.account = Convert.ToString(reader.GetValue(11));
-                        data.datetimeverified = Convert.ToString(reader.GetValue(12));
+                        data.account =  Convert.ToString(reader.GetValue(11));
+                        data.datetimeverified = "";// Convert.ToString(reader.GetValue(12));
+                        data.officeid = Convert.ToInt32(reader.GetValue(13));
                     }
                 }
             }
@@ -1367,7 +1368,7 @@ namespace iFMIS_BMS.BusinessLayer.Layers.BudgetControl
             }
             return data;
         }
-        public OBRLogger CheckOutOBRv2(int? TransactionNo, string OBRNowithFnCode = "", string ObrNoASs = "", int? EmployeeForward = 0, string otherindiv_id = "")
+        public OBRLogger CheckOutOBRv2(int? TransactionNo=0, string OBRNowithFnCode = "", string ObrNoASs = "", int? EmployeeForward = 0, string otherindiv_id = "",int? approveby=0)
         {
             OBRLogger data = new OBRLogger();
             using (SqlConnection con = new SqlConnection(Common.MyConn()))
@@ -1383,7 +1384,7 @@ namespace iFMIS_BMS.BusinessLayer.Layers.BudgetControl
                 }
                 catch { tmpID3 = "0"; }
 
-                SqlCommand query = new SqlCommand(@"dbo.[sp_BMS_CheckOutOBR_v2] " + Account.UserInfo.eid + ", " + TransactionNo + ",'" + tmpID3 + "',"+ EmployeeForward + ",'"+ otherindiv_id + "'", con);
+                SqlCommand query = new SqlCommand(@"dbo.[sp_BMS_CheckOutOBR_v2] " + Account.UserInfo.eid + ", " + TransactionNo + ",'" + tmpID3 + "',"+ EmployeeForward + ",'"+ otherindiv_id + "',"+ approveby + "", con);
                 con.Open();
                 try
                 {

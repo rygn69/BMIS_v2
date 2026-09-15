@@ -412,10 +412,10 @@ namespace iFMIS_BMS.Controllers
             var value = data.CheckOutOBR(TransactionNo, OBRNowithFnCode, ObrNoASs, approveby);
             return Json(value, JsonRequestBehavior.AllowGet);
         }
-        public JsonResult CheckOutOBRv2(int? TransactionNo, string OBRNowithFnCode = "", string ObrNoASs = "",int? EmployeeForward=0 ,string otherindiv_id ="")
+        public JsonResult CheckOutOBRv2(int? TransactionNo, string OBRNowithFnCode = "", string ObrNoASs = "",int? EmployeeForward=0 ,string otherindiv_id ="",int? approveby=0)
         {
             BudgetControl_Layer data = new BudgetControl_Layer();
-            var value = data.CheckOutOBRv2(TransactionNo, OBRNowithFnCode, ObrNoASs, EmployeeForward, otherindiv_id);
+            var value = data.CheckOutOBRv2(TransactionNo, OBRNowithFnCode, ObrNoASs, EmployeeForward, otherindiv_id, approveby);
             return Json(value, JsonRequestBehavior.AllowGet);
         }
         
