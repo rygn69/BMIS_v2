@@ -229,9 +229,10 @@ namespace iFMIS_BMS.Controllers
         }
         public ActionResult ePortal()
         {
-            return Redirect("https://pgas.ph/");
+            //return Redirect("https://pgas.ph/");
             //return Redirect("http://10.100.100.5/eportal/"); //tacurong city
             //return Redirect("https://pgzn.zamboangadelnorte.gov.ph/eportal"); //pgzn
+            return Redirect("http://172.16.100.8/eportal"); // ppc
         }
 
         public PartialViewResult pv_ApprovedBudget()

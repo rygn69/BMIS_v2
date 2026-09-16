@@ -326,6 +326,7 @@ function setTrnno() {
     // Updated
     
     var ControlNo = $("#OBRNo").val();
+    
     var url = SearchOBRURL();
     $.get(url, { ControlNo: ControlNo }, function (e) {
         var getControlNo = $("#OBRNoEntry").val();

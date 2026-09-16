@@ -223,7 +223,7 @@
             swal("Something went wrong!!!", "Please re-scan the QR CODE!", "warning")
           //  $("#cttsno").focus();
         }
-        else if ($("#OBRNo").val().length != 19 && $("#TransactionModeOUT").val() == 2) {
+        else if ($("#OBRNo").val().length != 19 && $("#TransactionModeOUT").val() == 2 && $("#OBRNo").val().length != 17) {
             swal("System Notice", "No OBR No. found!", "warning");
         }
         else if ($("#FundType").val() == -1 || $("#FundType").val() == "" || $("#FundType").val() == "0") {
@@ -406,7 +406,7 @@
                 console.log("23")
                 console.log(id)
                     if (id == 2) { //view the details
-                        $.get(urlv2, { TransactionNo: grtrnno, OBRNowithFnCode: OBRNowithFnCode, ObrNoASs: ObrNoASs, EmployeeForward: EmployeeForward, otherindiv_id: otherindiv_id }, function (e) {
+                        $.get(urlv2, { TransactionNo: grtrnno, OBRNowithFnCode: OBRNowithFnCode, ObrNoASs: ObrNoASs, EmployeeForward: EmployeeForward, otherindiv_id: otherindiv_id, approveby: approveby }, function (e) {
                             if (e.type == "success") {
                                 $("#grOBR").data("kendoGrid").dataSource.read();
                                 $("#UserOutTimeStamp").val(e.UserOutTimeStamp);

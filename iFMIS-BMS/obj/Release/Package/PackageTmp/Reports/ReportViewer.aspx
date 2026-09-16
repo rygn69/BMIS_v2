@@ -7,8 +7,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
     <head runat="server">
         <title></title>
-        <%--<link rel="SHORTCUT ICON" href="~/Images/PPC.png" />--%>
-        <link rel="SHORTCUT ICON" href="~/Images/Ph_seal_agusan_del_sur.png" />
+        <link rel="SHORTCUT ICON" href="~/Images/PPC.png" />
+        <%--<link rel="SHORTCUT ICON" href="~/Images/Ph_seal_agusan_del_sur.png" />--%>
         <%--<link rel="SHORTCUT ICON" href="~/Images/pgzn_logo.png" />--%>
          <%--<link rel="SHORTCUT ICON" href="~/Images/tacurong.png" />--%>
     </head>
