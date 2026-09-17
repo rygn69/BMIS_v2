@@ -1900,7 +1900,7 @@ namespace iFMIS_BMS.BusinessLayer.Layers.BudgetControl
             }
             return data;
         }
-        public OBRLogger UpdateOBR(int? TransactionNo, string RefNo, string Particular,int? Year,int? officeassign, int? EmployeeForward,string otherindiv_id, long approveby)
+        public OBRLogger UpdateOBR(int? TransactionNo, string RefNo, string Particular,int? Year,int? officeassign, int? EmployeeForward,string otherindiv_id, long approveby,int FundType)
         {
             OBRLogger data = new OBRLogger();
             using (SqlConnection con = new SqlConnection(Common.MyConn()))
@@ -1921,7 +1921,7 @@ namespace iFMIS_BMS.BusinessLayer.Layers.BudgetControl
                 }
                 else //other lgu's
                 {
-                    SqlCommand query = new SqlCommand(@"dbo.sp_BMS_UPDATEOBR " + TransactionNo + ", '" + RefNo + "', '" + Particular + "'," + Year + ","+ officeassign + ","+ EmployeeForward + ",'"+ otherindiv_id + "'," + approveby + "", con);
+                    SqlCommand query = new SqlCommand(@"dbo.sp_BMS_UPDATEOBR " + TransactionNo + ", '" + RefNo + "', '" + Particular + "'," + Year + ","+ officeassign + ","+ EmployeeForward + ",'"+ otherindiv_id + "'," + approveby + ","+ FundType + "", con);
                     query.CommandTimeout = 0;
                     con.Open();
                     SqlDataReader reader = query.ExecuteReader();

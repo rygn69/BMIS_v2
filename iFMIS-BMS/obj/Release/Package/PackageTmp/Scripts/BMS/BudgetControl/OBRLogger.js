@@ -120,8 +120,17 @@
             $("#TransactionModeIN").attr('disabled', true)
             $("#TransactionModeOUT").prop("checked", true);
             $("#Account").val(e.account);
-            
+           
             $("#UserInTimeStamp").val(e.DateTimeIN);
+            $("#TransactionModeIN").attr('disabled', true)
+            $("#TransactionModeOUT").prop("checked", true);
+            if (e.DateTimeOut == '' && e.Amount == 0) {
+                $("#FundType").data("kendoComboBox").enable(true);
+                $("#TransactionModeIN").attr('disabled', false)
+                $("#TransactionModeIN").prop("checked", true);
+                $("#TransactionModeOUT").attr("disabled", true);
+                $("#TransactionModeOUT").prop("checked", false);
+            }
             $("#VerifiedTimeStamp").val(e.datetimeverified);
             if (e.DateTimeOut != '') {
                 $("#UserOutTimeStamp").val(e.DateTimeOut);
@@ -214,11 +223,12 @@
         var EmployeeForward = $("#EmployeeForward").val() == "" ? 0 : $("#EmployeeForward").val()
         var otherindiv_id = $("#otherindiv_id").val()
         var approveby = $("#approveby").val() == null? 0 : $("#approveby").val()
-
+        var UserOutTimeStamp = $("#UserOutTimeStamp").val()
         //if ($("#cttsaccessid").val() == "True" && $("#cttsno").val() == "" && stat_code == 77 && chkcafoa==1) {
         //    swal("Something went wrong!!!", "Please re-scan the QR CODE!", "warning")
         //    $("#cttsno").focus();
         //}
+      
         if ($("#cttsaccessid").val() == "True" && stat_code == 77 && chkcafoa == 1) {
             swal("Something went wrong!!!", "Please re-scan the QR CODE!", "warning")
           //  $("#cttsno").focus();
@@ -232,7 +242,7 @@
         else if (OfficeForward == 0 && otherindiv_id == "" && $("#lguid").val() == 1 && document.getElementById("Save").innerText == " Check Out") {
             swal("Warning", "Before checking out and forwarding the transaction, please select an office from the list or enter the name of another individual.", "warning");
         }
-        else if (approveby == 0 && document.getElementById("Save").innerText == " Check Out"){
+        else if (approveby == 0 && document.getElementById("Save").innerText == " Check Out" ) {
             swal("Information","Please select an employee from the Approve By dropdown.","info")
         }
         else {
@@ -442,8 +452,8 @@
             $("#AddNewOBR").html(e);
             $('#AddNewOBR').data('kendoWindow').title("<i class='fa fa-clock-o'> </i> OBR Logger").center().open();
            // $("").disabled = true;
-            $("#TransactionModeIN").attr('disabled', true)
-            $("#TransactionModeOUT").prop("checked", true);
+            //$("#TransactionModeIN").attr('disabled', true)
+            //$("#TransactionModeOUT").prop("checked", true);
             //var url = OBRUserTime();
             //$.get(url, function (e) {
             //    $("#UserOutTimeStamp").val(e);
@@ -497,9 +507,12 @@
         var otherindiv_id = $("#otherindiv_id").val()
         var approveby = $("#approveby").val() == ""? 0 : $("#approveby").val()
         //if ($("#lguid").val() == 0) { //pgas
-            if (approveby != 0) {
+        var UserOutTimeStamp = $("#UserOutTimeStamp").val()
+        var FundType = $("#FundType").val()
+        
+        if (approveby != 0 || UserOutTimeStamp == "") {
                 var url = UpdateOBRURL();
-                $.get(url, { TransactionNo: TransactionNo, RefNo: RefNo, Particular: Particular, Year: Year, officeassign: officeassign, EmployeeForward: EmployeeForward, otherindiv_id: otherindiv_id, approveby: approveby }, function (e) {
+                $.get(url, { TransactionNo: TransactionNo, RefNo: RefNo, Particular: Particular, Year: Year, officeassign: officeassign, EmployeeForward: EmployeeForward, otherindiv_id: otherindiv_id, approveby: approveby, FundType: FundType }, function (e) {
                     swal(e.title, e.message, e.type);
                     $("#grOBR").data("kendoGrid").dataSource.read();
                 });
