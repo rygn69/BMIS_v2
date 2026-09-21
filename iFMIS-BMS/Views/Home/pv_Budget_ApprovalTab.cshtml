@@ -971,6 +971,27 @@
         var AccountDenominationID = dSource[0].AccountDenominationID;
         var AccountID = dSource[0].AccountID;
         var isExist = AccountsToCombine.indexOf(AccountID);
+
+        //appropriation
+        var childGrid = $("#" + arg.sender.element[0].id).data("kendoGrid");
+
+        // Get the child/detail row
+        var childRow = $(arg.container).closest("tr");
+
+        // Get the parent/main grid row
+        var parentRow = childRow.closest(".k-detail-row")
+                               .prev(".k-master-row");
+
+        // Get the main grid
+        var mainGrid = parentRow.closest(".k-grid").data("kendoGrid");
+
+        // Get main grid data item
+        var parentDataItem = mainGrid.dataItem(parentRow);
+
+        // Get Appropriation
+        var appropriation = parentDataItem.ProposalAmmount;
+        //appropriation - end
+
         if ((AccountDenominationID == 0 && isExist > -1) || AccountID == 0) {
             grid.closeCell(arg.container)
         }
@@ -1011,6 +1032,16 @@
                 input3.val(0);
                 arg.model.set("QuantityPercentageHistory", 0)
             }
+
+            var data = gridName.dataSource.view();
+            var subTotal = 0;
+
+            for (var i = 0; i < data.length; i++) {
+                var amount = parseFloat(data[i].TotalDenominationAmountHistory) || 0;
+                subTotal += amount;
+            }
+            return subTotal;
+
         });
 
         input2.keydown(function (event) {
@@ -1464,7 +1495,7 @@
                         .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: top; overflow: visible; white-space: normal" })
                         .ClientTemplate("<div>\\#=kendo.toString(QuantityPercentage)\\# </div>").Width(80).Hidden();
                 columns.Bound(e => e.AccountDenominationID).Hidden();
-                if (Account.UserInfo.UserTypeDesc == "Budget Committee / Local Finance Committee")
+                if (Account.UserInfo.UserTypeDesc == "Budget Committee / Local Finance Committee" || Account.UserInfo.allowupdate== 1)
                 { 
                     columns.Bound(e => e.QuantityPercentageHistory)
                         .HeaderTemplate(@<text><div id="QuantityPercentageHeader" style="font-weight:600;">Qty/% (Approve)</div></text>)

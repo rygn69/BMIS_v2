@@ -18,6 +18,7 @@ namespace iFMIS_BMS.BusinessLayer.Models
         public int Countopis { get; set; }
         public int UserTypeID { get; set; }
         public int lgu { get; set; }
+        public int allowupdate { get; set; }
 
     }
 }
