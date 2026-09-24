@@ -12,8 +12,8 @@
 </div>
 
 <div style="width:400px; min-height:60px;margin:10px 5px 0 10px; height:auto;  float:left; text-align:left"> 
-    <div class="fg-white" style="display:inline-block; opacity:0.6;"><span style="font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;"><span id="lgu_province2"> Province of Agusan del Sur </span>  © 2017 - 2024. All Rights Reserved.</span></div>
-    <div style="display:inline-block; opacity:0.6"><span style="font-style:italic">Powered by:</span><span style="font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;" id="lgu_province"> Province of Agusan del Sur</span></div>
+    <div class="fg-white" style="display:inline-block; opacity:0.6;"><span style="font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;"><span id="lgu_province2"> Province of Agusan del Sur </span>  © 2017 - 2026. All Rights Reserved.</span></div>
+    @*<div style="display:inline-block; opacity:0.6"><span style="font-style:italic">Powered by:</span><span style="font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;" id="lgu_province"> Province of Agusan del Sur</span></div>*@
     <div style="display:inline-block; opacity:0.6"><span style="font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">Best viewed using Mozilla Firefox & Google Chrome</span></div>
 </div>
 
@@ -26,8 +26,8 @@
     
 
 <script>
-    $(document).ready(function () {
-        @*if (@Account.UserInfo.lgu == 0) {
+    @*$(document).ready(function () {
+        if (@Account.UserInfo.lgu == 0) {
                 var url = "@Url.Action("loginfooteraddress", "LogIn")";
                 $.post(url, function(e) {
                     document.getElementById("lgu_name").innerHTML = e.lgu_abbr;
@@ -35,7 +35,7 @@
                     document.getElementById("lgu_province").innerHTML = e.lgu;
                     document.getElementById("lgu_province2").innerHTML = e.lgu;
                 });
-            }*@
+            }
         $("#username").focus()
-    })
+    })*@
 </script>

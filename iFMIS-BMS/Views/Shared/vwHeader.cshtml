@@ -45,6 +45,7 @@
             //var safeUrl = "http://10.10.51.111/hris/content/images/photos/" + @Account.UserInfo.eid + ".png" + "?timestamp=" + new Date().getTime();
             var safeUrl = "https://pgas.ph/hris/content/images/photos/" + @Account.UserInfo.eid + ".png" + "?timestamp=" + new Date().getTime(); // PGAS
             //var safeUrl = "http://10.100.100.5/hris/content/images/photos/" + @Account.UserInfo.eid + ".png" + "?timestamp=" + new Date().getTime(); //tacurong city
+            @*var safeUrl = " http://172.16.100.8/hris/content/images/photos/" + @Account.UserInfo.eid + ".png" + "?timestamp=" + new Date().getTime(); //ppc*@
             var errorUrl = "@Url.Content("~/Content/images/no_avatar_available.jpg")" + "?timestamp=" + new Date().getTime();
             $.LoadImage(safeUrl, errorUrl, image);
         }
@@ -172,7 +173,8 @@
         <div style="width:200px;"> @*<img style="float:left;margin-left:-115px;margin-top:2px; width:110px;height:110px;opacity:0.80" id="lgu_logo" src="~/Images/tacurong.png">*@</div>
         <div class="title" style="margin-left:100px;">
             @*<div class="toptitle font-stroke">       City Government of Tacurong</div>*@
-            <div class="toptitle font-stroke">       Provincial Government of Agusan del Sur</div>
+            <div class="toptitle font-stroke">       City Government of Puerto Princesa</div>
+            @*<div class="toptitle font-stroke">       Provincial Government of Agusan del Sur</div>*@
             @*<div class="toptitle font-stroke">       Provincial Government of Zamboanga del Norte</div>*@
             <div class="maintitle">
                 <span class="fg-darkGreen font-stroke">
