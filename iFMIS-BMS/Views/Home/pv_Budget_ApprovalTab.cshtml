@@ -1552,7 +1552,8 @@
                         .HeaderHtmlAttributes(new { style = "text-align:center; vertical-align: top; overflow: visible; white-space: normal" })
                         .ClientTemplate("<div>\\#=kendo.toString(QuantityPercentage)\\# </div>").Width(80).Hidden();
                 columns.Bound(e => e.AccountDenominationID).Hidden();
-                if (Account.UserInfo.UserTypeDesc == "Budget Committee / Local Finance Committee" || Account.UserInfo.allowupdate== 1)
+                //if (Account.UserInfo.UserTypeDesc == "Budget Committee / Local Finance Committee" || Account.UserInfo.allowupdate== 1)
+                if (Account.UserInfo.UserTypeDesc == "Budget Committee / Local Finance Committee")
                 { 
                     columns.Bound(e => e.QuantityPercentageHistory)
                         .HeaderTemplate(@<text><div id="QuantityPercentageHeader" style="font-weight:600;">Qty/% (Approve)</div></text>)
