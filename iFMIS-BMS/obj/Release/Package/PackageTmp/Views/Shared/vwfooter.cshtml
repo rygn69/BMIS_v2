@@ -1,12 +1,12 @@
 ﻿
 
 <div style="width:150px; min-height:60px;margin-top: -5px; height:auto; border-right: 0.5px solid #eee; float:left;">
-    @*<a class="fg-white" href="http://www.agusandelsur.gov.ph" target="_blank" style="text-align:left">*@
+    <a class="fg-white" href="http://www.agusandelsur.gov.ph" target="_blank" style="text-align:left">
         <div class="logos_40" style="margin-top:15px;"></div>
         @*<div class="logos_41 lfloat" style="margin-top:5px;"></div>*@
         <div style="float:left; margin-left:10px;margin-top:0px; ">
-            @*<div style="margin-left:35px; text-align:center;margin-top:0px; font-size:25px; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;vertical-align: baseline; " id="lgu_name">PGAS</div>
-            <div style="margin-left:35px;margin-top:-5px; text-align:left; font-size:9px; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;vertical-align: baseline; " id="lgu_site">www.agusandelsur.gov.ph</div>*@
+            <div style="margin-left:35px; text-align:center;margin-top:0px; font-size:25px; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;vertical-align: baseline; " id="lgu_name">PGAS</div>
+            <div style="margin-left:35px;margin-top:-5px; text-align:left; font-size:9px; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;vertical-align: baseline; " id="lgu_site">www.agusandelsur.gov.ph</div>
         </div>
     </a>
 </div>
@@ -26,7 +26,7 @@
     
 
 <script>
-    $(document).ready(function () {
+    @*$(document).ready(function () {
         if (@Account.UserInfo.lgu == 0) {
                 var url = "@Url.Action("loginfooteraddress", "LogIn")";
                 $.post(url, function(e) {
@@ -37,5 +37,5 @@
                 });
             }
         $("#username").focus()
-    })
+    })*@
 </script>

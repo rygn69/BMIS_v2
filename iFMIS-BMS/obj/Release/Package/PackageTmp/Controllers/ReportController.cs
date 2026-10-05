@@ -2162,7 +2162,8 @@ namespace iFMIS_BMS.Controllers
             {
                 if (mode == 1)
                 { //current
-                    string tempStr = "SELECT AccountID,AccountName FROM [IFMIS].[dbo].[tbl_R_BMSProgramAccounts] where AccountYear=" + tyear + " and ActionCode=1  and ProgramID=" + programid + " and isnull(AccountName,'') != ''  and ObjectOfExpendetureID=" + ooeid + " order by AccountName";
+                    //string tempStr = "SELECT AccountID,AccountName FROM [IFMIS].[dbo].[tbl_R_BMSProgramAccounts] where AccountYear=" + tyear + " and ActionCode=1  and ProgramID=" + programid + " and isnull(AccountName,'') != ''  and ObjectOfExpendetureID=" + ooeid + " order by AccountName";
+                    string tempStr = "exec ifmis.dbo.sp_BMS_WFPAccountlist "+ programid + ","+ ooeid + ","+ tyear + "";
                     DataTable dt = tempStr.DataSet();
 
                     var result = new ContentResult();

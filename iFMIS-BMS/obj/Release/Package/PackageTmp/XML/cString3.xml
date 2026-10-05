@@ -5,8 +5,8 @@
     <!--<ConName>Server=BPDWEBSERVER\MSSQLSERVER1;Database=IFMIS;Uid=sa;pwd=1;Pooling=False;</ConName>-->
     <!--<ConName2>Server=192.168.2.1\PGAS;Database=spms;Uid=pgasis;pwd=(@/51u0#2@3n8D0e1L1#0u1R;Pooling=False;</ConName2>-->
     <!--<ConName2>Server=.;Database=spms;Uid=sa;pwd=1;Pooling=False;</ConName2>-->
-    <ConName2>Server=172.16.100.7;Database=spms;Uid=sa;pwd=cgpp@2014;Pooling=False;</ConName2>
-    <!--<ConName2>Server=vm_db_pmis.pgas.ph;Database=spms;Integrated Security=True;Pooling=False;</ConName2>-->
+    <!--<ConName2>Server=172.16.100.7;Database=spms;Uid=sa;pwd=cgpp@2014;Pooling=False;</ConName2>-->
+    <ConName2>Server=vm_db_pmis.pgas.ph;Database=spms;Integrated Security=True;Pooling=False;</ConName2>
   <!--<ConName2>Server=10.10.51.110;Database=spms;Uid=sa;pwd=pgzn@*2023;Pooling=False;</ConName2>-->
     <!--<ConName2>Server=10.100.100.4;Database=spms;Uid=sa;pwd=pimo@123;Pooling=False;</ConName2>-->
   </constring>

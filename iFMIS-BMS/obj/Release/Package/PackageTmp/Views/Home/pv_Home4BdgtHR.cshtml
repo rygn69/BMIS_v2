@@ -224,7 +224,6 @@
                     }
                     
                     $("#grd_BudgetApprovalBudget").data("kendoGrid").dataSource.read();
-               //     $("#grd_BudgetApprovedBudget").data("kendoGrid").dataSource.read(); //hide on 6/22/2022 - xXx - not to load when selecting expense class
                 }
                 //HideComputationCollumn();
             }
@@ -322,10 +321,20 @@
                             document.getElementById("actualYearApprovalBudget").innerHTML = PastYear;
                             document.getElementById("estimatesYearApprovalBudget").innerHTML = CurrentYear;
                             if (regularaipid == 1) {
-                                document.getElementById("proposedYearApprovalBudget").innerHTML = "<br/>" + BudgetYear + "<br/> (Proposed)";
+                                //document.getElementById("proposedYearApprovalBudget").innerHTML = "<br/>" + BudgetYear + "<br/> (Proposed)";
+                                var element = document.getElementById("proposedYearApprovalBudget");
+
+                                if (element) {
+                                    element.innerHTML = "<br/>" + BudgetYear + "<br/> (Proposed)";;
+                                }
                             }
                             else {
-                                document.getElementById("proposedYearApprovalBudget").innerHTML = "<br/>" + BudgetYear + "<br/> (Apporoved)";
+                                //document.getElementById("proposedYearApprovalBudget").innerHTML = "<br/>" + BudgetYear + "<br/> (Apporoved)";
+                                var element = document.getElementById("proposedYearApprovalBudget");
+
+                                if (element) {
+                                    element.innerHTML = "<br/>" + BudgetYear + "<br/> (Approved)";
+                                }
                             }
                         }
                         else if (SelectedTabIndex == 1) {

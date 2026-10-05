@@ -34,6 +34,7 @@ namespace iFMIS_BMS.BusinessLayer.Layers
                         usr.OfficeName = reader.GetString(7);
                         usr.UserTypeID = Convert.ToInt32(reader.GetValue(8));
                         usr.lgu = Convert.ToInt32(reader.GetValue(9));
+                        usr.allowupdate= Convert.ToInt32(reader.GetValue(10));
                     }
                     reader.Close();
 
@@ -117,6 +118,7 @@ namespace iFMIS_BMS.BusinessLayer.Layers
                         usr.OfficeName = reader.GetString(7);
                         usr.UserTypeID = Convert.ToInt32(reader.GetValue(8));
                         usr.lgu = Convert.ToInt32(reader.GetValue(9));
+                        usr.allowupdate = Convert.ToInt32(reader.GetValue(10));
                     }
                     reader.Close();
 

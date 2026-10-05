@@ -43,9 +43,9 @@
             //var safeUrl = "@Url.Content("~/Content/images/photos/")" + imageFilename + ".png" + "?timestamp=" + new Date().getTime();
             @*var safeUrl = "http://192.168.2.104/idprod/pgas/" + @ProVenS.Models.USER.Data.eid + ".jpg" + "?timestamp=" + new Date().getTime();*@
             //var safeUrl = "http://10.10.51.111/hris/content/images/photos/" + @Account.UserInfo.eid + ".png" + "?timestamp=" + new Date().getTime();
-            //var safeUrl = "https://pgas.ph/hris/content/images/photos/" + @Account.UserInfo.eid + ".png" + "?timestamp=" + new Date().getTime(); // PGAS
+            var safeUrl = "https://pgas.ph/hris/content/images/photos/" + @Account.UserInfo.eid + ".png" + "?timestamp=" + new Date().getTime(); // PGAS
             //var safeUrl = "http://10.100.100.5/hris/content/images/photos/" + @Account.UserInfo.eid + ".png" + "?timestamp=" + new Date().getTime(); //tacurong city
-            var safeUrl = " http://172.16.100.8/hris/content/images/photos/" + @Account.UserInfo.eid + ".png" + "?timestamp=" + new Date().getTime(); //ppc
+            @*var safeUrl = " http://172.16.100.8/hris/content/images/photos/" + @Account.UserInfo.eid + ".png" + "?timestamp=" + new Date().getTime(); //ppc*@
             var errorUrl = "@Url.Content("~/Content/images/no_avatar_available.jpg")" + "?timestamp=" + new Date().getTime();
             $.LoadImage(safeUrl, errorUrl, image);
         }
