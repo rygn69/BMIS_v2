@@ -41,6 +41,7 @@
         var year = $("#propsYears").val()
         var trnnoEdit = $('#trnnoEdit').val();
         var url = "@Url.Action("AddInitiative", "BudgetPreparation")";
+     
         if (initiative <= 0 && $('#aiptagEdit').val() == 0 ) {
             swal("Warning","There is nothing to save! Please select PPA's from the dropdown list.","warning")
         }
@@ -165,7 +166,8 @@
             <label style="float:left;margin-top:5px;">
                 Amount : &nbsp; &nbsp;
                 <br />
-                <input id="txtPSAmountEdit" onkeyup="OnKeyUpConvertToCurrency(event, 'txtPSAmountEdit')" onblur="CheckAmount('txtPSAmountEdit')" onkeydown="FilterNumericOnly(event)" placeholder="0.00" style="width:140px" />
+                @*<input id="txtPSAmountEdit" onkeyup="OnKeyUpConvertToCurrency(event, 'txtPSAmountEdit')" onblur="CheckAmount('txtPSAmountEdit')" onkeydown="FilterNumericOnly(event)" placeholder="0.00" style="width:140px" />*@
+                <input id="txtPSAmountEdit" onkeydown="FilterNumericOnly(event)" placeholder="0.00" style="width:140px" />
 
             </label>
             <br />
@@ -257,7 +259,8 @@
                // swal("Note:","You can only update the 'ORDER No. or Target' to this AIP!","warning")
                 //$('#txtMajorFinalOutputEdit').prop('disabled', 'disabled');
                 //$('#txtPerformanceIndicatorEdit').prop('disabled', 'disabled');
-                $('#txtPSAmountEdit').prop('disabled', 'disabled');
+                //$('#txtPSAmountEdit').prop('disabled', 'disabled');
+                $('#txtPSAmountEdit').prop('disabled', false);
                 $('#txtsubinitiativeEdit').prop('disabled', 'disabled');
                // $('#txtTargetEdit').prop('disabled', 'disabled');
                 $('#txtOrderNoEdit').focus();
