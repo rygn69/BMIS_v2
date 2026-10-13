@@ -5302,7 +5302,8 @@ namespace iFMIS_BMS.Controllers
                 else if (ReportTypeID == 5 && docuid != 6) //lbp form 4
                 {
                     doctypeid = 69;
-                    rs.ReportDocument = new LBP4New(OfficeID, YearOf, 0, reloadlbp4);
+                    //rs.ReportDocument = new LBP4New(OfficeID, YearOf, 0, reloadlbp4);
+                    rs.ReportDocument = new LBP4PerFund_GroupActivity_v2(OfficeID, YearOf, 0, reloadlbp4);
                 }
                 else if (docuid == 6) //lbp form 1
                 {
