@@ -6098,7 +6098,8 @@ namespace iFMIS_BMS.Controllers
                 client.Host = "mail.pgas.ph";
                 client.EnableSsl = true;
                 client.UseDefaultCredentials = true;
-                client.Credentials = new System.Net.NetworkCredential("isadmin@pgas.ph", "EE942086-5ED5-464B-A709-1A5FD0EF23C8");
+                //client.Credentials = new System.Net.NetworkCredential("isadmin@pgas.ph", "EE942086-5ED5-464B-A709-1A5FD0EF23C8");
+                client.Credentials = new System.Net.NetworkCredential("isadmin@pgas.ph", "PgaS@*1038");
                 client.Send(message);
                 return OTS;
             }
