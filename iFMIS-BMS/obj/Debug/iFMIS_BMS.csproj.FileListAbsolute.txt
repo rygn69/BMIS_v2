@@ -1,3 +1,4 @@
+R:\IS\GitHub\BMIS_v2\iFMIS-BMS\bin\Telerik.Reporting.pdb
 R:\IS\GitHub\BMIS_v2\iFMIS-BMS\bin\iFMIS_BMS.dll.config
 R:\IS\GitHub\BMIS_v2\iFMIS-BMS\bin\iFMIS_BMS.dll
 R:\IS\GitHub\BMIS_v2\iFMIS-BMS\bin\iFMIS_BMS.pdb
@@ -9,7 +10,6 @@ R:\IS\GitHub\BMIS_v2\iFMIS-BMS\bin\Telerik.ReportViewer.Mvc.dll
 R:\IS\GitHub\BMIS_v2\iFMIS-BMS\bin\Telerik.ReportViewer.WebForms.dll
 R:\IS\GitHub\BMIS_v2\iFMIS-BMS\bin\Telerik.ReportViewer.WinForms.dll
 R:\IS\GitHub\BMIS_v2\iFMIS-BMS\bin\System.Net.Http.Formatting.xml
-R:\IS\GitHub\BMIS_v2\iFMIS-BMS\bin\Telerik.Reporting.pdb
 R:\IS\GitHub\BMIS_v2\iFMIS-BMS\bin\Telerik.Reporting.xml
 R:\IS\GitHub\BMIS_v2\iFMIS-BMS\bin\Telerik.Reporting.Service.pdb
 R:\IS\GitHub\BMIS_v2\iFMIS-BMS\bin\Telerik.Reporting.Service.xml

@@ -2421,7 +2421,7 @@ namespace iFMIS_BMS.Reports
             this.textBox60.Style.BorderStyle.Bottom = Telerik.Reporting.Drawing.BorderType.Solid;
             this.textBox60.Style.Font.Bold = true;
             this.textBox60.Style.VerticalAlign = Telerik.Reporting.Drawing.VerticalAlign.Top;
-            this.textBox60.Style.Visible = true;
+            this.textBox60.Style.Visible = false;
             this.textBox60.Value = "= Parameters.Signatory2.Value";
             // 
             // textBox64
@@ -2432,7 +2432,7 @@ namespace iFMIS_BMS.Reports
             this.textBox64.Style.BorderStyle.Top = Telerik.Reporting.Drawing.BorderType.None;
             this.textBox64.Style.Font.Bold = false;
             this.textBox64.Style.VerticalAlign = Telerik.Reporting.Drawing.VerticalAlign.Top;
-            this.textBox64.Style.Visible = true;
+            this.textBox64.Style.Visible = false;
             this.textBox64.Value = "Local Budget Officer";
             // 
             // textBox62
@@ -2443,7 +2443,7 @@ namespace iFMIS_BMS.Reports
             this.textBox62.Style.BorderStyle.Bottom = Telerik.Reporting.Drawing.BorderType.Solid;
             this.textBox62.Style.Font.Bold = true;
             this.textBox62.Style.VerticalAlign = Telerik.Reporting.Drawing.VerticalAlign.Top;
-            this.textBox62.Style.Visible = true;
+            this.textBox62.Style.Visible = false;
             this.textBox62.Value = "= Parameters.Signatory3.Value";
             // 
             // textBox65
@@ -2454,7 +2454,7 @@ namespace iFMIS_BMS.Reports
             this.textBox65.Style.BorderStyle.Top = Telerik.Reporting.Drawing.BorderType.None;
             this.textBox65.Style.Font.Bold = false;
             this.textBox65.Style.VerticalAlign = Telerik.Reporting.Drawing.VerticalAlign.Top;
-            this.textBox65.Style.Visible = true;
+            this.textBox65.Style.Visible = false;
             this.textBox65.Value = "Local Chief Executive";
             // 
             // textBox44
@@ -2464,7 +2464,7 @@ namespace iFMIS_BMS.Reports
             this.textBox44.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(3.997D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
             this.textBox44.Style.Font.Bold = true;
             this.textBox44.Style.VerticalAlign = Telerik.Reporting.Drawing.VerticalAlign.Top;
-            this.textBox44.Style.Visible = true;
+            this.textBox44.Style.Visible = false;
             this.textBox44.Value = "Approved :";
             // 
             // textBox130
@@ -2475,7 +2475,7 @@ namespace iFMIS_BMS.Reports
             this.textBox130.Style.BorderStyle.Left = Telerik.Reporting.Drawing.BorderType.None;
             this.textBox130.Style.Font.Bold = true;
             this.textBox130.Style.VerticalAlign = Telerik.Reporting.Drawing.VerticalAlign.Top;
-            this.textBox130.Style.Visible = true;
+            this.textBox130.Style.Visible = false;
             this.textBox130.Value = "Reviewed :";
             // 
             // reportFooterSection1
