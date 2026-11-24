@@ -445,9 +445,9 @@ function EditSetAppropriation(grAmount, total, grRefNo) {
 
 function PromptIfNonOffice() {
     var Program = $("#Program").val();
-    if (Program == 43) {
+    //if (Program == 43) {
         PromptOfficeRemainingBalance();
-    }
+    //}
 }
 
 function GridClickSetGenInfo() {
@@ -1359,7 +1359,6 @@ function Add(type) {
                 }
                 
                 if (balallotment >= 0) {
-                  
                     AddedItem.push(AcctCharge);
                     AddedItem.push(ppanonoffice);
 
@@ -1464,6 +1463,9 @@ function Save(type) {
             var NonOfficeTransaction = parseFloat((Number($("#_NonOfficeTransaction").val()) + Number(ClaimValue)) - Number(Amount)).toFixed(2);
         }
         else {
+            console.log(12)
+            console.log($("#_NonOfficeTransaction").val())
+            console.log(Amount)
             var NonOfficeTransaction = parseFloat((Number($("#_NonOfficeTransaction").val())) - Number(Amount)).toFixed(2);
         }
         console.log("Amount Length" + Amount.length);
@@ -1530,10 +1532,12 @@ function Save(type) {
         
         else if ((BalOfAllot < "0" || BalOfAllot < 0 || (Number(NonOfficeTransaction) < 0 && ppaNOffice > 0))  && $("#lguid").val() == 0)
         {
-           
+            console.log("123")
+            console.log(NonOfficeTransaction)
+            
             swal({
                 title: "Warning",
-                text: "Insufficient balance for this PPA/Accounts!",// + NonOfficeTransaction,
+                text: "Insufficient balance for this PPA/Accountsss!",// + NonOfficeTransaction,
                 type: "warning",
                 showCancelButton: false,
                 timer:2000,
@@ -2701,6 +2705,7 @@ function PromptOfficeRemainingBalance() {
                 swal(e.message, '', e.type)
             });
         }
+       
     }
     else {
         if (Program == 53) {
@@ -2715,7 +2720,7 @@ function PromptOfficeRemainingBalance() {
             });
         }
     }
-
+   
 }
 
 function ComputeSPO() {

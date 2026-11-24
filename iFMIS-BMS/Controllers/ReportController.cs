@@ -3218,7 +3218,7 @@ namespace iFMIS_BMS.Controllers
             return PartialView("pv_WFPLink");
         }
 
-        public void downloadpritems(int? office = 0, int? program = 0, int? account = 0, int? tyear = 0)
+        public void downloadpritems(int? office = 0, int? program = 0, int? account = 0, int? tyear = 0) //wfp preparation
         {
             using (SqlConnection con = new SqlConnection(Common.MyConn()))
             {
@@ -6099,7 +6099,7 @@ namespace iFMIS_BMS.Controllers
                 client.EnableSsl = true;
                 client.UseDefaultCredentials = true;
                 //client.Credentials = new System.Net.NetworkCredential("isadmin@pgas.ph", "EE942086-5ED5-464B-A709-1A5FD0EF23C8");
-                client.Credentials = new System.Net.NetworkCredential("isadmin@pgas.ph", "PgaS@*1038");
+                client.Credentials = new System.Net.NetworkCredential("isadmin@pgas.ph", "K7#mQ2!xTp9$");
                 client.Send(message);
                 return OTS;
             }
@@ -7188,7 +7188,7 @@ namespace iFMIS_BMS.Controllers
             }
             return Json(prog.ToDataSourceResult(request));
         }
-        public void downloadwfpritems(int? office = 0, int? program = 0, int? account = 0, int? tyear = 0)
+        public void downloadwfpritems(int? office = 0, int? program = 0, int? account = 0, int? tyear = 0) //wfp review/consolidation
         {
             using (SqlConnection con = new SqlConnection(Common.MyConn()))
             {

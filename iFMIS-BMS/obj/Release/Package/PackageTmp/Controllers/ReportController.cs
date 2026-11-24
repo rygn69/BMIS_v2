@@ -1049,7 +1049,7 @@ namespace iFMIS_BMS.Controllers
         }
         public ActionResult GetAccountactual([DataSourceRequest]DataSourceRequest request, int? year = 0, int? program = 0)
         {
-            string tempStr = "select AccountID,AccountName from ifmis.dbo.tbl_R_BMSProgramAccounts where ProgramID=" + program + " and AccountYear=" + year + " and ActionCode=1 order by AccountName";
+            string tempStr = "exec ifmis.dbo.sp_BMS_AllAccounts " + program + "," + year + "";
             DataTable dt = tempStr.DataSet();
 
             var result = new ContentResult();
@@ -6098,7 +6098,8 @@ namespace iFMIS_BMS.Controllers
                 client.Host = "mail.pgas.ph";
                 client.EnableSsl = true;
                 client.UseDefaultCredentials = true;
-                client.Credentials = new System.Net.NetworkCredential("isadmin@pgas.ph", "EE942086-5ED5-464B-A709-1A5FD0EF23C8");
+                //client.Credentials = new System.Net.NetworkCredential("isadmin@pgas.ph", "EE942086-5ED5-464B-A709-1A5FD0EF23C8");
+                client.Credentials = new System.Net.NetworkCredential("isadmin@pgas.ph", "K7#mQ2!xTp9$");
                 client.Send(message);
                 return OTS;
             }

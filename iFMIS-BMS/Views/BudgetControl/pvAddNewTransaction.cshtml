@@ -720,7 +720,12 @@
     function printcontrol(){
         var perprogram =0//$("#ExpenseClass").val()
         var OBRNoEntry=$("#OBRNoEntry").val()
+        var Program= $("#Program").val()
+        var accountid= $("#ObjOfExpenditure").val()
+        var tyear = $("#Years").val();
         //var peraccount=$("#ObjectExpenditure").val()
+        @*var urlgu="@Url.Action("lgusystem", "Report")";*@
+        var urlaccount="@Url.Action("checkAccountNo", "BudgetControl")";
         if (document.getElementById("ExpenseClass").checked){
             perprogram=1;
         }
@@ -732,10 +737,21 @@
             swal("","Please enter either control or ObR number!")
         }
         else{
-            $.ajax({
-                async: false,
-                dataType: 'html',
-                success: window.open("../Reports/ReportViewer.aspx?rid=38&OfficeID=" + $("#Office").val() + "&year=" + $("#Years").val() + "&controlno="+controlno+"&perprogram="+ perprogram +"")
+            $.get(urlaccount, { program: Program, accountid: accountid, tyear: tyear,controlno:controlno}, function (e) {
+                if (e == 1){ //per account
+                    $.ajax({
+                        async: false,
+                        dataType: 'html',
+                        success: window.open("../Reports/ReportViewer.aspx?rid=38&OfficeID=" + $("#Office").val() + "&year=" + $("#Years").val() + "&controlno="+controlno+"&perprogram=0")
+                    });
+                }
+                else{//per program
+                    $.ajax({
+                        async: false,
+                        dataType: 'html',
+                        success: window.open("../Reports/ReportViewer.aspx?rid=38&OfficeID=" + $("#Office").val() + "&year=" + $("#Years").val() + "&controlno="+controlno+"&perprogram="+ perprogram +"")
+                    });
+                }
             });
         }
     }
@@ -830,7 +846,7 @@
                 });
             }
         })
-        
+
         $("#OBRNoEntry").focus();
 
     });

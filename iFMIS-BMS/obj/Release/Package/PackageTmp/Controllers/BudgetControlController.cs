@@ -1178,5 +1178,24 @@ namespace iFMIS_BMS.Controllers
             result.ContentType = "application/json";
             return result;
         }
+        public int checkAccountNo(int program, int accountid, int tyear,string controlno)
+        {
+            try
+            {
+                using (SqlConnection con = new SqlConnection(Common.MyConn()))
+                {
+                    var data = 0;
+
+                    SqlCommand com = new SqlCommand(@"select COUNT(*) from (select distinct Budget_AcctCharge from  ifmis.dbo.tbl_T_BMSSubsidiaryLedger where obrno='"+ controlno + "' and ActionCode=1) as x", con);
+                    con.Open();
+                    data = Convert.ToInt32(com.ExecuteScalar());
+                    return data;
+                }
+            }
+            catch (Exception ex)
+            {
+                return 0;
+            }
+        }
     }
 }

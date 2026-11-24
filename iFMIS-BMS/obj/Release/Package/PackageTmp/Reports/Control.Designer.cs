@@ -212,7 +212,7 @@ namespace iFMIS_BMS.Reports
             tableGroup8.Groupings.Add(new Telerik.Reporting.Grouping(null));
             tableGroup8.Name = "detailTableGroup";
             this.table2.RowGroups.Add(tableGroup8);
-            this.table2.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Cm(19.456D), Telerik.Reporting.Drawing.Unit.Cm(1.138D));
+            this.table2.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Cm(19.457D), Telerik.Reporting.Drawing.Unit.Cm(1.137D));
             // 
             // textBox37
             // 
@@ -578,7 +578,8 @@ namespace iFMIS_BMS.Reports
             this.pictureBox1.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Cm(1.6D), Telerik.Reporting.Drawing.Unit.Cm(0D));
             this.pictureBox1.MimeType = "image/png";
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Cm(2.6D), Telerik.Reporting.Drawing.Unit.Cm(2.5D));
+            this.pictureBox1.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Cm(3.456D), Telerik.Reporting.Drawing.Unit.Cm(2.5D));
+            this.pictureBox1.Sizing = Telerik.Reporting.Drawing.ImageSizeMode.ScaleProportional;
             this.pictureBox1.Value = ((object)(resources.GetObject("pictureBox1.Value")));
             // 
             // pictureBox2

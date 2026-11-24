@@ -954,7 +954,7 @@ namespace iFMIS_BMS.BusinessLayer.Layers.BudgetControl
                     }
                     else if (formData.OBRNo != "0")
                     { //budget only
-                        query = @"dbo.sp_BMS_CurrentControl " + formData.OBRNo + ", " + formData.TransactionType + ", " + formData.ModeOfExpense + ", " + formData.Office + ", " + formData.FundTypeValue + ", " + formData.Program + ", " +
+                        query = @"dbo.sp_BMS_CurrentControl_sample " + formData.OBRNo + ", " + formData.TransactionType + ", " + formData.ModeOfExpense + ", " + formData.Office + ", " + formData.FundTypeValue + ", " + formData.Program + ", " +
                         "" + formData.ModePayment + ", " + formData.ObjOfExpenditure + ",'" + formData.TEVControlNoText + "'," + formData.TEVControlNo + ", " + formData.PPANonOffice + ", " + formData.SusProgram + ", '" + formData.OOEText + "', '" + ExpenseDescription + "'," +
                         "" + formData.SubsidyIncome + ", " + formData.AllotedAmountValue + "," + formData.ObligateValue + ", " + formData.DiffObliandAllocatedValue + ", " + formData.AmountInputed + "," + formData.BalanceAllotmentValue + ", " + formData.AccountCharged + ", " +
                         "" + formData.ActualAmountValue + "," + formData.AccntChargeValue + ", " + formData.BalanceAllotmentAppointmentValue + ", " + formData.UserID + ", '" + formData.OBRNoCenter + "','" + tmpID2 + "'";
